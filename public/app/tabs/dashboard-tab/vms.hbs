@@ -1,0 +1,59 @@
+{{! -------------------------------------------------------------------------- }}
+{{! Copyright 2002-2017, OpenNebula Project, OpenNebula Systems                }}
+{{!                                                                            }}
+{{! Licensed under the Apache License, Version 2.0 (the "License"); you may    }}
+{{! not use this file except in compliance with the License. You may obtain    }}
+{{! a copy of the License at                                                   }}
+{{!                                                                            }}
+{{! http://www.apache.org/licenses/LICENSE-2.0                                 }}
+{{!                                                                            }}
+{{! Unless required by applicable law or agreed to in writing, software        }}
+{{! distributed under the License is distributed on an "AS IS" BASIS,          }}
+{{! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   }}
+{{! See the License for the specific language governing permissions and        }}
+{{! limitations under the License.                                             }}
+{{! -------------------------------------------------------------------------- }}
+
+<div>
+  <fieldset class="large-font">
+    <legend>
+      <ul class="menu simple">
+        <li>
+          {{tr "VMs"}} <span class=" total_vms"></span> 
+        </li>
+        <li></li>
+        <li><span>{{tr "ACTIVE"}}</span> <span class=" active_vms success-color"></span></li>
+        <li><span>{{tr "PENDING"}}</span> <span class=" pending_vms"></span></li>
+        <li><span>{{tr "FAILED"}}</span> <span class=" failed_vms alert-color"></span></li>
+        <li></li>
+        <li>
+          <button class="button radius tiny show_vms_tab"> <i class="fa fa-lg fa-list fa-fw"></i></button>
+          {{#isTabActionEnabled "vms-tab" "VM.create_dialog"}}
+            <button class="button success radius tiny show_create_vm"> <i class="fa fa-lg fa-plus fa-fw"></i></button>
+          {{/isTabActionEnabled}}
+        </li>
+      </ul>
+    </legend>
+    <div class="row" id="dashboard_vm_accounting">
+      <input style="display:none;" value="vm" id="acct_group_by"/>
+      <div class="small-12 medium-4 columns">
+        <span>
+          {{tr "CPU hours"}}
+        </span>
+        <div class="large-12 columns centered graph text-center" id="acct_cpu_graph" style="height: 100px;">{{> ./empty-graph}}</div>
+      </div>
+      <div class="small-12 medium-4 columns">
+        <span>
+          {{tr "Memory GB hours"}}
+        </span>
+        <div class="large-12 columns centered graph text-center" id="acct_mem_graph" style="height: 100px;">{{> ./empty-graph}}</div>
+      </div>
+      <div class="small-12 medium-4 columns">
+        <span>
+          {{tr "Disk MB hours"}}
+        </span>
+        <div class="large-12 columns centered graph text-center" id="acct_disk_graph" style="height: 100px;">{{> ./empty-graph}}</div>
+      </div>
+    </div>
+  </fieldset>
+</div>

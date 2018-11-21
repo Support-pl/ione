@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Restart Sunstone WebServer",
+            "type": "shell",
+            "command": "ssh root@vcloud.support.by \"systemctl restart opennebula-sunstone && systemctl restart httpd\"",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Sunstone UI",
+            "type": "shell",
+            "command": "ssh root@vcloud.support.by \"cd /usr/lib/one/sunstone/public/ && grunt requirejs\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
