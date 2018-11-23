@@ -67,26 +67,31 @@ define(function(require) {
 
     function _setup(context) {
         var that = this;
-
+        var OpenNebula = require('opennebula');
         context.on("click", ".provision-pricing-table", function(){
             $(".provision-pricing-table").css('border','1px solid #f4f4f4');
             $(this).css('border','1px solid #2E9CB9');
+            var test = $(this).attr('opennebula_id');
+            console.log(test);
+            var template;
+            OpenNebula.Template.show({data:{'id':test},success: function(a,b){template=b}});
+            console.log(template);
         });
 
-        context.on("click",".butreinstall",function () {
-            $.ajax({
-                url: '/ansible',
-                type: 'GET',
-                success: function(response) {
-                    console.log(response);
-                    return response;
-                },
-                error: function(response) {
-                    return callbackError ?
-                        callbackError(request, OpenNebulaError(response)) : null;
-                }
-            })
-        })
+        // context.on("click",".butreinstall",function () {
+        //     $.ajax({
+        //         url: '/ansible',
+        //         type: 'GET',
+        //         success: function(response) {
+        //             console.log(response);
+        //             return response;
+        //         },
+        //         error: function(response) {
+        //             return callbackError ?
+        //                 callbackError(request, OpenNebulaError(response)) : null;
+        //         }
+        //     })
+        // })
 
 
         return false;

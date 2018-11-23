@@ -645,6 +645,12 @@ define(function(require) {
     "isSPICESupported": isSPICESupported,
     "getName": function(id){
       return OpenNebulaAction.getName(id, RESOURCE);
+    },
+    
+    // Additional actions
+    "reinstall" : function(params) {
+      var action_obj = params.data;
+      OpenNebulaAction.simple_action(params, RESOURCE, "reinstall", action_obj, "/vm/" + params.data.id + "/reinstall", true);
     }
   }
 

@@ -33,7 +33,7 @@ define(function(require) {
   }
 
   //Example: Simple action: publish. Simple action with action obj: deploy
-  var _simple_action = function(params, resource, method, action_obj, path) {
+  var _simple_action = function(params, resource, method, action_obj, path, pathReplace = false) {
     var callback = params.success;
     var callbackError = params.error;
     var id = params.data.id;
@@ -47,10 +47,11 @@ define(function(require) {
     };
 
     var reqPath = path ? path : resource.toLowerCase();
+    var url = pathReplace ? reqPath : reqPath + "/" + id + "/action";
     var cache_name = params.cache_name ? params.cache_name : resource;
 
     $.ajax({
-      url: reqPath + "/" + id + "/action",
+      url: url,
       type: "POST",
       contentType: "application/json; charset=utf-8",
       data: JSON.stringify(action),

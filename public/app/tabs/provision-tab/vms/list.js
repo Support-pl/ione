@@ -284,12 +284,19 @@ define(function(require) {
                    StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
           }
 
-          //кнопка реинсталла, отображение для одного пользователя
-          if(config.user_id == '197' && enabled('VM.reinstall')){
-            $(".provision_reinstall_confirm_button", context).show();
-          } else {
-            $(".provision_reinstall_confirm_button", context).hide();
+          function getvmtemplate(){
+            console.log (resultvm.VM.TEMPLATE.IMPORTED);
+
+              if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && config.user_id == '197' && enabled('VM.reinstall')){
+                  $(".provision_reinstall_confirm_button", context).show();
+              } else {
+                  $(".provision_reinstall_confirm_button", context).hide();
+              }
           }
+
+            var resultvm = 0;
+            OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b}});
+            setTimeout(getvmtemplate,500);
 
           if (enabled("VM.reboot") || enabled("VM.reboot_hard")){
             $(".provision_reboot_confirm_button", context).show();
@@ -729,6 +736,7 @@ define(function(require) {
       context.on("click", ".provision_reinstall_confirm_button", function(){
           var button = $(this);
           var vm_id = $(".provision_info_vm", context).attr("vm_id");
+          console.log(vm_id);
 
           var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
           dialog.setElement(that.element);
