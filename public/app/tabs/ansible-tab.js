@@ -44,7 +44,7 @@ define(function(require) {
 
   var Tab = {
     tabId: TAB_ID,
-    title: "Don't click lol"/*"Ansible Playbooks"*/,
+    title: Locale.tr("Automatization"),
     listHeader: Locale.tr("Playbooks"),
     infoHeader: Locale.tr("Playbook"),
     subheader: '<span>\

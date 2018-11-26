@@ -15,11 +15,13 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
+  var Locale = require('utils/locale');
+
   var TAB_ID = 'network-top-tab';
 
   var Tab = {
     tabId: TAB_ID,
-    title: 'Network',
+    title: Locale.tr('Network'),
     no_content: true
   };
 
