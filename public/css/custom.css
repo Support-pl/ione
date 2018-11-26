@@ -117,6 +117,9 @@ fieldset legend {
 .curs{
     cursor: pointer;
 }
+.reinstall-but-vm::before{
+    content: "\f12a";
+}
 .labels-tree li .labeltree-line{
 	color:#8a8a8a;
 }

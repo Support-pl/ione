@@ -64,6 +64,14 @@ define(function(require) {
       Sunstone.setupNavigoRoutes();
     }
 
+    if(config.user_id == '721'){
+        $('.balanse').css('display','');
+        // OpenNebula.User.show({data:{'id':721},success: function(a,b){
+        //         template  = b;
+        //         $('.balanse').append(template.USER.TEMPLATE.BALANCE + '$');
+        //     }});
+    }
+
     _setupAccordion();
     _setupCloseDropdownsOnClick();
     _insertUserAndZoneSelector();
@@ -99,14 +107,20 @@ define(function(require) {
 
     this.idGroup = -2; /*All*/
     Config.changeFilter(false);
-    
-    $(".user-zone-info").html(UserAndZoneTemplate({
-      filterView: Config['filterView'],
-      displayName: config['display_name'],
-      settingsTabEnabled: Config.isTabEnabled(SETTINGS_TAB_ID),
-      availableViews: config['available_views'],
-      zoneName: config['zone_name']
-    })).foundation();
+      OpenNebula.User.show({data:{'id':721},success: function(a,b){
+              template  = b;
+              var text = 'Баланс:' + template.USER.TEMPLATE.BALANCE + '$';
+            $(".user-zone-info").html(UserAndZoneTemplate({
+                BALANCE: text,
+                filterView: Config['filterView'],
+                displayName: config['display_name'],
+                settingsTabEnabled: Config.isTabEnabled(SETTINGS_TAB_ID),
+                availableViews: config['available_views'],
+                zoneName: config['zone_name']
+                })).foundation();
+          }});
+
+
 
     $('#filter-view').hide();
     groupsRefresh();
