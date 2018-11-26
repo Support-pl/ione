@@ -81,25 +81,27 @@
 </div>
 <div class="large-6 columns">{{{permissionsTableHTML}}}</div>
 </div>
+{{#if ShowVCenterInfo}}
 <div class="row vcenter">
-<div class="large-9 columns">{{{templateTableVcenterHTML}}}</div>
+  <div class="large-9 columns">{{{templateTableVcenterHTML}}}</div>
 </div>
+{{/if}}
 <div class="row">
-<div class="large-9 columns">{{{templateTableHTML}}}</div>
+  <div class="large-9 columns">{{{templateTableHTML}}}</div>
 </div>
-{{#if monitoringTableContentHTML}}
+{{#if ShowMonitoringTableContentHTML}}
 <div class="row">
-<div class="large-9 columns">
-  <table class="dataTable">
-    <thead>
-      <tr>
-        <th colspan="2">{{tr "Monitoring"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{{monitoringTableContentHTML}}}
-    </tbody>
-  </table>
-</div>
+  <div class="large-9 columns">
+    <table class="dataTable">
+      <thead>
+        <tr>
+          <th colspan="2">{{tr "Monitoring"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{{monitoringTableContentHTML}}}
+      </tbody>
+    </table>
+  </div>
 </div>
 {{/if}}

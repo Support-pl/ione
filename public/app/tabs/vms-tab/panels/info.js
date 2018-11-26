@@ -124,6 +124,8 @@ define(function(require) {
       monitoringTableContentHTML = Humanize.prettyPrintJSON(monitoring);
     }
 
+    var AdminView = !(~config.user_config.default_view.indexOf('user') || ~config.user_config.default_view.indexOf('cloud'))
+    
     return TemplateInfo({
       'element': this.element,
       'renameTrHTML': renameTrHTML,
@@ -138,7 +140,9 @@ define(function(require) {
       'templateTableVcenterHTML': templateTableVcenterHTML,
       'templateTableHTML': templateTableHTML,
       'monitoringTableContentHTML': monitoringTableContentHTML,
-      'vrouterHTML': vrouterHTML
+      'vrouterHTML': vrouterHTML,
+      'ShowVCenterInfo': AdminView,
+      'ShowMonitoringTableContentHTML': (monitoringTableContentHTML && AdminView)
     });
   }
 
