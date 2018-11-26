@@ -16,6 +16,7 @@
 
 <div id="{{dialogId}}" class="reveal small" data-reveal>
   <div class="row">
+  <div class="small-12 columns"><span style="font-weight: bold; font-size: 15px;">Reinstall тест описания</div>
   <div class="small-12 columns">
     <div id="provision_vm_instantiate_templates_table_wrapper" class="dataTables_wrapper dt-foundation no-footer">
     <table id="provision_vm_instantiate_templates_table" class="dataTable no-footer" role="grid">
@@ -24,12 +25,17 @@
     </div></table></div>
   </div>
   <div class="div_reinstall inputuser" style="display: none;">
-    Username <input class="reinstallinput" type="text" >
+  <span style="">Введите логин главного пользователя (root)</span><br>
+    Username <input id='user_vm' class="reinstallinput" type="text" >
   </div>
   <div class="div_reinstall unputpass" style="display: none;">
-    Password <input class="reinstallinput" type="password">
+  <span style="">Введите пароль</span><br>
+    Password <input id='pass_vm' class="reinstallinput" type="password">
   </div>
   <div class="alert"><span class="large-12 columns colorred" style="color:red"> ВНИМАНИЕ!!!! При переустановке что то происходит!!! (заменить) </span></div>
-  <div class="buttonwork"> <input type="submit" class="butreinstall" value="Reinstall"></div>
+  <div class="large-3 medium-6 columns">
+        <button class="button success expanded" type="submit">Reinstall</button>
+        </div>
+
   </div>
 </div>

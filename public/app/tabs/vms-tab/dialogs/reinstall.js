@@ -70,28 +70,53 @@ define(function(require) {
         var OpenNebula = require('opennebula');
         context.on("click", ".provision-pricing-table", function(){
             $(".provision-pricing-table").css('border','1px solid #f4f4f4');
+            $(".provision-pricing-table").removeClass('checktemp');
             $(this).css('border','1px solid #2E9CB9');
-            var test = $(this).attr('opennebula_id');
-            console.log(test);
-            var template;
-            OpenNebula.Template.show({data:{'id':test},success: function(a,b){template=b}});
-            console.log(template);
+            $(this).addClass('checktemp');
+            var id_template = $(this).attr('opennebula_id');
+            console.log(id_template);
+            OpenNebula.Template.show({data:{'id':id_template},success: function(a,b){
+                    $('.inputuser').css('display','none');
+                    $('.unputpass').css('display','none');
+                    for (key in b.VMTEMPLATE.TEMPLATE.USER_INPUTS) {
+                        if(~b.VMTEMPLATE.TEMPLATE.USER_INPUTS[key].indexOf('password')){
+                            $('.unputpass').css('display','');
+                        }
+                        if(~b.VMTEMPLATE.TEMPLATE.USER_INPUTS[key].indexOf('User')){
+                            $('.inputuser').css('display','');
+                        }
+
+                    }
+                }});
         });
 
-        // context.on("click",".butreinstall",function () {
-        //     $.ajax({
-        //         url: '/ansible',
-        //         type: 'GET',
-        //         success: function(response) {
-        //             console.log(response);
-        //             return response;
-        //         },
-        //         error: function(response) {
-        //             return callbackError ?
-        //                 callbackError(request, OpenNebulaError(response)) : null;
-        //         }
-        //     })
-        // })
+        context.on("click",".butreinstall",function () {
+            var OpenNebula = require('opennebula');
+            var username = $('#user_vm').val();
+            var password = $('#pass_vm').val();
+            var vm_id = $(".provision_info_vm").attr("vm_id");
+            var id_template = $('.checktemp').attr('opennebula_id');
+            if($('#pass_vm').val() == ''){
+                alert('введите пароль');
+            }else if($('#user_vm').val() == ''){
+                OpenNebula.VM.reinstall({
+                    data: {
+                        "id":vm_id, "template_id":id_template, "password": password
+                    },
+                    success: function(r, response){ console.log(r); console.log(response); },
+                    error: function(r, response){ console.log(response); }
+                });
+            }else{
+                OpenNebula.VM.reinstall({
+                    data: {
+                        "id":vm_id, "template_id":id_template, "username": username, "password": password
+                    },
+                    success: function(r, response){ console.log(r); console.log(response); },
+                    error: function(r, response){ console.log(response); }
+                });
+            }
+
+        })
 
 
         return false;

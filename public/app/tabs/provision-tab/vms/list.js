@@ -284,19 +284,15 @@ define(function(require) {
                    StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
           }
 
-          function getvmtemplate(){
-            console.log (resultvm.VM.TEMPLATE.IMPORTED);
-
-              if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && config.user_id == '197' && enabled('VM.reinstall')){
-                  $(".provision_reinstall_confirm_button", context).show();
-              } else {
-                  $(".provision_reinstall_confirm_button", context).hide();
-              }
-          }
 
             var resultvm = 0;
-            OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b}});
-            setTimeout(getvmtemplate,500);
+            OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
+                    if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && config.user_id == '197' && enabled('VM.reinstall')){
+                        $(".provision_reinstall_confirm_button", context).show();
+                    } else {
+                        $(".provision_reinstall_confirm_button", context).hide();
+                    }
+            }});
 
           if (enabled("VM.reboot") || enabled("VM.reboot_hard")){
             $(".provision_reboot_confirm_button", context).show();
@@ -736,31 +732,26 @@ define(function(require) {
       context.on("click", ".provision_reinstall_confirm_button", function(){
           var button = $(this);
           var vm_id = $(".provision_info_vm", context).attr("vm_id");
-          console.log(vm_id);
 
           var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
           dialog.setElement(that.element);
           dialog.show();
-
+          $('.listos').html('');
           var template;
-          OpenNebula.Template.list({data:{},success: function(a,b){template=b}});
-
-          function func(){
-            $('.lostos').html('');
-              for (key in template){
-                  if(template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE'){
-                      var html = '<div class="column"> ' +
-                          '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="'+template[key].VMTEMPLATE.ID+'"> ' +
-                          '<li class="provision-title" title="' + template[key].VMTEMPLATE.NAME + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.NAME+'</span></li> ' +
-                          '<li class="provision-bullet-item"><span class="provision-logo"><img src="'+template[key].VMTEMPLATE.TEMPLATE.LOGO+'"></span></li> ' +
-                          '<li class="provision-bullet-item-last text-left"></li> ' +
-                          '</ul> ' +
-                          '</div>';
-                      $('.listos').append(html);
-                  }
-              };
-          }
-          setTimeout(func,1000);
+          OpenNebula.Template.list({data:{},success: function(a,b){template=b;
+                  for (key in template){
+                      if(template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE'){
+                          var html = '<div class="column"> ' +
+                              '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="'+template[key].VMTEMPLATE.ID+'"> ' +
+                              '<li class="provision-title" title="' + template[key].VMTEMPLATE.NAME + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.NAME+'</span></li> ' +
+                              '<li class="provision-bullet-item"><span class="provision-logo"><img src="'+template[key].VMTEMPLATE.TEMPLATE.LOGO+'"></span></li> ' +
+                              '<li class="provision-bullet-item-last text-left"></li> ' +
+                              '</ul> ' +
+                              '</div>';
+                          $('.listos').append(html);
+                      }
+                  };
+          }});
 
 
           return false;
