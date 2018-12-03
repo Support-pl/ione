@@ -134,7 +134,6 @@ define(function(require) {
       if (force) {
         _clearCache(cache_name);
       }
-
       if (!force &&
           listCache[cache_name] &&
           listCache[cache_name]["timestamp"] + CACHE_EXPIRE > new Date().getTime()) {
@@ -196,9 +195,9 @@ define(function(require) {
 
             if (callback) {
               //console.log(cache_name+" list. Callback called");
-              try{
+              try {
                 callback(request, list, response);
-              }catch(err){
+              } catch(err) {
                 console.error(err);
               }
             }

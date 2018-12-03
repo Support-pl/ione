@@ -15,59 +15,123 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-  /*
-    DEPENDENCIES
-   */
+    /*
+      DEPENDENCIES
+     */
 
-  var CommonDataTable = require('./datatable-common');
+    // OpenNebula.Ansible.list({
+    //     options: {force: true}, success: function (a, result) {
+    //         for (key in result) {
+    //             html += '<div class="playbook">' + result[key].ANSIBLE.name + '</div>';
+    //         }
+    //         $('.playbooks').append(html);
+    //     }
+    // });
 
-  /*
-    CONSTANTS
-   */
+    var TabDataTable = require('utils/tab-datatable');
+    var SunstoneConfig = require('sunstone-config');
+    var Locale = require('utils/locale');
+    var LabelsUtils = require('utils/labels/utils');
 
-  var RESOURCE = "Template";
-  var TAB_NAME = require('./tabId');
+    /*
+      CONSTANTS
+     */
 
-  /*
-    CONSTRUCTOR
-   */
+    var RESOURCE = "Ansible";
+    var XML_ROOT = "ansible_playbook";
+    var TAB_NAME = require('./tabId');
+    var LABELS_COLUMN = 7;
+    var TEMPLATE_ATTR = 'TEMPLATE';
 
-  function Table(dataTableId, conf) {
-    CommonDataTable.call(this, RESOURCE, TAB_NAME, dataTableId, conf);
-    this.totalTemplates = 0;
-  };
+    /*
+      CONSTRUCTOR
+     */
 
-  Table.prototype = Object.create(CommonDataTable.prototype);
-  Table.prototype.constructor = Table;
-  Table.prototype.elementArray = _elementArray;
-  Table.prototype.preUpdateView = _preUpdateView;
-  Table.prototype.postUpdateView = _postUpdateView;
+    function Table(dataTableId, conf) {
+        this.conf = conf || {};
+        this.tabId = TAB_NAME;
+        this.dataTableId = dataTableId;
+        this.resource = RESOURCE;
+        this.xmlRoot = XML_ROOT;
+        this.labelsColumn = LABELS_COLUMN;
 
-  return Table;
+        this.dataTableOptions = {
+            "bAutoWidth": false,
+            "bSortClasses" : false,
+            "bDeferRender": true,
+            "aoColumnDefs": [
+                {"bSortable": false, "aTargets": ["check"] },
+                {"sWidth": "35px", "aTargets": [0]},
+                {"bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(TAB_NAME)},
+                {"bVisible": false, "aTargets": ['_all']},
+                {"sType": "num", "aTargets": [1, 3, 4, 5]}
+            ]
+        };
+        console.log(this.dataTableOptions);
 
-  /*
-    FUNCTION DEFINITIONS
-   */
+        this.columns = [
+            Locale.tr("id"),
+            Locale.tr("description"),
+            Locale.tr("extra_data"),
+            Locale.tr("gid"),
+            Locale.tr("body"),
+            Locale.tr("name"),
+            Locale.tr("uid")
+        ];
 
-  function _elementArray(element_json) {
-    var element = element_json[this.xmlRoot];
+        this.selectOptions = {
 
-    if (element.TEMPLATE.VROUTER != undefined &&
-        element.TEMPLATE.VROUTER.toUpperCase() == "YES"){
+        };
 
-      return false;
+        this.totalClusters = 0;
+
+        console.log(this);
+        TabDataTable.call(this);
     }
 
-    this.totalTemplates++;
+    Table.prototype = Object.create(TabDataTable.prototype);
+    Table.prototype.constructor = Table;
+    Table.prototype.elementArray = _elementArray;
+    Table.prototype.preUpdateView = _preUpdateView;
+    Table.prototype.postUpdateView = _postUpdateView;
 
-    return this.elementArrayCommon(element_json);
-  }
+    console.log(Table);
 
-  function _preUpdateView() {
-    this.totalTemplates = 0;
-  }
+    return Table;
 
-  function _postUpdateView() {
-    $(".total_templates").text(this.totalTemplates);
-  }
+
+    /*
+      FUNCTION DEFINITIONS
+     */
+
+    function _elementArray(element_json) {
+        var element = element_json[XML_ROOT];
+        console.log(element);
+        this.totalClusters++;
+        return [
+            '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
+            element + '" name="selected_items" value="' +
+            element + '"/>'
+
+        ];
+    }
+
+    function _lengthOf(ids){
+        var l = 0;
+        if ($.isArray(ids))
+            l = ids.length;
+        else if (!$.isEmptyObject(ids))
+            l = 1;
+
+        return l;
+    }
+
+    function _preUpdateView() {
+        this.totalClusters = 0;
+    }
+
+    function _postUpdateView() {
+        $(".total_clusters").text(this.totalClusters);
+    }
+
 });

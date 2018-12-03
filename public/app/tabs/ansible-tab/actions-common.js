@@ -18,12 +18,12 @@ define(function(require) {
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
   var Locale = require('utils/locale');
-  var OpenNebulaResource = require('opennebula/template');
+  var OpenNebulaResource = require('opennebula/ansible');
   var CommonActions = require('utils/common-actions');
   var OpenNebulaAction = require('opennebula/action');
   var Navigation = require('utils/navigation');
 
-  var XML_ROOT = "VMTEMPLATE"
+  var XML_ROOT = "ANSIBLE"
 
   function Actions(tabId, resource, ids){
 

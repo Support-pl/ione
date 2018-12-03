@@ -15,24 +15,33 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-  var Actions = require('tabs/templates-tab/actions-common');
+    var Sunstone = require('sunstone');
+    var Notifier = require('utils/notifier');
+    var Locale = require('utils/locale');
+    var DataTable = require('./datatable');
+    var OpenNebulaResource = require('opennebula/ansible');
+    var OpenNebulaAction = require('opennebula/action');
+    var CommonActions = require('utils/common-actions');
+    var Navigation = require('utils/navigation');
 
-  var TAB_ID = require('tabs/templates-tab/tabId');
-  var CREATE_DIALOG_ID = require('tabs/templates-tab/form-panels/create/formPanelId');
-  var CLONE_DIALOG_ID = require('tabs/templates-tab/dialogs/clone/dialogId');
-  var INSTANTIATE_DIALOG_ID = require('tabs/templates-tab/form-panels/instantiate/formPanelId');
-  var IMPORT_DIALOG_ID = require('tabs/templates-tab/form-panels/import/formPanelId');
-  var CONFIRM_DIALOG_ID = require('utils/dialogs/generic-confirm/dialogId');
+    var RESOURCE = "Ansible";
+    var XML_ROOT = "ansible_playbook";
+    var TAB_ID = require('./tabId');
 
-  var RESOURCE = "Template"
+    var _commonActions = new CommonActions(OpenNebulaResource, RESOURCE, TAB_ID,
+        XML_ROOT, Locale.tr("Ansible created"));
 
-  return Actions(TAB_ID, RESOURCE, 
-    {
-      'TAB_ID'  : TAB_ID,
-      'CREATE_DIALOG_ID'  : CREATE_DIALOG_ID,
-      'CLONE_DIALOG_ID' : CLONE_DIALOG_ID,
-      'INSTANTIATE_DIALOG_ID' : INSTANTIATE_DIALOG_ID,
-      'IMPORT_DIALOG_ID'  : IMPORT_DIALOG_ID,
-      'CONFIRM_DIALOG_ID' : CONFIRM_DIALOG_ID,
-    });
+    var _actions = {
+        "Ansible.list" : _commonActions.list(),
+        "Ansible.show" : _commonActions.show(),
+        "Ansible.refresh" : _commonActions.refresh(),
+        "Ansible.delete" : _commonActions.del(),
+        "Ansible.update_template" : _commonActions.updateTemplate(),
+        "Ansible.append_template" : _commonActions.appendTemplate(),
+        "Ansible.update_dialog" : _commonActions.checkAndShowUpdate(),
+        "Ansible.rename": _commonActions.singleAction('rename'),
+
+    };
+
+    return _actions;
 });

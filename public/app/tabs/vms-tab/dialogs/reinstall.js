@@ -68,6 +68,11 @@ define(function(require) {
     function _setup(context) {
         var that = this;
         var OpenNebula = require('opennebula');
+        var Locale = require('utils/locale');
+        var Notifier = require('utils/notifier');
+
+        var ProvisionVmsList = require('tabs/provision-tab/vms/list');
+        
         context.on("click", ".provision-pricing-table", function(){
             $(".provision-pricing-table").css('border','1px solid #f4f4f4');
             $(".provision-pricing-table").removeClass('checktemp');
@@ -77,45 +82,88 @@ define(function(require) {
             console.log(id_template);
             OpenNebula.Template.show({data:{'id':id_template},success: function(a,b){
                     $('.inputuser').css('display','none');
-                    $('.unputpass').css('display','none');
+                    $('.inputpass').css('display','none');
+                    $('#vm_username').attr('checkus','false');
+                    $('.inputrootpass').addClass('hidden');
                     for (key in b.VMTEMPLATE.TEMPLATE.USER_INPUTS) {
                         if(~b.VMTEMPLATE.TEMPLATE.USER_INPUTS[key].indexOf('password')){
-                            $('.unputpass').css('display','');
+                            $('.inputpass').css('display','');
                         }
                         if(~b.VMTEMPLATE.TEMPLATE.USER_INPUTS[key].indexOf('User')){
                             $('.inputuser').css('display','');
+                            $('#vm_username').attr('checkus','true');
                         }
-
+                    }
+                    if($('#vm_username').attr('checkus') != 'true'){
+                        $('.inputrootpass').removeClass('hidden');
                     }
                 }});
         });
 
-        context.on("click",".butreinstall",function () {
+        context.on("click",".button-reinstall-dialog",function () {
             var OpenNebula = require('opennebula');
-            var username = $('#user_vm').val();
-            var password = $('#pass_vm').val();
+            var username = $('#vm_username').val();
+            var password = $('#vm_password').val();
             var vm_id = $(".provision_info_vm").attr("vm_id");
             var id_template = $('.checktemp').attr('opennebula_id');
-            if($('#pass_vm').val() == ''){
-                alert('введите пароль');
-            }else if($('#user_vm').val() == ''){
-                OpenNebula.VM.reinstall({
-                    data: {
-                        "id":vm_id, "template_id":id_template, "password": password
-                    },
-                    success: function(r, response){ console.log(r); console.log(response); },
-                    error: function(r, response){ console.log(response); }
-                });
-            }else{
-                OpenNebula.VM.reinstall({
-                    data: {
-                        "id":vm_id, "template_id":id_template, "username": username, "password": password
-                    },
-                    success: function(r, response){ console.log(r); console.log(response); },
-                    error: function(r, response){ console.log(response); }
-                });
+            if(password == '') {
+                alert(Locale.tr("Password-field cannot be empty") + '!');
+            } else if($('#vm_username').attr('checkus') == 'true' && username == '') {
+                alert(Locale.tr("Username-field cannot be empty") + '!');
+            } else {
+                $('.reinstall-first-step').addClass('hidden');
+                $('.reinstall-second-step').removeClass('hidden');
+            }
+        })
+
+        context.on("click",".button-reinstall-confirm",function () {
+            var OpenNebula = require('opennebula');
+            var username = $('#vm_username').val();
+            var password = $('#vm_password').val();
+            var vm_id = $(".provision_info_vm").attr("vm_id");
+            var id_template = $('.checktemp').attr('opennebula_id');
+
+            function refresh(){
+                location.reload();
+                OpenNebula.Action.clear_cache("VM");
+                ProvisionVmsList.show(0);
+            }
+            function parse_result(response){
+                if(response.error != undefined){
+                    Notifier.notifyError('ReinstallError: ' + response.error);
+                    var id = $('#reinstalldialogvm').data('close');
+                    if (id) {
+                      triggers($('#reinstalldialogvm'), 'close');
+                    } else {
+                      $('#reinstalldialogvm').trigger('close.zf.trigger');
+                    };
+                } else {
+                    refresh();
+                }
             }
 
+            if(username == ''){
+                OpenNebula.VM.reinstall({
+                    data: {
+                        id:vm_id, template_id:id_template, password:password
+                    },
+                    success: function(r, response){ parse_result(response) },
+                    error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                });
+            } else {
+                OpenNebula.VM.reinstall({
+                    data: {
+                        id:vm_id, template_id:id_template, username:username, password:password
+                    },
+                    success: function(r, response){ parse_result(response) },
+                    error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                });
+            }
+        });
+
+        context.on("click",".button-reinstall-cancel",function () {
+            $('.reinstall-first-step').removeClass('hidden');
+            $('.reinstall-second-step').addClass('hidden');
         })
 
 

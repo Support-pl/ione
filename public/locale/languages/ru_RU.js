@@ -109,7 +109,7 @@ locale={
     "Datastore created":"Хранилище создано",
     "Virtual Machines":"Вирт. машины",
     "There are no Virtual Machines":"Виртуальные Машины отсутствуют",
-    "ALL":"ВСЕ",
+    "ALL":"Все",
     "GUEST STATE":"Состояние гостевой ОС",
     "VMWARETOOLS RUNNING STATUS":"Статус VMWare Tools",
     "VMWARETOOLS VERSION":"Версия VMWare Tools",
@@ -1543,5 +1543,9 @@ locale={
     "Snapshot alert two":"автоматически",
     "Snapshot alert three":"удаляются через 24 часа после их создания! Учитывайте это, при использовании снапшотов(снимков) в качестве подстраховки во время проведения технических работ.",
     "Reinstall":"Переустановка",
-    "Automatization":"Автоматизация"
+    "Automatization":"Автоматизация",
+    "Administrator":"Администратор",
+    "For example, Admin":"Например, Администратор",
+    "Password-field cannot be empty":"Поле ввода Пароля не может быть пустым",
+    "Username-field cannot be empty":"Поле ввода Имени Пользователя не может быть пустым"
 }

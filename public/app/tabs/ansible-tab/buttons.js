@@ -18,69 +18,62 @@ define(function(require) {
   var Locale = require('utils/locale');
 
   var Buttons = {
-    "Template.refresh" : {
+    "Ansible.refresh" : {
       type: "action",
       layout: "refresh",
       alwaysActive: true
     },
-    "Template.create_dialog" : {
+    "Ansible.create_dialog" : {
       type: "create_dialog",
       layout: "create"
     },
-    "Template.import_dialog" : {
-      type: "create_dialog",
-      layout: "create",
-      text:  Locale.tr("Import"),
-      icon: '<i class="fa fa-download"/>',
-      alwaysActive: true
-    },
-    "Template.update_dialog" : {
+    "Ansible.update_dialog" : {
       type: "action",
       layout: "main",
       text: Locale.tr("Update")
     },
-    "Template.instantiate_vms" : {
+    "Ansible.run" : {
       type: "action",
       layout: "main",
       text: Locale.tr("Instantiate")
     },
-    "Template.chown" : {
+    "Ansible.chown" : {
       type: "confirm_with_select",
       text: Locale.tr("Change owner"),
       layout: "user_select",
       select: "User",
       tip: Locale.tr("Select the new owner"),
     },
-    "Template.chgrp" : {
+    "Ansible.chgrp" : {
       type: "confirm_with_select",
       text: Locale.tr("Change group"),
       layout: "user_select",
       select: "Group",
       tip: Locale.tr("Select the new group"),
     },
-    "Template.clone_dialog" : {
+    "Ansible.clone_dialog" : {
       type: "action",
       layout: "main",
       text: Locale.tr("Clone")
     },
-    "Template.share" : {
+    "Ansible.share" : {
       type: "confirm",
       layout: "user_select",
       text: Locale.tr("Share"),
       tip: Locale.tr("The template, along with any image referenced by it, will be shared with the group's users. Permission changed: GROUP USE"),
     },
-    "Template.unshare" : {
+    "Ansible.unshare" : {
       type: "confirm",
       layout: "user_select",
       text: Locale.tr("Unshare"),
       tip: Locale.tr("The template, along with any image referenced by it, will be unshared with the group's users. Permission changed: GROUP USE"),
     },
-    "Template.delete_dialog" : {
+    "Ansible.delete_dialog" : {
       type: "action",
       layout: "del",
       text: Locale.tr("Delete")
     },
-    "Template.edit_labels" : {
+    "Ansible.edit_labels" : {
       layout: "labels",
     }
   };

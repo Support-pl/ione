@@ -14,7 +14,12 @@
 {{! limitations under the License.                                             }}
 {{! -------------------------------------------------------------------------- }}
 
-<ul class="dropdown menu" data-dropdown-menu data-alignment="right">
+<ul class="dropdown menu divfrombalance" data-dropdown-menu data-alignment="right">
+{{#if BALANCE}}
+<li>
+<span class='balance' style='display: none;' ></span>
+</li>
+{{/if}}
   {{#if filterView}}
   <li>
     <a class="thin-font" href="#" id="filter-view">

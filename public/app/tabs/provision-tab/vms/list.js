@@ -287,7 +287,7 @@ define(function(require) {
 
             var resultvm = 0;
             OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
-                    if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && config.user_id == '197' && enabled('VM.reinstall')){
+                    if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
                         $(".provision_reinstall_confirm_button", context).show();
                     } else {
                         $(".provision_reinstall_confirm_button", context).hide();
@@ -422,13 +422,16 @@ define(function(require) {
                 '</span>'+
               '</li>');
 
-          var vcenter_info = "";
-          if(data.MONITORING.VCENTER_GUEST_STATE){
-            vcenter_info = "<thead><tr><th>" + Locale.tr("vCenter information") + "</th></tr></thead><tbody>" +
-            "<tr><td>" + Locale.tr("GUEST STATE") + "</td><td>" + data.MONITORING.VCENTER_GUEST_STATE + "</td>" +
-             "<td>" + Locale.tr("VMWARETOOLS RUNNING STATUS") + "</td><td>" +
-             data.MONITORING.VCENTER_VMWARETOOLS_RUNNING_STATUS + "</td></tr>" +
-             "<tr><td>" + Locale.tr("VMWARETOOLS VERSION") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION + "</td><td>" + Locale.tr("VMWARETOOLS VERSION STATUS") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION_STATUS + "</td></tr></tbody>";
+          var AdminView = !(~config.user_config.default_view.indexOf('user') || ~config.user_config.default_view.indexOf('cloud'))
+          if(AdminView){
+            var vcenter_info = "";
+            if(data.MONITORING.VCENTER_GUEST_STATE){
+              vcenter_info = "<thead><tr><th>" + Locale.tr("vCenter information") + "</th></tr></thead><tbody>" +
+              "<tr><td>" + Locale.tr("GUEST STATE") + "</td><td>" + data.MONITORING.VCENTER_GUEST_STATE + "</td>" +
+               "<td>" + Locale.tr("VMWARETOOLS RUNNING STATUS") + "</td><td>" +
+               data.MONITORING.VCENTER_VMWARETOOLS_RUNNING_STATUS + "</td></tr>" +
+               "<tr><td>" + Locale.tr("VMWARETOOLS VERSION") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION + "</td><td>" + Locale.tr("VMWARETOOLS VERSION STATUS") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION_STATUS + "</td></tr></tbody>";
+            }
           }
 
           $(".provision-sunstone-vcenter-list", context).html(vcenter_info);
@@ -743,7 +746,7 @@ define(function(require) {
                       if(template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE'){
                           var html = '<div class="column"> ' +
                               '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="'+template[key].VMTEMPLATE.ID+'"> ' +
-                              '<li class="provision-title" title="' + template[key].VMTEMPLATE.NAME + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.NAME+'</span></li> ' +
+                              '<li class="provision-title" title="' + template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION+'</span></li> ' +
                               '<li class="provision-bullet-item"><span class="provision-logo"><img src="'+template[key].VMTEMPLATE.TEMPLATE.LOGO+'"></span></li> ' +
                               '<li class="provision-bullet-item-last text-left"></li> ' +
                               '</ul> ' +

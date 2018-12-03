@@ -23,6 +23,7 @@ define(function(require) {
       Error  = require('./opennebula/error'),
 
       Acl             = require('./opennebula/acl'),
+      Ansible         = require('./opennebula/ansible'),
       Cluster         = require('./opennebula/cluster'),
       Datastore       = require('./opennebula/datastore'),
       Group           = require('./opennebula/group'),
@@ -66,6 +67,7 @@ define(function(require) {
     'Auth': Auth,
     'Error': Error,
     'Acl': Acl,
+    'Ansible': Ansible,
     'Cluster': Cluster,
     'Datastore': Datastore,
     'Group': Group,
