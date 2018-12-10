@@ -46,14 +46,8 @@ define(function(require) {
         OpenNebulaAction.simple_action(params, RESOURCE, "chmod", action_obj);
       },
       "update" : function(params) {
-        var action_obj = {"template_raw" : params.data.extra_param};
+        var action_obj = params.data.extra_param;
         OpenNebulaAction.simple_action(params, RESOURCE, "update", action_obj);
-      },
-      "publish" : function(params) {
-        OpenNebulaAction.simple_action(params, RESOURCE, "publish");
-      },
-      "unpublish" : function(params) {
-        OpenNebulaAction.simple_action(params, RESOURCE, "unpublish");
       },
       "run" : function(params) {
         var action_obj = params.data.extra_param ? params.data.extra_param : {};
@@ -63,10 +57,6 @@ define(function(require) {
         var name = params.data.extra_param ? params.data.extra_param : "";
         var action_obj = {"name" : name};
         OpenNebulaAction.simple_action(params, RESOURCE, "clone", action_obj);
-      },
-      "rename" : function(params) {
-        var action_obj = params.data.extra_param;
-        OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
       }
     }
   
