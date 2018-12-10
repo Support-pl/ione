@@ -65,12 +65,9 @@ define(function(require) {
     }
 
     if(config.user_id == '721'){
-        $('.balanse').css('display','');
-        // OpenNebula.User.show({data:{'id':721},success: function(a,b){
-        //         template  = b;
-        //         $('.balanse').append(template.USER.TEMPLATE.BALANCE + '$');
-        //     }});
+        $('.balance').css('display','');
     }
+
 
     _setupAccordion();
     _setupCloseDropdownsOnClick();
@@ -107,20 +104,24 @@ define(function(require) {
 
     this.idGroup = -2; /*All*/
     Config.changeFilter(false);
+      var text;
       OpenNebula.User.show({data:{'id':721},success: function(a,b){
               template  = b;
-              var text = 'Баланс:' + template.USER.TEMPLATE.BALANCE + '$';
-            $(".user-zone-info").html(UserAndZoneTemplate({
-                BALANCE: text,
-                filterView: Config['filterView'],
-                displayName: config['display_name'],
-                settingsTabEnabled: Config.isTabEnabled(SETTINGS_TAB_ID),
-                availableViews: config['available_views'],
-                zoneName: config['zone_name']
-                })).foundation();
+              text = template.USER.TEMPLATE.BALANCE;
+              if(config.user_id == '721'){
+              $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: $'+ text + ' </span></li>');
+
+              };
           }});
 
 
+    $(".user-zone-info").html(UserAndZoneTemplate({
+      filterView: Config['filterView'],
+      displayName: config['display_name'],
+      settingsTabEnabled: Config.isTabEnabled(SETTINGS_TAB_ID),
+      availableViews: config['available_views'],
+      zoneName: config['zone_name']
+    })).foundation();
 
     $('#filter-view').hide();
     groupsRefresh();
@@ -137,6 +138,7 @@ define(function(require) {
       var sunstone_setting = {DEFAULT_VIEW : $(this).attr("view")};
       Sunstone.runAction("User.append_sunstone_setting_refresh", -1, sunstone_setting);
     });
+
 
     function groupsRefresh() {
 

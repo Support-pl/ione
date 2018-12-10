@@ -19,7 +19,10 @@ define(function(require) {
     DEPENDENCIES
    */
 
-  var BasePanel = require('tabs/templates-tab/panels/template-common');
+    var Locale = require('utils/locale');
+    var Humanize = require('utils/humanize');
+    var TemplateUtils = require('utils/template-utils');
+    var TemplateHtml = require('hbs!./template/html');
 
   /*
     CONSTANTS
@@ -27,22 +30,29 @@ define(function(require) {
 
   var TAB_ID = require('../tabId');
   var PANEL_ID = require('./template/panelId');
-  var RESOURCE = "Template"
+  var RESOURCE = "Ansible";
+  var XML_ROOT = "ANSIBLE";
 
   /*
     CONSTRUCTOR
    */
 
-  function Panel(info) {
-    this.tabId = TAB_ID;
-    this.resource = RESOURCE;
-
-    return BasePanel.call(this, info);
-  };
-
   Panel.PANEL_ID = PANEL_ID;
-  Panel.prototype = Object.create(BasePanel.prototype);
-  Panel.prototype.constructor = Panel;
+  Panel.prototype.html = _html;
+  Panel.prototype.setup = _setup;
 
   return Panel;
+
+  /*
+     FUNCTION DEFINITIONS
+   */
+  function _html() {
+    return TemplateHtml({
+        userTemplateString: TemplateUtils.templateToString(this.element.USER_TEMPLATE),
+        templateString: TemplateUtils.templateToString(this.element.TEMPLATE)
+    });
+  }
+
+  function _setup(context) {
+  }
 });

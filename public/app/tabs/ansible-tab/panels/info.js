@@ -15,34 +15,118 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-  /*
-    DEPENDENCIES
-   */
+    /*
+      DEPENDENCIES
+     */
 
-  var BasePanel = require('tabs/templates-tab/panels/info-common');
+    var TemplateHTML = require("hbs!./info/html");
+    var Locale = require("utils/locale");
+    var RenameTr = require("utils/panel/rename-tr");
+    var TemplateTable = require("utils/panel/template-table");
+    var PermissionsTable = require('utils/panel/permissions-table');
+    var Sunstone = require("sunstone");
+    var TemplateUtils = require("utils/template-utils");
+    var Humanize = require('utils/humanize');
+    var OpenNebula = require('opennebula');
+    var Config = require('sunstone-config');
+    var Navigation = require('utils/navigation');
 
-  /*
-    CONSTANTS
-   */
+    /*
+      CONSTANTS
+     */
 
-  var TAB_ID = require('../tabId');
-  var PANEL_ID = require('./info/panelId');
-  var RESOURCE = "Template"
+    var TAB_ID = require("../tabId");
+    var PANEL_ID = require("./info/panelId");
+    var RESOURCE = "Ansible";
+    var XML_ROOT = "ANSIBLE";
 
-  /*
-    CONSTRUCTOR
-   */
+    var OVERCOMMIT_DIALOG_ID = require("utils/dialogs/overcommit/dialogId");
 
-  function Panel(info) {
-    this.tabId = TAB_ID;
-    this.resource = RESOURCE;
+    /*
+      CONSTRUCTOR
+     */
 
-    return BasePanel.call(this, info);
-  };
+    function Panel(info) {
+        var that = this;
 
-  Panel.PANEL_ID = PANEL_ID;
-  Panel.prototype = Object.create(BasePanel.prototype);
-  Panel.prototype.constructor = Panel;
+        this.title = Locale.tr("Info");
+        this.icon = "fa-info-circle";
 
-  return Panel;
+        this.element = info[XML_ROOT];
+        this.percent = false;
+        var permissionsall = this.element.extra_data.PERMISSIONS;
+        var permissions = {
+            OWNER_U: permissionsall.charAt(0),
+            OWNER_M: permissionsall.charAt(1),
+            OWNER_A: permissionsall.charAt(2),
+            GROUP_U: permissionsall.charAt(3),
+            GROUP_M: permissionsall.charAt(4),
+            GROUP_A: permissionsall.charAt(5),
+            OTHER_U: permissionsall.charAt(6),
+            OTHER_M: permissionsall.charAt(7),
+            OTHER_A: permissionsall.charAt(8),
+
+        };
+
+        this.element.PERMISSIONS = permissions;
+        this.element.UID = this.element.uid;
+        this.element.UNAME = this.element.uname;
+        this.element.GID = this.element.gid;
+        this.element.GNAME = this.element.gname;
+
+        // Hide information in the template table. Unshow values are stored
+        // in the unshownTemplate object to be used when the element info is updated.
+        that.unshownTemplate = {};
+        that.strippedTemplate = {};
+        var unshownKeys = ["HOST", "RESERVED_CPU", "RESERVED_MEM"];
+        $.each(that.element, function(key, value) {
+            if ($.inArray(key, unshownKeys) > -1) {
+                that.unshownTemplate[key] = value;
+            } else {
+                that.strippedTemplate[key] = value;
+            }
+        });
+
+
+        return this;
+    }
+
+    Panel.PANEL_ID = PANEL_ID;
+    Panel.prototype.html = _html;
+    Panel.prototype.setup = _setup;
+
+    return Panel;
+
+    /*
+      FUNCTION DEFINITIONS
+     */
+
+    function _html() {
+        var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.name);
+        var permissionsTableHTML = PermissionsTable.html(TAB_ID, RESOURCE, this.element);
+        var templateTableHTML = TemplateTable.html(
+            this.strippedTemplate,
+            RESOURCE,
+            Locale.tr("Attributes"));
+
+        return TemplateHTML({
+            "element": this.element,
+            "renameTrHTML": renameTrHTML,
+            "permissionsTableHTML": permissionsTableHTML,
+            "templateTableHTML": templateTableHTML
+        });
+    }
+
+
+
+
+    function _setup(context) {
+        var that = this;
+
+        PermissionsTable.setup(TAB_ID, RESOURCE, this.element, context);
+        RenameTr.setup(TAB_ID, RESOURCE, this.element.id, context);
+
+        TemplateTable.setup(this.strippedTemplate, RESOURCE, this.element.id, context, this.unshownTemplate);
+
+    }
 });

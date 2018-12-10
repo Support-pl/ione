@@ -28,10 +28,9 @@ define(function(require) {
   //  require('./ansible-tab/dialogs/clone')
   //];
 
-  //var _panels = [
-  //  require('./ansible-tab/panels/info'),
-  //  require('./ansible-tab/panels/template')
-  //];
+  var _panels = [
+   require('./ansible-tab/panels/info')
+  ];
 
   //var _panelsHooks = [
   //  require('../utils/hooks/header')
@@ -57,8 +56,8 @@ define(function(require) {
     resource: 'Ansible',
     buttons: Buttons,
     actions: Actions,
-    dataTable: new Table(DATATABLE_ID, {actions: true, info: true})
-  //  panels: _panels,
+    dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),
+    panels: _panels
   //  panelsHooks: _panelsHooks,
   //  formPanels: _formPanels,
   //  dialogs: _dialogs
