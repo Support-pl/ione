@@ -53,6 +53,7 @@ define(function(require) {
     this.resource = RESOURCE;
     this.xmlRoot = XML_ROOT;
     this.labelsColumn = LABELS_COLUMN;
+    
 
     this.dataTableOptions = {
       "bAutoWidth": false,

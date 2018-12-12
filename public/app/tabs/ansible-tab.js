@@ -29,18 +29,18 @@ define(function(require) {
   //];
 
   var _panels = [
-   require('./ansible-tab/panels/info')
+   require('./ansible-tab/panels/info'),
+   require('./ansible-tab/panels/body')
   ];
+  
 
   //var _panelsHooks = [
   //  require('../utils/hooks/header')
   //];
 
-  //var _formPanels = [
-  //  require('./ansible-tab/form-panels/create'),
-  //  require('./ansible-tab/form-panels/import'),
-  //  require('./ansible-tab/form-panels/instantiate')
-  //];
+  var _formPanels = [
+   require('./ansible-tab/form-panels/create')
+  ];
 
   var AnsibleList = require('./ansible-tab/form-panels/list');
 
@@ -57,9 +57,9 @@ define(function(require) {
     buttons: Buttons,
     actions: Actions,
     dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),
-    panels: _panels
-  //  panelsHooks: _panelsHooks,
-  //  formPanels: _formPanels,
+    panels: _panels,
+    //panelsHooks: _panelsHooks
+    formPanels: _formPanels,
   //  dialogs: _dialogs
   };
   //console.log(content);

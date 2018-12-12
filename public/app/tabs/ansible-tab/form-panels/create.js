@@ -19,13 +19,13 @@ define(function(require) {
     DEPENDENCIES
    */
 
-  var BaseFormPanel = require('tabs/templates-tab/form-panels/create-common');
+  var BaseFormPanel = require('tabs/ansible-tab/form-panels/create-common');
 
   /*
     CONSTANTS
    */
 
-  var RESOURCE = "Template";
+  var RESOURCE = "Ansible";
   var FORM_PANEL_ID = require('./create/formPanelId');
   var TAB_ID = require('../tabId');
 

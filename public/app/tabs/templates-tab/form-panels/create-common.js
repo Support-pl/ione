@@ -39,16 +39,16 @@ define(function(require) {
 
   var WIZARD_TABS = [
     require('./create/wizard-tabs/general'),
-    require('./create/wizard-tabs/storage'),
-    require('./create/wizard-tabs/network'),
-    require('./create/wizard-tabs/os'),
-    require('./create/wizard-tabs/io'),
-    require('./create/wizard-tabs/actions'),
-    require('./create/wizard-tabs/context'),
-    require('./create/wizard-tabs/scheduling'),
-    require('./create/wizard-tabs/hybrid'),
-    require('./create/wizard-tabs/vmgroup'),
-    require('./create/wizard-tabs/other')
+    // require('./create/wizard-tabs/storage'),
+    // require('./create/wizard-tabs/network'),
+    // require('./create/wizard-tabs/os'),
+    // require('./create/wizard-tabs/io'),
+    // require('./create/wizard-tabs/actions'),
+    // require('./create/wizard-tabs/context'),
+    // require('./create/wizard-tabs/scheduling'),
+    // require('./create/wizard-tabs/hybrid'),
+    // require('./create/wizard-tabs/vmgroup'),
+    // require('./create/wizard-tabs/other')
   ]
 
   var TEMPLATES_TAB_ID = require('tabs/templates-tab/tabId');

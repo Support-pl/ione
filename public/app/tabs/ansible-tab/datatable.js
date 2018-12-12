@@ -65,7 +65,7 @@ define(function(require) {
                 {"bVisible": false, "aTargets": ['_all']}
             ]
         };
-        console.log(SunstoneConfig.tabTableColumns(TAB_NAME));
+        
 
 
         this.columns = [

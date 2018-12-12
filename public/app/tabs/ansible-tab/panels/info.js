@@ -23,7 +23,7 @@ define(function(require) {
     var Locale = require("utils/locale");
     var RenameTr = require("utils/panel/rename-tr");
     var TemplateTable = require("utils/panel/template-table");
-    var PermissionsTable = require('utils/panel/permissions-table');
+    var PermissionsTable = require('./permissions-table');
     var Sunstone = require("sunstone");
     var TemplateUtils = require("utils/template-utils");
     var Humanize = require('utils/humanize');
@@ -68,17 +68,25 @@ define(function(require) {
 
         };
 
-        this.element.PERMISSIONS = permissions;
+        console.log('тут нет никаких плейбуков');
+
+        this.element.ID = this.element.id;
         this.element.UID = this.element.uid;
         this.element.UNAME = this.element.uname;
         this.element.GID = this.element.gid;
         this.element.GNAME = this.element.gname;
+        this.element.PERMISSIONS = permissions;
+
 
         // Hide information in the template table. Unshow values are stored
         // in the unshownTemplate object to be used when the element info is updated.
         that.unshownTemplate = {};
         that.strippedTemplate = {};
-        var unshownKeys = ["HOST", "RESERVED_CPU", "RESERVED_MEM"];
+        var unshownKeys = [
+            "id", "uid", "uname", "UNAME", "gname",
+            "GNAME", "gid", "body", "description", "name",
+            "ID", "UID", "GID","PERMISSIONS"
+        ];
         $.each(that.element, function(key, value) {
             if ($.inArray(key, unshownKeys) > -1) {
                 that.unshownTemplate[key] = value;
@@ -104,16 +112,37 @@ define(function(require) {
     function _html() {
         var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.name);
         var permissionsTableHTML = PermissionsTable.html(TAB_ID, RESOURCE, this.element);
+        var blocksupportedos = '';
+        if(this.element.extra_data.SUPPORTED_OS != null) {
+            for (key in this.element.extra_data.SUPPORTED_OS) {
+                r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+                if(r_col.length == 6){
+                    r_col += '0';
+                }
+                blocksupportedos += '<div class="" style="margin-left: 10px; padding: 0px 10px 0px 10px; float: left; text-align: center; border: 2px solid '+ r_col +';\n' +
+                    '    border-radius: 100px !important; margin-bottom: 5px;">' + this.element.extra_data.SUPPORTED_OS[key] + '</div>';
+            }
+        }else{
+            r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+            if(r_col.length == 6){
+                r_col += '0';
+            }
+            blocksupportedos += '<div class="" style="margin-left: 10px; float: left; padding: 0px 10px 0px 10px; border: 2px solid; text-align: center;'+ r_col +';\n' +
+                '    border-radius: 100px !important;margin-bottom: 5px;">404 (NOT FOUND)</div>';
+        }
+        blocksupportedos += '<div class"large-2 columns"></div>';
+
         var templateTableHTML = TemplateTable.html(
             this.strippedTemplate,
             RESOURCE,
             Locale.tr("Attributes"));
 
+
         return TemplateHTML({
             "element": this.element,
             "renameTrHTML": renameTrHTML,
             "permissionsTableHTML": permissionsTableHTML,
-            "templateTableHTML": templateTableHTML
+            "templateTableHTML": blocksupportedos
         });
     }
 

@@ -15,5 +15,5 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require){
-  return 'createVMTemplateForm';
+  return 'createAnsibleForm';
 })

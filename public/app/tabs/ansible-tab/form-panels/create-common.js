@@ -30,8 +30,8 @@ define(function(require) {
     TEMPLATES
    */
 
-  var TemplateWizardHTML = require('hbs!./create/wizard');
-  var TemplateAdvancedHTML = require('hbs!./create/advanced');
+  //var TemplateWizardHTML = require('hbs!./create/wizard');
+  //var TemplateAdvancedHTML = require('hbs!./create/advanced');
 
   /*
     CONSTANTS
@@ -40,15 +40,15 @@ define(function(require) {
   var WIZARD_TABS = [
     require('./create/wizard-tabs/general'),
     require('./create/wizard-tabs/storage'),
-    require('./create/wizard-tabs/network'),
-    require('./create/wizard-tabs/os'),
-    require('./create/wizard-tabs/io'),
-    require('./create/wizard-tabs/actions'),
-    require('./create/wizard-tabs/context'),
-    require('./create/wizard-tabs/scheduling'),
-    require('./create/wizard-tabs/hybrid'),
-    require('./create/wizard-tabs/vmgroup'),
-    require('./create/wizard-tabs/other')
+    // require('./create/wizard-tabs/network'),
+    // require('./create/wizard-tabs/os'),
+    // require('./create/wizard-tabs/io'),
+    // require('./create/wizard-tabs/actions'),
+    // require('./create/wizard-tabs/context'),
+    // require('./create/wizard-tabs/scheduling'),
+    // require('./create/wizard-tabs/hybrid'),
+    // require('./create/wizard-tabs/vmgroup'),
+    // require('./create/wizard-tabs/other')
   ]
 
   var TEMPLATES_TAB_ID = require('tabs/templates-tab/tabId');
@@ -110,8 +110,8 @@ define(function(require) {
 
   FormPanel.prototype = Object.create(BaseFormPanel.prototype);
   FormPanel.prototype.constructor = FormPanel;
-  FormPanel.prototype.htmlWizard = _htmlWizard;
-  FormPanel.prototype.htmlAdvanced = _htmlAdvanced;
+  // FormPanel.prototype.htmlWizard = _htmlWizard;
+  // FormPanel.prototype.htmlAdvanced = _htmlAdvanced;
   FormPanel.prototype.setup = _setup;
   FormPanel.prototype.onShow = _onShow;
   FormPanel.prototype.submitWizard = _submitWizard;
@@ -126,17 +126,17 @@ define(function(require) {
     FUNCTION DEFINITIONS
    */
 
-  function _htmlWizard() {
+  // function _htmlWizard() {
+  //
+  //   return TemplateWizardHTML({
+  //     'formPanelId': this.formPanelId,
+  //     'wizardTabs': this.wizardTabs
+  //   });
+  // }
 
-    return TemplateWizardHTML({
-      'formPanelId': this.formPanelId,
-      'wizardTabs': this.wizardTabs
-    });
-  }
-
-  function _htmlAdvanced() {
-    return TemplateAdvancedHTML({formPanelId: this.formPanelId});
-  }
+  // function _htmlAdvanced() {
+  //   return TemplateAdvancedHTML({formPanelId: this.formPanelId});
+  // }
 
   function _setup(context) {
     $.each(this.wizardTabs, function(index, wizardTab) {

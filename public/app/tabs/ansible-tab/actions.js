@@ -23,9 +23,10 @@ define(function(require) {
     var OpenNebulaAction = require('opennebula/action');
     var CommonActions = require('utils/common-actions');
     var Navigation = require('utils/navigation');
+    var CREATE_DIALOG_ID = require('./form-panels/create/formPanelId');
 
     var RESOURCE = "Ansible";
-    var XML_ROOT = "ansible_playbook";
+    var XML_ROOT = "ANSIBLE";
     var TAB_ID = require('./tabId');
 
     var _commonActions = new CommonActions(OpenNebulaResource, RESOURCE, TAB_ID,
@@ -36,12 +37,19 @@ define(function(require) {
         "Ansible.show" : _commonActions.show(),
         "Ansible.refresh" : _commonActions.refresh(),
         "Ansible.delete" : _commonActions.del(),
-        "Ansible.update_template" : _commonActions.updateTemplate(),
-        "Ansible.append_template" : _commonActions.appendTemplate(),
-        "Ansible.update_dialog" : _commonActions.checkAndShowUpdate(),
+        "Ansible.update" : _commonActions.update(),
+        "Ansible.chmod" : _commonActions.singleAction('chmod'),
+        "Ansible.chown": _commonActions.multipleAction('chown'),
+        "Ansible.chgrp": _commonActions.multipleAction('chgrp'),
         "Ansible.rename": _commonActions.singleAction('rename'),
-
+        "Ansible.create_dialog" : {
+            type: "custom",
+            call: function() {
+                Sunstone.showFormPanel(TAB_ID, CREATE_DIALOG_ID, "create");
+            }
+        }
     };
+
 
     return _actions;
 });

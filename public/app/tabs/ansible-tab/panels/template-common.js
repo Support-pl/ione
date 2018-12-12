@@ -15,55 +15,55 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-  /*
-    DEPENDENCIES
-   */
+    /*
+      DEPENDENCIES
+     */
 
-  var Locale = require('utils/locale');
-  var TemplateUtils = require('utils/template-utils');
+    var Locale = require('utils/locale');
+    var TemplateUtils = require('utils/template-utils');
 
-  /*
-    TEMPLATES
-   */
+    /*
+      TEMPLATES
+     */
 
-  var TemplateInfo = require('hbs!./template/html');
+    var TemplateInfo = require('hbs!./body/html');
 
-  /*
-    CONSTANTS
-   */
+    /*
+      CONSTANTS
+     */
 
-  var PANEL_ID = require('./template/panelId');
-  var XML_ROOT = "VMTEMPLATE"
+    var PANEL_ID = require('./body/panelId');
+    var XML_ROOT = "ANSIBLE"
 
-  /*
-    CONSTRUCTOR
-   */
+    /*
+      CONSTRUCTOR
+     */
 
-  function Panel(info) {
-    this.title = Locale.tr("Template");
-    this.icon = "fa-file-o";
+    function Panel(info) {
+        this.title = Locale.tr("BODY");
+        this.icon = "fa-file-o";
 
-    this.element = info[XML_ROOT];
+        this.element = info[XML_ROOT];
 
-    return this;
-  };
+        return this;
+    };
 
-  Panel.prototype.html = _html;
-  Panel.prototype.setup = _setup;
+    Panel.prototype.html = _html;
+    Panel.prototype.setup = _setup;
 
-  return Panel;
+    return Panel;
 
-  /*
-    FUNCTION DEFINITIONS
-   */
+    /*
+      FUNCTION DEFINITIONS
+     */
 
-  function _html() {
-    return TemplateInfo({
-      'element': this.element,
-      'templateString': TemplateUtils.templateToString(this.element.TEMPLATE)
-    });
-  }
+    function _html() {
+        return TemplateInfo({
+            'element': this.element,
+            'templateString': TemplateUtils.templateToString(this.element.body)
+        });
+    }
 
-  function _setup(context) {
-  }
+    function _setup(context) {
+    }
 });
