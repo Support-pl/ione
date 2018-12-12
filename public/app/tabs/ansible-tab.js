@@ -42,14 +42,14 @@ define(function(require) {
    require('./ansible-tab/form-panels/create')
   ];
 
-  var AnsibleList = require('./ansible-tab/form-panels/list');
+  //var AnsibleList = require('./ansible-tab/form-panels/list');
 
   var Tab = {
     tabId: TAB_ID,
     title: Locale.tr("Automatization"),
     listHeader: Locale.tr("Playbooks"),
     infoHeader: Locale.tr("Playbook"),
-    content: AnsibleList,
+    //content: AnsibleList,
     subheader: '<span>\
         <span class="total_templates"/> <small>'+Locale.tr("TOTAL")+'</small>\
       </span>',
