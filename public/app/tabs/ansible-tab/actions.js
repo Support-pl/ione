@@ -36,7 +36,7 @@ define(function(require) {
         "Ansible.list" : _commonActions.list(),
         "Ansible.show" : _commonActions.show(),
         "Ansible.refresh" : _commonActions.refresh(),
-        "Ansible.delete" : _commonActions.del(),
+        "Ansible.delete" : _commonActions.multipleAction('del'),
         "Ansible.update" : _commonActions.update(),
         "Ansible.chmod" : _commonActions.singleAction('chmod'),
         "Ansible.chown": _commonActions.multipleAction('chown'),

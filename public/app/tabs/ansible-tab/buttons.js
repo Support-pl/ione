@@ -68,7 +68,7 @@ define(function(require) {
       text: Locale.tr("Unshare"),
       tip: Locale.tr("The template, along with any image referenced by it, will be unshared with the group's users. Permission changed: GROUP USE"),
     },
-    "Ansible.delete_dialog" : {
+    "Ansible.delete" : {
       type: "action",
       layout: "del",
       text: Locale.tr("Delete")

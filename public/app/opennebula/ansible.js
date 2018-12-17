@@ -34,8 +34,7 @@ define(function(require) {
         OpenNebulaAction.create(params, RESOURCE);
       },
       "del" : function(params) {
-        var action_obj = params.data.extra_param;
-        OpenNebulaAction.del(params, RESOURCE, action_obj);
+        OpenNebulaAction.del(params, RESOURCE);
       },
       "list" : function(params) {
         OpenNebulaAction.list(params, RESOURCE);
@@ -65,6 +64,11 @@ define(function(require) {
         var name = params.data.extra_param ? params.data.extra_param : "";
         var action_obj = {"name" : name};
         OpenNebulaAction.simple_action(params, RESOURCE, "clone", action_obj);
+      },
+      "rename" : function(params) {
+        console.log(params, RESOURCE);
+        var action_obj = params.data.extra_param;
+        OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
       }
     }
   
