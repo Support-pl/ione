@@ -68,7 +68,11 @@ define(function(require) {
 
         };
 
-        console.log('тут нет никаких плейбуков');
+        fmt = function(num){
+            return (num.toString().length > 1 ? '' : '0') + num.toString();
+        }
+        ct = new Date(this.element.create_time * 1000);
+        create_time = fmt(ct.getUTCDate()) + '.' + fmt(ct.getUTCMonth()) + '.' + fmt(ct.getUTCFullYear())+ ' ' + fmt((ct.getUTCHours() - ct.getTimezoneOffset() / 60)) + ':' + fmt(ct.getUTCMinutes())
 
         this.element.ID = this.element.id;
         this.element.UID = this.element.uid;
@@ -76,7 +80,7 @@ define(function(require) {
         this.element.GID = this.element.gid;
         this.element.GNAME = this.element.gname;
         this.element.PERMISSIONS = permissions;
-
+        this.element.create_time = create_time
 
         // Hide information in the template table. Unshow values are stored
         // in the unshownTemplate object to be used when the element info is updated.
@@ -113,14 +117,16 @@ define(function(require) {
         var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.name);
         var permissionsTableHTML = PermissionsTable.html(TAB_ID, RESOURCE, this.element);
         var blocksupportedos = '';
+
         if(this.element.extra_data.SUPPORTED_OS != null) {
-            for (key in this.element.extra_data.SUPPORTED_OS) {
+            var supportedOS = this.element.extra_data.SUPPORTED_OS.split(',');
+            for (var i = 0; i < supportedOS.length; i++){
                 r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
                 if(r_col.length == 6){
                     r_col += '0';
                 }
                 blocksupportedos += '<div class="" style="margin-left: 10px; padding: 0px 10px 0px 10px; float: left; text-align: center; border: 2px solid '+ r_col +';\n' +
-                    '    border-radius: 100px !important; margin-bottom: 5px;">' + this.element.extra_data.SUPPORTED_OS[key] + '</div>';
+                    '    border-radius: 100px !important; margin-bottom: 5px;">' + supportedOS[i] + '</div>';
             }
         }else{
             r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
