@@ -35,7 +35,7 @@ define(function(require) {
     "Ansible.run" : {
       type: "action",
       layout: "main",
-      text: Locale.tr("Instantiate")
+      text: Locale.tr("Run")
     },
     "Ansible.chown" : {
       type: "confirm_with_select",

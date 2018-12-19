@@ -24,9 +24,9 @@ define(function(require) {
   var DATATABLE_ID = "dataTableAnsible";
 
 
-  //var _dialogs = [
-  //  require('./ansible-tab/dialogs/clone')
-  //];
+  var _dialogs = [
+    require('./ansible-tab/dialogs/clone')
+  ];
 
   var _panels = [
    require('./ansible-tab/panels/info'),
@@ -60,7 +60,7 @@ define(function(require) {
     panels: _panels,
     //panelsHooks: _panelsHooks
     formPanels: _formPanels,
-  //  dialogs: _dialogs
+    dialogs: _dialogs
   };
   //console.log(content);
 

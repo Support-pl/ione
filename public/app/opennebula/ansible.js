@@ -69,6 +69,9 @@ define(function(require) {
         console.log(params, RESOURCE);
         var action_obj = params.data.extra_param;
         OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
+      },
+      "getName" : function(id) {
+        return OpenNebulaAction.getName(id, RESOURCE);
       }
     }
   
