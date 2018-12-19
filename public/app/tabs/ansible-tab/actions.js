@@ -33,6 +33,7 @@ define(function(require) {
         XML_ROOT, Locale.tr("Ansible created"));
 
     var _actions = {
+        "Ansible.create" : _commonActions.create(),
         "Ansible.list" : _commonActions.list(),
         "Ansible.show" : _commonActions.show(),
         "Ansible.refresh" : _commonActions.refresh(),
@@ -42,12 +43,16 @@ define(function(require) {
         "Ansible.chown": _commonActions.multipleAction('chown'),
         "Ansible.chgrp": _commonActions.multipleAction('chgrp'),
         "Ansible.rename": _commonActions.singleAction('rename'),
-        "Ansible.create_dialog" : {
-            type: "custom",
-            call: function() {
-                Sunstone.showFormPanel(TAB_ID, CREATE_DIALOG_ID, "create");
-            }
-        }
+        "Ansible.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
+        //{
+        //    type: "custom",
+        //    call: function() {
+        //        Sunstone.showFormPanel(TAB_ID, CREATE_DIALOG_ID, "create");
+        //    }
+        //},
+        "Ansible.update_dialog" : _commonActions.checkAndShowUpdate(),
+        "Ansible.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
+  
     };
 
 

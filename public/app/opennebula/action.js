@@ -57,7 +57,6 @@ define(function(require) {
       data: JSON.stringify(action),
       success: function(response) {
         _clearCache(cache_name);
-
         return callback ? callback(request, response) : null;
       },
       error: function(response) {

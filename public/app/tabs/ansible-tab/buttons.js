@@ -56,25 +56,10 @@ define(function(require) {
       layout: "main",
       text: Locale.tr("Clone")
     },
-    "Ansible.share" : {
-      type: "confirm",
-      layout: "user_select",
-      text: Locale.tr("Share"),
-      tip: Locale.tr("The template, along with any image referenced by it, will be shared with the group's users. Permission changed: GROUP USE"),
-    },
-    "Ansible.unshare" : {
-      type: "confirm",
-      layout: "user_select",
-      text: Locale.tr("Unshare"),
-      tip: Locale.tr("The template, along with any image referenced by it, will be unshared with the group's users. Permission changed: GROUP USE"),
-    },
     "Ansible.delete" : {
       type: "action",
       layout: "del",
       text: Locale.tr("Delete")
-    },
-    "Ansible.edit_labels" : {
-      layout: "labels",
     }
   };
 

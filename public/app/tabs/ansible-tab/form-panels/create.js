@@ -28,6 +28,7 @@ define(function(require) {
     var Config = require('sunstone-config');
     var WizardFields = require('utils/wizard-fields');
     var OpenNebula = require('opennebula');
+    var CommonActions = require('utils/common-actions');
 
     /*
       TEMPLATES
@@ -55,6 +56,11 @@ define(function(require) {
                 'title': Locale.tr("Create Playbook"),
                 'buttonText': Locale.tr("Create"),
                 'resetButton': true
+            },
+            'update': {
+                'title': Locale.tr("Update Playbook"),
+                'buttonText': Locale.tr("Update"),
+                'resetButton': false
             }
         }
 
@@ -65,11 +71,12 @@ define(function(require) {
 
     FormPanel.FORM_PANEL_ID = FORM_PANEL_ID;
     FormPanel.prototype = Object.create(BaseFormPanel.prototype);
-    FormPanel.prototype.constructor = FormPanel;
     FormPanel.prototype.htmlWizard = _htmlWizard;
     FormPanel.prototype.submitWizard = _submitWizard;
     FormPanel.prototype.onShow = _onShow;
     FormPanel.prototype.setup = _setup;
+    FormPanel.prototype.fill = _fill;
+    FormPanel.prototype.constructor = FormPanel;
 
     return FormPanel;
 
@@ -86,12 +93,14 @@ define(function(require) {
     function _setup(context) {
         var that = this;
 
+        WizardFields.fillInput($("#body", context), " - hosts: <%group%>");
+
         $('#body').keyup(function () {
             $('#control-i-check').removeClass('check-syntax-ok').addClass('check-syntax-false');
             $('#ansible-tabsubmit_button button').prop('disabled', true);
         });
 
-        $(".check").on("click",function () {
+        $(".check_syntax").on("click",function () {
             $.ajax({
                 url: '/ansible/check_syntax',
                 type: 'POST',
@@ -125,27 +134,47 @@ define(function(require) {
 
     function _submitWizard(context) {
 
-        var name = $('#name').val();
-        var description = $('#description').val();
-        var supportedOS = $('#supported_os').val();
-        var body = $('#body').val();
+        var name            = $('#name').val();
+        var description     = $('#description').val();
+        var supported_os    = $('#supported_os').val();
+        var body            = $('#body').val();
 
-        OpenNebula.Ansible.create({
-            data:{ name: name, body: body, description : description, extra_data: {PERMISSIONS: '111000000', SUPPORTED_OS: supportedOS}},
-            success: function(r, res){
-                if(res.response){
-                    Sunstone.resetFormPanel(this.tabId, this.formPanelId);
-                    Sunstone.hideFormPanel(this.tabId);
-                    Notifier.notifySubmit('Playbooks create',res.response.id);
-                }else{
-                    Notifier.notifyError(res.error);
-                    console.log(res.error);
-                }
-            }, error:function(r, res){
-                Notifier.notifyError(res);
-            }
-        })
+        if(this.action == "create"){
+            Sunstone.runAction(
+                "Ansible.create",
+                { name: name, body: body, description : description, extra_data: {PERMISSIONS: '111000000', SUPPORTED_OS: supported_os}}
+            );
+        } else if(this.action == "update") {
+            Sunstone.runAction(
+                "Ansible.update",
+                this.resourceId,
+                { name: name, body: body, description : description, extra_data: {PERMISSIONS: this.resource.extra_data.PERMISSIONS, SUPPORTED_OS: supported_os}}
+            )
+        }
+        return false;
     };
+
+
+    function _fill(context, element) {
+      if (this.action != "update") {
+        return;
+      }
+      
+      element.ID = element.id
+      element.NAME = element.name
+
+      this.setHeader(element);
+
+      this.resource     = element
+      this.resourceId   = element.ID;
+
+      // Fills the inputs
+      WizardFields.fillInput($("#name", context), element.name);
+      WizardFields.fillInput($("#body", context), element.body);
+      WizardFields.fillInput($("#description", context), element.description);
+      WizardFields.fillInput($("#supported_os", context), element.extra_data.SUPPORTED_OS);
+
+    }
 
     function _onShow(context) {
         $('#ansible-tabsubmit_button button').prop('disabled', true);
