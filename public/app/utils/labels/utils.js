@@ -117,7 +117,6 @@ define(function(require) {
     var labelsColumn = tabTable.labelsColumn;
 
     var labelsDropdown = $('#' + tabName + 'LabelsDropdown');
-
     OpenNebulaUser.show({
         data : {
           id: config['user_id']
@@ -527,15 +526,17 @@ define(function(require) {
         var template;
         if (element.USER_TEMPLATE) {
           template = element.USER_TEMPLATE;
+        } else if (element.extra_data) {
+            template = element;
         } else {
-          template = element.TEMPLATE;
+            template = element.TEMPLATE;
         }
-
         if (template["BODY"] && template["BODY"][LABELS_ATTR.toLowerCase()]) {
           return template["BODY"][LABELS_ATTR.toLowerCase()];
         } else {
           return template[LABELS_ATTR]||'';
         }
+
 
       } else {
         return '';

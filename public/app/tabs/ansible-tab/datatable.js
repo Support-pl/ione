@@ -38,9 +38,9 @@ define(function(require) {
      */
 
     var RESOURCE = "Ansible";
-    var XML_ROOT = "ansible_playbook";
+    var XML_ROOT = "ANSIBLE";
     var TAB_NAME = require('./tabId');
-    var LABELS_COLUMN = 7;
+    var LABELS_COLUMN = 5;
     var TEMPLATE_ATTR = 'TEMPLATE';
 
     /*
@@ -54,7 +54,6 @@ define(function(require) {
         this.resource = RESOURCE;
         this.xmlRoot = XML_ROOT;
         this.labelsColumn = LABELS_COLUMN;
-
         this.dataTableOptions = {
             "bAutoWidth": false,
             "bSortClasses" : false,
@@ -63,20 +62,18 @@ define(function(require) {
                 {"bSortable": false, "aTargets": ["check"] },
                 {"sWidth": "35px", "aTargets": [0]},
                 {"bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(TAB_NAME)},
-                {"bVisible": false, "aTargets": ['_all']},
-                {"sType": "num", "aTargets": [1, 3, 4, 5]}
+                {"bVisible": false, "aTargets": ['_all']}
             ]
         };
-        console.log(this.dataTableOptions);
+        
+
 
         this.columns = [
-            Locale.tr("id"),
-            Locale.tr("description"),
-            Locale.tr("extra_data"),
-            Locale.tr("gid"),
-            Locale.tr("body"),
-            Locale.tr("name"),
-            Locale.tr("uid")
+            Locale.tr("ID"),
+            Locale.tr("Name"),
+            Locale.tr("Description"),
+            Locale.tr("Owner"),
+            Locale.tr("Group"),
         ];
 
         this.selectOptions = {
@@ -85,7 +82,6 @@ define(function(require) {
 
         this.totalClusters = 0;
 
-        console.log(this);
         TabDataTable.call(this);
     }
 
@@ -95,7 +91,6 @@ define(function(require) {
     Table.prototype.preUpdateView = _preUpdateView;
     Table.prototype.postUpdateView = _postUpdateView;
 
-    console.log(Table);
 
     return Table;
 
@@ -106,12 +101,17 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
-        console.log(element);
         this.totalClusters++;
         return [
+
             '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
-            element + '" name="selected_items" value="' +
-            element + '"/>'
+            element.id + '" name="selected_items" value="' +
+            element.id + '"/>',
+            element.id,
+            element.name,
+            element.description,
+            element.uname,
+            element.gname,
 
         ];
     }

@@ -56,11 +56,12 @@ define(function(require) {
       contentType: "application/json; charset=utf-8",
       data: JSON.stringify(action),
       success: function(response) {
+      console.log(request, response);
         _clearCache(cache_name);
-
         return callback ? callback(request, response) : null;
       },
       error: function(response) {
+      console.log(request, response);
         return callbackError ?
             callbackError(request, OpenNebulaError(response)) : null;
       }

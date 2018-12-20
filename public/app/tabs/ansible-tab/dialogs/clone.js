@@ -23,7 +23,7 @@ define(function(require) {
   var TemplateHTML = require('hbs!./clone/html');
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
-  var OpenNebulaTemplate = require('opennebula/template');
+  var AnsiblePlaybook = require('opennebula/ansible');
 
   /*
     CONSTANTS
@@ -77,12 +77,7 @@ define(function(require) {
 
     $('#' + DIALOG_ID + 'Form', context).on("click", "button.custom_submit", function() {
       if(!$('#' + DIALOG_ID + 'Form', context)[0].checkValidity()){
-        if ($(this).val() == that.resource+".clone_recursive"){
-          $('#' + DIALOG_ID + 'Form button[type="submit"]', context).click();
           return true;
-        } else {
-          return true;
-        }
       }
 
       var extra_info;
@@ -93,7 +88,7 @@ define(function(require) {
         for (var i = 0; i < sel_elems.length; i++) {
           //If we are cloning several images we
           //use the name as prefix
-          extra_info = name + OpenNebulaTemplate.getName(sel_elems[i]);
+          extra_info = name + AnsiblePlaybook.getName(sel_elems[i]);
           Sunstone.runAction($(this).val(), sel_elems[i], extra_info);
         }
       } else {

@@ -24,44 +24,43 @@ define(function(require) {
   var DATATABLE_ID = "dataTableAnsible";
 
 
-  //var _dialogs = [
-  //  require('./ansible-tab/dialogs/clone')
-  //];
+  var _dialogs = [
+    require('./ansible-tab/dialogs/clone')
+  ];
 
-  //var _panels = [
-  //  require('./ansible-tab/panels/info'),
-  //  require('./ansible-tab/panels/template')
-  //];
+  var _panels = [
+   require('./ansible-tab/panels/info'),
+   require('./ansible-tab/panels/body')
+  ];
+  
 
   //var _panelsHooks = [
   //  require('../utils/hooks/header')
   //];
 
-  //var _formPanels = [
-  //  require('./ansible-tab/form-panels/create'),
-  //  require('./ansible-tab/form-panels/import'),
-  //  require('./ansible-tab/form-panels/instantiate')
-  //];
+  var _formPanels = [
+   require('./ansible-tab/form-panels/create')
+  ];
 
-  var AnsibleList = require('./ansible-tab/form-panels/list');
+  //var AnsibleList = require('./ansible-tab/form-panels/list');
 
   var Tab = {
     tabId: TAB_ID,
     title: Locale.tr("Automatization"),
     listHeader: Locale.tr("Playbooks"),
     infoHeader: Locale.tr("Playbook"),
-    content: AnsibleList,
+    //content: AnsibleList,
     subheader: '<span>\
         <span class="total_templates"/> <small>'+Locale.tr("TOTAL")+'</small>\
       </span>',
     resource: 'Ansible',
     buttons: Buttons,
     actions: Actions,
-    dataTable: new Table(DATATABLE_ID, {actions: true, info: true})
-  //  panels: _panels,
-  //  panelsHooks: _panelsHooks,
-  //  formPanels: _formPanels,
-  //  dialogs: _dialogs
+    dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),
+    panels: _panels,
+    //panelsHooks: _panelsHooks
+    formPanels: _formPanels,
+    dialogs: _dialogs
   };
   //console.log(content);
 

@@ -19,6 +19,14 @@ define(function(require) {
     var Config = require('sunstone-config');
   
     var RESOURCE = "ANSIBLE";
+
+    function CommonAnsible(openNebulaResource, resourceStr, tabId, xmlRoot, createdStr) {
+        this.openNebulaResource = openNebulaResource;
+        this.resourceStr = resourceStr;
+        this.tabId = tabId;
+        this.xmlRoot = xmlRoot;
+        this.createdStr = createdStr;
+    }
   
     var Ansible = {
       "resource": RESOURCE,
@@ -26,8 +34,7 @@ define(function(require) {
         OpenNebulaAction.create(params, RESOURCE);
       },
       "del" : function(params) {
-        var action_obj = params.data.extra_param;
-        OpenNebulaAction.del(params, RESOURCE, action_obj);
+        OpenNebulaAction.del(params, RESOURCE);
       },
       "list" : function(params) {
         OpenNebulaAction.list(params, RESOURCE);
@@ -42,18 +49,12 @@ define(function(require) {
         OpenNebulaAction.chgrp(params, RESOURCE);
       },
       "chmod" : function(params) {
-        var action_obj = params.data.extra_param;
+        var action_obj = params.data.extra_param.octet;
         OpenNebulaAction.simple_action(params, RESOURCE, "chmod", action_obj);
       },
       "update" : function(params) {
-        var action_obj = {"template_raw" : params.data.extra_param};
+        var action_obj = params.data.extra_param;
         OpenNebulaAction.simple_action(params, RESOURCE, "update", action_obj);
-      },
-      "publish" : function(params) {
-        OpenNebulaAction.simple_action(params, RESOURCE, "publish");
-      },
-      "unpublish" : function(params) {
-        OpenNebulaAction.simple_action(params, RESOURCE, "unpublish");
       },
       "run" : function(params) {
         var action_obj = params.data.extra_param ? params.data.extra_param : {};
@@ -65,8 +66,12 @@ define(function(require) {
         OpenNebulaAction.simple_action(params, RESOURCE, "clone", action_obj);
       },
       "rename" : function(params) {
+        console.log(params, RESOURCE);
         var action_obj = params.data.extra_param;
         OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
+      },
+      "getName" : function(id) {
+        return OpenNebulaAction.getName(id, RESOURCE);
       }
     }
   

@@ -79,7 +79,6 @@ define(function(require) {
             $(this).css('border','1px solid #2E9CB9');
             $(this).addClass('checktemp');
             var id_template = $(this).attr('opennebula_id');
-            console.log(id_template);
             OpenNebula.Template.show({data:{'id':id_template},success: function(a,b){
                     $('.inputuser').css('display','none');
                     $('.inputpass').css('display','none');

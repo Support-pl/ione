@@ -97,7 +97,6 @@ define(function(require) {
   function _elementArray(element_json) {
     var element = element_json[XML_ROOT];
     this.totalClusters++;
-
     return [
       '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
                            element.ID + '" name="selected_items" value="' +

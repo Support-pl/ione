@@ -24,21 +24,24 @@
       </thead>
       <tbody>
         <tr>
-          <td class="key_td" colspan="2"><img src="{{element.TEMPLATE.LOGO}}"></td>
-        </tr>
-        <tr>
           <td class="key_td">{{tr "ID"}}</td>
-          <td class="value_td" colspan="2">{{element.ID}}</td>
+          <td class="value_td" colspan="2">{{element.id}}</td>
         </tr>
         {{{renameTrHTML}}}
         <tr>
-          <td class="key_td">{{tr "Register time"}}</td>
-          <td class="value_td">{{prettyRegTime}}</td>
-          <td></td>
+          <td class="key_td">{{tr "Create time"}}</td>
+          <td class="value_td" colspan="2">{{element.create_time}}</td>
         </tr>
       </tbody>
     </table>
-    {{{labelsTableHTML}}}
   </div>
   <div class="large-6 columns">{{{permissionsTableHTML}}}</div>
+  <div class="large-12 columns">
+    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;"> Description </div>
+    <pre style='white-space: pre-wrap; font-family: "Lato","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;'>{{{element.description}}}</pre>
+  </div>
+  <div class="large-12 columns">
+    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;margin-top:10px;margin-bottom:5px;"> Supported OS </div>
+    {{{templateTableHTML}}}
+  </div>
 </div>

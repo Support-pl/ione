@@ -34,7 +34,7 @@ define(function(require) {
     CONSTANTS
    */
 
-  var XML_ROOT = "VMTEMPLATE"
+  var XML_ROOT = "ANSIBLE"
 
   /*
     CONSTRUCTOR
