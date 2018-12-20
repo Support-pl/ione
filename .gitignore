@@ -2,3 +2,4 @@
 public/dist/
 
 routes/ansible\.rb
+.vscode/settings.json
