@@ -19,14 +19,6 @@ define(function(require) {
     var Config = require('sunstone-config');
   
     var RESOURCE = "ANSIBLE";
-
-    function CommonAnsible(openNebulaResource, resourceStr, tabId, xmlRoot, createdStr) {
-        this.openNebulaResource = openNebulaResource;
-        this.resourceStr = resourceStr;
-        this.tabId = tabId;
-        this.xmlRoot = xmlRoot;
-        this.createdStr = createdStr;
-    }
   
     var Ansible = {
       "resource": RESOURCE,
