@@ -19,15 +19,6 @@ define(function(require) {
       DEPENDENCIES
      */
 
-    // OpenNebula.Ansible.list({
-    //     options: {force: true}, success: function (a, result) {
-    //         for (key in result) {
-    //             html += '<div class="playbook">' + result[key].ANSIBLE.name + '</div>';
-    //         }
-    //         $('.playbooks').append(html);
-    //     }
-    // });
-
     var TabDataTable = require('utils/tab-datatable');
     var SunstoneConfig = require('sunstone-config');
     var Locale = require('utils/locale');
@@ -131,7 +122,7 @@ define(function(require) {
     }
 
     function _postUpdateView() {
-        $(".total_playbooks").text(this.totalClusters);
+        $(".total_proccesses").text(this.totalClusters);
     }
 
 });

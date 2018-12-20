@@ -16,21 +16,21 @@
 
 define(function(require) {
   var Locale = require('utils/locale');
-  var Buttons = require('./ansible-tab/buttons');
-  var Actions = require('./ansible-tab/actions');
-  var Table = require('./ansible-tab/datatable');
+  var Buttons = require('./ansible-proccess-tab/buttons');
+  var Actions = require('./ansible-proccess-tab/actions');
+  var Table = require('./ansible-proccess-tab/datatable');
 
-  var TAB_ID = require('./ansible-tab/tabId');
-  var DATATABLE_ID = "dataTableAnsible";
+  var TAB_ID = require('./ansible-proccess-tab/tabId');
+  var DATATABLE_ID = "dataTableAnsibleProccess";
 
 
   var _dialogs = [
-    require('./ansible-tab/dialogs/clone')
+    require('./ansible-proccess-tab/dialogs/clone')
   ];
 
   var _panels = [
-   require('./ansible-tab/panels/info'),
-   require('./ansible-tab/panels/body')
+   require('./ansible-proccess-tab/panels/info'),
+   require('./ansible-proccess-tab/panels/body')
   ];
   
 
@@ -39,20 +39,20 @@ define(function(require) {
   //];
 
   var _formPanels = [
-   require('./ansible-tab/form-panels/create')
+   require('./ansible-proccess-tab/form-panels/create')
   ];
 
-  //var AnsibleList = require('./ansible-tab/form-panels/list');
+  //var AnsibleList = require('./ansible-proccess-tab/form-panels/list');
 
   var Tab = {
     tabId: TAB_ID,
-    title: Locale.tr("Playbooks"),
-    icon: 'fa-floppy-o',
+    title: Locale.tr("Proccesses"),
+    icon: 'fa-cogs',
     listHeader: Locale.tr("Playbooks"),
     infoHeader: Locale.tr("Playbook"),
     //content: AnsibleList,
     subheader: '<span>\
-        <span class="total_playbooks"/> <small>'+Locale.tr("TOTAL")+'</small>\
+        <span class="total_proccesses"/> <small>'+Locale.tr("TOTAL")+'</small>\
       </span>',
     resource: 'Ansible',
     buttons: Buttons,
@@ -63,7 +63,7 @@ define(function(require) {
     formPanels: _formPanels,
     dialogs: _dialogs,
     tabClass: "subTab",
-    parentTab: "automatization-top-tab"
+    parentTab: "automatization-top-tab",
   };
   //console.log(content);
 

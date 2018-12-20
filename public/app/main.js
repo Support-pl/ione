@@ -157,7 +157,9 @@ require.config({
         'tabs/support-tab',
         'tabs/upgrade-top-tab',
         'tabs/vmgroup-tab',
-        'tabs/ansible-tab'
+        'tabs/automatization-top-tab',
+        'tabs/ansible-tab',
+        'tabs/ansible-proccess-tab'
       ]
     },
 

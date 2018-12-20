@@ -1,0 +1,58 @@
+{{! -------------------------------------------------------------------------- }}
+{{! Copyright 2002-2017, OpenNebula Project, OpenNebula Systems                }}
+{{!                                                                            }}
+{{! Licensed under the Apache License, Version 2.0 (the "License"); you may    }}
+{{! not use this file except in compliance with the License. You may obtain    }}
+{{! a copy of the License at                                                   }}
+{{!                                                                            }}
+{{! http://www.apache.org/licenses/LICENSE-2.0                                 }}
+{{!                                                                            }}
+{{! Unless required by applicable law or agreed to in writing, software        }}
+{{! distributed under the License is distributed on an "AS IS" BASIS,          }}
+{{! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   }}
+{{! See the License for the specific language governing permissions and        }}
+{{! limitations under the License.                                             }}
+{{! -------------------------------------------------------------------------- }}
+
+<div>
+  <form data-abide novalidate id="{{formPanelId}}Wizard" class="custom creation">
+    <div class="large-6 columns">
+      <div class="large-6 columns">
+        <label for="name">
+          {{tr "Name"}}
+        </label>
+        <input type="text" name="name" id="name" required />
+      </div>
+      <div class="large-12 columns">
+        <label for="description">
+          {{tr "Description"}}
+          {{{tip (tr "Describe what your Playbook does. For example task-by-task.")}}}
+        </label>
+        <textarea name="description" id="description" />
+      </div>
+      <div class="large-12 columns">
+        <label for="supported_os">
+          {{tr "Supported OS"}}
+          {{{tip (tr "Comma-separated list of Operation Systems, which are supported by your Playbook. For example: 'Ubuntu 16.04, Debian 9'. Optional")}}}
+        </label>
+        <input type="text" name="supported_os" id="supported_os" />
+      </div>
+      <div class="medium-6 columns"></div>
+    </div>
+    <div class="large-6 columns">
+      <div class="large-12 columns">
+        <label id="body_label" for="body">
+          {{tr "Body"}}
+          {{{tip (tr "Written in YAML and responding to Ansible Playbook syntax. That means, that playbook root must be Array. Also don't forget, that hosts should be equal to '<%group%>' or Run method will not be able to run your Playbook. You can check if your Playbook corresponds to this rules by clicking on button 'Check Syntax'")}}}
+        </label>
+        <textarea name="body" id="body" style="height: 400px" required />
+      </div>
+    </div>
+  </form>
+  <div class="large-12 columns">
+    <div class="large-12 columns">
+      <button class="button secondary radius check_syntax" style="float:right;">{{tr "Check Syntax"}}</button>
+      <button disabled style="float:right;width:30.59px; height:30.59px;"><i id="control-i-check" class="fa fa-fw fa-lg check-syntax-false"></i></button>
+    </div>
+  </div>
+</div>
