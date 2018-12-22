@@ -14,6 +14,35 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require){
-  return 'ansible-proccess-tab';
-});
+define(function(require) {
+  var Locale = require('utils/locale');
+
+  var Buttons = {
+    "Ansible-process.refresh" : {
+      type: "action",
+      layout: "refresh",
+      alwaysActive: true
+    },
+    "Ansible-process.create_dialog" : {
+      type: "create_dialog",
+      layout: "create"
+    },
+    "Ansible-process.run" : {
+      type: "action",
+      layout: "main",
+      text: Locale.tr("Run")
+    },
+    "Ansible-process.clone_dialog" : {
+      type: "action",
+      layout: "main",
+      text: Locale.tr("Repeat")
+    },
+    "Ansible-process.delete" : {
+      type: "action",
+      layout: "del",
+      text: Locale.tr("Delete")
+    }
+  };
+
+  return Buttons;
+})

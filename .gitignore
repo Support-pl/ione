@@ -3,4 +3,4 @@ public/dist/
 
 routes/ansible\.rb
 .vscode/settings.json
-routes/ansible-proccess.rb
+routes/ansible-process.rb

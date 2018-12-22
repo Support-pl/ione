@@ -24,7 +24,7 @@ define(function(require) {
 
       Acl             = require('./opennebula/acl'),
       Ansible         = require('./opennebula/ansible'),
-      AnsibleProccess = require('./opennebula/ansible-proccess'),
+      AnsibleProcess = require('./opennebula/ansible-process'),
       Cluster         = require('./opennebula/cluster'),
       Datastore       = require('./opennebula/datastore'),
       Group           = require('./opennebula/group'),
@@ -69,7 +69,7 @@ define(function(require) {
     'Error': Error,
     'Acl': Acl,
     'Ansible': Ansible,
-    'AnsibleProccess': AnsibleProccess,
+    'AnsibleProcess': AnsibleProcess,
     'Cluster': Cluster,
     'Datastore': Datastore,
     'Group': Group,

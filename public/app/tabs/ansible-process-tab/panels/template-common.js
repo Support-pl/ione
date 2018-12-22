@@ -15,53 +15,55 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-  var Locale = require('utils/locale');
+    /*
+      DEPENDENCIES
+     */
 
-  var Buttons = {
-    "Ansible.refresh" : {
-      type: "action",
-      layout: "refresh",
-      alwaysActive: true
-    },
-    "Ansible.create_dialog" : {
-      type: "create_dialog",
-      layout: "create"
-    },
-    "Ansible.update_dialog" : {
-      type: "action",
-      layout: "main",
-      text: Locale.tr("Update")
-    },
-    "Ansible.run" : {
-      type: "action",
-      layout: "main",
-      text: Locale.tr("Run")
-    },
-    "Ansible.chown" : {
-      type: "confirm_with_select",
-      text: Locale.tr("Change owner"),
-      layout: "user_select",
-      select: "User",
-      tip: Locale.tr("Select the new owner"),
-    },
-    "Ansible.chgrp" : {
-      type: "confirm_with_select",
-      text: Locale.tr("Change group"),
-      layout: "user_select",
-      select: "Group",
-      tip: Locale.tr("Select the new group"),
-    },
-    "Ansible.clone_dialog" : {
-      type: "action",
-      layout: "main",
-      text: Locale.tr("Clone")
-    },
-    "Ansible.delete" : {
-      type: "action",
-      layout: "del",
-      text: Locale.tr("Delete")
+    var Locale = require('utils/locale');
+    var TemplateUtils = require('utils/template-utils');
+
+    /*
+      TEMPLATES
+     */
+
+    var TemplateInfo = require('hbs!./body/html');
+
+    /*
+      CONSTANTS
+     */
+
+    var PANEL_ID = require('./body/panelId');
+    var XML_ROOT = "ANSIBLEPROCESS"
+
+    /*
+      CONSTRUCTOR
+     */
+
+    function Panel(info) {
+        this.title = Locale.tr("BODY");
+        this.icon = "fa-file-o";
+
+        this.element = info[XML_ROOT];
+
+        return this;
+    };
+
+    Panel.prototype.html = _html;
+    Panel.prototype.setup = _setup;
+
+    return Panel;
+
+    /*
+      FUNCTION DEFINITIONS
+     */
+
+    function _html() {
+        return TemplateInfo({
+            'element': this.element,
+            'templateString': TemplateUtils.templateToString(this.element.body)
+        });
     }
-  };
 
-  return Buttons;
-})
+    function _setup(context) {
+    }
+});

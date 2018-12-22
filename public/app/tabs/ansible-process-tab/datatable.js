@@ -23,15 +23,16 @@ define(function(require) {
     var SunstoneConfig = require('sunstone-config');
     var Locale = require('utils/locale');
     var LabelsUtils = require('utils/labels/utils');
+    var Humanize = require('utils/humanize');
 
     /*
       CONSTANTS
      */
 
-    var RESOURCE = "Ansible";
-    var XML_ROOT = "ANSIBLE";
+    var RESOURCE = "Ansible_process";
+    var XML_ROOT = "ANSIBLE_PROCESS";
     var TAB_NAME = require('./tabId');
-    var LABELS_COLUMN = 5;
+    var LABELS_COLUMN = 6;
     var TEMPLATE_ATTR = 'TEMPLATE';
 
     /*
@@ -61,19 +62,21 @@ define(function(require) {
 
         this.columns = [
             Locale.tr("ID"),
-            Locale.tr("Name"),
-            Locale.tr("Description"),
-            Locale.tr("Owner"),
-            Locale.tr("Group"),
+            Locale.tr("Playbook"),
+            Locale.tr("Comment"),
+            Locale.tr("User"),
+            Locale.tr("Create time"),
+            Locale.tr("Install ID"),
         ];
 
         this.selectOptions = {
-
+     
         };
 
-        this.totalClusters = 0;
+        this.totalProcesses = 0;
 
         TabDataTable.call(this);
+
     }
 
     Table.prototype = Object.create(TabDataTable.prototype);
@@ -81,7 +84,6 @@ define(function(require) {
     Table.prototype.elementArray = _elementArray;
     Table.prototype.preUpdateView = _preUpdateView;
     Table.prototype.postUpdateView = _postUpdateView;
-
 
     return Table;
 
@@ -92,18 +94,19 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
-        this.totalClusters++;
+
+        this.totalProcesses++;
         return [
 
             '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
-            element.id + '" name="selected_items" value="' +
-            element.id + '"/>',
-            element.id,
-            element.name,
-            element.description,
+            element.proc_id + '" name="selected_items" value="' +
+            element.proc_id + '"/>',
+            element.proc_id,
+            element.playbook_id,
+            'test',
             element.uname,
-            element.gname,
-
+            Humanize.prettyTime(element.create_time),
+            element.install_id
         ];
     }
 
@@ -118,11 +121,11 @@ define(function(require) {
     }
 
     function _preUpdateView() {
-        this.totalClusters = 0;
+        this.totalProcesses = 0;
     }
 
     function _postUpdateView() {
-        $(".total_proccesses").text(this.totalClusters);
+        $(".total_processes").text(this.totalProcesses);
     }
 
 });

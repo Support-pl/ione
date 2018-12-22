@@ -18,9 +18,9 @@ define(function(require) {
     var OpenNebulaAction = require('./action');
     var Config = require('sunstone-config');
 
-    var RESOURCE = "ANSIBLE_PROCCESS";
+    var RESOURCE = "ANSIBLE_PROCESS";
 
-    var AnsibleProccess = {
+    var AnsibleProcess = {
         "resource": RESOURCE,
         "create" : function(params) {
             OpenNebulaAction.create(params, RESOURCE);
@@ -66,5 +66,5 @@ define(function(require) {
         }
     }
 
-    return AnsibleProccess;
+    return AnsibleProcess;
 })

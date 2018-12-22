@@ -159,7 +159,7 @@ require.config({
         'tabs/vmgroup-tab',
         'tabs/automatization-top-tab',
         'tabs/ansible-tab',
-        'tabs/ansible-proccess-tab'
+        'tabs/ansible-process-tab'
       ]
     },
 

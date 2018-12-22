@@ -28,8 +28,8 @@ define(function(require) {
 
     var TAB_ID = require('../tabId');
     var PANEL_ID = require('./body/panelId');
-    var RESOURCE = "Ansible"
-    var XML_ROOT = "ANSIBLE";
+    var RESOURCE = "AnsibleProcess"
+    var XML_ROOT = "ANSIBLEPROCESS";
 
 
     /*

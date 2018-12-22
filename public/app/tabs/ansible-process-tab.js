@@ -16,21 +16,21 @@
 
 define(function(require) {
   var Locale = require('utils/locale');
-  var Buttons = require('./ansible-proccess-tab/buttons');
-  var Actions = require('./ansible-proccess-tab/actions');
-  var Table = require('./ansible-proccess-tab/datatable');
+  var Buttons = require('./ansible-process-tab/buttons');
+  var Actions = require('./ansible-process-tab/actions');
+  var Table = require('./ansible-process-tab/datatable');
 
-  var TAB_ID = require('./ansible-proccess-tab/tabId');
-  var DATATABLE_ID = "dataTableAnsibleProccess";
+  var TAB_ID = require('./ansible-process-tab/tabId');
+  var DATATABLE_ID = "dataTableAnsibleProcess";
 
 
   var _dialogs = [
-    require('./ansible-proccess-tab/dialogs/clone')
+    require('./ansible-process-tab/dialogs/clone')
   ];
 
   var _panels = [
-   require('./ansible-proccess-tab/panels/info'),
-   require('./ansible-proccess-tab/panels/body')
+   require('./ansible-process-tab/panels/info'),
+   require('./ansible-process-tab/panels/body')
   ];
   
 
@@ -39,27 +39,24 @@ define(function(require) {
   //];
 
   var _formPanels = [
-   require('./ansible-proccess-tab/form-panels/create')
+   require('./ansible-process-tab/form-panels/create')
   ];
 
-  //var AnsibleList = require('./ansible-proccess-tab/form-panels/list');
 
   var Tab = {
     tabId: TAB_ID,
-    title: Locale.tr("Proccesses"),
+    title: Locale.tr("Processes"),
     icon: 'fa-cogs',
-    listHeader: Locale.tr("Playbooks"),
-    infoHeader: Locale.tr("Playbook"),
-    //content: AnsibleList,
+    listHeader: Locale.tr("Processes"),
+    infoHeader: Locale.tr("Processe"),
     subheader: '<span>\
-        <span class="total_proccesses"/> <small>'+Locale.tr("TOTAL")+'</small>\
+        <span class="total_processes"/> <small>'+Locale.tr("TOTAL")+'</small>\
       </span>',
-    resource: 'Ansible',
+    resource: 'Ansible_process',
     buttons: Buttons,
     actions: Actions,
     dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),
     panels: _panels,
-    //panelsHooks: _panelsHooks
     formPanels: _formPanels,
     dialogs: _dialogs,
     tabClass: "subTab",

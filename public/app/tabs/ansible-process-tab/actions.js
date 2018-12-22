@@ -19,35 +19,35 @@ define(function(require) {
     var Notifier = require('utils/notifier');
     var Locale = require('utils/locale');
     var DataTable = require('./datatable');
-    var OpenNebulaResource = require('opennebula/ansible');
+    var OpenNebulaResource = require('opennebula/ansible-process');
     var OpenNebulaAction = require('opennebula/action');
     var CommonActions = require('utils/common-actions');
     var Navigation = require('utils/navigation');
     var CREATE_DIALOG_ID = require('./form-panels/create/formPanelId');
     var CLONE_DIALOG_ID = require('./dialogs/clone/dialogId');
 
-    var RESOURCE = "Ansible";
-    var XML_ROOT = "ANSIBLE";
+    var RESOURCE = "Ansible_process";
+    var XML_ROOT = "ANSIBLEPROCESS";
     var TAB_ID = require('./tabId');
 
     var _commonActions = new CommonActions(OpenNebulaResource, RESOURCE, TAB_ID,
         XML_ROOT, Locale.tr("Ansible created"));
 
     var _actions = {
-        "Ansible.create" : _commonActions.create(),
-        "Ansible.list" : _commonActions.list(),
-        "Ansible.show" : _commonActions.show(),
-        "Ansible.refresh" : _commonActions.refresh(),
-        "Ansible.delete" : _commonActions.multipleAction('del'),
-        "Ansible.update" : _commonActions.update(),
-        "Ansible.chmod" : _commonActions.singleAction('chmod'),
-        "Ansible.chown": _commonActions.multipleAction('chown'),
-        "Ansible.chgrp": _commonActions.multipleAction('chgrp'),
-        "Ansible.rename": _commonActions.singleAction('rename'),
-        "Ansible.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
-        "Ansible.update_dialog" : _commonActions.checkAndShowUpdate(),
-        "Ansible.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
-        "Ansible.clone_dialog"  : {
+        "Ansible_process.create" : _commonActions.create(),
+        "Ansible_process.list" : _commonActions.list(),
+        "Ansible_process.show" : _commonActions.show(),
+        "Ansible_process.refresh" : _commonActions.refresh(),
+        "Ansible_process.delete" : _commonActions.multipleAction('del'),
+        "Ansible_process.update" : _commonActions.update(),
+        "Ansible_process.chmod" : _commonActions.singleAction('chmod'),
+        "Ansible_process.chown": _commonActions.multipleAction('chown'),
+        "Ansible_process.chgrp": _commonActions.multipleAction('chgrp'),
+        "Ansible_process.rename": _commonActions.singleAction('rename'),
+        "Ansible_process.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
+        "Ansible_process.update_dialog" : _commonActions.checkAndShowUpdate(),
+        "Ansible_process.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
+        "Ansible_process.clone_dialog"  : {
             type: "custom",
             call: function(){
               Sunstone.getDialog(CLONE_DIALOG_ID).setParams(
@@ -58,7 +58,7 @@ define(function(require) {
               Sunstone.getDialog(CLONE_DIALOG_ID).show();
             }
         },
-        "Ansible.clone" : {
+        "Ansible_process.clone" : {
             type: "single",
             call: OpenNebulaResource.clone,
             callback: function(request, response) {

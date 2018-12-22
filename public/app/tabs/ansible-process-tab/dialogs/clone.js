@@ -23,7 +23,7 @@ define(function(require) {
   var TemplateHTML = require('hbs!./clone/html');
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
-  var AnsiblePlaybook = require('opennebula/ansible');
+  var AnsiblePlaybook = require('opennebula/ansible-process');
 
   /*
     CONSTANTS

@@ -10,7 +10,7 @@ enabled_tabs:
     - vms-tab
     - automatization-top-tab
     - ansible-tab
-    - ansible-proccess-tab
+    - ansible-process-tab
     #- oneflow-services-tab
     #- vrouters-tab
     - templates-top-tab
@@ -100,16 +100,19 @@ tabs:
             Ansible.clone_dialog: true
             Ansible.delete_dialog: true
             Ansible.run: true
-    ansible-proccess-tab:
+    ansible-process-tab:
         panel_tabs:
             ansible_info_tab: true
             ansible_body_tab: true
+            ansible_log_tab: true
         table_columns:
             - 0         # Checkbox
             - 1         # ID
             - 2         # Name
-            - 3         # Description
-            - 4         # Owner
+            - 3         # Comment
+            - 4         # User
+            - 5         # Create Time
+            - 6         # Install ID
         actions:
             Ansible.refresh: true
             Ansible.create_dialog: true

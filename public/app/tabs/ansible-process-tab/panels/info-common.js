@@ -19,40 +19,60 @@ define(function(require) {
     DEPENDENCIES
    */
 
-    var Locale = require('utils/locale');
-    var Humanize = require('utils/humanize');
-    var TemplateUtils = require('utils/template-utils');
-    var TemplateHtml = require('hbs!./template/html');
+  var Locale = require('utils/locale');
+  var Humanize = require('utils/humanize');
+  var RenameTr = require('utils/panel/rename-tr');
+  var PermissionsTable = require('utils/panel/permissions-table');
+
+  /*
+    TEMPLATES
+   */
+
+  var TemplateInfo = require('hbs!./info/html');
 
   /*
     CONSTANTS
    */
 
-  var TAB_ID = require('../tabId');
-  var PANEL_ID = require('./template/panelId');
-  var RESOURCE = "Ansible";
-  var XML_ROOT = "ANSIBLE";
+  var XML_ROOT = "ANSIBLEPROCESS"
 
   /*
     CONSTRUCTOR
    */
 
-  Panel.PANEL_ID = PANEL_ID;
+  function Panel(info) {
+    this.title = Locale.tr("Info");
+    this.icon = "fa-info-circle";
+
+    this.element = info[XML_ROOT];
+
+    return this;
+  };
+
   Panel.prototype.html = _html;
   Panel.prototype.setup = _setup;
 
   return Panel;
 
   /*
-     FUNCTION DEFINITIONS
+    FUNCTION DEFINITIONS
    */
+
   function _html() {
-    return TemplateHtml({
-        userTemplateString: TemplateUtils.templateToString(this.element.USER_TEMPLATE),
-        templateString: TemplateUtils.templateToString(this.element.TEMPLATE)
+    var renameTrHTML = RenameTr.html(this.tabId, this.resource, this.element.NAME);
+    var permissionsTableHTML = PermissionsTable.html(this.tabId, this.resource, this.element);
+    var prettyRegTime = Humanize.prettyTime(this.element.REGTIME);
+
+    return TemplateInfo({
+      'element': this.element,
+      'renameTrHTML': renameTrHTML,
+      'permissionsTableHTML': permissionsTableHTML,
+      'prettyRegTime': prettyRegTime
     });
   }
 
   function _setup(context) {
+    RenameTr.setup(this.tabId, this.resource, this.element.ID, context);
+    PermissionsTable.setup(this.tabId, this.resource, this.element, context);
   }
 });

@@ -382,7 +382,7 @@ define(function(require) {
     //--------------------------------------------------------------------------
 
     // TODO filter
-    // True to proccess, false to discard
+    // True to process, false to discard
     var filter_by_fn = function(history){
       // return history.OID == 3605 || history.OID == 2673;
       return true;
