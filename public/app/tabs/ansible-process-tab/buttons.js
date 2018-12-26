@@ -18,26 +18,21 @@ define(function(require) {
   var Locale = require('utils/locale');
 
   var Buttons = {
-    "Ansible-process.refresh" : {
+    "AnsibleProcess.refresh" : {
       type: "action",
       layout: "refresh",
       alwaysActive: true
     },
-    "Ansible-process.create_dialog" : {
+    "AnsibleProcess.create_dialog" : {
       type: "create_dialog",
       layout: "create"
     },
-    "Ansible-process.run" : {
+    "AnsibleProcess.run" : {
       type: "action",
       layout: "main",
       text: Locale.tr("Run")
     },
-    "Ansible-process.clone_dialog" : {
-      type: "action",
-      layout: "main",
-      text: Locale.tr("Repeat")
-    },
-    "Ansible-process.delete" : {
+    "AnsibleProcess.delete" : {
       type: "action",
       layout: "del",
       text: Locale.tr("Delete")

@@ -102,25 +102,24 @@ tabs:
             Ansible.run: true
     ansible-process-tab:
         panel_tabs:
-            ansible_info_tab: true
-            ansible_body_tab: true
-            ansible_log_tab: true
+            ansible_process_info_tab: true
+            ansible_process_runnable_tab: true
+            ansible_process_log_tab: true
         table_columns:
             - 0         # Checkbox
             - 1         # ID
             - 2         # Name
-            - 3         # Comment
-            - 4         # User
-            - 5         # Create Time
-            - 6         # Install ID
+            - 3         # User
+            - 4         # Create Time
+            - 5         # Install ID
+            - 6         # Status
         actions:
-            Ansible.refresh: true
-            Ansible.create_dialog: true
-            Ansible.update_dialog: true
-            Ansible.rename: true
-            Ansible.clone_dialog: true
-            Ansible.delete_dialog: true
-            Ansible.run: true
+            AnsibleProcess.refresh: true
+            AnsibleProcess.create_dialog: true
+            AnsibleProcess.rename: true
+            AnsibleProcess.clone_dialog: true
+            AnsibleProcess.delete_dialog: true
+            AnsibleProcess.run: true
     system-top-tab:
         panel_tabs:
         actions:

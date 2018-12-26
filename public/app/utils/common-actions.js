@@ -157,7 +157,7 @@ define(function(require) {
         Sunstone.resetFormPanel(that.tabId, formPanelId);
         Sunstone.hideFormPanel(that.tabId);
         that.refresh();
-
+        console.log(that.xmlRoot, response);
         if (response[that.xmlRoot].ID != undefined){
           Notifier.notifyCustom(that.createdStr,
             Navigation.link(" ID: " + response[that.xmlRoot].ID, that.tabId, response[that.xmlRoot].ID),

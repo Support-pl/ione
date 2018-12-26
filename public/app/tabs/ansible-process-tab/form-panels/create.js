@@ -29,6 +29,7 @@ define(function(require) {
     var WizardFields = require('utils/wizard-fields');
     var OpenNebula = require('opennebula');
     var CommonActions = require('utils/common-actions');
+    var VMTable = require('tabs/vms-tab/datatable');
 
     /*
       TEMPLATES
@@ -53,14 +54,9 @@ define(function(require) {
         this.tabId = TAB_ID;
         this.actions = {
             'create': {
-                'title': Locale.tr("Create Playbook"),
+                'title': Locale.tr("Create Process"),
                 'buttonText': Locale.tr("Create"),
                 'resetButton': true
-            },
-            'update': {
-                'title': Locale.tr("Update Playbook"),
-                'buttonText': Locale.tr("Update"),
-                'resetButton': false
             }
         }
 
@@ -68,6 +64,15 @@ define(function(require) {
 
         BaseFormPanel.call(this);
     };
+
+    var Playbooks;
+    OpenNebula.Ansible.list({
+        success: function(r, res){
+            Playbooks = res;
+        }, error:function(r, res){
+
+        }
+    });
 
     FormPanel.FORM_PANEL_ID = FORM_PANEL_ID;
     FormPanel.prototype = Object.create(BaseFormPanel.prototype);
@@ -85,13 +90,24 @@ define(function(require) {
      */
 
     function _htmlWizard() {
+        var opts = {
+            info: false,
+            select: true,
+            selectOptions: {"multiple_choice": true}
+        };
+
+        this.VMTable = new VMTable("vms_wizard", opts);
+
         return TemplateWizardHTML({
-            'formPanelId': this.formPanelId
+            'formPanelId': this.formPanelId,
+            'VMTableHTML': this.VMTable.dataTableHTML,
+            'Playbooks': Playbooks,
         });
     }
 
     function _setup(context) {
         var that = this;
+        this.VMTable.initialize();
 
         WizardFields.fillInput($("#body", context), " - hosts: <%group%>");
 
@@ -100,39 +116,14 @@ define(function(require) {
             $('#ansible-tabsubmit_button button').prop('disabled', true);
         });
 
-        $(".check_syntax").on("click",function () {
-            $.ajax({
-                url: '/ansible/check_syntax',
-                type: 'POST',
-                dataType: 'json',
-                data: JSON.stringify({"body":$('#body').val()}),
-                success: function(response) {
-                    console.log(response.response[0]);
-                    if(response.response[0]){
-                        $('#body_label').removeClass('is-invalid-label');
-                        $('#body').removeClass('is-invalid-input');
-                        $('#control-i-check').addClass('check-syntax-ok').removeClass('check-syntax-false');
-                        $('#ansible-tabsubmit_button button').prop('disabled', false);
-                    } else {
-                        $('#body_label').addClass('is-invalid-label');
-                        $('#body').addClass('is-invalid-input');
-                        $('#control-i-check').removeClass('check-syntax-ok').addClass('check-syntax-false');
-                        $('#ansible-tabsubmit_button button').prop('disabled', true);
-                        Notifier.notifyError('Body syntax error');
-                    }
-                },
-                error: function(response) {
-                    console.log(response);
-                    return callbackError ?
-                        callbackError(request, OpenNebulaError(response)) : null;
-                }
-            })
-        });
 
         return false;
     }
 
     function _submitWizard(context) {
+        var that = this;
+
+        var selectedVMList = that.VMTable.retrieveResourceTableSelect();
 
         var name            = $('#name').val();
         var description     = $('#description').val();
@@ -140,25 +131,31 @@ define(function(require) {
         var body            = $('#body').val();
 
         if(this.action == "create"){
+            var selectedVM = {};
+            $.each(selectedHostsList, function(i,e){
+                selectedHosts[e] = 1;
+            });
+
+            var cluster_json = {
+                "VMs": {
+                    "name": $('#name',context).val(),
+                    "hosts": selectedHosts,
+                    "vnets": selectedVNets,
+                    "datastores": selectedDatastores
+                }
+            };
+
+
             Sunstone.runAction(
                 "Ansible.create",
                 { name: name, body: body, description : description, extra_data: {PERMISSIONS: '111000000', SUPPORTED_OS: supported_os}}
             );
-        } else if(this.action == "update") {
-            Sunstone.runAction(
-                "Ansible.update",
-                this.resourceId,
-                { name: name, body: body, description : description, extra_data: {PERMISSIONS: this.resource.extra_data.PERMISSIONS, SUPPORTED_OS: supported_os}}
-            )
         }
         return false;
     };
 
 
     function _fill(context, element) {
-      if (this.action != "update") {
-        return;
-      }
       
       element.ID = element.id
       element.NAME = element.name
@@ -174,10 +171,29 @@ define(function(require) {
       WizardFields.fillInput($("#description", context), element.description);
       WizardFields.fillInput($("#supported_os", context), element.extra_data.SUPPORTED_OS);
 
+        var VMIds = element.HOSTS.ID;
+
+        if (typeof VMIds == 'string'){
+            VMIds = [VMIds];
+        }
+
+        $('#name',context).val(name);
+        $('#name',context).attr("disabled", "disabled");
+
+        this.originalHostsList = [];
+
+        // Select hosts belonging to the cluster
+        if (VMIds){
+            this.originalVMList = VMIds;
+            this.VMTable.selectResourceTableSelect({ids: VMIds});
+        }
+
+
     }
 
     function _onShow(context) {
         $('#ansible-tabsubmit_button button').prop('disabled', true);
+        this.VMTable.refreshResourceTableSelect();
     }
 
 

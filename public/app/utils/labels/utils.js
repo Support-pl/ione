@@ -528,10 +528,13 @@ define(function(require) {
           template = element.USER_TEMPLATE;
         } else if (element.extra_data) {
             template = element;
+        } else if (element.proc_id) {
+            template = element;
         } else {
             template = element.TEMPLATE;
         }
         if (template["BODY"] && template["BODY"][LABELS_ATTR.toLowerCase()]) {
+          console.log('доходит1');
           return template["BODY"][LABELS_ATTR.toLowerCase()];
         } else {
           return template[LABELS_ATTR]||'';

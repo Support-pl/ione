@@ -25,23 +25,34 @@
       <tbody>
         <tr>
           <td class="key_td">{{tr "ID"}}</td>
-          <td class="value_td" colspan="2">{{element.proc_id}}</td>
+          <td class="value_td" colspan="2">{{element.install_id}}</td>
+          <td class="key_td">{{tr "Status"}}</td>
+          <td class="value_td" colspan="2">{{element.status}}</td>
         </tr>
-        {{{renameTrHTML}}}
+        <tr>
+          <td class="key_td">{{tr "Playbook ID"}}</td>
+          <td class="value_td" colspan="2">{{element.playbook_id}}</td>
+          <td class="key_td">{{tr "Playbook Name"}}</td>
+          <td class="value_td" colspan="2">{{element.playbook_id}}</td>
+        </tr>
         <tr>
           <td class="key_td">{{tr "Create time"}}</td>
           <td class="value_td" colspan="2">{{element.create_time}}</td>
+          <td class="key_td">{{tr "Start time"}}</td>
+          <td class="value_td" colspan="2">{{element.start_time}}</td>
+          <td class="key_td">{{tr "End time"}}</td>
+          <td class="value_td" colspan="2">{{element.end_time}}</td>
+        </tr>
+        <tr>
+          <td class="key_td">{{tr "Runned by"}}</td>
+          <td class="value_td" colspan="2">{{element.uname}}</td>
         </tr>
       </tbody>
     </table>
   </div>
   <div class="large-6 columns"></div>
   <div class="large-12 columns">
-    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;"> Description </div>
-    <pre style='white-space: pre-wrap; font-family: "Lato","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;'>{{{element.description}}}</pre>
-  </div>
-  <div class="large-12 columns">
-    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;margin-top:10px;margin-bottom:5px;"> Supported OS </div>
-    {{{templateTableHTML}}}
+    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;"> Comment </div>
+    <pre style='white-space: pre-wrap; font-family: "Lato","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;'>{{{element.comment}}}</pre>
   </div>
 </div>

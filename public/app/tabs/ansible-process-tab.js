@@ -30,7 +30,8 @@ define(function(require) {
 
   var _panels = [
    require('./ansible-process-tab/panels/info'),
-   require('./ansible-process-tab/panels/body')
+   require('./ansible-process-tab/panels/log'),
+   require('./ansible-process-tab/panels/runnable')
   ];
   
 
@@ -48,11 +49,11 @@ define(function(require) {
     title: Locale.tr("Processes"),
     icon: 'fa-cogs',
     listHeader: Locale.tr("Processes"),
-    infoHeader: Locale.tr("Processe"),
+    infoHeader: Locale.tr("Process"),
     subheader: '<span>\
         <span class="total_processes"/> <small>'+Locale.tr("TOTAL")+'</small>\
       </span>',
-    resource: 'Ansible_process',
+    resource: 'AnsibleProcess',
     buttons: Buttons,
     actions: Actions,
     dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),

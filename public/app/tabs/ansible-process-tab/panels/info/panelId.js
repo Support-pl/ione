@@ -15,5 +15,5 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require){
-  return 'ansible_info_tab';
+    return 'ansible_process_info_tab';
 });

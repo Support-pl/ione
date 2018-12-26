@@ -16,43 +16,36 @@
 
 <div>
   <form data-abide novalidate id="{{formPanelId}}Wizard" class="custom creation">
-    <div class="large-6 columns">
-      <div class="large-6 columns">
-        <label for="name">
-          {{tr "Name"}}
-        </label>
-        <input type="text" name="name" id="name" required />
+      <div class="lagre-12 columns">
+          <div class="large-6 columns">
+              <label for="Playbooks">
+                  {{tr "Playbooks"}}
+              </label>
+              <select wizard_field="Playbooks" id="Playbooks" name="Playbooks">
+                  <option value=""></option>
+                  {{#each Playbooks}}
+                  <option value="{{ANSIBLE.id}}">{{ANSIBLE.id}}:{{ANSIBLE.name}}</option>
+                  {{/each}}
+              </select>
+          </div>
+          <div class="large-6 column">
+            <input type="checkbox" id="checkbox_sshkey" name="checkbox_sshkey">
+            <label for="checkbox_sshkey">
+                {{tr "Use SSH key for all"}}
+            </label>
+            <label for="Playbooks">
+                {{tr "SSH Key"}}
+            </label>
+            <input name="ssh_key" id="ssh_key" type="text" value="">
+          </div>
       </div>
-      <div class="large-12 columns">
-        <label for="description">
-          {{tr "Description"}}
-          {{{tip (tr "Describe what your Playbook does. For example task-by-task.")}}}
-        </label>
-        <textarea name="description" id="description" />
-      </div>
-      <div class="large-12 columns">
-        <label for="supported_os">
-          {{tr "Supported OS"}}
-          {{{tip (tr "Comma-separated list of Operation Systems, which are supported by your Playbook. For example: 'Ubuntu 16.04, Debian 9'. Optional")}}}
-        </label>
-        <input type="text" name="supported_os" id="supported_os" />
-      </div>
-      <div class="medium-6 columns"></div>
-    </div>
-    <div class="large-6 columns">
-      <div class="large-12 columns">
-        <label id="body_label" for="body">
-          {{tr "Body"}}
-          {{{tip (tr "Written in YAML and responding to Ansible Playbook syntax. That means, that playbook root must be Array. Also don't forget, that hosts should be equal to '<%group%>' or Run method will not be able to run your Playbook. You can check if your Playbook corresponds to this rules by clicking on button 'Check Syntax'")}}}
-        </label>
-        <textarea name="body" id="body" style="height: 400px" required />
-      </div>
+
+    <div class="lagre-12 columns">
+        <div class="tabs-content" data-tabs-content="{{formPanelId}}Tabs">
+            <div id="tab-hostsTab" class="is-active tabs-panel">
+                {{{VMTableHTML}}}
+            </div>
+        </div>
     </div>
   </form>
-  <div class="large-12 columns">
-    <div class="large-12 columns">
-      <button class="button secondary radius check_syntax" style="float:right;">{{tr "Check Syntax"}}</button>
-      <button disabled style="float:right;width:30.59px; height:30.59px;"><i id="control-i-check" class="fa fa-fw fa-lg check-syntax-false"></i></button>
-    </div>
-  </div>
 </div>

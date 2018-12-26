@@ -26,51 +26,36 @@ define(function(require) {
     var CREATE_DIALOG_ID = require('./form-panels/create/formPanelId');
     var CLONE_DIALOG_ID = require('./dialogs/clone/dialogId');
 
-    var RESOURCE = "Ansible_process";
-    var XML_ROOT = "ANSIBLEPROCESS";
+    var RESOURCE = "AnsibleProcess";
+    var XML_ROOT = "ANSIBLE_PROCESS";
     var TAB_ID = require('./tabId');
 
     var _commonActions = new CommonActions(OpenNebulaResource, RESOURCE, TAB_ID,
         XML_ROOT, Locale.tr("Ansible created"));
 
     var _actions = {
-        "Ansible_process.create" : _commonActions.create(),
-        "Ansible_process.list" : _commonActions.list(),
-        "Ansible_process.show" : _commonActions.show(),
-        "Ansible_process.refresh" : _commonActions.refresh(),
-        "Ansible_process.delete" : _commonActions.multipleAction('del'),
-        "Ansible_process.update" : _commonActions.update(),
-        "Ansible_process.chmod" : _commonActions.singleAction('chmod'),
-        "Ansible_process.chown": _commonActions.multipleAction('chown'),
-        "Ansible_process.chgrp": _commonActions.multipleAction('chgrp'),
-        "Ansible_process.rename": _commonActions.singleAction('rename'),
-        "Ansible_process.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
-        "Ansible_process.update_dialog" : _commonActions.checkAndShowUpdate(),
-        "Ansible_process.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
-        "Ansible_process.clone_dialog"  : {
-            type: "custom",
-            call: function(){
-              Sunstone.getDialog(CLONE_DIALOG_ID).setParams(
-                { tabId : TAB_ID,
-                  resource : RESOURCE
-                });
-              Sunstone.getDialog(CLONE_DIALOG_ID).reset();
-              Sunstone.getDialog(CLONE_DIALOG_ID).show();
-            }
-        },
-        "Ansible_process.clone" : {
-            type: "single",
-            call: OpenNebulaResource.clone,
+        "AnsibleProcess.create" : _commonActions.create(),
+        "AnsibleProcess.list" : _commonActions.list(),
+        "AnsibleProcess.show" : _commonActions.show(),
+        "AnsibleProcess.refresh" : _commonActions.refresh(),
+        "AnsibleProcess.delete" : _commonActions.multipleAction('del'),
+        "AnsibleProcess.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
+        "AnsibleProcess.update_dialog" : _commonActions.checkAndShowUpdate(),
+        "AnsibleProcess.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
+        "AnsibleProcess.run" : {
+            type: "multiple",
+            call: OpenNebulaResource.run,
             callback: function(request, response) {
-              console.log(response);
-              OpenNebulaAction.clear_cache(RESOURCE);
-              Notifier.notifyCustom(Locale.tr("Ansible Playbook created"),
-                Navigation.link(" ID: " + response.response, "ansible-tab", response.response),
-                false);
+              Notifier.notifyCustom(Locale.tr("Process started"));
             },
-            error: Notifier.onError,
-            notify: true
-        }
+            elements: function(opts) {
+              return Sunstone.getDataTable(TAB_ID).elements(opts);
+            },
+            error: function(request, response){
+              Notifier.onError(request, response);
+            },
+            notify: false
+          }
     };
 
 

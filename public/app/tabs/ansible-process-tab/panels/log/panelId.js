@@ -14,59 +14,6 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
-    /*
-      DEPENDENCIES
-     */
-
-    var TemplateHTML = require("hbs!./body/html");
-    var Locale = require("utils/locale");
-
-    /*
-      CONSTANTS
-     */
-
-    var TAB_ID = require('../tabId');
-    var PANEL_ID = require('./body/panelId');
-    var RESOURCE = "AnsibleProcess"
-    var XML_ROOT = "ANSIBLEPROCESS";
-
-
-    /*
-      CONSTRUCTOR
-     */
-
-    function Panel(info) {
-        var that = this;
-
-        this.title = Locale.tr("Body");
-        this.icon = "fa-file-o";
-
-        this.element = info[XML_ROOT];
-
-        return this;
-    }
-
-    Panel.PANEL_ID = PANEL_ID;
-    Panel.prototype.html = _html;
-    Panel.prototype.setup = _setup;
-
-
-    return Panel;
-
-    /*
-          FUNCTION DEFINITIONS
-         */
-
-    console.log(this.element);
-
-    function _html() {
-        return TemplateHTML({
-            'element': this.element,
-            'templateString': this.element.body
-        });
-    }
-
-    function _setup(context) {
-    }
+define(function(require){
+    return 'ansible_process_log_tab';
 });

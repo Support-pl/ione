@@ -29,7 +29,7 @@ define(function(require) {
       CONSTANTS
      */
 
-    var RESOURCE = "Ansible_process";
+    var RESOURCE = "AnsibleProcess";
     var XML_ROOT = "ANSIBLE_PROCESS";
     var TAB_NAME = require('./tabId');
     var LABELS_COLUMN = 6;
@@ -63,10 +63,10 @@ define(function(require) {
         this.columns = [
             Locale.tr("ID"),
             Locale.tr("Playbook"),
-            Locale.tr("Comment"),
             Locale.tr("User"),
             Locale.tr("Create time"),
             Locale.tr("Install ID"),
+            Locale.tr("Status")
         ];
 
         this.selectOptions = {
@@ -102,11 +102,11 @@ define(function(require) {
             element.proc_id + '" name="selected_items" value="' +
             element.proc_id + '"/>',
             element.proc_id,
-            element.playbook_id,
-            'test',
+            element.playbook_name,
             element.uname,
             Humanize.prettyTime(element.create_time),
-            element.install_id
+            element.install_id,
+            element.status
         ];
     }
 

@@ -15,30 +15,55 @@
 /* -------------------------------------------------------------------------- */
 
 define(function(require) {
-    var OpenNebulaAction = require('./action');
-    var Config = require('sunstone-config');
+    /*
+      DEPENDENCIES
+     */
 
-    var RESOURCE = "ANSIBLE_PROCESS";
+    var TemplateHTML = require("hbs!./runnable/html");
+    var Locale = require("utils/locale");
 
-    var AnsibleProcess = {
-        "resource": RESOURCE,
-        "create" : function(params) {
-            OpenNebulaAction.create(params, RESOURCE);
-        },
-        "del" : function(params) {
-            OpenNebulaAction.del(params, RESOURCE);
-        },
-        "list" : function(params) {
-            OpenNebulaAction.list(params, RESOURCE);
-        },
-        "show" : function(params) {
-            OpenNebulaAction.show(params, RESOURCE);
-        },
-        "run" : function(params) {
-            var action_obj = params.data.id ? params.data.id : {};
-            OpenNebulaAction.simple_action(params, RESOURCE, "run", action_obj);
-        }
+    /*
+      CONSTANTS
+     */
+
+    var TAB_ID = require('../tabId');
+    var PANEL_ID = require('./runnable/panelId');
+    var RESOURCE = "AnsibleProcess"
+    var XML_ROOT = "ANSIBLE_PROCESS";
+
+
+    /*
+      CONSTRUCTOR
+     */
+
+    function Panel(info) {
+        var that = this;
+
+        this.title = Locale.tr("Body");
+        this.icon = "fa-file-o";
+
+        this.element = info[XML_ROOT];
+
+        return this;
     }
 
-    return AnsibleProcess;
-})
+    Panel.PANEL_ID = PANEL_ID;
+    Panel.prototype.html = _html;
+    Panel.prototype.setup = _setup;
+
+    return Panel;
+
+    /*
+          FUNCTION DEFINITIONS
+         */
+
+    function _html() {
+        return TemplateHTML({
+            'element': this.element,
+            'templateString': this.element.runnable
+        });
+    }
+
+    function _setup(context) {
+    }
+});

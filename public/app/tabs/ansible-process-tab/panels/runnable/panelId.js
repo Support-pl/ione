@@ -14,31 +14,6 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
-    var OpenNebulaAction = require('./action');
-    var Config = require('sunstone-config');
-
-    var RESOURCE = "ANSIBLE_PROCESS";
-
-    var AnsibleProcess = {
-        "resource": RESOURCE,
-        "create" : function(params) {
-            OpenNebulaAction.create(params, RESOURCE);
-        },
-        "del" : function(params) {
-            OpenNebulaAction.del(params, RESOURCE);
-        },
-        "list" : function(params) {
-            OpenNebulaAction.list(params, RESOURCE);
-        },
-        "show" : function(params) {
-            OpenNebulaAction.show(params, RESOURCE);
-        },
-        "run" : function(params) {
-            var action_obj = params.data.id ? params.data.id : {};
-            OpenNebulaAction.simple_action(params, RESOURCE, "run", action_obj);
-        }
-    }
-
-    return AnsibleProcess;
-})
+define(function(require){
+    return 'ansible_process_runnable_tab';
+});

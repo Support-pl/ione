@@ -23,7 +23,6 @@ define(function(require) {
     var Locale = require("utils/locale");
     var RenameTr = require("utils/panel/rename-tr");
     var TemplateTable = require("utils/panel/template-table");
-    var PermissionsTable = require('./permissions-table');
     var Sunstone = require("sunstone");
     var TemplateUtils = require("utils/template-utils");
     var Humanize = require('utils/humanize');
@@ -37,7 +36,7 @@ define(function(require) {
 
     var TAB_ID = require("../tabId");
     var PANEL_ID = require("./info/panelId");
-    var RESOURCE = "Ansible_process";
+    var RESOURCE = "AnsibleProcess";
     var XML_ROOT = "ANSIBLE_PROCESS";
 
     var OVERCOMMIT_DIALOG_ID = require("utils/dialogs/overcommit/dialogId");
@@ -55,8 +54,12 @@ define(function(require) {
         this.element = info[XML_ROOT];
         this.percent = false;
 
+        //this.element.id = this.element.proc_id;
+
 
         this.element.create_time = Humanize.prettyTime(this.element.create_time);
+        this.element.start_time = this.element.start_time == -1 ? ' — ' : Humanize.prettyTime(this.element.start_time);
+        this.element.end_time = this.element.end_time == -1 ? ' — ' : Humanize.prettyTime(this.element.end_time);
 
         // Hide information in the template table. Unshow values are stored
         // in the unshownTemplate object to be used when the element info is updated.
