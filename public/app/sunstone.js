@@ -190,6 +190,9 @@ define(function(require) {
       title += "<i class=\"fa fa-lg fa-fw " + tabInfo.icon + "\"></i> ";
     }
     title += tabInfo.title;
+    if (tabInfo.beta){
+      title += "<sup>βeta</sup> ";
+    }
 
     if (parent !== "") {
       liItem = "<li id=\"li_" + tabName + "\" class=\"" + tabClass + "\">" +

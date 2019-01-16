@@ -23,6 +23,7 @@ define(function(require) {
     var TemplateHTML = require('hbs!./reinstall/html');
     var Sunstone = require('sunstone');
     var Tips = require('utils/tips');
+    var Locale = require('utils/locale');
 
     /*
       CONSTANTS
@@ -59,6 +60,7 @@ define(function(require) {
     });
 
 
+
     function _html() {
         return TemplateHTML({
             'dialogId': this.dialogId
@@ -72,7 +74,15 @@ define(function(require) {
         var Notifier = require('utils/notifier');
 
         var ProvisionVmsList = require('tabs/provision-tab/vms/list');
-        
+
+
+        context.on("click",".checkbox_playbooks", function(){
+            if($(this).is(':checked')){
+                $('.checkbox_playbooks').prop('checked',false);
+                $(this).prop('checked',true);
+            }
+        });
+
         context.on("click", ".provision-pricing-table", function(){
             $(".provision-pricing-table").css('border','1px solid #f4f4f4');
             $(".provision-pricing-table").removeClass('checktemp');
@@ -141,23 +151,56 @@ define(function(require) {
                 }
             }
 
-            if(username == ''){
-                OpenNebula.VM.reinstall({
-                    data: {
-                        id:vm_id, template_id:id_template, password:password
-                    },
-                    success: function(r, response){ parse_result(response) },
-                    error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+            if($(".checkbox_playbooks:checked").val() != undefined) {
+                OpenNebula.Ansible.show({
+                    data: {id: $(".checkbox_playbooks:checked").val()},
+                    success: function (r, res) {
+                        ansible = true;
+                        ansible_local_id = $(".checkbox_playbooks:checked").val();
+                        ansible_vars = res.ANSIBLE.VARS;
+                        for (key in ansible_vars){
+                            ansible_vars[key] = $('.'+key+res.ANSIBLE.id).val();
+                        };
+                        if($('.inputuser').css('display') == 'none'){
+                            OpenNebula.VM.reinstall({
+                                data: {
+                                    id:vm_id, template_id:id_template, password:password, ansible: true, ansible_local_id: ansible_local_id, ansible_vars: ansible_vars
+                                },
+                                success: function(r, response){ parse_result(response) },
+                                error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                            });
+                        } else {
+                            OpenNebula.VM.reinstall({
+                                data: {
+                                    id:vm_id, template_id:id_template, username:username, password:password, ansible: true, ansible_local_id: ansible_local_id, ansible_vars: ansible_vars
+                                },
+                                success: function(r, response){ parse_result(response) },
+                                error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                            });
+                        }
+                    }
                 });
-            } else {
-                OpenNebula.VM.reinstall({
-                    data: {
-                        id:vm_id, template_id:id_template, username:username, password:password
-                    },
-                    success: function(r, response){ parse_result(response) },
-                    error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
-                });
-            }
+
+            }else{
+                if($('.inputuser').css('display') == 'none'){
+                    OpenNebula.VM.reinstall({
+                        data: {
+                            id:vm_id, template_id:id_template, password:password
+                        },
+                        success: function(r, response){ parse_result(response) },
+                        error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                    });
+                } else {
+                    OpenNebula.VM.reinstall({
+                        data: {
+                            id:vm_id, template_id:id_template, username:username, password:password
+                        },
+                        success: function(r, response){ parse_result(response) },
+                        error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+                    });
+                }
+            };
+
         });
 
         context.on("click",".button-reinstall-cancel",function () {
@@ -168,6 +211,7 @@ define(function(require) {
 
         return false;
     }
+
 
     function _onShow(context) {
         this.setNames( {tabId: TAB_ID} );

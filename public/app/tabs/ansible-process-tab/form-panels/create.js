@@ -90,13 +90,14 @@ define(function(require) {
      */
 
     function _htmlWizard() {
+
         var opts = {
             info: false,
             select: true,
             selectOptions: {"multiple_choice": true}
         };
 
-        this.VMTable = new VMTable("vms_wizard", opts);
+        this.VMTable = new VMTable("vms_wizard_process", opts);
 
         return TemplateWizardHTML({
             'formPanelId': this.formPanelId,
@@ -106,16 +107,107 @@ define(function(require) {
     }
 
     function _setup(context) {
-        var that = this;
-        this.VMTable.initialize();
 
-        WizardFields.fillInput($("#body", context), " - hosts: <%group%>");
+        $('div').on('click',function(){
+            var Hosts = {};
+            var HostsData = [];
+            $('.login-pass-vm').find('input').each(function(index,data){
+                HostsData.push(data.value);
+            });
+            for(var i = 0; i < HostsData.length; i += 4){
+                Hosts[HostsData[i].split(' ')[0]] = [
+                    HostsData[i].split(' ')[4] + ':' + HostsData[i + 1],
+                    HostsData[i + 2] + ':' + HostsData[i + 3],
+                ]
+            };
 
-        $('#body').keyup(function () {
-            $('#control-i-check').removeClass('check-syntax-ok').addClass('check-syntax-false');
-            $('#ansible-tabsubmit_button button').prop('disabled', true);
+            var Vars = {};
+            $('.playbooks_vars').find('input').each(function(index, input){
+                Vars[input.name] = input.value
+            });
+
+            var id_playbooks = $('#Playbooks').val();
+
+            if(Object.keys(Hosts).length != 0 && Object.keys(HostsData).length != 0 && id_playbooks != '' && $('#comment').val() != ''){
+                if($('.playbooks_vars').find('input').length != 0){
+                    if(Object.keys(HostsData).length != 0) {
+                        $('#ansible-process-tabsubmit_button button').prop('disabled', false);
+                    }else{
+                        $('#ansible-process-tabsubmit_button button').prop('disabled', true);
+                    }
+                }else{
+                    $('#ansible-process-tabsubmit_button button').prop('disabled', false);
+                }
+            }else{
+                $('#ansible-process-tabsubmit_button button').prop('disabled', true);
+            }
         });
 
+        $('#Playbooks').on('click',function () {
+            var id_playbooks = $('#Playbooks').val();
+            var playbook;
+            var html = '';
+            $('.playbooks_vars').html('');
+            if(id_playbooks != '') {
+                OpenNebula.Ansible.show({
+                    data: {id: id_playbooks},
+                    success: function (r, res) {
+                        for (key in res.ANSIBLE.VARS){
+                            html +='<div class="large-12 column" style="padding-left:0"><span style="font-size:15px;">'+ key + '' +
+                                '</span><input style="float:right;width:70%;" type="text" name="' +key+ '" value="' + res.ANSIBLE.VARS[key] + '"></div>';
+                        };
+                        $('.playbooks_vars').append(html);
+                    }
+                });
+            }
+        });
+
+        $('#vms_wizard_process').on('click',function () {
+            $('.login-pass-vm').html('');
+            var allvm = new Object();
+            var3 = 0;
+            $('#selected_ids_row_vms_wizard_process').find('.radius.label').each(function(var1, var2) {
+                if($(var2).attr('row_id') != undefined){
+                    $('.login-pass-vm').append('<div class="large-12 column"><div class="large-4 small-3 column">'+ $(var2).attr("info") +'</div>' +
+                        '<input type="hidden" value="'+$(var2).attr("info")+'">' +
+                        '<div class="large-2 small-2 column"><input type="text" value"" name="port'+$(var2).attr('row_id')+'" id="port'+$(var2).attr('row_id')+'" placeholder="Port" value="52222" required></div>' +
+                        '<div class="large-2 small-3 column"><input type="text" value"" name="login'+$(var2).attr('row_id')+'" id="login'+$(var2).attr('row_id')+'" placeholder="Login"></div>' +
+                        '<div class="large-2 small-4 column"><input type="text" value"" name="password'+$(var2).attr('row_id')+'" id="password'+$(var2).attr('row_id')+'" placeholder="Password"></div>' +
+                        '<div></div></div>');
+                    allvm[var3] = $(var2).attr('row_id');
+                    var3 ++;
+                }
+            });
+        });
+
+        $('.fa-times').on('click',function () {
+            $('.login-pass-vm').html('');
+            var allvm = new Object();
+            var3 = 0;
+            $('#selected_ids_row_vms_wizard_process').find('.radius.label').each(function(var1, var2) {
+                if($(var2).attr('row_id') != undefined){
+                    $('.login-pass-vm').append('<div class="large-12 column"><div class="large-4 small-3 column">'+ $(var2).attr("info") +'</div>' +
+                        '<input type="hidden" value="'+$(var2).attr("info")+'">' +
+                        '<div class="large-2 small-2 column"><input type="text" value"" name="port'+$(var2).attr('row_id')+'" id="port'+$(var2).attr('row_id')+'" placeholder="Port" value="52222" required></div>' +
+                        '<div class="large-2 small-3 column"><input type="text" value"" name="login'+$(var2).attr('row_id')+'" id="login'+$(var2).attr('row_id')+'" placeholder="Login"></div>' +
+                        '<div class="large-2 small-4 column"><input type="text" value"" name="password'+$(var2).attr('row_id')+'" id="password'+$(var2).attr('row_id')+'" placeholder="Password"></div>' +
+                        '<div></div></div>');
+                    allvm[var3] = $(var2).attr('row_id');
+                    var3 ++;
+                }
+            });
+        });
+
+        $('#checkbox_sshkey').on('click',function () {
+            if($('#checkbox_sshkey').prop('checked') == true){
+                $('.ssh_key_ok').removeClass('hidden');
+            }else{
+                $('.ssh_key_ok').addClass('hidden');
+            }
+        });
+
+        var that = this;
+        this.VMTable.initialize();
 
         return false;
     }
@@ -123,34 +215,32 @@ define(function(require) {
     function _submitWizard(context) {
         var that = this;
 
-        var selectedVMList = that.VMTable.retrieveResourceTableSelect();
-
-        var name            = $('#name').val();
-        var description     = $('#description').val();
-        var supported_os    = $('#supported_os').val();
-        var body            = $('#body').val();
-
-        if(this.action == "create"){
-            var selectedVM = {};
-            $.each(selectedHostsList, function(i,e){
-                selectedHosts[e] = 1;
-            });
-
-            var cluster_json = {
-                "VMs": {
-                    "name": $('#name',context).val(),
-                    "hosts": selectedHosts,
-                    "vnets": selectedVNets,
-                    "datastores": selectedDatastores
-                }
-            };
-
-
-            Sunstone.runAction(
-                "Ansible.create",
-                { name: name, body: body, description : description, extra_data: {PERMISSIONS: '111000000', SUPPORTED_OS: supported_os}}
-            );
+        var Hosts = {};
+        var HostsData = [];
+        $('.login-pass-vm').find('input').each(function(index,data){
+            HostsData.push(data.value);
+        });
+        for(var i = 0; i < HostsData.length; i += 4){
+            Hosts[HostsData[i].split(' ')[0]] = [
+                HostsData[i].split(' ')[4] + ':' + HostsData[i + 1],
+                HostsData[i + 2] + ':' + HostsData[i + 3],
+            ]
         }
+        
+        var Vars = {};
+        $('.playbooks_vars').find('input').each(function(index, input){
+            Vars[input.name] = input.value
+        })
+
+        opts =  {
+                    playbook_id:    $("#Playbooks").val(),
+                    hosts:          Hosts,
+                    vars:           Vars,
+                    comment:        $("#comment").val()
+                }
+
+        Sunstone.runAction( "AnsibleProcess.create", opts   );
+
         return false;
     };
 
@@ -166,12 +256,8 @@ define(function(require) {
       this.resourceId   = element.ID;
 
       // Fills the inputs
-      WizardFields.fillInput($("#name", context), element.name);
-      WizardFields.fillInput($("#body", context), element.body);
-      WizardFields.fillInput($("#description", context), element.description);
-      WizardFields.fillInput($("#supported_os", context), element.extra_data.SUPPORTED_OS);
 
-        var VMIds = element.HOSTS.ID;
+        var VMIds = element.VMs.ID;
 
         if (typeof VMIds == 'string'){
             VMIds = [VMIds];
@@ -192,7 +278,7 @@ define(function(require) {
     }
 
     function _onShow(context) {
-        $('#ansible-tabsubmit_button button').prop('disabled', true);
+        $('#ansible-process-tabsubmit_button button').prop('disabled', true);
         this.VMTable.refreshResourceTableSelect();
     }
 

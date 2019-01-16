@@ -651,6 +651,10 @@ define(function(require) {
     "reinstall" : function(params) {
       var action_obj = params.data;
       OpenNebulaAction.simple_action(params, RESOURCE, "reinstall", action_obj, "/vm/" + params.data.id + "/reinstall", true);
+    },
+    "revert_zfs_snapshot" : function(params){
+      var action_obj = params.data;
+      OpenNebulaAction.simple_action(params, RESOURCE, "revert_zfs_snapshot", action_obj, "/vm/" + params.data.id + "/revert_zfs_snapshot", true);
     }
   }
 

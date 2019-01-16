@@ -16,42 +16,49 @@
 
 <div id="{{dialogId}}" class="reveal small" data-reveal>
   <div class="row reinstall-first-step">
-    <div class="small-12 columns"><span style="font-weight: bold; font-size: 17px;" >Переустановка системы</span></div>
-    <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;"> ВНИМАНИЕ, при переустановке системы, все данные будут удалены !!! </span></div>
-    <div class="small-12 columns"><span style="font-size: 15px;" >ШАГ 1 Выберите ОС</span></div>
+    <div class="small-12 columns"><span style="font-weight: bold; font-size: 17px;" >{{tr "Reinstall OS"}}</span></div>
+    <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;">{{tr "WARNING, all data will be deleted during the reinstall !!!"}}</span></div>
+    <div class="small-12 columns"><span style="font-size: 15px;" >{{tr "STEP"}} I {{tr "Choose OS"}}:</span></div>
     <div class="small-12 columns">
       <div id="provision_vm_instantiate_templates_table_wrapper" class="dataTables_wrapper dt-foundation no-footer">
         <table id="provision_vm_instantiate_templates_table" class="dataTable no-footer" role="grid">
           <div id="provision_vm_instantiate_templates_ul" class="row large-up-4 medium-up-3 small-up-1 listos">
             <div class="column"></div>
           </div>
+
+        </table>
+      </div>
+      <div id="" class="row large-up-4 medium-up-3 small-up-1 playbooks_table hidden">
+        <span style="font-size: 15px;" >{{tr "Choose Playbook"}}:</span>
+        <table class="playbooks">
+          
         </table>
       </div>
     </div>
   <div class="div_reinstall inputuser" style="display: none;">
-    <span style="font-size: 15px;">ШАГ 2 Введите имя и пароль для администратора :</span><br>
+    <span style="font-size: 15px;">{{tr "STEP"}} II {{tr "Enter Username and Admin-password"}}:</span><br>
     <span style="font-size: 15px;">{{tr "Username"}}:</span><br>
     <input id='vm_username' class="reinstallinput" type="text" value="{{tr "Administrator"}}" placeholder="{{ tr "For example, Admin" }}">
   </div>
   <div class="div_reinstall inputpass" style="display: none;">
-  <span class="inputrootpass hidden" style="font-size: 15px;">ШАГ 2 Введите новый пароль для root:</span><br>
-  <span class="passinputtwo" style="font-size: 15px;">Пароль:</span><br>
+  <span class="inputrootpass hidden" style="font-size: 15px;">{{tr "STEP"}} II {{tr "Enter new root-password"}}:</span><br>
+  <span class="passinputtwo" style="font-size: 15px;">{{tr "Password"}}:</span><br>
     <input id='vm_password' class="reinstallinput" type="password">
   </div>
-  <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;"> ВНИМАНИЕ, при переустановке системы, все данные будут удалены !!! </span></div>
+  <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;">{{tr "WARNING, all data will be deleted during the reinstall !!!"}}</span></div>
   <div class="large-3 medium-6 columns">
-        <button class="button success expanded button-reinstall-dialog" type="submit">Переустановить</button>
+        <button class="button success expanded button-reinstall-dialog" type="submit">{{tr "Reinstall"}}</button>
         </div>
 <button class="close-button" data-close aria-label="{{tr "Close modal"}}" type="button">
         <span aria-hidden="true">&times;</span>
       </button>
   </div>
   <div class='row reinstall-second-step hidden'>
-  <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;"> ВНИМАНИЕ, при переустановке системы, все данные будут удалены !!! </span></div>
-  <div class="small-12 columns"><span style="font-weight: bold; font-size: 15px;">Вы уверены, что хотите переустановить систему?</span></div>
+  <div class="alert"><span class="large-12 columns colorred" style="color:red; fons-size: 15px;">{{tr "WARNING, all data will be deleted during the reinstall !!!"}}</span></div>
+  <div class="small-12 columns"><span style="font-weight: bold; font-size: 15px;">{{tr "Are you sure, that you want to reinstall the system?"}}</span></div>
   <div class="large-3 medium-6 columns">
-          <button class="button success expanded button-reinstall-confirm" type="submit">Переустановить</button>
-          <button class="button success expanded button-reinstall-cancel" type="submit">Отменить</button>
+          <button class="button success expanded button-reinstall-confirm" type="submit">{{tr "Reinstall"}}</button>
+          <button class="button success expanded button-reinstall-cancel" type="submit">{{tr "Cancel"}}</button>
   </div>
   <button class="close-button" data-close aria-label="{{tr "Close modal"}}" type="button">
           <span aria-hidden="true">&times;</span>

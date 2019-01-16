@@ -15,7 +15,7 @@
 {{! -------------------------------------------------------------------------- }}
 
 <div class="row">
-  <div class="large-6 columns">
+  <div class="large-12 columns">
     <table class="dataTable">
       <thead>
         <tr>
@@ -23,36 +23,62 @@
         </tr>
       </thead>
       <tbody>
+        <style>
+          td.key_td {
+            font-weight: bold;
+          }
+        </style>
         <tr>
           <td class="key_td">{{tr "ID"}}</td>
-          <td class="value_td" colspan="2">{{element.install_id}}</td>
+          <td class="value_td">{{element.install_id}}</td>
           <td class="key_td">{{tr "Status"}}</td>
-          <td class="value_td" colspan="2">{{element.status}}</td>
+          <td class="value_td"><b>{{element.status}}</b></td>
         </tr>
         <tr>
           <td class="key_td">{{tr "Playbook ID"}}</td>
-          <td class="value_td" colspan="2">{{element.playbook_id}}</td>
+          <td class="value_td">{{element.playbook_id}}</td>
           <td class="key_td">{{tr "Playbook Name"}}</td>
-          <td class="value_td" colspan="2">{{element.playbook_id}}</td>
+          <td class="value_td">{{element.playbook_name}}</td>
         </tr>
         <tr>
           <td class="key_td">{{tr "Create time"}}</td>
-          <td class="value_td" colspan="2">{{element.create_time}}</td>
-          <td class="key_td">{{tr "Start time"}}</td>
-          <td class="value_td" colspan="2">{{element.start_time}}</td>
-          <td class="key_td">{{tr "End time"}}</td>
-          <td class="value_td" colspan="2">{{element.end_time}}</td>
+          <td class="value_td">{{element.create_time}}</td>
         </tr>
         <tr>
-          <td class="key_td">{{tr "Runned by"}}</td>
-          <td class="value_td" colspan="2">{{element.uname}}</td>
+          <td class="key_td">{{tr "Start time"}}</td>
+          <td class="value_td">{{element.start_time}}</td>
+          <td class="key_td">{{tr "End time"}}</td>
+          <td class="value_td">{{element.end_time}}</td>
+        </tr>
+        <tr>
+          <td class="key_td">{{tr "Process created by user"}}</td>
+          <td class="value_td">{{element.uname}}</td>
+        </tr>
+        <tr>
+          <td class="key_td">{{tr "Comment"}}</td>
+          <td class="value_td">{{{element.comment}}}</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <div class="large-6 columns"></div>
-  <div class="large-12 columns">
-    <div class="" style="font-weight: bold;font-size: 1.1rem;color: #555;"> Comment </div>
-    <pre style='white-space: pre-wrap; font-family: "Lato","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;'>{{{element.comment}}}</pre>
+  <div class="lagre-12 columns">
+    <table>
+      <thead>
+        <tr>
+          <th colspan="3">{{tr "Hosts"}}</th>
+        </tr>
+      </thead>
+      <thead>
+        <tr>
+          <th colspan="1">{{tr "VM ID"}}</th>
+          <th colspan="1">{{tr "IP:Port"}}</th>
+          <th colspan="1">{{tr "Status Codes"}}</th>
+        </tr>
+      </thead>
+      <tbody id="tab-process-hosts"></tbody>
+    </table>
   </div>
 </div>
+<script>
+  console.log('HTML loaded');
+</script>

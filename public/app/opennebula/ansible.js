@@ -23,6 +23,7 @@ define(function(require) {
     var Ansible = {
       "resource": RESOURCE,
       "create" : function(params) {
+        console.log(params);
         OpenNebulaAction.create(params, RESOURCE);
       },
       "del" : function(params) {

@@ -27,25 +27,28 @@
                   <option value="{{ANSIBLE.id}}">{{ANSIBLE.id}}:{{ANSIBLE.name}}</option>
                   {{/each}}
               </select>
+              <div class="playbooks_vars"></div>
           </div>
           <div class="large-6 column">
-            <input type="checkbox" id="checkbox_sshkey" name="checkbox_sshkey">
-            <label for="checkbox_sshkey">
-                {{tr "Use SSH key for all"}}
-            </label>
-            <label for="Playbooks">
-                {{tr "SSH Key"}}
-            </label>
-            <input name="ssh_key" id="ssh_key" type="text" value="">
+              <input type="checkbox" id="checkbox_sshkey" name="checkbox_sshkey">
+              <label for="checkbox_sshkey">{{tr "Use SSH key for all"}}</label>
+              <div class="ssh_key_ok hidden">
+                   <label for="Playbooks">{{tr "SSH Key"}}</label>
+                   <textarea name="ssh_key" id="ssh_key"></textarea>
+              </div>
+              <div class="comment">
+                  {{tr "Comment"}}
+                  <textarea name="comment" id="comment"></textarea>
+              </div>
           </div>
       </div>
-
-    <div class="lagre-12 columns">
-        <div class="tabs-content" data-tabs-content="{{formPanelId}}Tabs">
-            <div id="tab-hostsTab" class="is-active tabs-panel">
-                {{{VMTableHTML}}}
-            </div>
-        </div>
-    </div>
+      <div class="lagre-12 columns login-pass-vm"></div>
+      <div class="lagre-12 columns">
+          <div class="tabs-content" data-tabs-content="{{formPanelId}}Tabs">
+              <div id="tab-VMsTab" class="is-active tabs-panel">
+                  {{{VMTableHTML}}}
+              </div>
+          </div>
+      </div>
   </form>
 </div>

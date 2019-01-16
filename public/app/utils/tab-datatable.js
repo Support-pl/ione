@@ -899,13 +899,22 @@ define(function(require) {
         } else {
           ids[row_id] = true;
 
+
           // Happens if row is not yet rendered (i.e. higher unvisited page)
           if (row != undefined) {
             $("td", row).addClass('markrowchecked');
             $('input.check_item', row).prop('checked', true);
           }
+            if (that.dataTableId == 'vms_wizard_process'){
+                row_name = aData[1] + ' : ' + aData[2];
+                ip = aData[9].split('<br>');
+                all_info = aData[1] + '  ' + aData[2] + '  ' + ip[0];
 
-          $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label">' + row_name + ' <span class="fa fa-times blue"></span></span> ');
+                $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label" info="'+ all_info +'">' + row_name + '<span class="fa fa-times blue"></span></span> ');
+            }else{
+                $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label">' + row_name + '<span class="fa fa-times blue"></span></span> ');
+            }
+
 
           that.selectOptions.select_callback(aData, that.selectOptions);
         }

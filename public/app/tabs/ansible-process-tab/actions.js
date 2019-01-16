@@ -46,7 +46,13 @@ define(function(require) {
             type: "multiple",
             call: OpenNebulaResource.run,
             callback: function(request, response) {
-              Notifier.notifyCustom(Locale.tr("Process started"));
+              console.log(response);
+              if(response.error){
+                Notifier.notifyError("Process didn't started: " + response.error);
+              } else {
+                Notifier.notifySubmit(Locale.tr("Process started"));
+              }
+              Sunstone.runAction('AnsibleProcess.refresh');
             },
             elements: function(opts) {
               return Sunstone.getDataTable(TAB_ID).elements(opts);

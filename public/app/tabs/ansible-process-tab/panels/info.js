@@ -29,6 +29,7 @@ define(function(require) {
     var OpenNebula = require('opennebula');
     var Config = require('sunstone-config');
     var Navigation = require('utils/navigation');
+    var VMTable = require('tabs/vms-tab/datatable');
 
     /*
       CONSTANTS
@@ -93,25 +94,35 @@ define(function(require) {
      */
 
     function _html() {
-        var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.name);
-
-
-        var templateTableHTML = TemplateTable.html(
-            this.strippedTemplate,
-            RESOURCE,
-            Locale.tr("Process"));
-
 
         return TemplateHTML({
-            "element": this.element,
-            "renameTrHTML": renameTrHTML,
-            // "templateTableHTML": blocksupportedos
+            "element": this.element
         });
     }
 
 
     function _setup(context) {
         var that = this;
+
+        OpenNebula.VM.list({
+            success: function(r, res){
+                res.forEach(
+                    function(host){
+                        if(Object.keys(that.element.hosts).includes(host.VM.ID.toString())){
+                            id = host.VM.ID, ip = that.element.hosts[host.VM.ID][0], codes = that.element.codes[that.element.hosts[host.VM.ID][0].split(':')[0]]
+                            $('#tab-process-hosts').append(
+                                '<tr class="useless-string">' +
+                                '<td class="key_td">' + id + '</td>' +
+                                '<td>' + ip + '</td>' +
+                                '<td>' + 'ok=' + codes.ok + ' changed=' + codes.changed + ' unreachable=' + codes.unreachable + ' failed=' + codes.failed + '</td>' +
+                                '</tr>'
+                            )
+                        }
+                    }
+                )
+            },
+            error: function(r, res){ console.log('Error getting hosts, error:', res) }
+        });
 
         RenameTr.setup(TAB_ID, RESOURCE, this.element.id, context);
 

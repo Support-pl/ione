@@ -18,7 +18,7 @@ end
 
 post '/vm/:id/reinstall' do | id |
    begin
-      data = {'id' => nil, 'template_id' => nil, 'password' => nil}
+      data = {'id' => nil, 'template_id' => nil, 'password' => nil, 'ansible' => false, 'ansible_local_id' => -1, 'ansible_vars' => {}}
       body = JSON.parse(request.body.read)
       data.merge!(body['action']['params'])
       vm = IONe.get_vm_data(id.to_i)
@@ -35,7 +35,7 @@ post '/vm/:id/reinstall' do | id |
       elsif vm['DRIVE'].to_i < image['/IMAGE/SIZE'].to_i then
          r error: "Drive cannot be smaller then #{image['/IMAGE/SIZE']}"
       else
-         r response:
+         r body:body, response:
             IONe.Reinstall({
                :vmid => id,
                :userid => @one_user.id,
@@ -50,10 +50,33 @@ post '/vm/:id/reinstall' do | id |
                :drive => vm['DRIVE'],
                :host => vm['HOST_ID'],
                :ds_type => vm['DS_TYPE'],
-               :release => true
-            }), data:[vm['DRIVE'].to_i, image['/IMAGE/SIZE'].to_i]
+               :release => true,
+               :ansible => data['ansible'],
+               :ansible_local_id => data['ansible_local_id'],
+               :ansible_vars => data['ansible_vars']
+            })
       end
    rescue => e
       r error: e.message, backtrace: e.backtrace, body: body
+   end
+end
+
+post '/vm/:id/revert_zfs_snapshot' do | id |
+   begin
+      data = {'previous' => nil}
+      body = JSON.parse(request.body.read)
+      data.merge!(body['action']['params'])
+
+      vm = IONe.get_vm_data(id.to_i)
+
+      if @one_user.id != vm['OWNERID'].to_i then
+         r error: "User is not OWNER for given VM"
+      elsif data['previous'].nil? then
+         r error: 'Snapshot not given'
+      else
+         r response: "It's ok #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted", code: IONe.RevertZFSSnapshot(id, data['previous'])
+      end
+   rescue => e
+      r error: e.message, backtrace: e.backtrace
    end
 end

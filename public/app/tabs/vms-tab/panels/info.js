@@ -69,7 +69,6 @@ define(function(require) {
    */
 
   function _html() {
-    console.log(this.element);
     var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.NAME);
     var permissionsTableHTML = PermissionsTable.html(TAB_ID, RESOURCE, this.element);
     var prettyStartTime = Humanize.prettyTime(this.element.STIME);

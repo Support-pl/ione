@@ -1,0 +1,54 @@
+<div data-closable class="callout large secondary">
+    <div class="row">
+        <div class="large-11 columns">
+            <span>{{tr "Machine recovery "}}{{id}}</span><br>
+        {{#if opts.backup}}
+        <br/>
+            <span>
+                <span style="color: red;">
+                    {{tr "Warning!"}}
+                </span><br>
+                {{tr "Virtual machine will be rebooted during the recovering!"}}<br>
+                <span style="font-weight: bold">
+                    {{tr "Important notice!"}}
+                </span><br>
+                {{tr "Backups are creating every day at 4:00 AM."}}
+                {{/if}}
+            </span>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="large-12 columns">
+            <button href"#" class="provision_backup_button button right">
+            {{tr "Recovery"}}
+            </button>
+            {{#if opts.backup}}
+            {{tr "Choose the backup for use:"}}
+            <ul class="menu simple">
+                <li>
+                    <label class="left">
+                        <input type="radio" name="provision_backup_radio" value="backup_yesterday">
+                        <i class="fa fa-fw fa-bolt"/> {{tr "Yesterday"}}
+                    </label>
+                </li>
+                <li>
+                    <label class="left">
+                        <input type="radio" name="provision_backup_radio" value="backup_today" checked>
+                        <i class="fa fa-fw fa-power-off"/> {{tr "Today"}}
+                    </label>
+                </li>
+            </ul>
+            {{else}}
+            {{#if opts.backup}}
+            <input checked hidden type="radio" name="provision_backup_radio" value="backup">
+            {{else}}
+            <input checked hidden type="radio" name="provision_backup_radio" value="backup_tomorrow">
+            {{/if}}
+            {{/if}}
+        </div>
+    </div>
+    <button class="close-button" aria-label="Close" type="button" data-close>
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>

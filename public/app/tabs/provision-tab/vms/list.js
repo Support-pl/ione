@@ -36,6 +36,7 @@ define(function(require) {
   var TemplateConfirmPoweroff = require('hbs!./confirm_poweroff');
   var TemplateConfirmUndeploy = require('hbs!./confirm_undeploy');
   var TemplateConfirmReboot = require('hbs!./confirm_reboot');
+  var TemplateConfirmBackup = require('hbs!./confirm_backup');
 
   var TAB_ID = require('../tabId');
   var _accordionId = 0;
@@ -261,6 +262,22 @@ define(function(require) {
   }
 
   function setup_info_vm(context) {
+
+      function refresh(){
+          // location.reload();
+          // OpenNebula.Action.clear_cache("VM");
+          // ProvisionVmsList.show(0);
+      }
+
+      function parse_result(response){
+          if(response.error != undefined){
+              Notifier.notifyError('ReinstallError: ' + response.error);
+          } else {
+              Notifier.notifyError('ReinstallError: ' + response);
+              refresh();
+          }
+      }
+
     function update_provision_vm_info(vm_id, context) {
       //var tempScrollTop = $(window).scrollTop();
       $(".provision_info_vm_name", context).text("");
@@ -285,14 +302,20 @@ define(function(require) {
           }
 
 
-            var resultvm = 0;
-            OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
-                    if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
-                        $(".provision_reinstall_confirm_button", context).show();
-                    } else {
-                        $(".provision_reinstall_confirm_button", context).hide();
-                    }
-            }});
+          var resultvm = 0;
+          OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
+          if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
+            $(".provision_reinstall_confirm_button", context).show();
+          } else {
+            $(".provision_reinstall_confirm_button", context).hide();
+          }
+          }});
+
+          if(config.user_id == '197'){
+              $(".provision_backup_confirm_button", context).show();
+          } else {
+              $(".provision_backup_confirm_button", context).hide();
+          }
 
           if (enabled("VM.reboot") || enabled("VM.reboot_hard")){
             $(".provision_reboot_confirm_button", context).show();
@@ -639,6 +662,35 @@ define(function(require) {
       $(".provision_confirm_action:first", context).html(TemplateConfirmReboot({opts: opts}));
     });
 
+      context.on("click", ".provision_backup_confirm_button", function(){
+          var vm_id = $(".provision_info_vm", context).attr("vm_id");
+          var data = $(".provision_info_vm", context).data("vm");
+          var name = $('.provision_info_vm_name').text();;
+
+          // var today = OpenNebula.VM.revert_zfs_snapshot({
+          //     data: {
+          //         id:vm_id, previous:false
+          //     },
+          //     success: function(r, response){ parse_result(response) },
+          //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+          // });
+          //
+          // var tomorrow = OpenNebula.VM.revert_zfs_snapshot({
+          //     data: {
+          //         id:vm_id, previous:true
+          //     },
+          //     success: function(r, response){ parse_result(response) },
+          //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+          // });
+
+          var opts = {};
+
+          opts.backup = true;
+
+
+          $(".provision_confirm_action:first", context).html(TemplateConfirmBackup({opts: opts,id:vm_id,name:name}));
+      });
+
 
     context.on("click", ".provision_terminate_button", function(){
       var button = $(this);
@@ -732,6 +784,41 @@ define(function(require) {
 
       return false;
     });
+
+      context.on("click", ".provision_backup_button", function(){
+
+
+          var button = $(this);
+          button.attr("disabled", "disabled");
+
+          var vm_id = $(".provision_info_vm", context).attr("vm_id");
+          var backup_action = $('input[name=provision_backup_radio]:checked').val()
+
+          if(backup_action == 'backup_today'){
+              OpenNebula.VM.revert_zfs_snapshot({
+                  data: {
+                      id:vm_id, previous:false
+                  },
+                  success: function(r, response){Notifier.notifySubmit('Backup: ' + response.response); update_provision_vm_info(vm_id, context) },
+                  error: function(r, response){ Notifier.notifyError('Backup: ' + response.response); }
+              });
+          }else if(backup_action == 'backup_yesterday'){
+              OpenNebula.VM.revert_zfs_snapshot({
+                  data: {
+                      id:vm_id, previous:true
+                  },
+                  success: function(r, response){Notifier.notifySubmit('Backup: ' + response.response); update_provision_vm_info(vm_id, context) },
+                  error: function(r, response){ Notifier.notifyError('Backup: ' + response.response); }
+              });
+          }
+
+
+
+          return false;
+      });
+      
+
+
       context.on("click", ".provision_reinstall_confirm_button", function(){
           var button = $(this);
           var vm_id = $(".provision_info_vm", context).attr("vm_id");
@@ -756,6 +843,45 @@ define(function(require) {
                   };
           }});
 
+          if(config.user_id == '197'){
+              var html = '<tr>' +
+                  '<td></td>' +
+                  '<td>Name</td>' +
+                  '<td style="width: 250px;">Description</td>' +
+                  '<td style="width: 180px;">OS</td>' +
+                  '<td>Vars</td>' +
+                  '</tr>';
+              var vars = '';
+              $('.playbooks').html('');
+              $('.playbooks').append(html);
+              $('.playbooks_table').removeClass('hidden');
+              OpenNebula.Ansible.list({
+                  success: function (r, res) {
+                      for (key in res){
+                          if(Object.keys(res[key].ANSIBLE.VARS).length != 0){
+                              for (kkey in res[key].ANSIBLE.VARS){
+                                  vars += kkey +': <input type="text" class="vars'+res[key].ANSIBLE.id+' vars '+kkey+''+res[key].ANSIBLE.id+' " ><br>'
+                              }
+                          }else{
+                              vars = '-';
+                          }
+                          html = '<tr><td><input type="checkbox" name="checkansible" id="check'+res[key].ANSIBLE.id+'" class="checkbox_playbooks" value="' + res[key].ANSIBLE.id + '"></td>' +
+                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.name +'</span></td>' +
+                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.description +'</span></td>' +
+                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.extra_data.SUPPORTED_OS +'</span> </td>' +
+                              '<td><span class="playbooks-text">'+ vars +'</span></td>' +
+                              '</tr>'
+                          $('.playbooks').append(html);
+                          if(Object.keys(res[key].ANSIBLE.VARS).length != 0){
+                              for (kkey in res[key].ANSIBLE.VARS){
+                                  $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey]);
+                              }
+                          }
+                      }
+
+                  }
+              });
+          }
 
           return false;
       });

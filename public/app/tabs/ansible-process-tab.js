@@ -48,6 +48,7 @@ define(function(require) {
     tabId: TAB_ID,
     title: Locale.tr("Processes"),
     icon: 'fa-cogs',
+    beta: true,
     listHeader: Locale.tr("Processes"),
     infoHeader: Locale.tr("Process"),
     subheader: '<span>\
