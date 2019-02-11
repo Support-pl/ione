@@ -70,6 +70,12 @@ define(function(require) {
             },
             error: Notifier.onError,
             notify: true
+        },
+        "Ansible.run" :{
+            type: 'single',
+            call: function (){
+                Sunstone.showFormPanel('ansible-process-tab','createAnsibleForm','create')
+            }
         }
     };
 

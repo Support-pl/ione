@@ -794,25 +794,21 @@ define(function(require) {
           var vm_id = $(".provision_info_vm", context).attr("vm_id");
           var backup_action = $('input[name=provision_backup_radio]:checked').val()
 
-          if(backup_action == 'backup_today'){
-              OpenNebula.VM.revert_zfs_snapshot({
-                  data: {
-                      id:vm_id, previous:false
-                  },
-                  success: function(r, response){Notifier.notifySubmit('Backup: ' + response.response); update_provision_vm_info(vm_id, context) },
-                  error: function(r, response){ Notifier.notifyError('Backup: ' + response.response); }
-              });
-          }else if(backup_action == 'backup_yesterday'){
-              OpenNebula.VM.revert_zfs_snapshot({
-                  data: {
-                      id:vm_id, previous:true
-                  },
-                  success: function(r, response){Notifier.notifySubmit('Backup: ' + response.response); update_provision_vm_info(vm_id, context) },
-                  error: function(r, response){ Notifier.notifyError('Backup: ' + response.response); }
-              });
-          }
-
-
+          OpenNebula.VM.revert_zfs_snapshot({
+              data: {
+                  id:vm_id, previous:(backup_action == 'backup_today' ? 'backup_today' : 'backup_yesterday')
+              },
+              success: function(r, response){
+                if(response.error != undefined){
+                  Notifier.notifyError(Locale.tr(response.error));
+                } else {
+                  Notifier.notifySubmit(Locale.tr(response.response)); 
+                }
+                
+                update_provision_vm_info(vm_id, context)
+              },
+              error: function(r, response){ Notifier.notifyError(Locale.tr('Error occurred, contact technical support'))}
+          });
 
           return false;
       });
@@ -865,7 +861,8 @@ define(function(require) {
                           }else{
                               vars = '-';
                           }
-                          html = '<tr><td><input type="checkbox" name="checkansible" id="check'+res[key].ANSIBLE.id+'" class="checkbox_playbooks" value="' + res[key].ANSIBLE.id + '"></td>' +
+
+                          html = '<tr style="border-top: 1px solid grey;border-bottom: 1px solid grey;"><td><input type="checkbox" name="checkansible" id="check'+res[key].ANSIBLE.id+'" class="checkbox_playbooks" value="' + res[key].ANSIBLE.id + '"></td>' +
                               '<td><span class="playbooks-text">'+ res[key].ANSIBLE.name +'</span></td>' +
                               '<td><span class="playbooks-text">'+ res[key].ANSIBLE.description +'</span></td>' +
                               '<td><span class="playbooks-text">'+ res[key].ANSIBLE.extra_data.SUPPORTED_OS +'</span> </td>' +
@@ -874,9 +871,14 @@ define(function(require) {
                           $('.playbooks').append(html);
                           if(Object.keys(res[key].ANSIBLE.VARS).length != 0){
                               for (kkey in res[key].ANSIBLE.VARS){
-                                  $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey]);
+                                  if (typeof(res[key].ANSIBLE.VARS[kkey]) == 'string') {
+                                      $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey].replace(/[\\]+/g, ''));
+                                  }else{
+                                      $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey]);
+                                  }
                               }
                           }
+                          vars = '';
                       }
 
                   }

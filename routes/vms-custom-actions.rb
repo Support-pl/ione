@@ -57,7 +57,9 @@ post '/vm/:id/reinstall' do | id |
             })
       end
    rescue => e
-      r error: e.message, backtrace: e.backtrace, body: body
+      msg = e.message
+      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
+      r error: e.message, backtrace: e.backtrace
    end
 end
 
@@ -74,9 +76,13 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       elsif data['previous'].nil? then
          r error: 'Snapshot not given'
       else
-         r response: "It's ok #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted", code: IONe.RevertZFSSnapshot(id, data['previous'])
+         IONe.RevertZFSSnapshot(id, data['previous']) == true ?
+            r(response: "It's ok #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
+            r(response: "Contact Tech.Support to make sure revert process started")
       end
    rescue => e
+      msg = e.message
+      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
       r error: e.message, backtrace: e.backtrace
    end
 end
