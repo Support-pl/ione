@@ -31,6 +31,7 @@ define(function(require) {
     var CommonActions = require('utils/common-actions');
     var VMTable = require('tabs/vms-tab/datatable');
 
+
     /*
       TEMPLATES
      */
@@ -128,7 +129,7 @@ define(function(require) {
 
             var id_playbooks = $('#Playbooks').val();
 
-            if(Object.keys(Hosts).length != 0 && Object.keys(HostsData).length != 0 && id_playbooks != '' && $('#comment').val() != ''){
+            if(Object.keys(Hosts).length != 0 && Object.keys(HostsData).length != 0 && id_playbooks != ''){
                 if($('.playbooks_vars').find('input').length != 0){
                     if(Object.keys(HostsData).length != 0) {
                         $('#ansible-process-tabsubmit_button button').prop('disabled', false);
@@ -144,25 +145,39 @@ define(function(require) {
         });
 
         $('#Playbooks').on('click',function () {
+
             var id_playbooks = $('#Playbooks').val();
             var playbook;
             var html = '';
+
             $('.playbooks_vars').html('');
             if(id_playbooks != '') {
                 OpenNebula.Ansible.show({
                     data: {id: id_playbooks},
                     success: function (r, res) {
                         for (key in res.ANSIBLE.VARS){
-                            html +='<div class="large-12 column" style="padding-left:0"><span style="font-size:15px;">'+ key + '' +
-                                '</span><input style="float:right;width:70%;" type="text" name="' +key+ '" value="' + res.ANSIBLE.VARS[key] + '"></div>';
+                                html +='<div class="large-12 column" style="padding-left:0"><span style="font-size:15px;">'+ key + '' +
+                                    '</span><input style="float:right;width:70%;" type="text" name="' +key+ '"></div>';
                         };
                         $('.playbooks_vars').append(html);
+                        for (key in res.ANSIBLE.VARS){
+                            if (isNaN(res.ANSIBLE.VARS[key]) == true && res.ANSIBLE.VARS[key].indexOf('\\') == 0) {
+                                $("input[name="+key+"]").val(res.ANSIBLE.VARS[key].replace(/[\\"]+/g, '\"'));
+                            }else{
+                                $("input[name="+key+"]").val(res.ANSIBLE.VARS[key]);
+                            }
+                        }
                     }
                 });
             }
         });
 
         $('#vms_wizard_process').on('click',function () {
+
+            $('.fa-times').on('click',function () {
+                $('input[value="'+$(this).parent().attr("info")+'"]').parent().remove();
+            });
+
             $('.login-pass-vm').html('');
             var allvm = new Object();
             var3 = 0;
@@ -178,25 +193,9 @@ define(function(require) {
                     var3 ++;
                 }
             });
+
         });
 
-        $('.fa-times').on('click',function () {
-            $('.login-pass-vm').html('');
-            var allvm = new Object();
-            var3 = 0;
-            $('#selected_ids_row_vms_wizard_process').find('.radius.label').each(function(var1, var2) {
-                if($(var2).attr('row_id') != undefined){
-                    $('.login-pass-vm').append('<div class="large-12 column"><div class="large-4 small-3 column">'+ $(var2).attr("info") +'</div>' +
-                        '<input type="hidden" value="'+$(var2).attr("info")+'">' +
-                        '<div class="large-2 small-2 column"><input type="text" value"" name="port'+$(var2).attr('row_id')+'" id="port'+$(var2).attr('row_id')+'" placeholder="Port" value="52222" required></div>' +
-                        '<div class="large-2 small-3 column"><input type="text" value"" name="login'+$(var2).attr('row_id')+'" id="login'+$(var2).attr('row_id')+'" placeholder="Login"></div>' +
-                        '<div class="large-2 small-4 column"><input type="text" value"" name="password'+$(var2).attr('row_id')+'" id="password'+$(var2).attr('row_id')+'" placeholder="Password"></div>' +
-                        '<div></div></div>');
-                    allvm[var3] = $(var2).attr('row_id');
-                    var3 ++;
-                }
-            });
-        });
 
         $('#checkbox_sshkey').on('click',function () {
             if($('#checkbox_sshkey').prop('checked') == true){
@@ -206,9 +205,11 @@ define(function(require) {
             }
         });
 
+
+
         var that = this;
         this.VMTable.initialize();
-
+        
         return false;
     }
 
@@ -226,7 +227,7 @@ define(function(require) {
                 HostsData[i + 2] + ':' + HostsData[i + 3],
             ]
         }
-        
+
         var Vars = {};
         $('.playbooks_vars').find('input').each(function(index, input){
             Vars[input.name] = input.value
@@ -238,7 +239,7 @@ define(function(require) {
                     vars:           Vars,
                     comment:        $("#comment").val()
                 }
-
+                
         Sunstone.runAction( "AnsibleProcess.create", opts   );
 
         return false;
@@ -278,6 +279,53 @@ define(function(require) {
     }
 
     function _onShow(context) {
+
+        var playbooks;
+        OpenNebula.Ansible.list({
+            success: function(r, res){
+                playbooks = res;
+            }, error:function(r, res){
+
+            }
+        });
+
+        if (Playbooks != playbooks){
+            var difference = playbooks.slice(Playbooks.length)
+            for(key in difference){
+            $('#Playbooks').append($('<option>', {value:difference[key].ANSIBLE.id, text:difference[key].ANSIBLE.id+':'+difference[key].ANSIBLE.name}));
+            }
+            Playbooks = playbooks;
+        }
+
+        if (Object.keys(Sunstone.getDataTable('ansible-tab').elements()).length !== 0){
+            var idplaybook = Sunstone.getDataTable('ansible-tab').elements();
+            $('#Playbooks').val(idplaybook);
+
+            var id_playbooks = $('#Playbooks').val();
+            var playbook;
+            var html = '';
+            $('.playbooks_vars').html('');
+            if(id_playbooks != '') {
+                OpenNebula.Ansible.show({
+                    data: {id: id_playbooks},
+                    success: function (r, res) {
+                        for (key in res.ANSIBLE.VARS){
+                            html +='<div class="large-12 column" style="padding-left:0"><span style="font-size:15px;">'+ key + '' +
+                                '</span><input style="float:right;width:70%;" type="text" name="' +key+ '"></div>';
+                        };
+                        $('.playbooks_vars').append(html);
+                        for (key in res.ANSIBLE.VARS){
+                            if (isNaN(res.ANSIBLE.VARS[key]) == true && res.ANSIBLE.VARS[key].indexOf('\\') == 0) {
+                                $("input[name="+key+"]").val(res.ANSIBLE.VARS[key].replace(/[\\"]+/g, '\"'));
+                            }else{
+                                $("input[name="+key+"]").val(res.ANSIBLE.VARS[key]);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         $('#ansible-process-tabsubmit_button button').prop('disabled', true);
         this.VMTable.refreshResourceTableSelect();
     }

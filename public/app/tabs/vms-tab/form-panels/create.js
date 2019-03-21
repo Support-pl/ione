@@ -91,5 +91,6 @@ define(function(require) {
 
     $(".nameContainer", context).hide();
     $(".persistentContainer", context).hide();
+
   }
 });

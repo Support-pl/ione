@@ -197,7 +197,17 @@ define(function(require) {
     },
     "VM.edit_labels" : {
       layout: "labels",
+    },
+    "VM.place_on_node" : {
+      type: text,
+      custom_classes: "warning",
+      text: Locale.tr("Place on node")
     }
   }
+
+  if (Config.isTabActionEnabled("vms-tab", "VM.place_on_node") != true){
+    delete Buttons["VM.place_on_node"];
+  }
+
   return Buttons;
 })

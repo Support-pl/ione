@@ -1564,5 +1564,9 @@ locale={
     "Choose Playbook":"Выберите плейбук",
     "Enter Username and Admin-password":"Введите имя и пароль для администратора",
     "Enter new root-password":"Введите новый пароль для root",
-    "Are you sure, that you want to reinstall the system?":"Вы уверены, что хотите переустановить систему?"
+    "Are you sure, that you want to reinstall the system?":"Вы уверены, что хотите переустановить систему?",
+    "Contact Technical Support to make sure revert process started":"Обратитесь в техническую поддержку, чтобы убедится, что процесс восстановления был запущен успешно",
+    "It's ok, yesterdays snapshot will be reverted":"Успешно, ВМ будет восстановлена из вчерашней копии",
+    "It's ok, todays snapshot will be reverted":"Успешно, ВМ будет восстановлена из сегодняшней копии",
+    "Error while recovering VM, contact technical support":"Ошибка при восстановлении ВМ, обратитесь в техническую поддержку"
 }

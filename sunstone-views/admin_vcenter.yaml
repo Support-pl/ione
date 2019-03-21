@@ -851,6 +851,7 @@ tabs:
         panel_tabs:
             settings_info_tab: true
             settings_config_tab: false
+            settings_cloud_tab: true
             settings_quotas_tab: true
             settings_group_quotas_tab: true
             settings_accounting_tab: true

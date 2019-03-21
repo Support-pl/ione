@@ -23,7 +23,6 @@ define(function(require) {
     var Ansible = {
       "resource": RESOURCE,
       "create" : function(params) {
-        console.log(params);
         OpenNebulaAction.create(params, RESOURCE);
       },
       "del" : function(params) {
@@ -59,7 +58,6 @@ define(function(require) {
         OpenNebulaAction.simple_action(params, RESOURCE, "clone", action_obj);
       },
       "rename" : function(params) {
-        console.log(params, RESOURCE);
         var action_obj = params.data.extra_param;
         OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
       },

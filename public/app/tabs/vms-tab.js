@@ -37,7 +37,8 @@ define(function(require) {
     require('./vms-tab/dialogs/revert'),
     require('./vms-tab/dialogs/vnc'),
     require('./vms-tab/dialogs/spice'),
-    require('./vms-tab/dialogs/saveas-template')
+    require('./vms-tab/dialogs/saveas-template'),
+    require('./vms-tab/dialogs/place-on-node')
   ];
 
   var _panelsHooks = [

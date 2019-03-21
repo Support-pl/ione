@@ -51,8 +51,8 @@ define(function(require){
       cost += $(this).data('disk_snapshot_total_cost');
     });
 
-    $(".cost_value", context).text(cost.toFixed(6));
-
+    //$(".cost_value", context).text(cost.toFixed(3));
+    $(".cost_value", context).attr('value',cost.toFixed(3));
     if(callback != undefined){
       callback();
     }
@@ -147,7 +147,7 @@ define(function(require){
           label = disk.IMAGE ? disk.IMAGE : Locale.tr("Image was not found");
         }
 
-        $("label", diskContext).text(Locale.tr("DISK") + ' ' + disk_id + ': ' + label);
+        $("label", diskContext).text(Locale.tr("DISK") + ' ' + disk_id);
 
         var persistent =
           ( opts.force_persistent ||
@@ -208,8 +208,11 @@ define(function(require){
         } else {
           UserInputs.insertAttributeInputMB(attr, $(".diskSlider", diskContext));
         }
-      })
-
+      });
+      $('.uinput-slider-container').find('.small-6').removeClass('large-8 large-4');
+      $('#addDiskToContainer').on( "click", function() {
+        console.log('DiskADD');
+      });
     } else {
       disksContext.html("");
     }

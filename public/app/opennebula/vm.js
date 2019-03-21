@@ -437,6 +437,7 @@ define(function(require) {
     },
     "deploy": function(params) {
       var action_obj = params.data.extra_param;
+      console.log(params, RESOURCE, "deploy", action_obj);
       OpenNebulaAction.simple_action(params, RESOURCE, "deploy", action_obj);
     },
     "livemigrate": function(params) {

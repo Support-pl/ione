@@ -499,12 +499,16 @@ define(function(require) {
       //enable action buttons
       $('.top_button, .list_button', context).prop('disabled', false);
 
+
       //enable checkall box
       if (total_length == checked_length) {
         $('.check_all', this.dataTable).prop('checked', true);
       } else {
         $('.check_all', this.dataTable).prop('checked', false);
       };
+
+      if (checked_length > 1) $("[href^='Ansible.run']", context).prop('disabled', true);
+
     } else { //no elements cheked
       //disable action buttons, uncheck checkAll
       $('.check_all', this.dataTable).prop('checked', false);
@@ -718,22 +722,24 @@ define(function(require) {
   //replaces an element with id 'tag' in a dataTable with a new one
   function _updateElement(request, elementJSON) {
     var that = this;
-    var elementId = elementJSON[that.xmlRoot].ID;
-    var element = that.elementArray(elementJSON);
+    if (elementJSON[that.xmlRoot] != undefined) {
+      var elementId = elementJSON[that.xmlRoot].ID;
+      var element = that.elementArray(elementJSON);
 
-    $.each(that.dataTable.fnGetData(), function(index, aData) {
-      if (aData[that.selectOptions.id_index] === elementId) {
-        var nodes = that.dataTable.fnGetNodes();
-        var checkId = '#' + that.resource.toLowerCase() + '_' + elementId;
-        var checkVal = $(checkId, nodes).prop('checked');
-        that.dataTable.fnUpdate(element, index, undefined, false);
-        if (checkVal) {
-          $(checkId, nodes).prop('checked', checkVal);
+      $.each(that.dataTable.fnGetData(), function (index, aData) {
+        if (aData[that.selectOptions.id_index] === elementId) {
+          var nodes = that.dataTable.fnGetNodes();
+          var checkId = '#' + that.resource.toLowerCase() + '_' + elementId;
+          var checkVal = $(checkId, nodes).prop('checked');
+          that.dataTable.fnUpdate(element, index, undefined, false);
+          if (checkVal) {
+            $(checkId, nodes).prop('checked', checkVal);
+          }
+          that.recountCheckboxes();
+          return false;
         }
-        that.recountCheckboxes();
-        return false;
-      }
-    });
+      });
+    }
   }
 
   function _getElementData(id, resource_tag) {

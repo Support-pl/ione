@@ -159,14 +159,21 @@ define(function(require) {
                         ansible_local_id = $(".checkbox_playbooks:checked").val();
                         ansible_vars = res.ANSIBLE.VARS;
                         for (key in ansible_vars){
-                            ansible_vars[key] = $('.'+key+res.ANSIBLE.id).val();
+                            if (isNaN($('.'+key+res.ANSIBLE.id).val()) == true && $('.'+key+res.ANSIBLE.id).val().indexOf('\"') == 0){
+                                ansible_vars[key] = '\\\"'+$('.'+key+res.ANSIBLE.id).val().replace(/['"]+/g, '')+'\\\"';
+                            }else{
+                                ansible_vars[key] = $('.'+key+res.ANSIBLE.id).val();
+                            }
                         };
                         if($('.inputuser').css('display') == 'none'){
                             OpenNebula.VM.reinstall({
                                 data: {
                                     id:vm_id, template_id:id_template, password:password, ansible: true, ansible_local_id: ansible_local_id, ansible_vars: ansible_vars
                                 },
-                                success: function(r, response){ parse_result(response) },
+                                success: function(r, response){
+
+                                    parse_result(response);
+                                },
                                 error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                             });
                         } else {
@@ -174,7 +181,9 @@ define(function(require) {
                                 data: {
                                     id:vm_id, template_id:id_template, username:username, password:password, ansible: true, ansible_local_id: ansible_local_id, ansible_vars: ansible_vars
                                 },
-                                success: function(r, response){ parse_result(response) },
+                                success: function(r, response){
+                                    parse_result(response);
+                                },
                                 error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                             });
                         }

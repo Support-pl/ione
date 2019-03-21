@@ -17,25 +17,27 @@
 <br>
 <div class="template-row" element-id="{{element.ID}}">
   <div class="row">
-    <div class="medium-2 small-12 columns">
-      <h6>
-        {{element.NAME}}<br>
-        <span class="total_cost_div" hidden>
-          <small class="cost_value">0.00</small>
-          <small>{{tr "COST"}} / {{tr "HOUR"}}</small>
+  <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
+    <h6>
+      {{element.NAME}}<br>
+      <span class="total_cost_div" hidden>
+          <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
+          <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
         </span>
-      </h6>
-      <span>
+    </h6>
+    <span>
         <img src="{{element.TEMPLATE.LOGO}}">
       </span>
-    </div>
-    <div class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 15px; padding-left: 35px">
+  </div>
+  </div>
+  <div class="row">
+    <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 15px; padding-right: 35px;width: 33%">
       <fieldset>
-        <legend>
-          <i class="fa fa-laptop"></i> {{tr "Capacity"}}
+        <legend style="width: 100%">
+          <i class="fa fa-laptop"></i> {{tr "Capacity"}}<br>
           <span class="capacity_cost_div" hidden>
             <span class="cost_value">0.00</span>
-            <small>{{tr "COST"}} / {{tr "HOUR"}}</small>
+            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
           </span>
         </legend>
         <div>
@@ -43,10 +45,8 @@
         </div>
       </fieldset>
     </div>
-    <div class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 15px"></div>
-  </div>
-  <div class="row">
-    <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}"></div>
+    <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 15px;width: 34%"></div>
+    <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="padding-top: 15px;width: 33%"></div>
   </div>
   {{#isFeatureEnabled "show_vnet_instantiate"}}
   <div class="row">

@@ -311,11 +311,11 @@ define(function(require) {
           }
           }});
 
-          if(config.user_id == '197'){
+          //if(config.user_id == '197'){
               $(".provision_backup_confirm_button", context).show();
-          } else {
-              $(".provision_backup_confirm_button", context).hide();
-          }
+          //} else {
+             // $(".provision_backup_confirm_button", context).hide();
+          //}
 
           if (enabled("VM.reboot") || enabled("VM.reboot_hard")){
             $(".provision_reboot_confirm_button", context).show();

@@ -95,7 +95,7 @@ define(function(require) {
       extra_info['enforce'] = $("#enforce", this).is(":checked") ? true : false
 
       $.each(Sunstone.getDataTable(TAB_ID).elements(), function(index, elem) {
-          Sunstone.runAction("VM.deploy_action", elem, extra_info);
+        Sunstone.runAction("VM.deploy_action", elem, extra_info);
       });
 
       Sunstone.getDialog(DIALOG_ID).hide();

@@ -27,6 +27,7 @@ define(function(require) {
   var TAB_ID = require('./tabId');
   var CREATE_DIALOG_ID           = require('./form-panels/create/formPanelId');
   var DEPLOY_DIALOG_ID           = require('./dialogs/deploy/dialogId');
+  var PLACE_ON_NODE_DIALOG_ID    = require('./dialogs/place-on-node/dialogId');
   var MIGRATE_DIALOG_ID          = require('./dialogs/migrate/dialogId');
   var VNC_DIALOG_ID              = require('./dialogs/vnc/dialogId');
   var SPICE_DIALOG_ID            = require('./dialogs/spice/dialogId');
@@ -226,6 +227,12 @@ define(function(require) {
         Notifier.onError(request, response);
       },
       notify: false
+    },
+    "VM.place_on_node" : {
+      type: "custom",
+      call: function() {
+        Sunstone.getDialog(PLACE_ON_NODE_DIALOG_ID).show();
+      }
     }
   };
 

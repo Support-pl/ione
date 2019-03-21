@@ -13,6 +13,8 @@
                     {{tr "Important notice!"}}
                 </span><br>
                 {{tr "Backups are creating every day at 4:00 AM."}}
+                <br>
+                {{tr "50GB Disk Recovery taxes approximately 1 hour."}}
                 {{/if}}
             </span>
         </div>
@@ -29,13 +31,13 @@
                 <li>
                     <label class="left">
                         <input type="radio" name="provision_backup_radio" value="backup_yesterday">
-                        <i class="fa fa-fw fa-bolt"/> {{tr "Yesterday"}}
+                        {{tr "Yesterday"}}
                     </label>
                 </li>
                 <li>
                     <label class="left">
                         <input type="radio" name="provision_backup_radio" value="backup_today" checked>
-                        <i class="fa fa-fw fa-power-off"/> {{tr "Today"}}
+                        {{tr "Today"}}
                     </label>
                 </li>
             </ul>

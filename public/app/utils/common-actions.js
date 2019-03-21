@@ -18,6 +18,7 @@ define(function(require) {
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
   var Locale = require('utils/locale');
+  var OpenNebula = require('opennebula');
   var Navigation = require('utils/navigation');
 
   /*
@@ -103,7 +104,6 @@ define(function(require) {
       call : that.openNebulaResource.del,
       callback : function(request, response) {
         var tab = $('#' + that.tabId);
-
         if (Sunstone.getTab() == that.tabId) {
           Sunstone.showTab(that.tabId);
         }
@@ -122,6 +122,8 @@ define(function(require) {
       type: "multiple",
       call: that.openNebulaResource[actionStr],
       callback: function (req, response) {
+        console.log(that.openNebulaResource);
+        Sunstone.runAction(that.resourceStr + ".refresh");
         Sunstone.runAction(that.resourceStr + ".show", req.request.data[0]);
       },
       elements: function(opts) {
@@ -156,17 +158,23 @@ define(function(require) {
       callback : function(request, response) {
         Sunstone.resetFormPanel(that.tabId, formPanelId);
         Sunstone.hideFormPanel(that.tabId);
-        that.refresh();
-        console.log(that.xmlRoot, response);
-        if (response[that.xmlRoot].ID != undefined){
-          Notifier.notifyCustom(that.createdStr,
-            Navigation.link(" ID: " + response[that.xmlRoot].ID, that.tabId, response[that.xmlRoot].ID),
-            false);
-        }else{
-          Notifier.notifyCustom(that.createdStr, "", false);
+        //OpenNebula.Action.clear_cache('ANSIBLE');
+        if (response.error != undefined){
+          Notifier.notifyError(response.error);
+          console.log(response.error);
+        }
+        if (response[that.xmlRoot] != undefined){
+          if (response[that.xmlRoot].ID != undefined){
+            Notifier.notifyCustom(that.createdStr,
+                Navigation.link(" ID: " + response[that.xmlRoot].ID, that.tabId, response[that.xmlRoot].ID),
+                false);
+          }else{
+            Notifier.notifyCustom(that.createdStr, "", false);
+          }
         }
       },
       error: function(request, response) {
+        console.log('error');
         Sunstone.hideFormPanelLoading(that.tabId);
         Notifier.onError(request, response);
       },

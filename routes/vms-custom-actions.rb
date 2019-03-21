@@ -77,8 +77,8 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
          r error: 'Snapshot not given'
       else
          IONe.RevertZFSSnapshot(id, data['previous']) == true ?
-            r(response: "It's ok #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
-            r(response: "Contact Tech.Support to make sure revert process started")
+            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
+            r(response: "Contact Technical Support to make sure revert process started")
       end
    rescue => e
       msg = e.message

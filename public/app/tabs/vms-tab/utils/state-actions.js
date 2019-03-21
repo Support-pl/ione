@@ -23,10 +23,10 @@ define(function(require) {
     ["VM.resize", "VM.terminate_hard", "VM.recover"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.PENDING] =
-    ["VM.hold", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall"];
+    ["VM.hold", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall", "VM.place_on_node"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.HOLD] =
-    ["VM.release", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall"];
+    ["VM.release", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall", "VM.place_on_node"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.ACTIVE] =
     ["VM.recover"];

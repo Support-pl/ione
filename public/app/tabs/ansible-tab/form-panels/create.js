@@ -134,6 +134,7 @@ define(function(require) {
 
     function _submitWizard(context) {
 
+        var that = this;
         var name            = $('#name').val();
         var description     = $('#description').val();
         var supported_os    = $('#supported_os').val();
@@ -149,7 +150,7 @@ define(function(require) {
                 "Ansible.update",
                 this.resourceId,
                 { name: name, body: body, description : description, extra_data: {PERMISSIONS: this.resource.extra_data.PERMISSIONS, SUPPORTED_OS: supported_os}}
-            )
+            );
         }
         return false;
     };
