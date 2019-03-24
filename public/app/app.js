@@ -64,11 +64,6 @@ define(function(require) {
       Sunstone.setupNavigoRoutes();
     }
 
-    if(config.user_id == '721'){
-        $('.balance').css('display','');
-    }
-
-
     _setupAccordion();
     _setupCloseDropdownsOnClick();
     _insertUserAndZoneSelector();
@@ -104,15 +99,18 @@ define(function(require) {
 
     this.idGroup = -2; /*All*/
     Config.changeFilter(false);
-      var text;
-      OpenNebula.User.show({data:{'id':721},success: function(a,b){
-              template  = b;
-              text = template.USER.TEMPLATE.BALANCE;
-              if(config.user_id == '721'){
-              $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: $'+ text + ' </span></li>');
-
-              };
-          }});
+      if(config.user_config.default_view == 'user') {
+          var text;
+          OpenNebula.User.show({
+              data: {'id': config.user_id}, success: function (a, b) {
+                  template = b;
+                  if (template.USER.TEMPLATE.BALANCE != undefined){
+                      text = template.USER.TEMPLATE.BALANCE;
+                      $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: ' + text + ' BYN</span></li>');
+                  }
+              }
+          });
+      }
 
 
     $(".user-zone-info").html(UserAndZoneTemplate({

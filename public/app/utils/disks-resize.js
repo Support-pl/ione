@@ -99,15 +99,12 @@ define(function(require){
       disksContext.off("change", "input");
 
       if (disk_cost != 0 && Config.isFeatureEnabled("showback")) {
-        $(".provision_create_template_disk_cost_div", disksContext).show();
 
         disksContext.on("change", "input", function(){
           _calculateCost(disksContext, disk_cost, opts.cost_callback);
         });
 
         _calculateCost(disksContext, disk_cost, opts.cost_callback);
-      } else {
-        $(".provision_create_template_disk_cost_div", disksContext).hide();
       }
 
       var diskContext;

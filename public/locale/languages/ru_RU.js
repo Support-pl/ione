@@ -1568,5 +1568,10 @@ locale={
     "Contact Technical Support to make sure revert process started":"Обратитесь в техническую поддержку, чтобы убедится, что процесс восстановления был запущен успешно",
     "It's ok, yesterdays snapshot will be reverted":"Успешно, ВМ будет восстановлена из вчерашней копии",
     "It's ok, todays snapshot will be reverted":"Успешно, ВМ будет восстановлена из сегодняшней копии",
-    "Error while recovering VM, contact technical support":"Ошибка при восстановлении ВМ, обратитесь в техническую поддержку"
+    "Error while recovering VM, contact technical support":"Ошибка при восстановлении ВМ, обратитесь в техническую поддержку",
+    "50GB Disk Recovery taxes approximately 1 hour.":"Восстановление диска 50 гб занимает около  1 часа.",
+    "DAY":"День",
+    "WEEK":"Неделя",
+    "MONTH":"Месяц",
+    "COST / TIME indicator":"Индикатор стоимость / время",
 }

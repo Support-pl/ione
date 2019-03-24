@@ -21,6 +21,7 @@ define(function(require) {
 
     var Notifier = require('utils/notifier');
     var Locale = require('utils/locale');
+    var OpenNebula = require('opennebula');
 
     /*
       TEMPLATES
@@ -38,6 +39,8 @@ define(function(require) {
     var XML_ROOT = "USER";
     var for_hbs = [];
     var settings;
+    var datastores_hbs = [];
+    var datastores
     /*
       CONSTRUCTOR
      */
@@ -57,9 +60,12 @@ define(function(require) {
     Panel.PANEL_ID = PANEL_ID;
 
     $.get("settings", function(data, status){
-        settings = data.response;
-        Panel.prototype.html = _html;
-        Panel.prototype.setup = _setup;
+        OpenNebula.Datastore.list({success: function(r,res){
+                settings = data.response;
+                datastores = res;
+                Panel.prototype.html = _html;
+                Panel.prototype.setup = _setup;
+        }});
     });
 
 
@@ -70,6 +76,20 @@ define(function(require) {
      */
 
     function _html() {
+        datastores_hbs = [];
+        for(var key in datastores){
+            if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS'){
+                if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE"){
+                    datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,DEPLOY:true});
+                }else{
+                    datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, DEPLOY:false});
+                }
+
+            }
+        }
+        console.log(datastores_hbs);
+
+        for_hbs = [];
         for(var i in settings){
             if (settings[i] != null){
                 if (settings[i].indexOf('{') == 0){
@@ -84,11 +104,36 @@ define(function(require) {
                 }
             }
         }
-        return TemplateEasyInfo({'settings':for_hbs});
+
+        return TemplateEasyInfo({'settings':for_hbs,'datastores':datastores_hbs});
     }
 
     function _setup(context) {
         var that = this;
+        var disk_type = settings['DISK_TYPES'].split(',');
+        var datastores = document.querySelectorAll("#datastores_select_disk_type");
+        var len =  datastores.length;
+
+        $(datastores[0]).append('<option selected disabled>Select disk type disabled</option>');
+        $(datastores[0]).parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
+
+        for (var i = 1; i < len; i++) {
+            if (datastores_hbs[i].DISK_TYPE != undefined){
+                for(var k in disk_type){
+                    if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
+                        $(datastores[i]).append('<option selected>'+ disk_type[k] +'</option>');
+                    }else{
+                        $(datastores[i]).append('<option>'+ disk_type[k] +'</option>');
+                    }
+                }
+            }else{
+                $(datastores[i]).append('<option selected disabled>Select disk type</option>');
+                for(var k in disk_type){
+                    $(datastores[i]).append('<option>'+ disk_type[k] +'</option>');
+                }
+            }
+        }
+
 
         for(var i in for_hbs){
             if (for_hbs[i].bool_tree == true){
@@ -103,7 +148,33 @@ define(function(require) {
 
         var rezerv_clone_settings = $('tbody#settings_body').clone();
         var rezerv_for_hbs = JSON.parse(JSON.stringify(for_hbs));
-        set_events()
+        set_events();
+
+        $('#datastores_but_reset').click(function () {
+            for (var i = 1; i < len; i++) {
+                $(datastores[i]).val(datastores_hbs[i].DISK_TYPE);
+                $(datastores[i]).parent().next('#deploy_switch').children().children('#togBtn').prop('checked',datastores_hbs[i].DEPLOY);
+            }
+        });
+
+
+        $('#datastores_but_submit').click(function () {
+            for (var i = 1; i < len; i++) {
+                if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()){
+                    OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DRIVE_TYPE = '+$(datastores[i]).val()}});
+                }
+                var dep = $(datastores[i]).parent().next('#deploy_switch').children().children('#togBtn').prop('checked');
+                if (datastores_hbs[i].DEPLOY != dep){
+                    if (dep == true){
+                        OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = TRUE'}});
+                    }else{
+                        OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = FALSE'}});
+                    }
+                }
+            }
+        });
+
+
 
         $('#settings_but_reset').click(function () {
             $('tbody#settings_body').remove();
@@ -219,7 +290,7 @@ define(function(require) {
                         '<td class="td_key_setting" style="font-weight: bold;">' +
                         '<span id="setting_tree_circle">' +
                         '<a href="#"><i class="fa fa-circle-o"></i></a></span>' +
-                        '<span>'+new_key+'</span><small style="color: grey;display: none;">&emsp;'+new_key1+'</small></td></tr>'+
+                        '<span id="setting_tree_key_span" style="cursor: pointer;">'+new_key+'</span><small style="color: grey;display: none;">&emsp;'+new_key1+'</small></td></tr>'+
                         '<tr class="tr_setting_'+new_key1+'">' +
                         '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
                         '<td class="td_value_setting">'+new_val+'</td>' +
@@ -247,23 +318,21 @@ define(function(require) {
                             var body_str = '{';
                             var len = for_hbs[i].value.length - 1;
                             for(var k in for_hbs[i].value){
+                                var val1 = JSON.stringify(JSON.stringify(for_hbs[i].value[k].value1));
                                 if (k != len){
-                                    body_str += '"'+for_hbs[i].value[k].key1+'":"'+for_hbs[i].value[k].value1+'",';
+                                    body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
                                 }else{
-                                    body_str += '"'+for_hbs[i].value[k].key1+'":"'+for_hbs[i].value[k].value1+'"}';
+                                    body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
                                 }
                             }
-                            if (body_str != settings[j]){
-
-                                var re = new RegExp('"', 'g');
-                                var body_str2 = body_str.replace(re, '\\"');
+                            if (body_str.replace(/\\"/g,'\"').replace(/\\\\\\"/g,'\\"') != settings[j]){
 
                                 $.ajax({
                                     url: '/settings/'+j,
                                     type: 'POST',
-                                    data: '{"body":"'+ body_str2 +'"}',
+                                    data: '{"body":"'+ body_str +'"}',
                                     success: function(msg) {
-                                        Notifier.notifySubmit('add');
+                                        Notifier.notifySubmit('Field have been added');
                                     }
                                 });
                                 settings[j] = body_str;
@@ -277,7 +346,7 @@ define(function(require) {
                                     type: 'POST',
                                     data: '{"body":"'+ for_hbs[i].value +'"}',
                                     success: function(msg) {
-                                        Notifier.notifySubmit('add')
+                                        Notifier.notifySubmit('Field have been added')
                                     }
                                 });
                                 settings[j] = for_hbs[i].value;
@@ -292,22 +361,20 @@ define(function(require) {
                         var body_str = '{';
                         var len = for_hbs[i].value.length - 1;
                         for(var k in for_hbs[i].value){
+                            var val1 = JSON.stringify(JSON.stringify(for_hbs[i].value[k].value1));
                             if (k != len){
-                                body_str += '"'+for_hbs[i].value[k].key1+'":"'+for_hbs[i].value[k].value1+'",';
+                                body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
                             }else{
-                                body_str += '"'+for_hbs[i].value[k].key1+'":"'+for_hbs[i].value[k].value1+'"}';
+                                body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
                             }
                         }
-
-                        var re = new RegExp('"', 'g');
-                        body_str = body_str.replace(re, '\\"');
 
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
                             data: '{"name":"'+for_hbs[i].key+'","body":"'+ body_str +'"}',
                             success: function(msg) {
-                                Notifier.notifySubmit('add');
+                                Notifier.notifySubmit('Field have been added');
                                 $.get("settings", function(data, status){
                                     settings = data.response;
                                 });
@@ -319,7 +386,7 @@ define(function(require) {
                             type: 'POST',
                             data: '{"name":"'+ for_hbs[i].key +'","body":"'+ for_hbs[i].value +'"}',
                             success: function(msg) {
-                                Notifier.notifySubmit('add');
+                                Notifier.notifySubmit('Field have been added');
                                 $.get("settings", function(data, status){
                                     settings = data.response;
                                 });
@@ -342,7 +409,7 @@ define(function(require) {
                         type: 'DELETE',
                         data: '{"name":"'+i+'"}',
                         success: function(msg) {
-                            Notifier.notifySubmit('delete');
+                            Notifier.notifySubmit('Field has been deleted');
                             $.get("settings", function(data, status){
                                 settings = data.response;
                             });
@@ -355,8 +422,10 @@ define(function(require) {
         return false;
     }
 
+
     function circle_event() {
         var tree_circle = document.querySelectorAll("#setting_tree_circle");
+        var tree_key_span = document.querySelectorAll("#setting_tree_key_span");
         var len =  tree_circle.length;
 
         for (var i = 0; i < len; i++) {
@@ -378,12 +447,15 @@ define(function(require) {
                     }
                 }
             };
+            tree_key_span[i].onclick = function (){
+                $(this).parent().children('#setting_tree_circle').click();
+            };
         }
     }
 
     function edit_event() {
         var edit_setting = document.querySelectorAll("#div_edit_setting");
-        len =  edit_setting.length;
+        var len =  edit_setting.length;
 
         for (var i = 0; i < len; i++) {
             edit_setting[i].onclick = function(){
@@ -419,7 +491,7 @@ define(function(require) {
 
     function minus_event() {
         var minus_setting = document.querySelectorAll("#div_minus_setting");
-        len =  minus_setting.length;
+        var len =  minus_setting.length;
 
         for (var i = 0; i < len; i++) {
             minus_setting[i].onclick = function(){

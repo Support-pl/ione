@@ -14,48 +14,486 @@
 {{! limitations under the License.                                             }}
 {{! -------------------------------------------------------------------------- }}
 
+{{#if azure_template}}
+
+
+
 <br>
 <div class="template-row" element-id="{{element.ID}}">
-  <div class="row">
-  <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
-    <h6>
-      {{element.NAME}}<br>
-      <span class="total_cost_div" hidden>
+  <div class="row" style="background-color: #e9e9e9;">
+    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 90%;">
+
+      <div class="medium-2 small-12 columns" style="width: 50%">
+        <label for="vm_name">
+          {{tr "VM name"}}
+          <span class="tip">
+          {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
+        </span>
+        </label>
+        <input type="text" name="vm_name" id="vm_name" />
+      </div>
+
+      <div class="medium-2 small-12 columns" style="width: 50%">
+        <label for="vm_n_times">
+          {{tr "Number of instances"}}
+        </label>
+        <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" disabled>
+      </div>
+
+      <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
+        <h6>
+          {{element.NAME}}<br>
+          <span class="total_cost_div" style="display: none">
           <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
           <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
         </span>
-    </h6>
-    <span>
-        <img src="{{element.TEMPLATE.LOGO}}">
-      </span>
-  </div>
-  </div>
-  <div class="row">
-    <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 15px; padding-right: 35px;width: 33%">
-      <fieldset>
-        <legend style="width: 100%">
-          <i class="fa fa-laptop"></i> {{tr "Capacity"}}<br>
-          <span class="capacity_cost_div" hidden>
+        </h6>
+        <div class="OC_name_Container">
+
+        </div>
+      </div>
+
+      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 62px; width: 50%">
+        <fieldset>
+          <legend style="width: 100%">
+            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <span class="capacity_cost_div" style="display: none">
             <span class="cost_value">0.00</span>
             <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
           </span>
+          </legend>
+          <div class="capacityContext">
+
+
+          </div>
+        </fieldset>
+      </div>
+
+      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 62px;width: 50%;">
+        <fieldset>
+          <legend style="width: 100%">
+            <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
+            <span class="provision_create_template_disk_cost_div" style="display: none">
+              <span class="cost_value">0.00</span>
+              <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+            </span>
+          </legend>
+          <div class="disksContainer">
+
+          </div>
+        </fieldset>
+      </div>
+
+
+      {{#isFeatureEnabled "show_vnet_instantiate"}}
+      <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
+        <div class="provision_network_selector">
+        </div>
+      </div>
+      {{/isFeatureEnabled}}
+
+    </div>
+
+
+
+
+    <div class="medium-4 columns" id="right_colum">
+
+
+      <div class="medium-2 small-12 columns" style="width: 100%;padding-bottom: 17px;">
+        {{#if default_user_view}}
+        <label style="height: 22.5px;">{{tr "COST / TIME indicator"}}</label>
+        {{else}}
+        {{#isTabActionEnabled "vms-tab" "VM.hold"}}
+        <label style="height: 22.5px;">
+          <input type="checkbox" name="hold" id="hold"/>
+          {{tr "Start on hold"}}
+          <span class="tip">
+          {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
+        </span>
+        </label>
+        {{/isTabActionEnabled}}
+        {{/if}}
+        <select type="text" id="CostVaribl">
+          <option>{{tr "COST"}} / {{tr "HOUR"}}</option>
+          <option>{{tr "COST"}} / {{tr "DAY"}}</option>
+          <option>{{tr "COST"}} / {{tr "WEEK"}}</option>
+          <option>{{tr "COST"}} / {{tr "MONTH"}}</option>
+        </select>
+      </div>
+
+      <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
+        <div style="width: 100%">
+          <span class="capacity_cost_div" >
+            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+        <div style="width: 100%">
+          <span class="provision_create_template_disk_cost_div">
+            <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+        <div style="width: 100%;border-top-style: groove; ">
+          <span class="total_cost_div">
+            <i class="fa fa-cloud-upload"></i>{{tr "COST"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+
+
+      </div>
+
+      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
+      <div style="width: 60%;"><button class="button success radius submit_button" href="submit">Создать</button></div>
+    </div>
+
+
+  </div>
+
+  {{#if default_user_view}}
+  <div style="display: none">
+    {{#advancedSection (tr "Advanced options") }}
+    {{#isFeatureEnabled "show_host_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns hostContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fas fa-hdd"></i> {{tr "Deploy VM in a specific Host"}}
+          </legend>
+          <div class="provision_host_selector{{element.ID}}" data-tab-content>{{{hostsDatatable}}}</div>
+          <div class="row">
+            <div class="large-12 columns">
+              <label for="SCHED_REQUIREMENTS">
+                {{tr "Expression"}}
+                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+              </label>
+              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    {{#isFeatureEnabled "show_ds_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns dsContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fas fa-folder-open"></i> {{tr "Deploy VM in a specific Datastore"}}
+          </legend>
+          <div class="provision_ds_selector{{element.ID}}" data-tab-content>{{{dsDatatable}}}</div>
+          <div class="row">
+            <div class="large-12 columns">
+              <label for="SCHED_DS_REQUIREMENTS">
+                {{tr "Expression"}}
+                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+              </label>
+              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    {{#isFeatureEnabled "show_vmgroup_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns vmgroupContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fa fa-globe"></i> {{tr "VM Group"}}
+          </legend>
+          <div>
+            <a class="button small provision_add_vmgroup">
+              <i class="fa fa-lg fa-plus-circle add_vmgroup"></i> {{tr "VM Group"}}
+            </a>
+          </div>
+          <div class="provision_vmgroup_selector">
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    <div class="row">
+      <div class="medium-6 small-12 columns vcenterVMFolderContext{{element.ID}}">
+        <div class="provision_vcenter_vm_folder_selector">
+        </div>
+      </div>
+    </div>
+    {{/advancedSection}}
+  </div>
+  {{else}}
+  {{#advancedSection (tr "Advanced options") }}
+  {{#isFeatureEnabled "show_host_instantiate"}}
+  <div class="row">
+    <div class="small-12 columns hostContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fas fa-hdd"></i> {{tr "Deploy VM in a specific Host"}}
         </legend>
-        <div>
-          {{{capacityInputsHTML}}}
+        <div class="provision_host_selector{{element.ID}}" data-tab-content>{{{hostsDatatable}}}</div>
+        <div class="row">
+          <div class="large-12 columns">
+            <label for="SCHED_REQUIREMENTS">
+              {{tr "Expression"}}
+              {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+            </label>
+            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+          </div>
         </div>
       </fieldset>
     </div>
-    <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 15px;width: 34%"></div>
-    <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="padding-top: 15px;width: 33%"></div>
   </div>
-  {{#isFeatureEnabled "show_vnet_instantiate"}}
+  {{/isFeatureEnabled}}
+  {{#isFeatureEnabled "show_ds_instantiate"}}
   <div class="row">
-    <div class="small-12 columns nicsContext{{element.ID}}">
-      <div class="provision_network_selector">
-      </div>
+    <div class="small-12 columns dsContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fas fa-folder-open"></i> {{tr "Deploy VM in a specific Datastore"}}
+        </legend>
+        <div class="provision_ds_selector{{element.ID}}" data-tab-content>{{{dsDatatable}}}</div>
+        <div class="row">
+          <div class="large-12 columns">
+            <label for="SCHED_DS_REQUIREMENTS">
+              {{tr "Expression"}}
+              {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+            </label>
+            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+          </div>
+        </div>
+      </fieldset>
     </div>
   </div>
   {{/isFeatureEnabled}}
+  {{#isFeatureEnabled "show_vmgroup_instantiate"}}
+  <div class="row">
+    <div class="small-12 columns vmgroupContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fa fa-globe"></i> {{tr "VM Group"}}
+        </legend>
+        <div>
+          <a class="button small provision_add_vmgroup">
+            <i class="fa fa-lg fa-plus-circle add_vmgroup"></i> {{tr "VM Group"}}
+          </a>
+        </div>
+        <div class="provision_vmgroup_selector">
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  {{/isFeatureEnabled}}
+  <div class="row">
+    <div class="medium-6 small-12 columns vcenterVMFolderContext{{element.ID}}">
+      <div class="provision_vcenter_vm_folder_selector">
+      </div>
+    </div>
+  </div>
+  {{/advancedSection}}
+  {{/if}}
+</div>
+<br>
+
+
+
+
+
+{{else}}
+<br>
+<div class="template-row" element-id="{{element.ID}}">
+  <div class="row" style="background-color: #e9e9e9;">
+    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 90%;">
+
+      <div class="medium-2 small-12 columns" style="width: 50%">
+        <label for="vm_name">
+          {{tr "VM name"}}
+          <span class="tip">
+          {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
+        </span>
+        </label>
+        <input type="text" name="vm_name" id="vm_name" />
+      </div>
+
+      <div class="medium-2 small-12 columns" style="width: 50%">
+        <label for="vm_n_times">
+          {{tr "Number of instances"}}
+        </label>
+        <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" disabled>
+      </div>
+
+      <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
+        <h6>
+          {{element.NAME}}<br>
+        <span class="total_cost_div" style="display: none">
+          <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
+          <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+        </span>
+        </h6>
+        <span>
+        <img src="{{element.TEMPLATE.LOGO}}">
+      </span>
+      </div>
+
+      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 62px; width: 50%">
+        <fieldset>
+          <legend style="width: 100%">
+            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+          <span class="capacity_cost_div" style="display: none">
+            <span class="cost_value">0.00</span>
+            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+          </span>
+          </legend>
+          <div>
+            {{{capacityInputsHTML}}}
+          </div>
+        </fieldset>
+      </div>
+      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 62px;width: 50%;"></div>
+
+
+      {{#isFeatureEnabled "show_vnet_instantiate"}}
+      <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
+        <div class="provision_network_selector">
+        </div>
+      </div>
+      {{/isFeatureEnabled}}
+
+    </div>
+
+
+
+
+    <div class="medium-4 columns" id="right_colum">
+
+
+      <div class="medium-2 small-12 columns" style="width: 100%;padding-bottom: 17px;">
+        {{#if default_user_view}}
+        <label style="height: 22.5px;">{{tr "COST / TIME indicator"}}</label>
+        {{else}}
+        {{#isTabActionEnabled "vms-tab" "VM.hold"}}
+        <label style="height: 22.5px;">
+          <input type="checkbox" name="hold" id="hold"/>
+          {{tr "Start on hold"}}
+          <span class="tip">
+          {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
+        </span>
+        </label>
+        {{/isTabActionEnabled}}
+        {{/if}}
+        <select type="text" id="CostVaribl">
+          <option>{{tr "COST"}} / {{tr "HOUR"}}</option>
+          <option>{{tr "COST"}} / {{tr "DAY"}}</option>
+          <option>{{tr "COST"}} / {{tr "WEEK"}}</option>
+          <option>{{tr "COST"}} / {{tr "MONTH"}}</option>
+        </select>
+      </div>
+
+      <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
+        <div style="width: 100%">
+          <span class="capacity_cost_div" >
+            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+        <div style="width: 100%">
+          <span class="provision_create_template_disk_cost_div">
+            <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+        <div style="width: 100%;border-top-style: groove; ">
+          <span class="total_cost_div">
+            <i class="fa fa-cloud-upload"></i>{{tr "COST"}}<br>
+            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+          </span>
+        </div>
+
+
+      </div>
+
+      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
+      <div style="width: 60%;"><button class="button success radius submit_button" href="submit">Создать</button></div>
+    </div>
+
+
+  </div>
+
+  {{#if default_user_view}}
+  <div style="display: none">
+  {{#advancedSection (tr "Advanced options") }}
+  {{#isFeatureEnabled "show_host_instantiate"}}
+  <div class="row">
+    <div class="small-12 columns hostContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fas fa-hdd"></i> {{tr "Deploy VM in a specific Host"}}
+        </legend>
+        <div class="provision_host_selector{{element.ID}}" data-tab-content>{{{hostsDatatable}}}</div>
+        <div class="row">
+          <div class="large-12 columns">
+            <label for="SCHED_REQUIREMENTS">
+              {{tr "Expression"}}
+              {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+            </label>
+            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  {{/isFeatureEnabled}}
+  {{#isFeatureEnabled "show_ds_instantiate"}}
+  <div class="row">
+    <div class="small-12 columns dsContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fas fa-folder-open"></i> {{tr "Deploy VM in a specific Datastore"}}
+        </legend>
+        <div class="provision_ds_selector{{element.ID}}" data-tab-content>{{{dsDatatable}}}</div>
+        <div class="row">
+          <div class="large-12 columns">
+            <label for="SCHED_DS_REQUIREMENTS">
+              {{tr "Expression"}}
+              {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+            </label>
+            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  {{/isFeatureEnabled}}
+  {{#isFeatureEnabled "show_vmgroup_instantiate"}}
+  <div class="row">
+    <div class="small-12 columns vmgroupContext{{element.ID}}">
+      <fieldset>
+        <legend>
+          <i class="fa fa-globe"></i> {{tr "VM Group"}}
+        </legend>
+        <div>
+          <a class="button small provision_add_vmgroup">
+            <i class="fa fa-lg fa-plus-circle add_vmgroup"></i> {{tr "VM Group"}}
+          </a>
+        </div>
+        <div class="provision_vmgroup_selector">
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  {{/isFeatureEnabled}}
+  <div class="row">
+    <div class="medium-6 small-12 columns vcenterVMFolderContext{{element.ID}}">
+      <div class="provision_vcenter_vm_folder_selector">
+      </div>
+    </div>
+  </div>
+  {{/advancedSection}}
+  </div>
+  {{else}}
   {{#advancedSection (tr "Advanced options") }}
   {{#isFeatureEnabled "show_host_instantiate"}}
   <div class="row">
@@ -124,5 +562,7 @@
     </div>
   </div>
   {{/advancedSection}}
+  {{/if}}
 </div>
 <br>
+{{/if}}

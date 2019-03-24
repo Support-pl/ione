@@ -35,44 +35,7 @@
        {{/isFeatureEnabled}}
     </div>
   </div>
-  <div class="row nameContainer">
-    <div class="medium-4 columns">
-      <label for="vm_name">
-        {{tr "VM name"}}
-        <span class="tip">
-          {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
-        </span>
-      </label>
-      <input type="text" name="vm_name" id="vm_name" />
-    </div> 
-    <div class="medium-4 columns">
-      <label for="vm_n_times">
-        {{tr "Number of instances"}}
-      </label>
-      <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
-      <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" disabled>
-    </div>
-    <div class="medium-4 columns">
-      {{#if default_view}}
-      <label style="height: 22.5px;">{{tr "COST / TIME indicator"}}</label>
-      {{else}}
-      {{#isTabActionEnabled "vms-tab" "VM.hold"}}
-      <label style="height: 22.5px;">
-        <input type="checkbox" name="hold" id="hold"/>
-        {{tr "Start on hold"}}
-        <span class="tip">
-          {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
-        </span>
-      </label>
-      {{/isTabActionEnabled}}
-      {{/if}}
-      <select type="text" id="CostVaribl">
-        <option>{{tr "COST"}} / {{tr "HOUR"}}</option>
-        <option>{{tr "COST"}} / {{tr "DAY"}}</option>
-        <option>{{tr "COST"}} / {{tr "WEEK"}}</option>
-        <option>{{tr "COST"}} / {{tr "MONTH"}}</option>
-      </select>
-    </div>
+
   </div>
   <div class="row">
     <div class="large-12 large-centered columns list_of_templates">

@@ -17,6 +17,118 @@
 <div class="row">
     <div class="large-12 columns">
         <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
+            <thead id="datastores_thead">
+            <tr role="row">
+                <th colspan="1" rowspan="1">{{tr "ID"}}</th>
+                <th colspan="1" rowspan="1">{{tr "NAME"}}</th>
+                <th colspan="1" rowspan="1">{{tr "DISK TYPE"}}</th>
+                <th colspan="1" rowspan="1">{{tr "DEPLOY"}}</th>
+            </tr>
+            </thead>
+            <tbody id="datastores_body" style="border-bottom: none;">
+            <style type="text/css">
+                .tetswitch {
+                    position: relative;
+                    display: inline-block;
+                    width: 70px;
+                    height: 20px;
+                    margin-top: 5px;
+                }
+
+                .tetswitch input {display:none;}
+
+                .tetslider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ca2222;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                    border-radius: 34px;
+                }
+
+                .tetslider:before {
+                    position: absolute;
+                    content: "";
+                    height: 13px;
+                    width: 13px;
+                    left: 4px;
+                    bottom: 4px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                    border-radius: 50%;
+                }
+
+                input:checked + .tetslider {
+                    background-color: #2ab934;
+                }
+
+                input:focus + .tetslider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .tetslider:before {
+                    -webkit-transform: translateX(26px);
+                    -ms-transform: translateX(26px);
+                    transform: translateX(50px);
+                }
+
+                .tetslider:after
+                {
+                    content:'NO';
+                    color: white;
+                    display: block;
+                    position: absolute;
+                    transform: translate(-50%,-50%);
+                    top: 50%;
+                    left: 50%;
+                    font-size: 12px;
+                    font-family: Verdana, sans-serif;
+                }
+
+                input:checked + .tetslider:after
+                {
+                    content:'YES';
+                }
+
+            </style>
+            {{#each datastores}}
+            <tr role="row">
+                <td>{{ID}}</td>
+                <td>{{NAME}}</td>
+                <td>
+                    <select style="width: 80%;" id="datastores_select_disk_type"></select>
+                </td>
+                <td id="deploy_switch">
+                    {{#if DEPLOY}}
+                    <label class="tetswitch"><input type="checkbox" id="togBtn" checked><div class="tetslider round"></div></label>
+                    {{else}}
+                    <label class="tetswitch"><input type="checkbox" id="togBtn"><div class="tetslider round"></div></label>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+            </tbody>
+        </table>
+
+        <div style="text-align: right">
+            <button id="datastores_but_reset"class="button radius info" type="button">Reset</button>
+            <button id="datastores_but_submit" class="button radius success" type="button">Submit</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="row">
+    <div class="large-12 columns">
+        <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
             <thead id="settings_thead">
             <tr>
                 <th colspan="3">{{tr "Cloud settings"}}</th>
@@ -32,7 +144,7 @@
                                 <i class="fa fa-circle"/>
                             </a>
                         </span>
-                        <span>{{key}}</span>
+                        <span id="setting_tree_key_span" style="cursor: pointer;">{{key}}</span>
                         {{else}}
                         <span>&#8195;{{key}}</span>
                         {{/if}}
@@ -70,7 +182,7 @@
         <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
             <tr>
                 <td class="key_setting_td">
-                    <input type="text" list="settings_key_vars" name="new_key_setting"/>
+                    <input type="text" list="settings_key_vars" name="new_key_setting" placeholder="parent key"/>
                     <datalist id="settings_key_vars">
                         {{#each settings}}
                         <option value="{{key}}">
@@ -78,11 +190,11 @@
                     </datalist>
                 </td>
                 <td class="key1_setting_td">
-                    <input type="text"  list="settings_key1_vars" name="new_key1_setting"/>
+                    <input type="text"  list="settings_key1_vars" name="new_key1_setting" placeholder="subkey(optional)"/>
                     <datalist id="settings_key1_vars"></datalist>
                 </td>
                 <td class="value_setting_td">
-                    <input type="text"  list="settings_value_vars" name="new_value_setting"/>
+                    <input type="text"  list="settings_value_vars" name="new_value_setting" placeholder="value"/>
                     <datalist id="settings_value_vars"></datalist>
                 </td>
                 <td style="text-align: center">

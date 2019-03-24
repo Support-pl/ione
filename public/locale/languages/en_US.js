@@ -759,4 +759,9 @@ locale={
     "Enter Username and Admin-password":"",
     "Enter new root-password":"",
     "Are you sure, that you want to reinstall the system?":"",
+    "50GB Disk Recovery taxes approximately 1 hour.":"",
+    "DAY":"",
+    "WEEK":"",
+    "MONTH":"",
+    "COST / TIME indicator":"",
 }
