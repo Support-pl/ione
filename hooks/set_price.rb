@@ -59,7 +59,14 @@ end
 
 db = $db[:settings].as_hash(:name, :body)
 
-costs = JSON.parse db['CAPACITY_COST']
+costs = {}
+
+costs.merge!(
+    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'] * vm['/VM/TEMPLATE/CPU'],
+    'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'] * vm['/VM/TEMPLATE/MEMORY'] / 1024
+)
+
+JSON.parse db['CAPACITY_COST']
 
 unless vm['/VM/TEMPLATE/DISK'].nil? then
     cost, disk_volume = JSON.parse(db['DISK_COSTS']), vm['/VM/TEMPLATE/DISK/SIZE'].to_f / 1024
