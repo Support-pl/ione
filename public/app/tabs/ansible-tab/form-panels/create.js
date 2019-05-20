@@ -129,6 +129,20 @@ define(function(require) {
             })
         });
 
+        $('#playbook_file_upload').bind("click" , function () {
+            $('#playbook_file').click();
+        });
+
+        $( "#playbook_file" ).change(function() {
+            var file = document.getElementById('playbook_file').files[0];
+            var reader = new FileReader();
+            reader.onload = function() {
+                $('#body').val(reader.result);
+                $('#body_label').append(file.name);
+            }
+            reader.readAsText(file);
+        });
+
         return false;
     }
 

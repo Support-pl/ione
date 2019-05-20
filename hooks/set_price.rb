@@ -18,6 +18,16 @@
 
 STARTUP_TIME = Time.now.to_f
 
+nk_encoding = nil
+
+if RUBY_VERSION =~ /^1.9/
+    Encoding.default_external = Encoding::UTF_8
+    Encoding.default_internal = Encoding::UTF_8
+    nk_encoding = "UTF-8"
+end
+
+NOKOGIRI_ENCODING = nk_encoding
+
 ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
 
 if !ONE_LOCATION
@@ -29,11 +39,14 @@ else
 end
 
 $: << RUBY_LIB_LOCATION
+$: << RUBY_LIB_LOCATION+'/onedb'
 
 require 'yaml'
 require 'json'
 require 'sequel'
 require 'opennebula'
+require 'onedb'
+require 'onedb_live'
 include OpenNebula
 
 CONF = YAML.load_file("#{ETC_LOCATION}/config.yml") # IONe configuration constants
@@ -62,38 +75,20 @@ db = $db[:settings].as_hash(:name, :body)
 costs = {}
 
 costs.merge!(
-    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'] * vm['/VM/TEMPLATE/CPU'],
-    'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'] * vm['/VM/TEMPLATE/MEMORY'] / 1024
+    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
+    'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f
 )
 
-JSON.parse db['CAPACITY_COST']
 
 unless vm['/VM/TEMPLATE/DISK'].nil? then
-    cost, disk_volume = JSON.parse(db['DISK_COSTS']), vm['/VM/TEMPLATE/DISK/SIZE'].to_f / 1024
-
     costs.merge!(
-        'DISK_COST' => cost[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f * disk_volume
+        'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f
     )
 end
 
 unless vm['/VM/TEMPLATE/NIC'].nil? then
-    cost, public_ip_count = db['PUBLIC_IP_COST'].to_f, 0
-    
-    nic = vm.to_hash['VM']['TEMPLATE']['NIC']
-    if nic.class == Array then
-        nic.each do | el |
-            vnet = VirtualNetwork.new_with_id el['NETWORK_ID'], Client.new
-            vnet.info!
-            public_ip_count += vnet['/VNET/TEMPLATE/TYPE'] == 'PUBLIC' ? 1 : 0
-        end
-    elsif nic.class == Hash 
-        vnet = VirtualNetwork.new_with_id nic['NETWORK_ID'], Client.new
-        vnet.info!
-        public_ip_count += vnet['/VNET/TEMPLATE/TYPE'] == 'PUBLIC' ? 1 : 0
-    end
-
     costs.merge!(
-        'PUBLIC_IP_COST' => cost * public_ip_count
+        'PUBLIC_IP_COST' => db['PUBLIC_IP_COST'].to_f
     )
 end
 
@@ -103,5 +98,10 @@ template =
     end
 
 vm.update(template, true)
+
+action = OneDBLive.new
+costs.each do | key, value |
+    action.change_body('vm', "/VM/TEMPLATE/#{key}", value.to_s, {:id => vm.id})
+end
 
 puts "Work time: #{(Time.now.to_f - STARTUP_TIME).round(6).to_s} sec"

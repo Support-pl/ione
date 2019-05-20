@@ -297,54 +297,71 @@ define(function(require) {
 
           // helper, cleaner code
           function enabled(action){
-            return Config.isTabActionEnabled("provision-tab", action) &&
-                   StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
+              if (Config.isTabActionEnabled("provision-tab", action) == undefined){
+                  return StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
+              }else{
+                  return Config.isTabActionEnabled("provision-tab", action) &&
+                  StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
+              }
           }
-
 
           var resultvm = 0;
           OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
-          if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
-            $(".provision_reinstall_confirm_button", context).show();
-          } else {
-            $(".provision_reinstall_confirm_button", context).hide();
-          }
+                if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
+                    $(".provision_reinstall_confirm_button", context).show();
+                } else {
+                    $(".provision_reinstall_confirm_button", context).hide();
+                }
           }});
 
-          //if(config.user_id == '197'){
-              $(".provision_backup_confirm_button", context).show();
-          //} else {
-             // $(".provision_backup_confirm_button", context).hide();
-          //}
-
-          if (enabled("VM.reboot") || enabled("VM.reboot_hard")){
+          if (enabled("VM.recover") == true){
+            $(".provision_backup_confirm_button", context).show();
+          } else {
+            $(".provision_backup_confirm_button", context).hide();
+          }
+          if (enabled("VM.reboot")){
             $(".provision_reboot_confirm_button", context).show();
           } else {
             $(".provision_reboot_confirm_button", context).hide();
           }
-
           if (enabled("VM.poweroff") || enabled("VM.poweroff_hard")){
             $(".provision_poweroff_confirm_button", context).show();
           } else {
             $(".provision_poweroff_confirm_button", context).hide();
           }
-
           if (enabled("VM.undeploy") || enabled("VM.undeploy_hard")){
             $(".provision_undeploy_confirm_button", context).show();
           } else {
             $(".provision_undeploy_confirm_button", context).hide();
           }
-
           if (enabled("VM.resume")){
             $(".provision_resume_button", context).show();
           } else {
             $(".provision_resume_button", context).hide();
           }
-
           if (enabled("VM.terminate") || enabled("VM.terminate_hard")){
             $(".provision_terminate_confirm_button", context).show();
           } else {
             $(".provision_terminate_confirm_button", context).hide();
+          }
+
+          if (data.STATE == 8) {
+            OpenNebula.AnsibleProcess.list({success: function(a,res){
+                for(var i in res){
+                    if (res[i].ANSIBLE_PROCESS.status == 'RUNNING'){
+                        if (vm_id == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]){
+                            $(".provision_reinstall_confirm_button", context).hide();
+                            $(".provision_backup_confirm_button", context).hide();
+                            $(".provision_reboot_confirm_button", context).hide();
+                            $(".provision_poweroff_confirm_button", context).hide();
+                            $(".provision_undeploy_confirm_button", context).hide();
+                            $(".provision_resume_button", context).hide();
+                            $(".provision_terminate_confirm_button", context).hide();
+                            return false;
+                        }
+                    }
+                }
+            }});
           }
 
           if(Config.isTabActionEnabled("provision-tab", "VM.save_as_template")){
@@ -438,13 +455,12 @@ define(function(require) {
                 '</span>'+
                 '<span>'+
                   '<i class="fa fa-fw fa-lg fa-clock-o"/> '+
-                  Humanize.prettyTimeAgo(data.STIME)+
+              Humanize.prettyTimeAgo(data.STIME)+
                   ' - '+
                   'ID: '+
                   data.ID+
                 '</span>'+
               '</li>');
-
           var AdminView = !(~config.user_config.default_view.indexOf('user') || ~config.user_config.default_view.indexOf('cloud'))
           if(AdminView){
             var vcenter_info = "";
@@ -686,8 +702,6 @@ define(function(require) {
           var opts = {};
 
           opts.backup = true;
-
-
           $(".provision_confirm_action:first", context).html(TemplateConfirmBackup({opts: opts,id:vm_id,name:name}));
       });
 
@@ -792,20 +806,24 @@ define(function(require) {
           button.attr("disabled", "disabled");
 
           var vm_id = $(".provision_info_vm", context).attr("vm_id");
-          var backup_action = $('input[name=provision_backup_radio]:checked').val()
-
+          if ($('input[name=provision_backup_radio]:checked').val() == 'backup_today'){
+              var backup_action = false;
+          }else{
+              var backup_action = true;
+          }
+          Notifier.notifyMessage('Процесс восстановления запущен. Пожалуйста ожидайте.');
           OpenNebula.VM.revert_zfs_snapshot({
               data: {
-                  id:vm_id, previous:(backup_action == 'backup_today' ? 'backup_today' : 'backup_yesterday')
+                  id:vm_id, previous:backup_action
               },
               success: function(r, response){
                 if(response.error != undefined){
                   Notifier.notifyError(Locale.tr(response.error));
-                } else {
-                  Notifier.notifySubmit(Locale.tr(response.response)); 
+                }else{
+                  Notifier.notifySubmit(Locale.tr(response.response));
                 }
-                
-                update_provision_vm_info(vm_id, context)
+
+                update_provision_vm_info(vm_id, context);
               },
               error: function(r, response){ Notifier.notifyError(Locale.tr('Error occurred, contact technical support'))}
           });

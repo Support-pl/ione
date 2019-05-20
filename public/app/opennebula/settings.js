@@ -17,26 +17,25 @@
 define(function(require){
     var OpenNebulaAction = require('./action');
     var Config = require('sunstone-config');
-  
+
     var RESOURCE = "SETTINGS";
 
     var Settings = {
         "resource": RESOURCE,
-        "del" : function(params) {
-            OpenNebulaAction.del(params, RESOURCE);
-        },
-        "list" : function(params) {
-            OpenNebulaAction.list(params, RESOURCE);
-        },
-        "show" : function(params) {
-            OpenNebulaAction.show(params, RESOURCE);
-        },
-        "create" : function(params) {
-            OpenNebulaAction.create(params, RESOURCE);
-        },
-        "update" : function(params) {
-            var action_obj = params.data.extra_param;
-            OpenNebulaAction.simple_action(params, RESOURCE, "update", action_obj);
+        "showback" : function(params) {
+            var callback = params.success;
+            var data = JSON.stringify(params);
+
+            $.ajax({
+                url: '/ione_showback',
+                type: 'POST',
+                data: data,
+                success: function(req, res){
+                    console.log(req, res);
+                    return callback ? callback(req, res) : null;
+                },
+                error: function(req, res){ console.log(req, res) }
+            });
         }
     }
 

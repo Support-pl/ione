@@ -764,7 +764,9 @@ define(function(require) {
     });
 
     $("#" + containerId + "Tabs", context).on("change.zf.tabs", function(target) {
-      var tabIdWithHash = $(".is-active > a", this)[0].hash;
+      var elemIdWithHash = $(".is-active > a")[0];
+      var tabIdWithHash = elemIdWithHash.hash;
+
       var panel = SunstoneCfg["tabs"][tabName]["panelInstances"][tabIdWithHash.substring(1)];
       if (panel && panel.onShow) {
         panel.onShow(context);

@@ -65,6 +65,8 @@ define(function(require) {
     },
     "instantiate" : function(params) {
       var action_obj = params.data.extra_param ? params.data.extra_param : {};
+      console.log(params, action_obj);
+      console.trace();
       OpenNebulaAction.simple_action(params, RESOURCE, "instantiate", action_obj);
     },
     "instantiate_persistent" : function(params) {

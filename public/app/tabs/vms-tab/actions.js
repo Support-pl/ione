@@ -28,6 +28,7 @@ define(function(require) {
   var CREATE_DIALOG_ID           = require('./form-panels/create/formPanelId');
   var DEPLOY_DIALOG_ID           = require('./dialogs/deploy/dialogId');
   var PLACE_ON_NODE_DIALOG_ID    = require('./dialogs/place-on-node/dialogId');
+  var REVERT_ZFS_SNAPSHOT_DIALOG_ID = require('./dialogs/revert-zfs-snapshot/dialogId');
   var MIGRATE_DIALOG_ID          = require('./dialogs/migrate/dialogId');
   var VNC_DIALOG_ID              = require('./dialogs/vnc/dialogId');
   var SPICE_DIALOG_ID            = require('./dialogs/spice/dialogId');
@@ -233,7 +234,13 @@ define(function(require) {
       call: function() {
         Sunstone.getDialog(PLACE_ON_NODE_DIALOG_ID).show();
       }
-    }
+    },"VM.revert_zfs_snapshot": {
+      type: "custom",
+      call: function() {
+        Sunstone.getDialog(REVERT_ZFS_SNAPSHOT_DIALOG_ID).show();
+      }
+     // _commonActions.singleAction('revert_zfs_snapshot')
+    },
   };
 
   return _actions;

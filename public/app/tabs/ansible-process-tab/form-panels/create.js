@@ -221,6 +221,7 @@ define(function(require) {
         $('.login-pass-vm').find('input').each(function(index,data){
             HostsData.push(data.value);
         });
+
         for(var i = 0; i < HostsData.length; i += 4){
             Hosts[HostsData[i].split(' ')[0]] = [
                 HostsData[i].split(' ')[4] + ':' + HostsData[i + 1],
@@ -231,16 +232,17 @@ define(function(require) {
         var Vars = {};
         $('.playbooks_vars').find('input').each(function(index, input){
             Vars[input.name] = input.value
-        })
+        });
 
+        //if (Hosts)
+        console.log(Hosts);
         opts =  {
                     playbook_id:    $("#Playbooks").val(),
                     hosts:          Hosts,
                     vars:           Vars,
                     comment:        $("#comment").val()
-                }
-                
-        Sunstone.runAction( "AnsibleProcess.create", opts   );
+                };
+        Sunstone.runAction("AnsibleProcess.create", opts);
 
         return false;
     };
@@ -284,18 +286,19 @@ define(function(require) {
         OpenNebula.Ansible.list({
             success: function(r, res){
                 playbooks = res;
+
+                if (Playbooks != playbooks){
+                    var difference = playbooks.slice(Playbooks.length)
+                    for(key in difference){
+                        $('#Playbooks').append($('<option>', {value:difference[key].ANSIBLE.id, text:difference[key].ANSIBLE.id+':'+difference[key].ANSIBLE.name}));
+                    }
+                    Playbooks = playbooks;
+                }
             }, error:function(r, res){
 
             }
         });
 
-        if (Playbooks != playbooks){
-            var difference = playbooks.slice(Playbooks.length)
-            for(key in difference){
-            $('#Playbooks').append($('<option>', {value:difference[key].ANSIBLE.id, text:difference[key].ANSIBLE.id+':'+difference[key].ANSIBLE.name}));
-            }
-            Playbooks = playbooks;
-        }
 
         if (Object.keys(Sunstone.getDataTable('ansible-tab').elements()).length !== 0){
             var idplaybook = Sunstone.getDataTable('ansible-tab').elements();

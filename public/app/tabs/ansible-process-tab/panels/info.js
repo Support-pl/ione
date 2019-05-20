@@ -109,14 +109,24 @@ define(function(require) {
                 res.forEach(
                     function(host){
                         if(Object.keys(that.element.hosts).includes(host.VM.ID.toString())){
-                            id = host.VM.ID, ip = that.element.hosts[host.VM.ID][0], codes = that.element.codes[that.element.hosts[host.VM.ID][0].split(':')[0]]
-                            $('#tab-process-hosts').append(
-                                '<tr class="useless-string">' +
-                                '<td class="key_td">' + id + '</td>' +
-                                '<td>' + ip + '</td>' +
-                                '<td>' + 'ok=' + codes.ok + ' changed=' + codes.changed + ' unreachable=' + codes.unreachable + ' failed=' + codes.failed + '</td>' +
-                                '</tr>'
-                            )
+                            var id = host.VM.ID;
+                            var ip = that.element.hosts[host.VM.ID][0];
+                            var codes = that.element.codes[that.element.hosts[host.VM.ID][0].split(':')[0]];
+                            if (codes == undefined){
+                                $('#tab-process-hosts').append(
+                                    '<tr class="useless-string">' +
+                                    '<td class="key_td">' + id + '</td>' +
+                                    '<td>' + ip + '</td></tr>'
+                                );
+                            }else{
+                                $('#tab-process-hosts').append(
+                                    '<tr class="useless-string">' +
+                                    '<td class="key_td">' + id + '</td>' +
+                                    '<td>' + ip + '</td>' +
+                                    '<td>' + 'ok=' + codes.ok + ' changed=' + codes.changed + ' unreachable=' + codes.unreachable + ' failed=' + codes.failed + '</td>' +
+                                    '</tr>'
+                                );
+                            }
                         }
                     }
                 )

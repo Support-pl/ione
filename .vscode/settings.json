@@ -28,5 +28,12 @@
         "typescript",
         "typescriptreact",
         "yml"
+    ],
+    "cSpell.words": [
+        "governi",
+        "ionelogroot",
+        "ioneroot",
+        "oned",
+        "ownerid"
     ]
 }

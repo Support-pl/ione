@@ -200,13 +200,21 @@ define(function(require) {
     },
     "VM.place_on_node" : {
       type: text,
-      custom_classes: "warning",
+      custom_classes: "warning state-dependent",
       text: Locale.tr("Place on node")
+    },
+    "VM.revert_zfs_snapshot" : {
+      type: text,
+      custom_classes: "state-dependent",
+      text: '<i class="fa fa-fw fa-lg fa-backward"></i>',
     }
   }
 
   if (Config.isTabActionEnabled("vms-tab", "VM.place_on_node") != true){
     delete Buttons["VM.place_on_node"];
+  }
+  if (Config.isTabActionEnabled("vms-tab", "VM.revert_zfs_snapshot") != true){
+    delete Buttons["VM.revert_zfs_snapshot"];
   }
 
   return Buttons;

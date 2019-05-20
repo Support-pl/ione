@@ -122,7 +122,6 @@ define(function(require) {
       type: "multiple",
       call: that.openNebulaResource[actionStr],
       callback: function (req, response) {
-        console.log(that.openNebulaResource);
         Sunstone.runAction(that.resourceStr + ".refresh");
         Sunstone.runAction(that.resourceStr + ".show", req.request.data[0]);
       },
@@ -156,22 +155,29 @@ define(function(require) {
       type: "create",
       call: that.openNebulaResource.create,
       callback : function(request, response) {
+
+        if (response.response.error != undefined){
+          Notifier.notifyError(response.response.error);
+          console.log(response.response.error);
+        }
+        if (response.response[that.xmlRoot].ID != undefined){
+          Notifier.notifyCustom(that.createdStr,
+              Navigation.link(" ID: " + response.response[that.xmlRoot].ID, that.tabId, response.response[that.xmlRoot].ID),
+              false);
+          if (that.xmlRoot == 'ANSIBLE_PROCESS'){
+            Sunstone.runAction("AnsibleProcess.run", response.response[that.xmlRoot]);
+            if (config.user_config.default_view == 'user'){
+              Sunstone.showTab('ansible-process-tab/'+response.response[that.xmlRoot].ID.toString());
+            }
+          }
+        }else{
+          Notifier.notifyCustom(that.createdStr, "", false);
+        }
+
         Sunstone.resetFormPanel(that.tabId, formPanelId);
         Sunstone.hideFormPanel(that.tabId);
         //OpenNebula.Action.clear_cache('ANSIBLE');
-        if (response.error != undefined){
-          Notifier.notifyError(response.error);
-          console.log(response.error);
-        }
-        if (response[that.xmlRoot] != undefined){
-          if (response[that.xmlRoot].ID != undefined){
-            Notifier.notifyCustom(that.createdStr,
-                Navigation.link(" ID: " + response[that.xmlRoot].ID, that.tabId, response[that.xmlRoot].ID),
-                false);
-          }else{
-            Notifier.notifyCustom(that.createdStr, "", false);
-          }
-        }
+
       },
       error: function(request, response) {
         console.log('error');

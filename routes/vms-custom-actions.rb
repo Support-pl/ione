@@ -71,8 +71,8 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
 
       vm = IONe.get_vm_data(id.to_i)
 
-      if @one_user.id != vm['OWNERID'].to_i then
-         r error: "User is not OWNER for given VM"
+      if (@one_user.id != vm['OWNERID'].to_i) && !@one_user.groups.include?(0) then
+         r error: "User is not OWNER for given VM", id: @one_user.id, groups: @one_user.groups
       elsif data['previous'].nil? then
          r error: 'Snapshot not given'
       else

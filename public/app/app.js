@@ -106,7 +106,77 @@ define(function(require) {
                   template = b;
                   if (template.USER.TEMPLATE.BALANCE != undefined){
                       text = template.USER.TEMPLATE.BALANCE;
-                      $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: ' + text + ' BYN</span></li>');
+                      if (config.user_id == '721'){
+                          var style = '<style>' +
+                              '.popup-fade {' +
+                              'display: none;' +
+                              '}' +
+                              '.popup-fade:before {' +
+                              'content: \'\';' +
+                              'position: fixed; ' +
+                              'left: 0;' +
+                              'top: 0;' +
+                              'width: 100%; ' +
+                              'height: 100%;' +
+                              'opacity: 0.7;' +
+                              'z-index: 9999;' +
+                              '}' +
+                              '.popup {' +
+                              'max-height: 400px;' +
+                              'overflow-x: hidden;' +
+                              'position: absolute;' +
+                              'box-shadow: 0 20px 40px 0 rgba(0,0,0,.3);' +
+                              'left: 75%;' +
+                              'top: 45px;' +
+                              'width: 278px;' +
+                              'margin-left: -200px;' +
+                              'background: #fff;' +
+                              'border: 1px solid #c5d0db;' +
+                              'border-radius: 4px; ' +
+                              'z-index: 99999;' +
+                              'opacity: 1;    ' +
+                              '}' + '.popup_title{border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;padding: 5px 10px;}'+
+                              '.popup_body{max-height: 300px;    overflow-x: auto;}.popup_item{padding: 5px 5px 5px 10px;border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;}'+
+                              '.popup_footer{text-align: center;border-top-style: ridge;border-top-width: inherit;border-top-color: #c5d0db;cursor: pointer;padding: 5px 0;}</style>';
+                          var str = '<div class="popup-fade">' +
+                              '    <div class="popup">' +
+                              '        <div class="popup_title"><span style="font-weight: bold">Ваши уведомления</span><span style="float: right;cursor: pointer">Настройки</span>' +
+                              '</div><div class="popup_body"><div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><div style="padding-right: 10px;float: left;font-size: 23px;color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i></div><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div></div> ' +
+                              '<div class="popup_footer">Показать все</div></div>' +
+                              '</div>';
+
+                          $('head').append(style);
+                          $('.divfrombalance').prepend('<li role="menuitem"><span class="balance popup-open" style="cursor: pointer">Баланс: ' + text + ' BYN</span>'+str+'</li>');
+
+
+                          $(document).ready(function($) {
+                              $('.popup-open').click(function() {
+                                  $('.popup-fade').fadeIn(0);
+                                  return false;
+                              });
+
+                              $(document).keydown(function(e) {
+                                  if (e.keyCode === 27) {
+                                      e.stopPropagation();
+                                      $('.popup-fade').fadeOut(0);
+                                  }
+                              });
+
+                              $('.popup-fade').click(function(e) {
+                                  if ($(e.target).closest('.popup').length == 0) {
+                                      $(this).fadeOut(0);
+                                  }
+                              });
+                          });
+                      }else{
+                          $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: ' + text + ' BYN</span></li>');
+                      }
                   }
               }
           });
@@ -350,7 +420,7 @@ define(function(require) {
     jQuery.extend( jQuery.fn.dataTableExt.oSort, {
     "ip-address-pre": function ( a ) {
       if(a.split){
-      var ip = a.split("<br>");
+       var ip = a.split("<br>");
         var i, item;
         if(ip.length == 1){
           var m = a.split("."),

@@ -90,8 +90,6 @@ define(function(require) {
           <td></td>\
           <td>\
             <select id="select_new_action" class="select_new_action" name="select_action">\
-              <option value="terminate">' + Locale.tr("terminate") + '</option>\
-              <option value="terminate-hard">' + Locale.tr("terminate-hard") + '</option>\
               <option value="hold">' + Locale.tr("hold") + '</option>\
               <option value="release">' + Locale.tr("release") + '</option>\
               <option value="stop">' + Locale.tr("stop") + '</option>\
@@ -104,6 +102,8 @@ define(function(require) {
               <option value="undeploy">' + Locale.tr("undeploy") + '</option>\
               <option value="undeploy-hard">' + Locale.tr("undeploy-hard") + '</option>\
               <option value="snapshot-create">' + Locale.tr("snapshot-create") + '</option>\
+              <option value="terminate">' + Locale.tr("terminate") + '</option>\
+              <option value="terminate-hard">' + Locale.tr("terminate-hard") + '</option>\
             </select>\
           </td>\
          <td>\

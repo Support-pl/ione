@@ -21,7 +21,7 @@
 <br>
 <div class="template-row" element-id="{{element.ID}}">
   <div class="row" style="background-color: #e9e9e9;">
-    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 90%;">
+    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;">
 
       <div class="medium-2 small-12 columns" style="width: 50%">
         <label for="vm_name">
@@ -38,7 +38,7 @@
           {{tr "Number of instances"}}
         </label>
         <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
-        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" disabled>
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none" disabled>
       </div>
 
       <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
@@ -49,28 +49,31 @@
           <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
         </span>
         </h6>
+        <span>
+        <img id="OC_image" src="">
+        </span>
         <div class="OC_name_Container">
 
         </div>
       </div>
 
-      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 62px; width: 50%">
+      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 20px; width: 100%">
         <fieldset>
           <legend style="width: 100%">
-            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
             <span class="capacity_cost_div" style="display: none">
             <span class="cost_value">0.00</span>
             <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
           </span>
           </legend>
-          <div class="capacityContext">
+          <div class="capacityContext" style="padding-right: 40px;">
 
 
           </div>
         </fieldset>
       </div>
 
-      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 62px;width: 50%;">
+      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="width: 100%;">
         <fieldset>
           <legend style="width: 100%">
             <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
@@ -79,12 +82,23 @@
               <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
             </span>
           </legend>
-          <div class="disksContainer">
+          <div class="disksContainer" style="padding-right: 40px;">
 
           </div>
         </fieldset>
       </div>
 
+
+      <div id="nicsContext" class="medium-5 small-12 columns" style="width: 100%;">
+        <fieldset>
+          <legend style="width: 100%">
+            <i class="fa fa-globe"></i> {{tr "Network"}}<br>
+          </legend>
+          <div class="nicsContainer" style="padding-right: 40px;">
+
+          </div>
+        </fieldset>
+      </div>
 
       {{#isFeatureEnabled "show_vnet_instantiate"}}
       <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
@@ -94,7 +108,6 @@
       {{/isFeatureEnabled}}
 
     </div>
-
 
 
 
@@ -116,10 +129,10 @@
         {{/isTabActionEnabled}}
         {{/if}}
         <select type="text" id="CostVaribl">
-          <option>{{tr "COST"}} / {{tr "HOUR"}}</option>
-          <option>{{tr "COST"}} / {{tr "DAY"}}</option>
-          <option>{{tr "COST"}} / {{tr "WEEK"}}</option>
-          <option>{{tr "COST"}} / {{tr "MONTH"}}</option>
+          <option value="1">{{tr "COST"}} / {{tr "HOUR"}}</option>
+          <option value="24">{{tr "COST"}} / {{tr "DAY"}}</option>
+          <option value="168">{{tr "COST"}} / {{tr "WEEK"}}</option>
+          <option value="706">{{tr "COST"}} / {{tr "MONTH"}}</option>
         </select>
       </div>
 
@@ -128,18 +141,21 @@
           <span class="capacity_cost_div" >
             <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
         </div>
         <div style="width: 100%">
           <span class="provision_create_template_disk_cost_div">
             <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
         </div>
         <div style="width: 100%;border-top-style: groove; ">
           <span class="total_cost_div">
             <i class="fa fa-cloud-upload"></i>{{tr "COST"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
         </div>
 
@@ -147,7 +163,7 @@
       </div>
 
       <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 60%;"><button class="button success radius submit_button" href="submit">Создать</button></div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">Создать</button></div>
     </div>
 
 
@@ -301,11 +317,17 @@
 
 
 
+
+
+
+
+
+
 {{else}}
 <br>
 <div class="template-row" element-id="{{element.ID}}">
   <div class="row" style="background-color: #e9e9e9;">
-    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 90%;">
+    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 46%;">
 
       <div class="medium-2 small-12 columns" style="width: 50%">
         <label for="vm_name">
@@ -322,7 +344,7 @@
           {{tr "Number of instances"}}
         </label>
         <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
-        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" disabled>
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none" disabled>
       </div>
 
       <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
@@ -338,10 +360,10 @@
       </span>
       </div>
 
-      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 62px; width: 50%">
+      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="width: 100%">
         <fieldset>
           <legend style="width: 100%">
-            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
           <span class="capacity_cost_div" style="display: none">
             <span class="cost_value">0.00</span>
             <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
@@ -352,16 +374,51 @@
           </div>
         </fieldset>
       </div>
-      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="padding-top: 62px;width: 50%;"></div>
+      <div id="disksContext" class="medium-5 small-12 columns disksContext{{element.ID}}" style="width: 100%;"></div>
 
+      {{#if default_user_view}}
+      <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
+        <div class="provision_network_selector">
+        <fieldset style="padding-top: 1rem">
+          <legend style="width: 100%">
+            <i class="fa fa-globe"></i> {{tr "Network"}}<br>
+          </legend>
+          <div class="provision_network_selector_div">
+            <div>
+              <label style="width: 20%;float: left;">{{tr "Public IP"}}</label>
+              <div id="public_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                <div class="switch left" style="margin-right: 20%;">
+                  <input class="switch-input" id="input_public_ip" type="checkbox">
+                  <label class="switch-paddle" for="input_public_ip">
+                  </label>
+                </div>
+                <input type="number" id="amt_public_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
+              </div>
+            </div>
 
+            <div>
+              <label style="width: 20%;float: left;">{{tr "Private IP"}}</label>
+              <div id="private_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                <div class="switch left" style="margin-right: 20%;">
+                  <input class="switch-input" id="input_private_ip" type="checkbox">
+                  <label class="switch-paddle" for="input_private_ip">
+                  </label>
+                </div>
+                <input type="number" id="amt_private_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        </div>
+      </div>
+      {{else}}
       {{#isFeatureEnabled "show_vnet_instantiate"}}
       <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
         <div class="provision_network_selector">
         </div>
       </div>
       {{/isFeatureEnabled}}
-
+      {{/if}}
     </div>
 
 
@@ -385,30 +442,35 @@
         {{/isTabActionEnabled}}
         {{/if}}
         <select type="text" id="CostVaribl">
-          <option>{{tr "COST"}} / {{tr "HOUR"}}</option>
-          <option>{{tr "COST"}} / {{tr "DAY"}}</option>
-          <option>{{tr "COST"}} / {{tr "WEEK"}}</option>
-          <option>{{tr "COST"}} / {{tr "MONTH"}}</option>
+          <option value="1">{{tr "COST"}} / {{tr "HOUR"}}</option>
+          <option value="24">{{tr "COST"}} / {{tr "DAY"}}</option>
+          <option value="168">{{tr "COST"}} / {{tr "WEEK"}}</option>
+          <option value="706">{{tr "COST"}} / {{tr "MONTH"}}</option>
         </select>
       </div>
 
       <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
+        <div id="element_cost">
         <div style="width: 100%">
           <span class="capacity_cost_div" >
-            <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
+            <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
         </div>
         <div style="width: 100%">
           <span class="provision_create_template_disk_cost_div">
             <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
+        </div>
         </div>
         <div style="width: 100%;border-top-style: groove; ">
           <span class="total_cost_div">
-            <i class="fa fa-cloud-upload"></i>{{tr "COST"}}<br>
+            <i class="fa fa-cloud-upload"></i> {{tr "Total cost"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+            <span>{{tr "BYN"}} / {{tr "HOUR"}}</span>
           </span>
         </div>
 
@@ -416,7 +478,7 @@
       </div>
 
       <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 60%;"><button class="button success radius submit_button" href="submit">Создать</button></div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">Создать</button></div>
     </div>
 
 
@@ -493,7 +555,14 @@
   </div>
   {{/advancedSection}}
   </div>
+
+
+
   {{else}}
+
+
+
+
   {{#advancedSection (tr "Advanced options") }}
   {{#isFeatureEnabled "show_host_instantiate"}}
   <div class="row">

@@ -87,7 +87,6 @@ define(function(require) {
 
             }
         }
-        console.log(datastores_hbs);
 
         for_hbs = [];
         for(var i in settings){
@@ -98,23 +97,32 @@ define(function(require) {
                     for(var j in tree){
                         arr.push({key1:j,value1:tree[j]});
                     }
-                    for_hbs.push({key:i,bool_tree:true,value:arr});
+                    if(i.indexOf('COST') != -1){
+                        for_hbs.unshift({key:i,bool_tree:true,value:arr});
+                    }else{
+                        for_hbs.push({key:i,bool_tree:true,value:arr});
+                    }
                 }else{
-                    for_hbs.push({key:i,bool_tree:false,value:settings[i]});
+                    if(i.indexOf('COST') != -1){
+                        for_hbs.unshift({key:i,bool_tree:false,value:settings[i]});
+                    }else{
+                        for_hbs.push({key:i,bool_tree:false,value:settings[i]});
+                    }
                 }
             }
         }
-
+        console.log(for_hbs);
         return TemplateEasyInfo({'settings':for_hbs,'datastores':datastores_hbs});
     }
 
     function _setup(context) {
         var that = this;
         var disk_type = settings['DISK_TYPES'].split(',');
-        var datastores = document.querySelectorAll("#datastores_select_disk_type");
+        var datastores = $('#datastores_body #datastores_select_disk_type');
         var len =  datastores.length;
 
         $(datastores[0]).append('<option selected disabled>Select disk type disabled</option>');
+        $(datastores[0]).prop('disabled',true);
         $(datastores[0]).parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
 
         for (var i = 1; i < len; i++) {
@@ -424,12 +432,7 @@ define(function(require) {
 
 
     function circle_event() {
-        var tree_circle = document.querySelectorAll("#setting_tree_circle");
-        var tree_key_span = document.querySelectorAll("#setting_tree_key_span");
-        var len =  tree_circle.length;
-
-        for (var i = 0; i < len; i++) {
-            tree_circle[i].onclick = function () {
+        $('#settings_body #setting_tree_circle').click(function () {
                 if ($(this).children().children().attr('class') == 'fa fa-circle'){
                     $(this).children().children().switchClass('fa-circle','fa-circle-o');
                     $(this).parent().children('small').toggle();
@@ -438,27 +441,23 @@ define(function(require) {
                     $(this).parent().children('small').toggle();
                 }
                 var len = for_hbs.length;
-                for (var j = 0; j < len; j++){
-                    if(for_hbs[j].key == $(this).next().text()){
-                        for(var k in for_hbs[j].value){
-                            $('tr.tr_setting_'+for_hbs[j].value[k].key1).toggle();
+                for (var j = 0; j < len; j++) {
+                    if (for_hbs[j].key == $(this).next().text()) {
+                        for (var k in for_hbs[j].value) {
+                            $('tr.tr_setting_' + for_hbs[j].key).nextAll('tr.tr_setting_' + for_hbs[j].value[k].key1).eq(0).toggle();
                         }
                         return;
                     }
                 }
-            };
-            tree_key_span[i].onclick = function (){
-                $(this).parent().children('#setting_tree_circle').click();
-            };
-        }
+        });
+
+        $('#settings_body #setting_tree_key_span').click(function () {
+            $(this).parent().children('#setting_tree_circle').click();
+        });
     }
 
     function edit_event() {
-        var edit_setting = document.querySelectorAll("#div_edit_setting");
-        var len =  edit_setting.length;
-
-        for (var i = 0; i < len; i++) {
-            edit_setting[i].onclick = function(){
+        $('#settings_body #div_edit_setting').click(function () {
                 var tr_setting = $(this).parent().parent();
                 var td_value = tr_setting.children('.td_value_setting');
 
@@ -484,18 +483,12 @@ define(function(require) {
                     td_value.html("<input class='input_edit_value_setting' type='text'></input>");
                     td_value.children('input.input_edit_value_setting').val(str);
                 }
-            };
-        }
-
+        });
     }
 
     function minus_event() {
-        var minus_setting = document.querySelectorAll("#div_minus_setting");
-        var len =  minus_setting.length;
 
-        for (var i = 0; i < len; i++) {
-            minus_setting[i].onclick = function(){
-
+        $('#settings_body #div_minus_setting').click(function () {
                 var key1 = $(this).parent().parent().children('.td_key_setting').text();
                 for(var j in for_hbs){
                     if(for_hbs[j].bool_tree == true){
@@ -524,8 +517,7 @@ define(function(require) {
                         return;
                     }
                 }
-            };
-        }
+        });
     }
 
     function set_events() {

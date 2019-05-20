@@ -877,4 +877,8 @@ post '/:resource/:id/action' do
                                    @request_body)
 end
 
+##############################################################################
+# IONe Actions
+##############################################################################
+
 Sinatra::Application.run! if(!defined?(WITH_RACKUP))

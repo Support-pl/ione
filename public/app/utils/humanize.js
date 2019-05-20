@@ -261,17 +261,17 @@ define(function(require) {
 
     if(difference_in_seconds < 60) {
       return difference_in_seconds + "s" + " ago";
-    } else if (difference_in_seconds < 60*60) {
+    } else if (difference_in_seconds < 3600) {
       minutes = Math.floor(difference_in_seconds/60);
       return minutes + "m" + " ago";
-    } else if (difference_in_seconds < 60*60*24) {
-      hours = Math.floor(difference_in_seconds/60/60);
+    } else if (difference_in_seconds < 86400) {
+      hours = Math.floor(difference_in_seconds/3600);
       return hours + "h" + " ago";
-    } else if (difference_in_seconds > 60*60*24){
+    } else if (difference_in_seconds >= 86400){
       if(current_date.getYear() !== new Date().getYear())
-        return current_date.getDay() + " " + Locale.months[current_date.getMonth()].substr(0,3) + " " + _fourdigits(current_date.getYear());
+        return current_date.getDate() + " " + Locale.months[current_date.getMonth()].substr(0,3) + " " + _fourdigits(current_date.getYear());
       else {
-          return current_date.getDay() + " " + Locale.months[current_date.getMonth()].substr(0,3);
+          return current_date.getDate() + " " + Locale.months[current_date.getMonth()].substr(0,3);
       }
     }
 

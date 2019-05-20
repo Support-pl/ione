@@ -16,26 +16,28 @@
 
 define(function(require) {
   var OpenNebulaVM = require('opennebula/vm');
+  var OpenNebula = require('opennebula');
+  var Sunstone = require('sunstone');
 
   var STATE_ACTIONS = {};
 
   STATE_ACTIONS[OpenNebulaVM.STATES.INIT] =
-    ["VM.resize", "VM.terminate_hard", "VM.recover"];
+    ["VM.resize", "VM.terminate_hard"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.PENDING] =
-    ["VM.hold", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall", "VM.place_on_node"];
+    ["VM.hold", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.resize", "VM.reinstall", "VM.place_on_node"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.HOLD] =
-    ["VM.release", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize", "VM.reinstall", "VM.place_on_node"];
+    ["VM.release", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.resize", "VM.reinstall", "VM.place_on_node"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.ACTIVE] =
-    ["VM.recover"];
+    [];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.STOPPED] =
-    ["VM.resume", "VM.deploy", "VM.terminate_hard", "VM.recover", "VM.reinstall"];
+    ["VM.resume", "VM.deploy", "VM.terminate_hard", "VM.reinstall"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.SUSPENDED] =
-    ["VM.resume", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_revert", "VM.disk_snapshot_delete", "VM.stop", "VM.terminate_hard", "VM.recover", "VM.migrate", "VM.reinstall"];
+    ["VM.resume", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_revert", "VM.disk_snapshot_delete", "VM.stop", "VM.terminate_hard", "VM.migrate", "VM.reinstall"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.DONE] =
     [];
@@ -44,23 +46,23 @@ define(function(require) {
     [];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.POWEROFF] =
-    ["VM.resume", "VM.resize", "VM.attachdisk", "VM.detachdisk", "VM.attachnic", "VM.detachnic", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_revert", "VM.disk_snapshot_delete", "VM.migrate", "VM.undeploy", "VM.undeploy_hard", "VM.save_as_template", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.disk_resize", "VM.reinstall"];
+    ["VM.resume", "VM.resize", "VM.attachdisk", "VM.detachdisk" , "VM.revert_zfs_snapshot", "VM.attachnic", "VM.detachnic", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_revert", "VM.disk_snapshot_delete", "VM.migrate", "VM.undeploy", "VM.undeploy_hard", "VM.save_as_template", "VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.disk_resize", "VM.reinstall"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.UNDEPLOYED] =
-    ["VM.resume", "VM.resize", "VM.deploy", "VM.updateconf", "VM.terminate_hard", "VM.recover"];
+    ["VM.resume", "VM.resize", "VM.deploy", "VM.updateconf", "VM.terminate_hard"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.CLONING] =
-    ["VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize"];
+    ["VM.updateconf", "VM.terminate_hard", "VM.resize"];
 
   STATE_ACTIONS[OpenNebulaVM.STATES.CLONING_FAILURE] =
-    ["VM.updateconf", "VM.terminate_hard", "VM.recover", "VM.resize"];
+    ["VM.updateconf", "VM.terminate_hard", "VM.resize"];
 
   var LCM_STATE_ACTIONS = {};
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.LCM_INIT ] = [];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.PROLOG ] = ["VM.updateconf"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.BOOT ] = [];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.RUNNING ] =
-    ["VM.stop", "VM.suspend", "VM.reboot", "VM.reboot_hard", "VM.resched", "VM.unresched", "VM.poweroff", "VM.poweroff_hard", "VM.undeploy", "VM.undeploy_hard", "VM.migrate", "VM.migrate_live", "VM.attachdisk", "VM.detachdisk", "VM.attachnic", "VM.detachnic", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_delete", "VM.terminate", "VM.terminate_hard", "VM.disk_resize", "VM.reinstall"];
+    ["VM.stop", "VM.suspend", "VM.reboot", "VM.reboot_hard", "VM.resched", "VM.revert_zfs_snapshot","VM.recover","VM.unresched", "VM.poweroff", "VM.poweroff_hard", "VM.undeploy", "VM.undeploy_hard", "VM.migrate", "VM.migrate_live", "VM.attachdisk", "VM.detachdisk", "VM.attachnic", "VM.detachnic", "VM.disk_saveas", "VM.disk_snapshot_create", "VM.disk_snapshot_delete", "VM.terminate", "VM.terminate_hard", "VM.disk_resize", "VM.reinstall"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.MIGRATE ] = [];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.SAVE_STOP ] = [];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.SAVE_SUSPEND ] = [];
@@ -94,7 +96,7 @@ define(function(require) {
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.HOTPLUG_PROLOG_POWEROFF ] = ["VM.updateconf"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.HOTPLUG_EPILOG_POWEROFF ] = ["VM.updateconf"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.BOOT_MIGRATE ] = [];
-  LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.BOOT_FAILURE ] = ["VM.updateconf", "VM.terminate"];
+  LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.BOOT_FAILURE ] = ["VM.updateconf", "VM.terminate" , "VM.recover"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.BOOT_MIGRATE_FAILURE ] = ["VM.terminate"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.PROLOG_MIGRATE_FAILURE ] = ["VM.terminate"];
   LCM_STATE_ACTIONS[ OpenNebulaVM.LCM_STATES.PROLOG_FAILURE ] = ["VM.updateconf", "VM.terminate"];
@@ -157,16 +159,49 @@ define(function(require) {
   function enableStateActions(state, lcm_state) {
     var state = parseInt(state);
     var lcm_state = parseInt(lcm_state);
+    var in_proc = false;
 
-    $.each(STATE_ACTIONS[state], function(i, action) {
-      enableStateButton(action);
-    });
+    if (state == OpenNebulaVM.STATES.POWEROFF) {
+      OpenNebula.AnsibleProcess.list({success: function(a,res){
+          var elem = Sunstone.getDataTable('vms-tab').elements();
+          for(var i in res){
+            if (res[i].ANSIBLE_PROCESS.status == 'RUNNING'){
+              for(var j in elem){
+                if (elem[j] == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]){
+                  in_proc = true;
+                  break;
+                }
+              }
+              if (in_proc == true){
+                break;
+              }
+            }
+          }
+          if (in_proc == false){
+            $.each(STATE_ACTIONS[state], function(i, action) {
+              enableStateButton(action);
+            });
 
-    if (state == OpenNebulaVM.STATES.ACTIVE) {
-      $.each(LCM_STATE_ACTIONS[lcm_state], function(i, action) {
+            if (state == OpenNebulaVM.STATES.ACTIVE) {
+              $.each(LCM_STATE_ACTIONS[lcm_state], function(i, action) {
+                enableStateButton(action);
+              });
+            }
+          }
+
+        }});
+    }else{
+      $.each(STATE_ACTIONS[state], function(i, action) {
         enableStateButton(action);
       });
+
+      if (state == OpenNebulaVM.STATES.ACTIVE) {
+        $.each(LCM_STATE_ACTIONS[lcm_state], function(i, action) {
+          enableStateButton(action);
+        });
+      }
     }
+
   }
 
   // Returns true if the action is enabled for the given state

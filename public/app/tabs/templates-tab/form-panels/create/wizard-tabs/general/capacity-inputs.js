@@ -168,7 +168,7 @@ define(function(require) {
     }
 
     if (attr.type != "range"){
-      $("div.memory_input_wrapper", context).addClass("large-6").addClass("medium-8");
+      $("div.memory_input_wrapper", context).addClass("large-12").addClass("medium-12");
     }
 
     UserInputs.insertAttributeInputMB(attr, $("div.memory_input", context));

@@ -115,10 +115,10 @@ define(function(require){
       $.each(disks, function(disk_id, disk) {
         diskContext = $(
           '<div class="row diskContainer">'+
-            '<div class="small-12 columns">'+
+            '<div class="small-12 columns" style="width: 30%">'+
               '<label></label>'+
             '</div>'+
-            '<div class="large-12 columns diskSlider">' +
+            '<div class="large-12 columns diskSlider" style="width: 57%;padding-right: 12%;">' +
             '</div>' +
           '</div>').appendTo($(".disksContainer", disksContext));
         if (disks_base) {

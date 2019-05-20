@@ -91,11 +91,6 @@ define(function(require) {
            </thead>\
            <tbody>';
 
-        if(config.user_id == '197'){
-            $(".provision_reinstall_confirm_button", context).show();
-        } else {
-            $(".provision_reinstall_confirm_button", context).hide();
-        }
         return html;
     }
 

@@ -227,6 +227,7 @@ define(function(require) {
 
   function _setup(context) {
     var that = this;
+    that.onshow = _onShow(context, that);
 
     var nics = []
 
@@ -428,8 +429,8 @@ define(function(require) {
     }
   }
 
-  function _onShow(context) {
-    var that = this;
+  function _onShow(context, that) {
+    //var that = this;
     if (OpenNebulaVM.isNICGraphsSupported(that.element)) {
       OpenNebulaVM.monitor({
         data: {

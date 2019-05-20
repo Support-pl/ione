@@ -162,6 +162,7 @@ define(function(require) {
 
   function _setup(context) {
     var that = this;
+    that.onshow = _onShow(context, that);
 
     var snapshots = [];
     if ($.isArray(this.element.SNAPSHOTS)){
@@ -715,8 +716,8 @@ define(function(require) {
     };
   }
 
-  function _onShow(context) {
-    var that = this;
+  function _onShow(context, that) {
+    //var that = this;
     if (OpenNebulaVM.isDiskGraphsSupported(that.element)) {
       OpenNebulaVM.monitor({
         data: {

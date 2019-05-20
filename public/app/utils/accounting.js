@@ -367,7 +367,6 @@ define(function(require) {
       group_by_fn = function(history){
         return history.OID;
       }
-
       group_by_name = function(history){
         return history.VM.NAME;
       }

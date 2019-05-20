@@ -70,10 +70,12 @@ define(function(require) {
   }
 
   function _setup(context) {
+    var that = this;
+    that.onshow = _onShow(context, that);
   }
 
-  function _onShow(context) {
-    var that = this;
+  function _onShow(context, that) {
+    //var that = this;
     OpenNebulaVM.log({
       data: {id: that.element.ID},
       success: function(req, response) {

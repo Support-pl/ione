@@ -93,6 +93,7 @@ define(function(require) {
 
   function _setup(context) {
     var that = this;
+    that.onshow = _onShow(context, that);
     if (Config.isTabActionEnabled("vms-tab", "VM.resize")) {
       context.off('click', '#resize_capacity');
       context.on('click', '#resize_capacity', function() {
@@ -104,8 +105,8 @@ define(function(require) {
     }
   }
 
-  function _onShow(context) {
-    var that = this;
+  function _onShow(context, that) {
+   // var that = this;
     OpenNebulaVM.monitor({
       data: {
         id: that.element.ID,
