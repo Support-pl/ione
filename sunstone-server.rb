@@ -884,12 +884,10 @@ end
 # IONe Actions
 ##############################################################################
 
-Thread.new do
-    begin
-        require 'ione/server/ione.rb'
-    rescue => e
-        puts e.message, e.backtrace
-    end
-end 
+begin
+    require 'ione/server/ione.rb'
+rescue => e
+    puts e.message, e.backtrace
+end
 
 Sinatra::Application.run! if(!defined?(WITH_RACKUP))

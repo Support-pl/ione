@@ -17,7 +17,7 @@ if ROOT.nil? || LOG_ROOT.nil? then
 end
 
 puts 'Parsing config file'
-CONF = YAML.load_file("#{ETC_LOCATION}/config.yml") # IONe configuration constants
+CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 
 puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
@@ -169,4 +169,6 @@ LOG_COLOR "Server initialized", 'none', 'green'
 # end
 
 puts 'Pre-init job ended, starting up server'
-server.server_loop # Server start
+Thread.new do
+    server.server_loop # Server start
+end
