@@ -19,19 +19,6 @@ end
 puts 'Parsing config file'
 CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 
-puts 'Defining base class'
-# Main App class. All methods, which must be available as JSON-RPC methods, should be defined in this class
-class IONe
-    include Deferable
-    # IONe initializer, stores auth-client and version
-    # @param [OpenNebula::Client] client 
-    def initialize(client, db)
-        @client = client
-        @db = db
-        @version = VERSION
-    end
-end
-
 puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
 include IONeLoggerKit
@@ -91,6 +78,18 @@ at_exit do
         LOG("       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", "", false)
     rescue => e
         LOG_DEBUG e.message
+    end
+end
+
+# Main App class. All methods, which must be available as JSON-RPC methods, should be defined in this class
+class IONe
+    include Deferable
+    # IONe initializer, stores auth-client and version
+    # @param [OpenNebula::Client] client 
+    def initialize(client, db)
+        @client = client
+        @db = db
+        @version = VERSION
     end
 end
 
