@@ -159,9 +159,12 @@ end
 
 $methods = IONe.instance_methods(false).map { | method | method.to_s }
 
+rpc_log_file = "#{LOG_ROOT}/rpc.log"
+`touch #{rpc_log_file}` unless File.exist? rpc_log_file
+
 LOG "Initializing JSON-RPC Server..."
 puts 'Initializing JSON_RPC server and logic handler'
-server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{CONF['Server']['listen-port']}", Logger.new('/var/log/ione/rpc.log'))
+server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{CONF['Server']['listen-port']}", Logger.new(rpc_log_file))
 LOG_COLOR "Server initialized", 'none', 'green'
 
 # Signal.trap('CLD') do
