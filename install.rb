@@ -20,13 +20,15 @@ sh.system 'npm install -g bower grunt grunt-cli'
 
 puts "Moving sunstone src files"
 sunstone = %w(
-    config.ru models public routes sunstone-server.rb views ione
+    models public routes views ione
 )
 
 sunstone.each do | files |
     sh.system "cp -rf #{files} /usr/lib/one/sunstone/"
 end
-    
+sh.system "cp sunstone-server.rb /usr/lib/one/sunstone/"
+sh.system "cp config.ru /usr/lib/one/sunstone/"
+
 sh.cd '/usr/lib/one/sunstone/public'
 
 puts "Installung bower and NPM packages"
