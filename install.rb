@@ -20,7 +20,7 @@ sh.system 'npm install -g bower grunt grunt-cli'
 
 puts "Moving sunstone src files"
 sunstone = %w(
-    config.ru models public routes sunstone-server.rb views
+    config.ru models public routes sunstone-server.rb views ione
 )
 
 sunstone.each do | files |
