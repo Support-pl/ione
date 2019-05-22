@@ -12,8 +12,8 @@ src_dir = sh.pwd
 # Installing packages
 #####################################
 
-puts "Installing NPM"
-sh.system `yum install -y npm`
+puts "Installing NPM and zeromq"
+sh.system `yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel`
 
 puts "Installing bower and grunt"
 sh.system 'npm install -g bower grunt grunt-cli'
@@ -34,6 +34,9 @@ sh.system 'npm install && bower install --allow-root'
 
 puts "Building source"
 sh.system 'grunt requirejs'
+
+puts "Installing zmqjsonrpc"
+sh.system 'gem install zmqjsonrpc'
 
 sh.cd src_dir
 
