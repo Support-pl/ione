@@ -3,7 +3,16 @@ require 'sequel'
 
 # Get this values from /etc/oned.conf
 $DB = Sequel.connect({
-    adapter: :mysql2, user: 'root', password: 'opennebula', database: 'opennebula', host: 'localhost'  })
+    adapter: :mysql2, user: 'root', password: 'opennebula', database: 'opennebula', host: 'localhost', :encoding => 'utf8' })
+
+begin
+    $DB.create_table :settings do 
+        String :name, size: 128, primary_key: true
+        String :body, text: true
+    end
+rescue
+    puts "Table :settings already exists, skipping"
+end
 
 SETTINGS_TABLE = $DB[:settings]
 

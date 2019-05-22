@@ -97,6 +97,8 @@ require 'open3'
 require 'CloudAuth'
 require 'SunstoneServer'
 require 'SunstoneViews'
+require 'SettingsDriver'
+require 'AnsibleDriver'
 
 ##############################################################################
 # Configuration
