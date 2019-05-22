@@ -1,6 +1,6 @@
 require 'zmqjsonrpc'
 
-IONe = ZmqJsonRpc::Client.new("tcp://localhost:8008") # ZmqJsonRpc Client for IONe
+$ione = ZmqJsonRpc::Client.new("tcp://localhost:8008") # ZmqJsonRpc Client for IONe
 
 def r **result # Generates response
    JSON.pretty_generate result
@@ -82,12 +82,12 @@ class AnsiblePlaybook
          raise ParamsError.new(@params) if check # Custom error if something is nil
          raise NoAccessError.new(2) unless user.groups.include? 0 # Custom error if user is not in oneadmin group
          @user.info! # Retrieve object body
-         @id = id = IONe.CreateAnsiblePlaybook(@params.merge({:uid => @user.id, :gid => @user.gid})) # Save id of new playbook
+         @id = id = $ione.CreateAnsiblePlaybook(@params.merge({:uid => @user.id, :gid => @user.gid})) # Save id of new playbook
       else # If id is given getting existing playbook
          # Params from OpenNebula are always in {"action" => {"perform" => <%method name%>, "params" => <%method params%>}} form
          # So here initializer saves method and params to object
          @method, @params = data['action']['perform'], data['action']['params']
-         @body = IONe.GetAnsiblePlaybook(@id = id) # Getting Playbook in hash form
+         @body = $ione.GetAnsiblePlaybook(@id = id) # Getting Playbook in hash form
          @permissions = Array.new(3) {|uma| ansible_check_permissions(@body, @user, uma) } # Parsing permissions
          
          raise NoAccessError.new(0) unless @permissions[0] # Custom error if user has no USE rights
@@ -102,7 +102,7 @@ class AnsiblePlaybook
    def clone # Clones Playbook with given id to a new playbook with given name in params
       args = @body
       args.delete('id')
-      IONe.CreateAnsiblePlaybook(
+      $ione.CreateAnsiblePlaybook(
          args.merge({
             :name => @params["name"], :uid => @user.id, :gid => @user.gid
          })
@@ -113,11 +113,11 @@ class AnsiblePlaybook
          @body[key] = value
       end
 
-      IONe.UpdateAnsiblePlaybook @body # Updating playbook with resulting body
+      $ione.UpdateAnsiblePlaybook @body # Updating playbook with resulting body
       nil
    end
    def delete # Deletes Playbook with id
-      IONe.DeleteAnsiblePlaybook @id
+      $ione.DeleteAnsiblePlaybook @id
       nil
    end
 
@@ -125,29 +125,29 @@ class AnsiblePlaybook
       # if chown or chgrp method called OpenNebula always calling chown.
       # And if owner or group is not changing, it sets corresponding key to "-1".
       # So if owner is set to "-1" chown will try to call chgrp 
-      IONe.UpdateAnsiblePlaybook( "id" => @body['id'], "uid" => @params['owner_id'] ) unless @params['owner_id'] == '-1'
+      $ione.UpdateAnsiblePlaybook( "id" => @body['id'], "uid" => @params['owner_id'] ) unless @params['owner_id'] == '-1'
       chgrp unless @params['group_id'] == '-1' # But if group is also set to "-1", nothing will be called if so
       nil
    end
    def chgrp # Changes Playbook group
-      IONe.UpdateAnsiblePlaybook( "id" => @body['id'], "gid" => @params['group_id'] )
+      $ione.UpdateAnsiblePlaybook( "id" => @body['id'], "gid" => @params['group_id'] )
       nil
    end
    def chmod # Changes Playbook permissions table by changing extra_data => PERMISSIONS
       raise ParamsError.new(@params) if @params.nil? # PERMISSIONS cannot be nil, but database not checking this
-      IONe.UpdateAnsiblePlaybook( "id" => @body['id'], "extra_data" => @body['extra_data'].merge("PERMISSIONS" => @params) )
+      $ione.UpdateAnsiblePlaybook( "id" => @body['id'], "extra_data" => @body['extra_data'].merge("PERMISSIONS" => @params) )
       nil
    end
    def rename # Renames Playbook
-      IONe.UpdateAnsiblePlaybook( "id" => @body['id'], "name" => @params['name'] )
+      $ione.UpdateAnsiblePlaybook( "id" => @body['id'], "name" => @params['name'] )
       nil
    end
 
    def vars # Returns Variabled defined at Playbook body
-      IONe.GetAnsiblePlaybookVariables @id
+      $ione.GetAnsiblePlaybookVariables @id
    end
    def to_process # Creates install process from given Playbook with given hosts and vars
-      IONe.AnsiblePlaybookToProcess( @body['id'], @params['hosts'], 'default', @params['vars'] )
+      $ione.AnsiblePlaybookToProcess( @body['id'], @params['hosts'], 'default', @params['vars'] )
    end
 
    class NoAccessError < StandardError # Custom error for no access exceptions. Returns string contain which action is blocked
@@ -181,13 +181,13 @@ end
 
 get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL format
    begin
-      pool = IONe.ListAnsiblePlaybooks # Array of playbooks
+      pool = $ione.ListAnsiblePlaybooks # Array of playbooks
       pool.delete_if {|pb| !ansible_check_permissions(pb, @one_user, 0) } # Deletes playbooks, which aren't under user access
       pool.map! do | pb | # Adds user and group name to every object
          user, group =  OpenNebula::User.new_with_id( pb['uid'], @one_client),
                         OpenNebula::Group.new_with_id( pb['gid'], @one_client)
          user.info!; group.info!
-         pb['vars']  =  IONe.GetAnsiblePlaybookVariables(pb['id'])
+         pb['vars']  =  $ione.GetAnsiblePlaybookVariables(pb['id'])
          pb.merge(
             'uname' => user.name, 'gname' => group.name,
             'vars' => pb['vars'].nil? ? {} : pb['vars']  )
@@ -283,7 +283,7 @@ post '/ansible/:action' do | action | # Performs actions, which are defined as d
 
    begin
       if action == 'check_syntax' then
-         r response: IONe.CheckAnsiblePlaybookSyntax( data['body'])
+         r response: $ione.CheckAnsiblePlaybookSyntax( data['body'])
       else
          r response: "Action is not defined"
       end
@@ -322,12 +322,12 @@ class AnsiblePlaybookProcess
           @user.info! # Retrieve object body
           @id =
              id =
-                IONe.AnsiblePlaybookToProcess( @params['playbook_id'], @user.id, @params['hosts'], @params['vars'], @params['comment']) # Save id of new playbook
+                $ione.AnsiblePlaybookToProcess( @params['playbook_id'], @user.id, @params['hosts'], @params['vars'], @params['comment']) # Save id of new playbook
        else # If id is given getting existing playbook
           # Params from OpenNebula are always in {"action" => {"perform" => <%method name%>, "params" => <%method params%>}} form
           # So here initializer saves method and params to object
           @method, @params = data['action']['perform'], data['action']['params']
-          @body = IONe.GetAnsiblePlaybookProcess(@id = id) # Getting Playbook in hash form
+          @body = $ione.GetAnsiblePlaybookProcess(@id = id) # Getting Playbook in hash form
           @permissions = Array.new(3) do |uma|
              ansible_check_permissions( {'uid' => @body['uid'], 'extra_data' => { 'PERMISSIONS' => '111000000' } }, @user, uma  )
           end # Parsing permissions
@@ -341,11 +341,11 @@ class AnsiblePlaybookProcess
        send(@method) # Calling method from @method
     end
     def run
-       IONe.RunAnsiblePlaybookProcess(@id)
+       $ione.RunAnsiblePlaybookProcess(@id)
        nil
     end
     def delete
-       IONe.DeleteAnsiblePlaybookProcess(@id)
+       $ione.DeleteAnsiblePlaybookProcess(@id)
     end
  
  
@@ -380,10 +380,10 @@ class AnsiblePlaybookProcess
  
  get '/ansible_process' do
     begin
-       pool = IONe.ListAnsiblePlaybookProcesses
-       IONe.Test(pool.size, 'DEBUG')
+       pool = $ione.ListAnsiblePlaybookProcesses
+       $ione.Test(pool.size, 'DEBUG')
        pool.delete_if {|apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
-       IONe.Test(pool.size, 'DEBUG')
+       $ione.Test(pool.size, 'DEBUG')
        pool.map! do | apc | # Adds user name to every object
           user =  OpenNebula::User.new_with_id( apc['uid'], @one_client)
           user.info!

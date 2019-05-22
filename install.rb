@@ -24,7 +24,7 @@ sunstone = %w(
 )
 
 sunstone.each do | files |
-    sh.system "cp -rf ./#{files} /usr/lib/one/sunstone/"
+    sh.system "cp -rf #{files} /usr/lib/one/sunstone/"
 end
     
 sh.cd '/usr/lib/one/sunstone/public'
