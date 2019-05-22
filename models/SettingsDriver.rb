@@ -20,10 +20,6 @@ def db_result answer
     answer.as_hash(:name, :body)
 end
 
-get '/test' do
-    'result'
-end
-
 get '/settings' do
     begin
         r response: db_result(SETTINGS_TABLE)

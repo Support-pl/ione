@@ -97,8 +97,6 @@ require 'open3'
 require 'CloudAuth'
 require 'SunstoneServer'
 require 'SunstoneViews'
-require 'SettingsDriver'
-require 'AnsibleDriver'
 
 ##############################################################################
 # Configuration
@@ -448,6 +446,9 @@ if $conf[:routes]
         require "routes/#{route}"
     }
 end
+
+require 'SettingsDriver'
+require 'AnsibleDriver'
 
 ##############################################################################
 # HTML Requests

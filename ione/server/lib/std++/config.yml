@@ -1,0 +1,10 @@
+PrivateKeys:
+  - 'passwd'
+  - 'password'
+  - 'pass'
+  - 'username'
+  - 'login'
+  - 'port'
+  - 'host'
+  - 'credentials'
+  - 'endpoint'

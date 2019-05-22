@@ -1,0 +1,25 @@
+[Unit]
+Description=Integrated OpenNebula Cloud Server
+After=opennebula.service
+
+[Service]
+Environment=RACK_ENV=production
+
+Type=forking
+SyslogIdentifier=ione-cloud
+User=root
+PIDFile=/var/run/ione.rb.pid
+WorkingDirectory=/root
+OOMScoreAdjust=-1000
+
+Restart=always
+RestartSec=10
+
+ExecStart=/bin/ruby ${IONEROOT}/daemon.rb start
+ExecReload=/bin/ruby ${IONEROOT}/daemon.rb restart
+ExecStop=/bin/ruby ${IONEROOT}/daemon.rb stop
+TimeoutSec=300
+StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target

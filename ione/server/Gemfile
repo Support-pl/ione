@@ -1,0 +1,6 @@
+gem 'json', '1.7.7'
+gem 'nori', '2.6.0'
+gem 'net-ssh', '4.2.0'
+gem 'yaml'
+gem 'daemons', '1.2.4'
+gem 'zmqjsonrpc', '0.1.1'

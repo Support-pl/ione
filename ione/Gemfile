@@ -1,0 +1,12 @@
+ruby '2.0.0'
+
+source 'https://rubygems.org'
+gem 'json'
+gem 'net-ssh', '~> 4.2'
+gem 'net-sftp', '~> 2.1', '>= 2.1.2'
+gem 'rubysl-yaml', '2.1.0'
+gem 'daemons', '1.2.4'
+gem 'zmqjsonrpc', '0.1.1'
+gem 'rbvmomi', '1.11.6'
+gem 'file-tail'
+gem 'colorize'
