@@ -3,10 +3,6 @@ module IONeLoggerKit
     require "#{ROOT}/service/time.rb"
     require "colorize"
 
-    begin
-        `mkdir #{LOG_ROOT}`
-    rescue
-    end
     `echo > #{LOG_ROOT}/errors.txt`
     `echo > #{LOG_ROOT}/sys.log` if !CONF['Other']['key']
     begin

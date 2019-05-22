@@ -35,8 +35,8 @@ sh.system 'npm install && bower install --allow-root'
 puts "Building source"
 sh.system 'grunt requirejs'
 
-puts "Installing zmqjsonrpc"
-sh.system 'gem install zmqjsonrpc'
+puts "Installing gems for IONe"
+sh.system 'gem install zmqjsonrpc colorize'
 
 sh.cd src_dir
 
