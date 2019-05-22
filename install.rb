@@ -40,3 +40,5 @@ sh.system 'gem install zmqjsonrpc'
 
 sh.cd src_dir
 
+sh.system 'cp -f ./sunstone-views.yaml /etc/one/'
+sh.system 'cp -rf ./sunstone-views /etc/one/'
