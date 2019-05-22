@@ -22,7 +22,7 @@ define(function(require) {
   var Notifier = require('utils/notifier');
   var ResourceSelect = require('utils/resource-select');
   var Settings = require('opennebula/settings');
-
+  var lists_month;
 
   require('flot');
   require('flot.stack');
@@ -85,55 +85,81 @@ define(function(require) {
 
     showback_dataTable.fnSort( [ [0, "desc"] ] );
 
-    test_dataTable = $("#test_datatable", context).dataTable({
-      "bSortClasses" : false,
-      "bDeferRender": true,
-      "aoColumnDefs": [
-        { "sType": "num", "aTargets": [0,3,4]}
-      ]
-      // scrollY: "300px",
-      // scrollX: true,
-      // scrollCollapse: true,
-      // paging: false,
-      // "bSort": false,
-      // "bPaginate": false,
-      // "bInfo": false
-    });
-
-    test_fixcol_dataTable = $("#test_fixcol_datatable", context).dataTable({
-      "bSortClasses" : false,
-      "bDeferRender": true,
-      "aoColumnDefs": [
-        { "sType": "num", "aTargets": [0,3,4]}
-      ]
-      // paging: false,
-      // "bSort": false,
-      // "bPaginate": false,
-      // "bInfo": false
-    });
-
 
     showback_dataTable.on("click", "tbody tr", function(){
       var cells = showback_dataTable.fnGetData(this);
       var year = cells[1];
       var month = cells[2];
 
-      showback_vms_dataTable = $("#showback_vms_datatable",context).dataTable({
-        "bSortClasses" : false,
-        "bDeferRender": true,
-        "aoColumnDefs": [
-          { "sType": "num", "aTargets": [0,3,4]}
-        ]
-      });
 
-      showback_vms_dataTable.fnClearTable();
-      showback_vms_dataTable.fnAddData(
-                    showback_dataTable.data("vms_per_date")[year][month].VMS);
-      console.log(showback_dataTable.data("vms_per_date")[year][month].VMS);
-      $("#showback_vms_title", context).text(
-                  Locale.months[month-1] + " " + year + " " + Locale.tr("VMs"));
-      $(".showback_vms_table", context).show();
-      $(".showback_select_a_row", context).hide();
+      if (config.user_id == '721'){
+        $('.test_table').hide();
+        $('#test_datatable_wrapper').remove();
+        $('#test_datatable').remove();
+        $('#div_test_datatable').append('<table id="test_datatable" class="hover"><thead><tr></tr></thead><tbody></tbody><tfoot><tr id="tr_total"></tr></tfoot></table>');
+        var months_days = days_month(2019,month);
+        var vms = {};
+        $('#test_datatable thead tr').append('<th>'+Locale.tr("DAY")+'</th>');
+        for(var i in lists_month[month]['vms']) {
+          $('#test_datatable thead tr').append('<th>'+i+'</th>');
+          vms[i] = lists_month[month]['vms'][i];
+        }
+        $('#test_datatable thead tr').append('<th>'+Locale.tr("Total")+'</th>');
+        var showback = [];
+        for(var i in lists_month[month]){
+          if (!isNaN(i)){
+            var pole = [i];
+            for(var j in  vms){
+              if ( lists_month[month][i][j] != undefined){
+                pole.push(lists_month[month][i][j]);
+              }else{
+                pole.push('-');
+              }
+            }
+            pole.push(lists_month[month][i]['day_total'].toFixed(2));
+
+            showback.push(pole);
+          }
+        }
+        $('#test_datatable #tr_total').append('<td>'+Locale.tr("Total")+'</td>');
+        for(var j in  vms){
+          if (vms[j]['time'].toFixed(2) < 0.01){
+            $('#test_datatable #tr_total').append('<td>'+vms[j]['cost'].toFixed(2)+'</td>');
+          }else{
+            $('#test_datatable #tr_total').append('<td>'+vms[j]['cost'].toFixed(2)+'/'+vms[j]['time'].toFixed(2)+'</td>');
+          }
+        }
+        $('#test_datatable #tr_total').append('<td>'+lists_month[month]['total'].toFixed(2)+'</td>');
+
+
+        test_dataTable = $("#test_datatable", context).dataTable({
+          scrollX: true,
+          scrollCollapse: true
+        });
+
+        test_dataTable.fnClearTable();
+        $('.test_table').show();
+        test_dataTable.fnAddData(showback);
+
+        $("#test_title", context).text(Locale.months[month-1] + " " + year + " " + Locale.tr("VMs"));
+        $(".showback_select_a_row", context).hide();
+      }else{
+        showback_vms_dataTable = $("#showback_vms_datatable",context).dataTable({
+          "bSortClasses" : false,
+          "bDeferRender": true,
+          "aoColumnDefs": [
+            { "sType": "num", "aTargets": [0,3,4]}
+          ]
+        });
+
+        showback_vms_dataTable.fnClearTable();
+        showback_vms_dataTable.fnAddData(
+            showback_dataTable.data("vms_per_date")[year][month].VMS);
+        $("#showback_vms_title", context).text(
+            Locale.months[month-1] + " " + year + " " + Locale.tr("VMs"));
+        $(".showback_vms_table", context).show();
+        $(".showback_select_a_row", context).hide();
+      }
 
     });
 
@@ -147,49 +173,18 @@ define(function(require) {
       if (config.user_id == '721'){
         var uid = config.user_id;
         var edate = Math.round(Date.now() / 1000);
-
         var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
+            lists = req.response;
+            lists_month = create_list_months(lists);
 
-            var months_days = days_months(2019);
-            var lists = req.response;
-            create_list_months(lists);
-
-            // var months = {};
-            // var shwback = [];
-            // var fix_col = [];
-            // for(var i in lists){
-            //   if (lists[i].TOTAL > 0){
-            //     fix_col.push([i]);
-            //     var pole = [];
-            //     for(var j in showback_days){
-            //       for(var s in lists[i].showback){
-            //         if (lists[i].showback[s].date == showback_days[j]){
-            //           pole.push(lists[i].showback[s].TOTAL.toFixed(2));
-            //           break;
-            //         }
-            //         if (s == lists[i].showback.length - 1){
-            //           pole.push(0);
-            //         }
-            //       }
-            //     }
-            //
-            //     shwback.push(pole);
-            //
-            //   }
-            // }
-            // console.log(shwback);
-            // console.log(fix_col);
-            //
-            // test_fixcol_dataTable.fnAddData(fix_col);
-            // test_dataTable.fnAddData(shwback);
-            //
-            $('#test_datatable_wrapper').css('padding-left','100px');
-            $('#test_fixcol_datatable_wrapper').css({width:'10%',position:'absolute'});
-            //
-            $('.test_table').prop('hidden', false);
-            //
-            $('.test_fixcol_datatable').prop('hidden', false);
-            // $('th:contains("Day")').click();
+            OpenNebulaVM.showback({
+              // timeout: true,
+              success: function(req, response){
+                _fillShowback(context, req, response);
+              },
+              error: Notifier.onError,
+              data: options
+            });
           }};
         Settings.showback(param);
       }
@@ -219,32 +214,11 @@ define(function(require) {
         options.group = group;
       }
 
-      OpenNebulaVM.showback({
-        // timeout: true,
-        success: function(req, response){
-          _fillShowback(context, req, response);
-        },
-        error: Notifier.onError,
-        data: options
-      });
+
 
       return false;
     });
   }
-
-  function _my_fill(lists) {
-    var series = [];
-    for(var i in lists){
-      var date = new Date("1/"+ lists[i] +"/2019"),
-          locale = "en-us",
-          month = date.toLocaleString(locale, { month: "long" });
-      var kk = [123,'2019','11',month + ' 2019',];
-
-    }
-    showback_dataTable.fnAddData(series);
-  }
-
-
 
   function _fillShowback(context, req, response) {
     $("#showback_no_data", context).hide();
@@ -298,9 +272,17 @@ define(function(require) {
 
     showback_dataTable.fnClearTable();
     if (series.length > 0) {
-      console.log(1,vms_per_date,series);
       showback_dataTable.data("vms_per_date", vms_per_date);
-      showback_dataTable.fnAddData(series);
+      if (config.user_id == '721'){
+        var series = [];
+        for(var i in lists_month){
+          series.push([123,'2019',i,Locale.months[i-1] + ' 2019',lists_month[i].total]);
+        }
+        showback_dataTable.fnAddData(series);
+      }else{
+        showback_dataTable.fnAddData(series);
+      }
+
     }
 
     var showback_plot_series = [];
@@ -352,15 +334,8 @@ define(function(require) {
     $("#showback_content", context).show();
   }
 
-  function days_months(year) {
-    var showback_days = {};
-    var month = 1;
-    while(month <= 12){
-      showback_days[month] = 32 - new Date(year, month-1, 32).getDate();
-      month++;
-    }
-    console.log(showback_days);
-    return showback_days;
+  function days_month(year,month) {
+    return 32 - new Date(year, month-1, 32).getDate();
   }
 
   function create_list_months(lists) {
@@ -371,26 +346,48 @@ define(function(require) {
         for(var j in lists[i].showback){
           var day = lists[i].showback[j].date.split('/')[0] * 1;
           var month = lists[i].showback[j].date.split('/')[1] * 1;
-          var total = lists[i].showback[j].TOTAL;
-          var total_and_hour = lists[i].showback[j].TOTAL.toFixed(2) + '/' + lists[i].showback[j].work_time.toFixed(4);
+          var cost = lists[i].showback[j].TOTAL * 1;
+          if (lists[i].showback[j].work_time.toFixed(4) < 0.01){
+            var cost_and_hour = lists[i].showback[j].TOTAL.toFixed(2);
+          }else{
+            var cost_and_hour = lists[i].showback[j].TOTAL.toFixed(2) + '/' + lists[i].showback[j].work_time.toFixed(2);
+          }
 
           if (list_months[month] == undefined){
             list_months[month] = {};
             list_months[month][day] = {};
-            list_months[month][day][i] =  total_and_hour;
+            list_months[month][day][i] =  cost_and_hour;
           }else{
             if (list_months[month][day] == undefined){
               list_months[month][day] = {};
-              list_months[month][day][i] =  total_and_hour;
+              list_months[month][day][i] =  cost_and_hour;
             }else{
-              list_months[month][day][i] =  total_and_hour;
+              list_months[month][day][i] =  cost_and_hour;
             }
           }
 
-          if (list_months[month]['total'] == undefined){
-            list_months[month]['total'] = total;
+          if (list_months[month][day]['day_total'] == undefined){
+            list_months[month][day]['day_total'] = cost;
           }else{
-            list_months[month]['total'] += total;
+            list_months[month][day]['day_total']+= cost;
+          }
+
+          if (list_months[month]['total'] == undefined){
+            list_months[month]['total'] = cost;
+          }else{
+            list_months[month]['total'] += cost;
+          }
+
+          if (list_months[month]['vms'] == undefined){
+            list_months[month]['vms'] = {};
+            list_months[month]['vms'][i] = {'cost':cost,'time':lists[i].showback[j].work_time};
+          }else{
+            if (list_months[month]['vms'][i] == undefined){
+              list_months[month]['vms'][i] = {'cost':cost,'time':lists[i].showback[j].work_time};
+            }else{
+              list_months[month]['vms'][i]['time'] += lists[i].showback[j].work_time;
+              list_months[month]['vms'][i]['cost'] += cost;
+            }
           }
 
         }

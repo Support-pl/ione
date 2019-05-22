@@ -146,8 +146,6 @@ define(function(require) {
                     } else {
                       $('#reinstalldialogvm').trigger('close.zf.trigger');
                     };
-                } else {
-                    refresh();
                 }
             }
 
@@ -176,6 +174,7 @@ define(function(require) {
                                 },
                                 error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                             });
+                            refresh();
                         } else {
                             OpenNebula.VM.reinstall({
                                 data: {
@@ -186,6 +185,7 @@ define(function(require) {
                                 },
                                 error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                             });
+                            refresh();
                         }
                     }
                 });
@@ -199,6 +199,7 @@ define(function(require) {
                         success: function(r, response){ parse_result(response) },
                         error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                     });
+                    refresh();
                 } else {
                     OpenNebula.VM.reinstall({
                         data: {
@@ -207,6 +208,7 @@ define(function(require) {
                         success: function(r, response){ parse_result(response) },
                         error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
                     });
+                    refresh();
                 }
             };
 

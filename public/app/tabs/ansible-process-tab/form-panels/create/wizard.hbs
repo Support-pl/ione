@@ -34,8 +34,8 @@
                   {{tr "Comment"}}
                   <textarea name="comment" id="comment"></textarea>
               </div>
-              <input type="checkbox" id="checkbox_sshkey" name="checkbox_sshkey">
-              <label for="checkbox_sshkey">{{tr "Use SSH key for all"}}</label>
+              <input type="checkbox" id="checkbox_sshkey" name="checkbox_sshkey" hidden>
+              <label for="checkbox_sshkey" style="display: none">{{tr "Use SSH key for all"}}</label>
               <div class="ssh_key_ok hidden">
                    <label for="Playbooks">{{tr "SSH Key"}}</label>
                    <textarea name="ssh_key" id="ssh_key"></textarea>

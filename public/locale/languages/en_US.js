@@ -764,4 +764,8 @@ locale={
     "WEEK":"",
     "MONTH":"",
     "COST / TIME indicator":"",
+    "Total cost":"",
+    "Public IP":"",
+    "Private IP":"",
+    "Run":"",
 }

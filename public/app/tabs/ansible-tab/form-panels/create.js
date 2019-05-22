@@ -154,6 +154,7 @@ define(function(require) {
         var supported_os    = $('#supported_os').val();
         var body            = $('#body').val();
 
+        console.log(body);
         if(this.action == "create"){
             Sunstone.runAction(
                 "Ansible.create",

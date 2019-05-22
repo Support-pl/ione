@@ -155,11 +155,14 @@ define(function(require) {
       type: "create",
       call: that.openNebulaResource.create,
       callback : function(request, response) {
-
-        if (response.response.error != undefined){
-          Notifier.notifyError(response.response.error);
-          console.log(response.response.error);
+        if (response.error != undefined){
+          Notifier.notifyError(response.error);
+          console.log(response.error);
+          Sunstone.resetFormPanel(that.tabId, formPanelId);
+          Sunstone.hideFormPanel(that.tabId);
+          return false;
         }
+
         if (response.response[that.xmlRoot].ID != undefined){
           Notifier.notifyCustom(that.createdStr,
               Navigation.link(" ID: " + response.response[that.xmlRoot].ID, that.tabId, response.response[that.xmlRoot].ID),
@@ -168,6 +171,7 @@ define(function(require) {
             Sunstone.runAction("AnsibleProcess.run", response.response[that.xmlRoot]);
             if (config.user_config.default_view == 'user'){
               Sunstone.showTab('ansible-process-tab/'+response.response[that.xmlRoot].ID.toString());
+              return false;
             }
           }
         }else{

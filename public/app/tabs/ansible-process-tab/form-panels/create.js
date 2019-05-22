@@ -53,10 +53,15 @@ define(function(require) {
 
         this.formPanelId = FORM_PANEL_ID;
         this.tabId = TAB_ID;
+        if (config.user_config.default_view == 'user'){
+            var but_txt = Locale.tr("Run");
+        }else{
+            var but_txt = Locale.tr("Create");
+        }
         this.actions = {
             'create': {
                 'title': Locale.tr("Create Process"),
-                'buttonText': Locale.tr("Create"),
+                'buttonText': but_txt,
                 'resetButton': true
             }
         }
