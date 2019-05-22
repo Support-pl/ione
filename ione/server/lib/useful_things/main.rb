@@ -1,5 +1,5 @@
 class IONe
-    # Logs sent message into activities.log and gives data about availability
+    # Logs sent message into ione.log and gives data about availability
     # @param [String] msg - message to log
     # @return [String('DONE') | String('PONG')]
     # @example

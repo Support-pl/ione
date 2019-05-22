@@ -8,16 +8,16 @@ require 'logger'
 STARTUP_TIME = Time.now().to_i # IONe server start time
 
 puts 'Getting path to the server'
-ROOT = ENV['IONEROOT'] # IONe root path
-LOG_ROOT = ENV['IONELOGROOT'] # IONe logs path
+ROOT = SUNSTONE_ROOT_DIR + '/ione/server' # IONe root path
+LOG_ROOT = LOG_LOCATION # IONe logs path
 
 if ROOT.nil? || LOG_ROOT.nil? then
-    `echo "Set ENV variables $IONEROOT and $IONELOGROOT at .bashrc and systemd!"`
+    puts "Set ENV variables $IONEROOT and $IONELOGROOT at .bashrc and systemd!"
     raise "ENV NOT SET"
 end
 
 puts 'Parsing config file'
-CONF = YAML.load_file("#{ROOT}/config.yml") # IONe configuration constants
+CONF = YAML.load_file("#{ETC_LOCATION}/config.yml") # IONe configuration constants
 
 puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
@@ -36,34 +36,6 @@ puts 'Setting up Environment(OpenNebula API)'
 ###########################################
 # Setting up Environment                   #
 ###########################################
-ONE_LOCATION=ENV["ONE_LOCATION"] # OpenNebula location
-if !ONE_LOCATION
-    LOG_LOCATION = "/var/log/one"
-    VAR_LOCATION = "/var/lib/one"
-    ETC_LOCATION = "/etc/one"
-    SHARE_LOCATION = "/usr/share/one"
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
-else
-    VAR_LOCATION = ONE_LOCATION + "/var"
-    LOG_LOCATION = ONE_LOCATION + "/var"
-    ETC_LOCATION = ONE_LOCATION + "/etc"
-    SHARE_LOCATION = ONE_LOCATION + "/share"
-    RUBY_LIB_LOCATION = ONE_LOCATION+"/lib/ruby"
-end
-
-SUNSTONE_AUTH             = VAR_LOCATION + "/.one/sunstone_auth"
-SUNSTONE_LOG              = LOG_LOCATION + "/sunstone.log"
-CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
-
-PLUGIN_CONFIGURATION_FILE = ETC_LOCATION + "/sunstone-plugins.yaml"
-LOGOS_CONFIGURATION_FILE  = ETC_LOCATION + "/sunstone-logos.yaml"
-
-SUNSTONE_ROOT_DIR         = File.dirname(__FILE__)
-
-$: << RUBY_LIB_LOCATION
-$: << RUBY_LIB_LOCATION+'/cloud'
-$: << SUNSTONE_ROOT_DIR
-$: << SUNSTONE_ROOT_DIR+'/models'
 
 require "opennebula"
 include OpenNebula
@@ -74,11 +46,6 @@ CREDENTIALS = CONF['OpenNebula']['credentials']
 ENDPOINT = CONF['OpenNebula']['endpoint']
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
-require 'cloud/CloudAuth'
-
-ENV["ONE_CIPHER_AUTH"] = SUNSTONE_AUTH
-$conf = YAML.load_file(CONFIGURATION_FILE)
-$cloud_auth = CloudAuth.new($conf)
 require CONF['DataBase']['adapter']
 $db = Sequel.connect({
         adapter: CONF['DataBase']['adapter'].to_sym,

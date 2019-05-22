@@ -10,9 +10,9 @@ module IONeLoggerKit
     `echo > #{LOG_ROOT}/errors.txt`
     `echo > #{LOG_ROOT}/sys.log` if !CONF['Other']['key']
     begin
-        `echo > #{LOG_ROOT}/activities.log` if File.read("#{LOG_ROOT}/activities.log").split("\n").size >= 1000
+        `echo > #{LOG_ROOT}/ione.log` if File.read("#{LOG_ROOT}/ione.log").split("\n").size >= 1000
     rescue
-        `echo > #{LOG_ROOT}/activities.log`
+        `echo > #{LOG_ROOT}/ione.log`
     end
 
     $log = []
@@ -35,7 +35,7 @@ module IONeLoggerKit
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
         else
-            destination = "#{LOG_ROOT}/activities.log"
+            destination = "#{LOG_ROOT}/ione.log"
         end
         msg = msg.to_s
         msg = "[ #{time()} ] " + msg if _time
@@ -51,7 +51,7 @@ module IONeLoggerKit
     # Logging the message with choosen color and font to the one of two destinations
     # Check out 'colorize' gem for available colors and fonts 
     def LOG_COLOR(msg, method = caller_locations(1,1)[0].label.dup, color = 'red', font = 'bold')
-        destination = "#{LOG_ROOT}/activities.log"
+        destination = "#{LOG_ROOT}/ione.log"
         destination = "#{LOG_ROOT}/snapshot.log" if method == "SnapController"
         msg = msg.to_s.send(color).send(font)
         msg = "[ #{time()} ] " + msg
@@ -89,7 +89,7 @@ module IONeLoggerKit
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
         else
-            destination = "#{LOG_ROOT}/activities.log"
+            destination = "#{LOG_ROOT}/ione.log"
         end
         msg = msg.to_s
         msg = "[ #{time()} ] " + msg if _time
@@ -148,15 +148,15 @@ module IONeLoggerKit
 end
 
 class IONe
-    # Get log from activities.log file
+    # Get log from ione.log file
     # @return [String] Log
     def activity_log()
         LOG_STAT()        
         LOG "Log file content has been copied remotely", "activity_log"
-        log = File.read("#{LOG_ROOT}/activities.log")
+        log = File.read("#{LOG_ROOT}/ione.log")
         log
     end
-    # Logs given message to activities.log
+    # Logs given message to ione.log
     # @param [String] msg - your message
     # @return [String] returns given message
     def log(msg)

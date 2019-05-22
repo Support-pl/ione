@@ -191,7 +191,7 @@ Also, you may check the path to log file:
 
 ```sh
 $ ione log path
-/var/log/ione/activities.log
+/var/log/ione/ione.log
 ```
 
 It's may be usefull, for using _tail -f_.
@@ -373,10 +373,10 @@ $IONEROOT/:
 |   |-- version.txt
 
 $IONELOGROOT/:
-|-- activities.log # Main IONe log
+|-- ione.log # Main IONe log
 |-- snapshot.log # All logs, with SnapshotController method sended are here
 |-- debug.log # Debug logs
-|-- old.log # Old logs from activities.log
+|-- old.log # Old logs from ione.log
 |-- errors.txt # Daemon errors stores here
 
 /usr/bin/:

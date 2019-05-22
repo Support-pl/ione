@@ -42,3 +42,4 @@ sh.cd src_dir
 
 sh.system 'cp -f ./sunstone-views.yaml /etc/one/'
 sh.system 'cp -rf ./sunstone-views /etc/one/'
+# sh.system 'cp -f ./ione/ione.conf /etc/one/'

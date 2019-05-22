@@ -52,7 +52,7 @@ case ARGV[0]
             puts client.IONeUpdate(ARGV[1])
         end
     when 'log'
-        print_log("activities.log")
+        print_log("ione.log")
     when 'debug'
         print_log("debug.log")
     when 'snapshot'
