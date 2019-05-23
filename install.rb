@@ -147,6 +147,6 @@ USER_HOOK = [
     arguments = "$TEMPLATE" ]
 '
 
-File.open('/etc/one/oned.conf', 'a') do conf
+File.open('/etc/one/oned.conf', 'a') do | conf |
     conf << hooks
 end
