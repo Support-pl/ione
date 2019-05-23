@@ -4,6 +4,7 @@ require 'json'
 require 'ipaddr'
 require 'sequel'
 require 'logger'
+require 'securerandom'
 
 STARTUP_TIME = Time.now().to_i # IONe server start time
 
@@ -50,7 +51,8 @@ require CONF['DataBase']['adapter']
 $db = Sequel.connect({
         adapter: CONF['DataBase']['adapter'].to_sym,
         user: CONF['DataBase']['user'], password: CONF['DataBase']['pass'],
-        database: CONF['DataBase']['database'], host: CONF['DataBase']['host']  })
+        database: CONF['DataBase']['database'], host: CONF['DataBase']['host'],
+        encoding: 'utf8'   })
 
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"

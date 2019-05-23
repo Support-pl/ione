@@ -38,7 +38,7 @@ puts "Building source"
 sh.system 'grunt requirejs'
 
 puts "Installing gems for IONe"
-sh.system 'gem install zmqjsonrpc colorize nori'
+sh.system 'gem install zmqjsonrpc colorize nori mysql2 sequel'
 
 sh.cd src_dir
 

@@ -1,0 +1,11 @@
+ - hosts: <%group%>
+   vars:
+     cause_error:  "false"
+     work_time:    10
+   tasks:
+   - name: Create Test Script
+     shell: echo "sleep({{ work_time }});raise RuntimeError.new(\"Error MESSAGE\") if {{cause_error}};exit 0" > ~/ansible_test.rb
+   - name: Run Test Script
+     shell: /usr/bin/ruby ~/ansible_test.rb
+   - name: Remove Test Script
+     shell: rm -f ~/ansible_test.rb
