@@ -1,3 +1,13 @@
+begin
+    $db.create_table :records do 
+        primary_key :id, :integer, null: false
+        String  :state, size: 10, null: false
+        Integer :time, null: false
+    end
+rescue
+    puts "Table :records already exists, skipping"
+end
+
 class IONe
     def CalculateShowback uid, stime, etime = Time.now.to_i, group_by_day = false
         vm_pool = @db[:vm_pool].select(:oid).where(:uid => uid).to_a.map! {| vm | vm[:oid]}

@@ -449,6 +449,7 @@ end
 
 require 'SettingsDriver'
 require 'AnsibleDriver'
+require 'ShowbackDriver'
 
 ##############################################################################
 # HTML Requests
