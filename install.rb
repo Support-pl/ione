@@ -23,11 +23,14 @@ sunstone = %w(
     models public routes views ione
 )
 
+sh.system "chown oneadmin -R ./* && chgrp oneadmin -R ./*"
+
 sunstone.each do | files |
     sh.system "cp -rf #{files} /usr/lib/one/sunstone/"
 end
 sh.system "cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "cp config.ru /usr/lib/one/sunstone/"
+sh.system 'cp Gemfile /usr/lib/one/sunstone'
 
 sh.cd '/usr/lib/one/sunstone/public'
 
@@ -38,9 +41,7 @@ puts "Building source"
 sh.system 'grunt requirejs'
 
 puts "Installing gems for IONe"
-sh.system 'gem install zmqjsonrpc colorize nori mysql2 sequel'
-sh.system 'gem install net-ssh -v 4.2'
-sh.system 'gem install net-sftp'
+sh.system 'bundle install'
 
 sh.cd src_dir
 
