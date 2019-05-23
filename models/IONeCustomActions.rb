@@ -86,3 +86,11 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       r error: e.message, backtrace: e.backtrace
    end
 end
+
+get '/ione_conf' do
+    begin
+        r response: CONF, ione: IONe.new($client, $db)
+    rescue => e
+        r error: e.message
+    end
+end
