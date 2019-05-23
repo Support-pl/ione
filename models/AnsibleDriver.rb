@@ -68,6 +68,7 @@ class AnsiblePlaybook
 
    def initialize id:nil, data:{'action' => {'params' => {}}}, user:nil
       @user = user # Need this to check permissions later
+      @user.info!
       if id.nil? then # If id is not given - new Playbook will be created
          @params = data
          begin
@@ -80,8 +81,7 @@ class AnsiblePlaybook
             raise ParamsError.new @params # Custom error if extra_data is nil
          end
          raise ParamsError.new(@params) if check # Custom error if something is nil
-         raise NoAccessError.new(2) unless user.groups.include? 0 # Custom error if user is not in oneadmin group
-         @user.info! # Retrieve object body
+         raise NoAccessError.new(2) unless @user.groups.include? 0 # Custom error if user is not in oneadmin group
          @id = id = $ione.CreateAnsiblePlaybook(@params.merge({:uid => @user.id, :gid => @user.gid})) # Save id of new playbook
       else # If id is given getting existing playbook
          # Params from OpenNebula are always in {"action" => {"perform" => <%method name%>, "params" => <%method params%>}} form

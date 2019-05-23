@@ -33,6 +33,8 @@ class AnsiblePlaybook
             @uid, @gid, @name, @description, @body, @extra_data = args.get *FIELDS
             @uid, @gid, @extra_data = @uid || 0, @gid || 0, @extra_data || {}
 
+            @extra_data['PERMISSIONS'] = @extra_data['PERMISSIONS'] || {"PERMISSIONS" => "111000000"}
+
             r, msg = self.class.check_syntax(@body)
             raise RuntimeError.new(msg) unless r
 

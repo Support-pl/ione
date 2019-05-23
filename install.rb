@@ -39,6 +39,8 @@ sh.system 'grunt requirejs'
 
 puts "Installing gems for IONe"
 sh.system 'gem install zmqjsonrpc colorize nori mysql2 sequel'
+sh.system 'gem install net-ssh -v 4.2'
+sh.system 'gem install net-sftp'
 
 sh.cd src_dir
 
