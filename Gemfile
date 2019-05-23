@@ -1,8 +1,9 @@
+source 'https://rubygems.org'
+
 gem 'json'
 gem 'nori', '2.6.0'
 gem 'net-ssh', '4.2.0'
 gem 'net-sftp'
-gem 'yaml'
 gem 'zmqjsonrpc', '0.1.1'
 gem 'colorize'
 gem 'mysql2'
