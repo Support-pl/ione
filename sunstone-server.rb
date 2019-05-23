@@ -450,6 +450,7 @@ end
 require 'SettingsDriver'
 require 'AnsibleDriver'
 require 'ShowbackDriver'
+require 'IONeCustomActions'
 
 ##############################################################################
 # HTML Requests
