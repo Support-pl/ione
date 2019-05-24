@@ -150,3 +150,8 @@ USER_HOOK = [
 File.open('/etc/one/oned.conf', 'a') do | conf |
     conf << hooks
 end
+
+puts "Restarting one.d, Sunstone and httpd"
+sh.system "systemctl restart opennebula && systemctl status opennebula"
+sh.system "systemctl restart opennebula-sunstone && systemctl status opennebula-sunstone"
+sh.system "systemctl restart httpd && systemctl status httpd"
