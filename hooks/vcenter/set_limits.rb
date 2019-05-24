@@ -32,7 +32,7 @@ $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
 require 'zmqjsonrpc'
-IONe = ZmqJsonRpc::Client.new('tcp://localhost:8008')
+IONe = ZmqJsonRpc::Client.new('tcp://localhost:8008', -1)
 
 id = ARGV.first.to_i
 vm = VirtualMachine.new_with_id(id, Client.new)
@@ -40,10 +40,10 @@ vm.info!
 puts "States are: [#{ARGV[1]}, #{ARGV[2]}] -> [#{vm.state} -- #{vm.state_str}, #{vm.lcm_state} -- #{vm.lcm_state_str}]"
 if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
     puts "VM started not from PENDING state, skipping..."
+    exit 0
 end
 
 host = Host.new_with_id IONe.get_vm_host(id, true).last.to_i, Client.new
-
 
 IONe.SetVMResourcesLimits(
     id,
@@ -51,28 +51,9 @@ IONe.SetVMResourcesLimits(
     {
         'cpu' => vm['/VM/TEMPLATE/CPU'].to_i,
         'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-        'iops' => IONe.GetvCenterIOPsConf[vm['/VM/USER_TEMPLATE/DRIVE']]
+        'iops' => IONe.GetvCenterIOPsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
     }
 ) if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter'
-
-puts 'Successful set Limits up'
-exit 0
-
-onblock(:vm, id) do | vm |
-
-    vm.info!
-
-    lim_res = vm.setResourcesAllocationLimits(
-        cpu: vm['/VM/TEMPLATE/CPU'].to_i * CONF['vCenter']['cpu-limits-koef'],
-        ram: vm['/VM/TEMPLATE/MEMORY'].to_i,
-        iops: CONF['vCenter']['drive-types'][vm['/VM/USER_TEMPLATE/DRIVE']]
-    )
-    unless lim_res.nil? then
-        err, back = lim_res.split("<|>")
-        puts err, back
-        exit -1
-    end
-end if ClusterType(host.id) == 'vcenter'
 
 puts 'Successful set Limits up'
 exit 0
