@@ -112,7 +112,8 @@ class IONe
                         "DISK = [ \n" \
                         "IMAGE_ID = \"#{template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
                         "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
+                        "OPENNEBULA_MANAGED = \"NO\"\t]" \
+                        "DRIVE = \"#{params['ds_type']}\""
             LOG_DEBUG "Resulting capacity template:\n#{context}"
             
             trace << "Terminating VM:#{__LINE__ + 1}"            
@@ -286,8 +287,8 @@ class IONe
                         "DISK = [ \n" \
                         "IMAGE_ID = \"#{t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
                         "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
-
+                        "OPENNEBULA_MANAGED = \"NO\"\t]" \
+                        "DRIVE = \"#{params['ds_type']}\""
             elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'] == 'AZURE' then
                 specs = "OS_DISK_SIZE = \"#{params['drive']}\"\n" \
                         "SIZE = \"#{params['extra']['instance_size']}\"\n" \
