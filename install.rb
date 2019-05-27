@@ -50,7 +50,7 @@ sh.system 'grunt requirejs'
 
 puts "Installing gems for IONe"
 sh.system 'sudo bundle install'
-sh.system '/usr/share/one/install_gems'
+sh.system 'echo | sudo /usr/share/one/install_gems'
 
 sh.cd src_dir
 
