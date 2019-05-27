@@ -65,7 +65,7 @@ hooks = "#**********************************************************************
         "# You can move it to hook section" \
         "#*******************************************************************************"
 
-hooks.gsub("#", "\n#")
+hooks.gsub!("#", "\n#")
 hooks += "\n\n"
 
 hooks += 
@@ -166,6 +166,6 @@ File.open('/etc/one/oned.conf', 'a') do | conf |
 end
 
 puts "Restarting one.d, Sunstone and httpd"
-sh.system "systemctl restart opennebula && systemctl status opennebula"
-sh.system "systemctl restart opennebula-sunstone && systemctl status opennebula-sunstone"
-sh.system "systemctl restart httpd && systemctl status httpd"
+sh.system "sudo systemctl restart opennebula && systemctl status opennebula"
+sh.system "sudo systemctl restart opennebula-sunstone && systemctl status opennebula-sunstone"
+sh.system "sudo systemctl restart httpd && systemctl status httpd"
