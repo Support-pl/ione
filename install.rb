@@ -21,7 +21,7 @@ puts "Installing NPM and zeromq"
 sh.system `sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel`
 
 puts "Installing bower and grunt"
-sh.system 'npm install -g bower grunt grunt-cli'
+sh.system 'sudo npm install -g bower grunt grunt-cli'
 
 puts "Setting hooks up"
 sh.system "cp -rf hooks /usr/lib/one/remotes/" 
@@ -31,7 +31,7 @@ sunstone = %w(
     models public routes views ione
 )
 
-sh.system "chown oneadmin -R ./* && chgrp oneadmin -R ./*"
+sh.system "sudo chown oneadmin -R ./* && chgrp oneadmin -R ./*"
 
 sunstone.each do | files |
     sh.system "cp -rf #{files} /usr/lib/one/sunstone/"
