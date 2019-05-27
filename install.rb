@@ -49,7 +49,7 @@ puts "Building source"
 sh.system 'grunt requirejs'
 
 puts "Installing gems for IONe"
-sh.system 'bundle install'
+sh.system 'sudo bundle install'
 
 sh.cd src_dir
 
@@ -65,7 +65,7 @@ hooks = "#**********************************************************************
         "# You can move it to hook section" \
         "#*******************************************************************************"
 
-hooks.gsub!("#", "\n#")
+hooks.gsub! ("#", "\n#")
 hooks += "\n\n"
 
 hooks += 
