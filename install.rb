@@ -43,7 +43,7 @@ sh.system 'cp Gemfile /usr/lib/one/sunstone'
 sh.cd '/usr/lib/one/sunstone/public'
 
 puts "Installung bower and NPM packages"
-sh.system 'npm install && bower install --allow-root'
+sh.system 'sudo npm install && bower install --allow-root'
 
 puts "Building source"
 sh.system 'grunt requirejs'
