@@ -76,6 +76,13 @@ class Array
             self[index]
         end
     end
+    def without(*vals)
+        cpy = self.dup
+        vals.each do | val |
+            cpy.delete(val) 
+        end
+        cpy
+    end
 end
 
 # Ruby default String class
