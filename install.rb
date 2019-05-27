@@ -24,7 +24,7 @@ puts "Installing bower and grunt"
 sh.system 'sudo npm install -g bower grunt grunt-cli'
 
 puts "Setting hooks up"
-sh.system "cp -rf hooks /usr/lib/one/remotes/" 
+sh.system "sudo cp -rf hooks /usr/lib/one/remotes/" 
 
 puts "Moving sunstone src files"
 sunstone = %w(
@@ -54,8 +54,8 @@ sh.system '/usr/share/one/install_gems'
 
 sh.cd src_dir
 
-sh.system 'cp -f ./sunstone-views.yaml /etc/one/'
-sh.system 'cp -rf ./sunstone-views /etc/one/'
+sh.system 'sudo cp -f ./sunstone-views.yaml /etc/one/'
+sh.system 'sudo cp -rf ./sunstone-views /etc/one/'
 # sh.system 'cp -f ./ione/ione.conf /etc/one/'
 
 puts 'Appending hooks to oned.conf'
