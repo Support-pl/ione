@@ -1,6 +1,7 @@
 whoami = `whoami`.chomp
 unless whoami == 'oneadmin' then
     puts "You must be oneadmin to avoid problems with installing packages"
+    exit -1
 end
 
 `gem install shell`
@@ -19,6 +20,7 @@ src_dir = sh.pwd
 
 puts "Installing NPM and zeromq"
 sh.system `sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel`
+sh.system 'gem install zmqjsonrpc colorize sequel'
 
 puts "Installing bower and grunt"
 sh.system 'sudo npm install -g bower grunt grunt-cli'
