@@ -31,14 +31,14 @@ sunstone = %w(
     models public routes views ione
 )
 
-sh.system "sudo chown oneadmin -R ./* && chgrp oneadmin -R ./*"
-
 sunstone.each do | files |
     sh.system "sudo cp -rf #{files} /usr/lib/one/sunstone/"
 end
 sh.system "sudo cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "sudo cp config.ru /usr/lib/one/sunstone/"
 sh.system 'sudo cp Gemfile /usr/lib/one/sunstone'
+
+sh.system "sudo chown oneadmin:oneadmin -R /usr/lib/one/sunstone"
 
 sh.cd '/usr/lib/one/sunstone/public'
 
