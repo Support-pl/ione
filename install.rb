@@ -54,7 +54,13 @@ sh.system 'cp -rf ./sunstone-views /etc/one/'
 
 puts 'Appending hooks to oned.conf'
 
-hooks = 
+hooks = '#*******************************************************************************' \
+        '# Appending hooks for IONe' \
+        '#*******************************************************************************' \
+        '# You can move it to hook section' \
+        '#*******************************************************************************'
+
+hooks += 
 'VM_HOOK = [
     name      = "set_price",
     on        = "CREATE",
