@@ -48,10 +48,10 @@ sh.system 'sudo npm install && bower install --allow-root'
 puts "Building source"
 sh.system 'sudo ./build.sh'
 
-puts "Installing gems for IONe"
-sh.cd '..'
-sh.system 'bundle install'
-sh.system 'echo | sudo /usr/share/one/install_gems'
+#puts "Installing gems for IONe"
+#sh.cd '..'
+#sh.system 'bundle install'
+#sh.system 'echo | sudo /usr/share/one/install_gems'
 
 sh.cd src_dir
 
@@ -163,9 +163,9 @@ USER_HOOK = [
     arguments = "$TEMPLATE" ]
 '
 
-File.open('/etc/one/oned.conf', 'a') do | conf |
-    conf << hooks
-end
+# File.open('/etc/one/oned.conf', 'a') do | conf |
+#     conf << hooks
+# end
 
 puts "Restarting one.d, Sunstone and httpd"
 sh.system "sudo systemctl restart opennebula && systemctl status opennebula"
