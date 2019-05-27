@@ -46,7 +46,7 @@ puts "Installung bower and NPM packages"
 sh.system 'sudo npm install && bower install --allow-root'
 
 puts "Building source"
-sh.system 'grunt requirejs'
+sh.system 'sudo ./build.sh'
 
 puts "Installing gems for IONe"
 sh.system 'sudo bundle install'
