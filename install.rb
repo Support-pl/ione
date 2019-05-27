@@ -49,7 +49,8 @@ puts "Building source"
 sh.system 'sudo ./build.sh'
 
 puts "Installing gems for IONe"
-sh.system 'sudo bundle install'
+sh.cd '..'
+sh.system 'bundle install'
 sh.system 'echo | sudo /usr/share/one/install_gems'
 
 sh.cd src_dir
