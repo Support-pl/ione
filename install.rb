@@ -38,6 +38,7 @@ end
 sh.system "sudo cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "sudo cp config.ru /usr/lib/one/sunstone/"
 
+sh.system('sudo chown oneadmin:oneadmin -R /usr/share/one/')
 gems = File.read('Gemfile')
 File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
     gemfile << "\n# Gems for IONe\n"
