@@ -19,7 +19,7 @@ src_dir = sh.pwd
 #####################################
 
 puts "Installing NPM and zeromq"
-sh.system `sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel`
+sh.system 'sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel'
 sh.system 'gem install zmqjsonrpc colorize sequel'
 
 puts "Installing bower and grunt"
@@ -50,16 +50,16 @@ sh.system 'sudo npm install && bower install --allow-root'
 puts "Building source"
 sh.system 'sudo ./build.sh'
 
-#puts "Installing gems for IONe"
-#sh.cd '..'
-#sh.system 'bundle install'
-#sh.system 'echo | sudo /usr/share/one/install_gems'
+puts "Installing gems for IONe"
+sh.cd '..'
+# sh.system 'bundle install'
+sh.system 'echo | sudo /usr/share/one/install_gems'
 
 sh.cd src_dir
 
 sh.system 'sudo cp -f ./sunstone-views.yaml /etc/one/'
 sh.system 'sudo cp -rf ./sunstone-views /etc/one/'
-# sh.system 'cp -f ./ione/ione.conf /etc/one/'
+sh.system 'cp -f ./ione/ione.conf /etc/one/'
 
 puts 'Appending hooks to oned.conf'
 
@@ -165,9 +165,9 @@ USER_HOOK = [
     arguments = "$TEMPLATE" ]
 '
 
-# File.open('/etc/one/oned.conf', 'a') do | conf |
-#     conf << hooks
-# end
+File.open('/etc/one/oned.conf', 'a') do | conf |
+    conf << hooks
+end
 
 puts "Restarting one.d, Sunstone and httpd"
 sh.system "sudo systemctl restart opennebula && systemctl status opennebula"
