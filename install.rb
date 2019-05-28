@@ -20,7 +20,6 @@ src_dir = sh.pwd
 
 puts "Installing NPM and zeromq"
 sh.system 'sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel'
-sh.system 'gem install zmqjsonrpc colorize sequel'
 
 puts "Installing bower and grunt"
 sh.system 'sudo npm install -g bower grunt grunt-cli'
@@ -38,7 +37,13 @@ sunstone.each do | files |
 end
 sh.system "sudo cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "sudo cp config.ru /usr/lib/one/sunstone/"
-sh.system 'sudo cp Gemfile /usr/lib/one/sunstone'
+
+gems = File.read('Gemfile')
+File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
+    gemfile << "\n# Gems for IONe\n"
+    gemfile << gems
+end
+# sh.system 'sudo cp Gemfile /usr/lib/one/sunstone'
 
 sh.system "sudo chown oneadmin:oneadmin -R /usr/lib/one/sunstone"
 
