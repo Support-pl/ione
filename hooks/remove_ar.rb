@@ -35,7 +35,7 @@ require 'sequel'
 require 'opennebula'
 include OpenNebula
 
-CONF = YAML.load_file("#{ETC_LOCATION}/config.yml") # IONe configuration constants
+CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 require CONF['DataBase']['adapter']
 $db = Sequel.connect({
         adapter: CONF['DataBase']['adapter'].to_sym,

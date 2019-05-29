@@ -3,7 +3,7 @@
 require 'yaml'
 ROOT = ENV['IONEROOT']
 LOG_ROOT = ENV['IONELOGROOT']
-CONF = YAML.load(File.read("#{ROOT}/config.yml"))
+CONF = YAML.load(File.read("#{ROOT}/ione.conf"))
 
 require 'zmqjsonrpc'
 uri = "tcp://localhost:#{CONF['Server']['listen-port']}"
@@ -47,7 +47,7 @@ case ARGV[0]
         end  
     when 'update'
         if ARGV[1].nil? then
-            puts "Type your update token. You can see it at #{ROOT}/modules/updatesmanager/config.yml"
+            puts "Type your update token. You can see it at #{ROOT}/modules/updatesmanager/ione.conf"
         else
             puts client.IONeUpdate(ARGV[1])
         end

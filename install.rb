@@ -1,5 +1,5 @@
 whoami = `whoami`.chomp
-unless whoami == 'oneadmin' then
+unless whoami == 'root' then
     puts "You must be oneadmin to avoid problems with installing packages"
     exit -1
 end
@@ -25,7 +25,8 @@ puts "Installing bower and grunt"
 sh.system 'sudo npm install -g bower grunt grunt-cli'
 
 puts "Setting hooks up"
-sh.system "sudo cp -rf hooks /usr/lib/one/remotes/" 
+sh.system "sudo cp -rf hooks /var/lib/one/remotes/"
+sh.system "sudo chmod -R +x /var/lib/one/remotes/"
 
 puts "Moving sunstone src files"
 sunstone = %w(
@@ -47,7 +48,7 @@ sh.system "sudo chown -R oneadmin:oneadmin /etc/one/sunstone-views"
 sh.system "sudo chmod -R 775 /etc/one/sunstone-views"
 
 puts "Appending gems to Gemfile"
-sh.system('sudo chown oneadmin:oneadmin /usr/share/one/')
+sh.system('sudo chown -R oneadmin:oneadmin /usr/share/one/')
 gems = File.read('Gemfile')
 File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
     gemfile << "\n# Gems for IONe\n"

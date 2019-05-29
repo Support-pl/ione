@@ -2,7 +2,7 @@ require 'mysql2'
 require 'yaml'
 
 ROOT = ENV['IONEROOT'] # IONe root path
-CONF = YAML.load(File.read("#{ROOT}/config.yml")) # IONe configuration constants
+CONF = YAML.load(File.read("#{ROOT}/ione.conf")) # IONe configuration constants
 
 print 'Connecting to DB server...'
 begin

@@ -71,7 +71,7 @@ IONe has the main config file, it's placed at the IONe root directory:
 
 ```sh
 $ ls $IONEROOT | grep config
-config.yml
+ione.conf
 ```
 
 Main config file is consists of several main keys:
@@ -298,7 +298,7 @@ IONe module is also the kind of Ruby Gem. The difference between libraries and m
 * IONe module structure
 
 Your module should starts from the _main.rb_ file inside your module directory.
-If your module have some constants, you may put it to the _config.yml_.
+If your module have some constants, you may put it to the _ione.conf_.
 
 * For example
 
@@ -329,7 +329,7 @@ So, the basic structure should you have is:
 ```
 modulename/:
 |-- main.rb
-|-- config.yml
+|-- ione.conf
 |-- 'any data you wish to store and use here'
 ```
 
@@ -350,7 +350,7 @@ IONe server structure is:
 ```sh
 $IONEROOT/:
 |-- ione.rb # IONe bootstrapper
-|-- config.yml # Basic IONe config
+|-- ione.conf # Basic IONe config
 |-- daemon.rb # IONe daemon(kind of power key)
 |-- Gemfile
 |-- debug_lib.rb # IONe bootstrapper replication, you may use it for tests at irb

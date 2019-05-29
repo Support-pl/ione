@@ -16,7 +16,7 @@ if ROOT.nil? || LOG_ROOT.nil? then
 end
 
 puts 'Parsing config file'
-CONF = YAML.load(File.read("#{ROOT}/config.yml")) # IONe configuration constants
+CONF = YAML.load(File.read("#{ROOT}/ione.conf")) # IONe configuration constants
 CONF['Other']['key'] = true
 
 puts 'Including log-library'
@@ -122,7 +122,7 @@ begin
     CONF['Other']['debug-modules'].each do | mod |
         puts "\tIncluding #{mod}"    
         begin
-            CONF.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
+            CONF.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/ione.conf"))) if File.exist?("#{ROOT}/modules/#{mod}/ione.conf")
             require "#{ROOT}/modules/#{mod}/main.rb"
         rescue => e
             puts "Module \"#{mod}\" was not included | Error: #{e.message}"
