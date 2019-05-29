@@ -37,13 +37,6 @@ sunstone.each do | files |
 end
 sh.system "sudo cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "sudo cp config.ru /usr/lib/one/sunstone/"
-
-sh.system('sudo chown oneadmin:oneadmin -R /usr/share/one/')
-gems = File.read('Gemfile')
-File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
-    gemfile << "\n# Gems for IONe\n"
-    gemfile << gems
-end
 sh.system "sudo chown oneadmin:oneadmin -R /usr/lib/one/sunstone"
 
 sh.system "sudo cp -f sunstone-views.yaml /etc/one/"
@@ -53,6 +46,14 @@ sh.system "sudo cp -rf sunstone-views /etc/one/"
 sh.system "sudo chown -R oneadmin:oneadmin /etc/one/sunstone-views"
 sh.system "sudo chmod -R 775 /etc/one/sunstone-views"
 
+puts "Appending gems to Gemfile"
+sh.system('sudo chown oneadmin:oneadmin /usr/share/one/')
+gems = File.read('Gemfile')
+File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
+    gemfile << "\n# Gems for IONe\n"
+    gemfile << gems
+end
+
 sh.cd '/usr/lib/one/sunstone/public'
 
 puts "Installung bower and NPM packages"
@@ -60,6 +61,7 @@ sh.system 'sudo npm install && bower install --allow-root'
 
 puts "Building source"
 sh.system 'sudo ./build.sh'
+sh.system 'sudo cp -f ./dist/main-dist.js ./dist/main.js'
 
 puts "Installing gems for IONe"
 sh.cd '..'
