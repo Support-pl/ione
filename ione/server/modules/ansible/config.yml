@@ -1,0 +1,4 @@
+AnsibleServer: # Credentials for Ansible Server
+  host: 
+  port: 
+  user: 
