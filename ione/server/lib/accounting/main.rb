@@ -1,6 +1,6 @@
 begin
     $db.create_table :records do 
-        Inteeger    :id,    null: false
+        Integer    :id,    null: false
         Integer     :time,  null: false
         String      :state, size: 10,   null: false
     end
