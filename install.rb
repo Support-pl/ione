@@ -44,9 +44,14 @@ File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
     gemfile << "\n# Gems for IONe\n"
     gemfile << gems
 end
-# sh.system 'sudo cp Gemfile /usr/lib/one/sunstone'
-
 sh.system "sudo chown oneadmin:oneadmin -R /usr/lib/one/sunstone"
+
+sh.system "sudo cp -f sunstone-views.yaml /etc/one/"
+sh.system "sudo chown oneadmin:oneadmin /etc/one/sunstone-views.yaml"
+sh.system "sudo chmod 775 /etc/one/sunstone-views.yaml"
+sh.system "sudo cp -rf sunstone-views /etc/one/"
+sh.system "sudo chown -R oneadmin:oneadmin /etc/one/sunstone-views"
+sh.system "sudo chmod -R 775 /etc/one/sunstone-views"
 
 sh.cd '/usr/lib/one/sunstone/public'
 
