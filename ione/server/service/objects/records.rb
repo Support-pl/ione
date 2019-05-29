@@ -3,7 +3,7 @@ class OpenNebula::Records
 
     def initialize id
         @id = id
-        @records = $db[:records].where(id:id).where.to_a
+        @records = $db[:records].where(id:id).to_a
         raise NoRecordsError if @records.empty?
     end
 

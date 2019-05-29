@@ -1,6 +1,5 @@
 require 'zmqjsonrpc'
 require 'yaml'
-require 'json'
 require 'ipaddr'
 require 'sequel'
 require 'logger'
@@ -176,4 +175,4 @@ LOG_COLOR "Server initialized", 'none', 'green'
 puts 'Pre-init job ended, starting up server'
 Thread.new do
     server.server_loop # Server start
-end
+end 
