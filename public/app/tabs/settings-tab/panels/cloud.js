@@ -117,15 +117,16 @@ define(function(require) {
 
     function _setup(context) {
         var that = this;
-        var disk_type = settings['DISK_TYPES'].split(',');
-        var datastores = $('#datastores_body #datastores_select_disk_type');
+        if (settings['DISK_TYPES'] == undefined){
+            var disk_type = [];
+        }else{
+            var disk_type = settings['DISK_TYPES'].split(',');
+        }
+
+        var datastores = $('#datastores_body .datastores_select_disk_type');
         var len =  datastores.length;
 
-        $(datastores[0]).append('<option selected disabled>Select disk type disabled</option>');
-        $(datastores[0]).prop('disabled',true);
-        $(datastores[0]).parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
-
-        for (var i = 1; i < len; i++) {
+        for (var i = 0; i < len; i++) {
             if (datastores_hbs[i].DISK_TYPE != undefined){
                 for(var k in disk_type){
                     if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
@@ -141,6 +142,10 @@ define(function(require) {
                 }
             }
         }
+
+        $('#datastores_body #0').append('<option selected disabled>Select disk type disabled</option>');
+        $('#datastores_body #0').prop('disabled',true);
+        $('#datastores_body #0').parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
 
 
         for(var i in for_hbs){
