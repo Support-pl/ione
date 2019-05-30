@@ -1,6 +1,0 @@
-/test
-.travis.yml
-.gitignore
-.jshintrc
-*.sublime-project
-*.sublime-workspace
