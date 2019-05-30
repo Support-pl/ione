@@ -1,10 +1,6 @@
 require 'mysql2'
 require 'sequel'
 
-# Get this values from /etc/oned.conf
-$db = Sequel.connect({
-    adapter: :mysql2, user: 'root', password: 'opennebula', database: 'opennebula', host: 'localhost', encoding: 'utf8', charset: 'utf8'  })
-
 class AnsiblePlaybook
     FIELDS = %w(uid gid name description body extra_data create_time)
     TABLE = 'ansible_playbook'

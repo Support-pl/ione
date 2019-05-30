@@ -51,7 +51,7 @@ $db = Sequel.connect({
         adapter: CONF['DataBase']['adapter'].to_sym,
         user: CONF['DataBase']['user'], password: CONF['DataBase']['pass'],
         database: CONF['DataBase']['database'], host: CONF['DataBase']['host'],
-        encoding: 'utf8'   })
+        encoding: 'utf8mb4'   })
 
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
@@ -63,7 +63,7 @@ LOG(
 "\n" +
 "       ################################################################\n".light_green.bold +
 "       ##                                                            ##\n".light_green.bold +
-"       ##".light_green.bold + "       " + "I".red.bold + "ntegrated " + "O".red.bold + "pen" + "Ne".red.bold + "bula Cloud  ".light_cyan +
+"       ##".light_green.bold + "       " + "I".red.bold + "ntegrated " + "O".red.bold + "pen" + "Ne".red.bold + "bula Cloud  " +
                                     "v#{VERSION.chomp}".cyan.underline + "#{" " if VERSION.split(' ').last == 'stable'}        " + "##\n".light_green.bold +
 "       ##                                                            ##\n".light_green.bold +
 "       ################################################################\n".light_green.bold +
