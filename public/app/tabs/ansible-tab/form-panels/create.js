@@ -96,12 +96,11 @@ define(function(require) {
         WizardFields.fillInput($("#body", context), " - hosts: <%group%>");
 
         $('#body').keyup(function () {
-            $('#control-i-check').removeClass('check-syntax-ok').addClass('check-syntax-false');
+            $('#control-i-check').hide();
             $('#ansible-tabsubmit_button button').prop('disabled', true);
         });
 
         $(".check_syntax").on("click",function () {
-            console.log(111);
             $.ajax({
                 url: '/ansible/check_syntax',
                 type: 'POST',
@@ -112,12 +111,12 @@ define(function(require) {
                     if(response.response[0]){
                         $('#body_label').removeClass('is-invalid-label');
                         $('#body').removeClass('is-invalid-input');
-                        $('#control-i-check').addClass('check-syntax-ok').removeClass('check-syntax-false');
+                        $('#control-i-check').show();
                         $('#ansible-tabsubmit_button button').prop('disabled', false);
                     } else {
                         $('#body_label').addClass('is-invalid-label');
                         $('#body').addClass('is-invalid-input');
-                        $('#control-i-check').removeClass('check-syntax-ok').addClass('check-syntax-false');
+                        $('#control-i-check').hide();
                         $('#ansible-tabsubmit_button button').prop('disabled', true);
                         Notifier.notifyError('Body syntax error');
                     }

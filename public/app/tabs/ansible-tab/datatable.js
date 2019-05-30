@@ -95,7 +95,6 @@ define(function(require) {
 
         this.totalPlaybooks++;
         return [
-
             '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
             element.id + '" name="selected_items" value="' +
             element.id + '"/>',

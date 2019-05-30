@@ -4,10 +4,10 @@ define(function(require) {
       The row can be edited and a rename action will be sent
      */
   
-    var TemplatePermissionsTable = require('hbs!utils/panel//permissions-table/html');
-    var TemplatePermissions = require('hbs!utils/panel//permissions-table/permissions');
-    var TemplateOwner = require('hbs!utils/panel//permissions-table/owner');
-    var TemplateGroup = require('hbs!utils/panel//permissions-table/group');
+    var TemplatePermissionsTable = require('hbs!utils/panel/permissions-table/html');
+    var TemplatePermissions = require('hbs!utils/panel/permissions-table/permissions');
+    var TemplateOwner = require('hbs!utils/panel/permissions-table/owner');
+    var TemplateGroup = require('hbs!utils/panel/permissions-table/group');
     var ResourceSelect = require('utils/resource-select');
     var Sunstone = require('sunstone');
     var Config = require('sunstone-config');
@@ -205,7 +205,7 @@ define(function(require) {
       if (_otherAdmin(element))
           $('.other_a', context).attr('checked', 'checked');
     };
-  
+    
     return {
       'html': _html,
       'setup': _setup
