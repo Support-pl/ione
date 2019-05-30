@@ -45,7 +45,7 @@ class Hash
    end
 end
 
-class AnsiblePlaybook
+class AnsiblePlaybookModel
 
    attr_reader    :method, :id
    attr_accessor  :body
@@ -80,7 +80,7 @@ class AnsiblePlaybook
          end
          raise ParamsError.new(@params) if check # Custom error if something is nil
          raise NoAccessError.new(2) unless @user.groups.include? 0 # Custom error if user is not in oneadmin group
-         @id = id = IONe.new($client, $db).CreateAnsiblePlaybook(@params.merge({:uid => @user.id, :gid => @user.gid})) # Save id of new playbook
+         @id = id = AnsiblePlaybook.new(**@params.to_sym!.merge({uid: @user.id, gid: @user.gid})).id # Save id of new playbook
       else # If id is given getting existing playbook
          # Params from OpenNebula are always in {"action" => {"perform" => <%method name%>, "params" => <%method params%>}} form
          # So here initializer saves method and params to object
@@ -151,7 +151,7 @@ class AnsiblePlaybook
    class NoAccessError < StandardError # Custom error for no access exceptions. Returns string contain which action is blocked
       def initialize action
          super()
-         @action = AnsiblePlaybook::ACTIONS[action]
+         @action = AnsiblePlaybookModel::ACTIONS[action]
       end
       def message
          "Not enough rights to perform action: #{@action}!"
@@ -207,7 +207,7 @@ end
 post '/ansible' do # Allocates new playbook
    begin
       data = JSON.parse(@request_body)
-      r response: { :ANSIBLE => {:ID => AnsiblePlaybook.new(id:nil, data:data, user:@one_user).id }}
+      r response: { :ANSIBLE => {:ID => AnsiblePlaybookModel.new(id:nil, data:data, user:@one_user).id }}
    rescue JSON::ParserError # If JSON.parse fails
       r error: "Broken data received, unable to parse."
    rescue => e
@@ -221,7 +221,7 @@ end
 delete '/ansible/:id' do |id| # Deletes given playbook
    begin
       data = {'action' => {'perform' => 'delete', 'params' => nil}}
-      pb = AnsiblePlaybook.new(id:id, data:data, user:@one_user)
+      pb = AnsiblePlaybookModel.new(id:id, data:data, user:@one_user)
 
       r response: pb.call
    rescue JSON::ParserError # If JSON.parse fails
@@ -235,7 +235,7 @@ end
 
 get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required format
    begin
-      pb = AnsiblePlaybook.new(id:id, user:@one_user) # Getting playbook
+      pb = AnsiblePlaybookModel.new(id:id, user:@one_user) # Getting playbook
       # Saving user and group to objects
       user, group =  OpenNebula::User.new_with_id( pb.body['uid'], @one_client),
                      OpenNebula::Group.new_with_id( pb.body['gid'], @one_client)
@@ -252,7 +252,7 @@ end
 get '/ansible/:id/vars' do | id | # I think it's not needed here, rly
    begin
       raise "CustomError for debug proposes" if id.to_i == 31
-      pb = AnsiblePlaybook.new(id:id, data:{'action' => {'perform' => 'vars'}}, user:@one_user)
+      pb = AnsiblePlaybookModel.new(id:id, data:{'action' => {'perform' => 'vars'}}, user:@one_user)
       r vars: pb.call
    rescue => e
       msg = e.message
@@ -264,7 +264,7 @@ end
 post '/ansible/:id/action' do | id | # Performs action
    begin
       data = JSON.parse(@request_body)
-      pb = AnsiblePlaybook.new(id:id, data:data, user:@one_user)
+      pb = AnsiblePlaybookModel.new(id:id, data:data, user:@one_user)
 
       r response: pb.call
    rescue JSON::ParserError # If JSON.parse fails
@@ -276,7 +276,7 @@ post '/ansible/:id/action' do | id | # Performs action
    end
 end
 
-post '/ansible/:action' do | action | # Performs actions, which are defined as def self.method for AnsiblePlaybook model
+post '/ansible/:action' do | action | # Performs actions, which are defined as def self.method for AnsiblePlaybookModel model
    data = JSON.parse(@request_body)
 
    begin
@@ -294,7 +294,7 @@ post '/ansible/:action' do | action | # Performs actions, which are defined as d
    end
 end
 
-class AnsiblePlaybookProcess
+class AnsiblePlaybookProcessModel
 
     RIGHTS = {
        'run' => 1,
@@ -404,7 +404,7 @@ class AnsiblePlaybookProcess
  post '/ansible_process' do
     begin
        data = JSON.parse(@request_body)
-       r ANSIBLE_PROCESS: {:ID => AnsiblePlaybookProcess.new(id:nil, data:data, user:@one_user).id }
+       r ANSIBLE_PROCESS: {:ID => AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }
     rescue JSON::ParserError # If JSON.parse fails
        r error: "Broken data received, unable to parse."
     rescue => e
@@ -417,7 +417,7 @@ class AnsiblePlaybookProcess
  
  get '/ansible_process/:id' do |id|
     begin
-       apc = AnsiblePlaybookProcess.new(id:id, user:@one_user) # Getting playbook
+       apc = AnsiblePlaybookProcessModel.new(id:id, user:@one_user) # Getting playbook
        # Saving user and group to objects
        user =  OpenNebula::User.new_with_id( apc.body['uid'], @one_client)
        user.info!
@@ -434,7 +434,7 @@ class AnsiblePlaybookProcess
  delete '/ansible_process/:id' do |id| # Deletes given playbook process
     begin
        data = {'action' => {'perform' => 'delete', 'params' => nil}}
-       pb = AnsiblePlaybookProcess.new(id:id, data:data, user:@one_user)
+       pb = AnsiblePlaybookProcessModel.new(id:id, data:data, user:@one_user)
  
        r response: pb.call
     rescue JSON::ParserError # If JSON.parse fails
@@ -449,7 +449,7 @@ class AnsiblePlaybookProcess
  post '/ansible_process/:id/action' do | id | # Performs action
     begin
        data = JSON.parse(@request_body)
-       pb = AnsiblePlaybookProcess.new(id:id, data:data, user:@one_user)
+       pb = AnsiblePlaybookProcessModel.new(id:id, data:data, user:@one_user)
  
        r response: pb.call
     rescue JSON::ParserError # If JSON.parse fails
