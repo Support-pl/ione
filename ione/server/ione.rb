@@ -175,4 +175,4 @@ LOG_COLOR "Server initialized", 'none', 'green'
 puts 'Pre-init job ended, starting up server'
 Thread.new do
     server.server_loop # Server start
-end if defined? DEBUG_LIB
+end if !defined? DEBUG_LIB
