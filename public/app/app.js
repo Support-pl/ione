@@ -106,7 +106,6 @@ define(function(require) {
                   template = b;
                   if (template.USER.TEMPLATE.BALANCE != undefined){
                       text = template.USER.TEMPLATE.BALANCE;
-                      if (config.user_id == '721'){
                           var style = '<style>' +
                               '.popup-fade {' +
                               'display: none;' +
@@ -174,9 +173,6 @@ define(function(require) {
                                   }
                               });
                           });
-                      }else{
-                          $('.divfrombalance').prepend('<li role="menuitem"><span class="balance">Баланс: ' + text + ' BYN</span></li>');
-                      }
                   }
               }
           });

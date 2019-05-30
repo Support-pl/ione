@@ -319,7 +319,7 @@ define(function(require) {
       OpenNebula.User.show({data:{id:config.user_id},success: function(r,res) {
         user_info = {User_id: res.USER.ID, ID_GROUP: res.USER.GROUPS.ID, BALANCE: res.USER.TEMPLATE.BALANCE};
 
-        if (user_info.ID_GROUP != '0' && user_info.User_id != '721'){
+        if (user_info.ID_GROUP != '0'){
           $('#CostVaribl').val(24);
           _calculateCost();
           var user_balance = user_info.BALANCE * 1;
