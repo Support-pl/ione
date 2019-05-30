@@ -484,7 +484,7 @@ class OpenNebula::VirtualMachine
         raise ShowbackError, ["VM didn't exist in given time-period", etime, self['/VM/STIME'].to_i] if self['/VM/STIME'].to_i > etime
 
         stime = self['/VM/STIME'].to_i if self['/VM/STIME'].to_i > stime
-        etime = self['/VM/ETIME'].to_i if self['/VM/ETIME'].to_i > etime
+        etime = self['/VM/ETIME'].to_i if self['/VM/ETIME'].to_i < etime && self['/VM/ETIME'].to_i != 0
 
         requested_time = (etime - stime) / 3600.0
 
