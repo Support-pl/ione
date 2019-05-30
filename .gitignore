@@ -6,3 +6,4 @@ routes/ansible\.rb
 routes/ansible-process.rb
 .vscode/settings.json
 .vscode/sftp.json
+.vscode/sftp.json
