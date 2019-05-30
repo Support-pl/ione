@@ -41,7 +41,7 @@ require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(SUNSTONE_AUTH).chomp #CONF['OpenNebula']['credentials']
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #CONF['OpenNebula']['credentials']
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT = CONF['OpenNebula']['endpoint']
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client

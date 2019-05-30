@@ -17,7 +17,7 @@
 define(function(require){
     var OpenNebulaAction = require('./action');
     var Config = require('sunstone-config');
-
+    var Notifier = require('utils/notifier');
     var RESOURCE = "SETTINGS";
 
     var Settings = {
@@ -31,10 +31,11 @@ define(function(require){
                 type: 'POST',
                 data: data,
                 success: function(req, res){
-                    console.log(req, res);
+                    console.log(1,req);
+                    console.log(2,res);
                     return callback ? callback(req, res) : null;
                 },
-                error: function(req, res){ console.log(req, res) }
+                error: function(req, res){ Notifier.notifyError(req) }
             });
         }
     }

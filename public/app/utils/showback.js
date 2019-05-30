@@ -245,7 +245,13 @@ define(function(require) {
       series.push([123,'2019',i,Locale.months[i-1] + ' 2019',lists_month[i].total.cost.toFixed(2)]);
       showback_data.push([(new Date(2019, i-1)), lists_month[i].total.cost.toFixed(2) ]);
     }
-    showback_dataTable.fnAddData(series);
+    console.log(series.length,series);
+    if (series.length > 0){
+      showback_dataTable.fnAddData(series);
+    }else{
+      Notifier.notifyMessage('No info');
+      return false;
+    }
 
     var showback_plot_series = [];
     showback_plot_series.push(

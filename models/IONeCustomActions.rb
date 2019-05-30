@@ -1,7 +1,5 @@
 require 'zmqjsonrpc'
 
-$ione = ZmqJsonRpc::Client.new("tcp://localhost:8008", -1)
-
 def r **result
    JSON.pretty_generate result
 end
@@ -21,7 +19,7 @@ post '/vm/:id/reinstall' do | id |
       data = {'id' => nil, 'template_id' => nil, 'password' => nil, 'ansible' => false, 'ansible_local_id' => -1, 'ansible_vars' => {}}
       body = JSON.parse(request.body.read)
       data.merge!(body['action']['params'])
-      vm = $ione.get_vm_data(id.to_i)
+      vm = IONe.new($client, $db).get_vm_data(id.to_i)
 
       template = OpenNebula::Template.new_with_id(data['template_id'], @one_client)
       template.info!
@@ -36,7 +34,7 @@ post '/vm/:id/reinstall' do | id |
          r error: "Drive cannot be smaller then #{image['/IMAGE/SIZE']}"
       else
          r body:body, response:
-            $ione.Reinstall({
+            IONe.new($client, $db).Reinstall({
                :vmid => id,
                :userid => @one_user.id,
                :login => vm['OWNER'],
@@ -69,14 +67,14 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       body = JSON.parse(request.body.read)
       data.merge!(body['action']['params'])
 
-      vm = $ione.get_vm_data(id.to_i)
+      vm = IONe.new($client, $db).get_vm_data(id.to_i)
 
       if (@one_user.id != vm['OWNERID'].to_i) && !@one_user.groups.include?(0) then
          r error: "User is not OWNER for given VM", id: @one_user.id, groups: @one_user.groups
       elsif data['previous'].nil? then
          r error: 'Snapshot not given'
       else
-         $ione.RevertZFSSnapshot(id, data['previous']) == true ?
+         IONe.new($client, $db).RevertZFSSnapshot(id, data['previous']) == true ?
             r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
             r(response: "Contact Technical Support to make sure revert process started")
       end

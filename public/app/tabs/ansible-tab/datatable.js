@@ -92,6 +92,7 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
+
         this.totalPlaybooks++;
         return [
 

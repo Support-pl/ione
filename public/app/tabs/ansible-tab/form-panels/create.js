@@ -101,6 +101,7 @@ define(function(require) {
         });
 
         $(".check_syntax").on("click",function () {
+            console.log(111);
             $.ajax({
                 url: '/ansible/check_syntax',
                 type: 'POST',

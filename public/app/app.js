@@ -415,7 +415,7 @@ define(function(require) {
     //source https://datatables.net/plug-ins/sorting/ip-address (modified)
     jQuery.extend( jQuery.fn.dataTableExt.oSort, {
     "ip-address-pre": function ( a ) {
-      if(a.split){
+      if(a != null){
        var ip = a.split("<br>");
         var i, item;
         if(ip.length == 1){
@@ -428,12 +428,12 @@ define(function(require) {
         }
         var x = "",
             xa = "";
- 
+
         if (m.length == 4) {
             // IPV4
             for(i = 0; i < m.length; i++) {
                 item = m[i];
- 
+
                 if(item.length == 1) {
                     x += "00" + item;
                 }
@@ -450,11 +450,11 @@ define(function(require) {
             var count = 0;
             for(i = 0; i < n.length; i++) {
                 item = n[i];
- 
+
                 if (i > 0) {
                     xa += ":";
                 }
- 
+
                 if(item.length === 0) {
                     count += 0;
                 }
@@ -475,14 +475,14 @@ define(function(require) {
                     count += 4;
                 }
             }
- 
+
             // Padding the ::
             n = xa.split(":");
             var paddDone = 0;
- 
+
             for (i = 0; i < n.length; i++) {
                 item = n[i];
- 
+
                 if (item.length === 0 && paddDone === 0) {
                     for (var padding = 0 ; padding < (32-count) ; padding++) {
                         x += "0";
@@ -494,7 +494,7 @@ define(function(require) {
                 }
             }
         }
- 
+
         return x;
       }else return a;
     },

@@ -1,4 +1,4 @@
 AnsibleServer: # Credentials for Ansible Server
-  host: '185.66.69.101'
-  port: 52222
-  user: 'root'
+  host: 
+  port: 
+  user: 
