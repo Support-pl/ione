@@ -98,7 +98,7 @@ class IONe
             LOG_DEBUG 'Initializing template obj'
             LOG_DEBUG 'Generating new template'
             trace << "Generating NIC context:#{__LINE__ + 1}"
-            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{nic['NETWORK']}\",\n\tNETWORK_UNAME=\"#{nic['NETWORK_UNAME']}\"\n]\n"
+            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{nic['NETWORK']}\"\n]\n"
             trace << "Generating template object:#{__LINE__ + 1}"            
             template = onblock(Template, params['templateid'])
             template.info!
