@@ -31,8 +31,6 @@ define(function(require){
                 type: 'POST',
                 data: data,
                 success: function(req, res){
-                    console.log(1,req);
-                    console.log(2,res);
                     return callback ? callback(req, res) : null;
                 },
                 error: function(req, res){ Notifier.notifyError(req) }

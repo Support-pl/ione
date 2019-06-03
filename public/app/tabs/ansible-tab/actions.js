@@ -62,7 +62,6 @@ define(function(require) {
             type: "single",
             call: OpenNebulaResource.clone,
             callback: function(request, response) {
-              console.log(response);
               OpenNebulaAction.clear_cache(RESOURCE);
               Notifier.notifyCustom(Locale.tr("Ansible Playbook created"),
                 Navigation.link(" ID: " + response.response, "ansible-tab", response.response),

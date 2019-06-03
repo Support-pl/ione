@@ -111,7 +111,6 @@ define(function(require) {
                 }
             }
         }
-        console.log(for_hbs);
         return TemplateEasyInfo({'settings':for_hbs,'datastores':datastores_hbs});
     }
 

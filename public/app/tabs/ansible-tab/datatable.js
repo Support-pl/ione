@@ -92,8 +92,10 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
+        if (element.length != 0){
+            this.totalPlaybooks++;
+        }
 
-        this.totalPlaybooks++;
         return [
             '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
             element.id + '" name="selected_items" value="' +
@@ -123,6 +125,20 @@ define(function(require) {
 
     function _postUpdateView() {
         $(".total_playbooks").text(this.totalPlaybooks);
+        if (this.totalPlaybooks == 0){
+            $('#dataTableAnsible tr').eq(1).html('<td valign="top" colspan="7" class="dataTables_empty">\n' +
+                '<span class="text-center" style="font-size: 18px; color: #999">\n' +
+                '  <br>\n' +
+                '  <span class="fa-stack fa-3x" style="color: #dfdfdf"> \n' +
+                '    <i class="fa fa-cloud fa-stack-2x"></i> \n' +
+                '    <i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>\n' +
+                '  </span>\n' +
+                '  <br>\n' +
+                '  <span style=" color: #999">There is no data available</span>\n' +
+                '</span>\n' +
+                '<br>\n' +
+                '</td>');
+        }
     }
 
 });

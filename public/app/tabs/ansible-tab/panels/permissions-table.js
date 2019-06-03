@@ -62,7 +62,6 @@ define(function(require) {
         context.off('change', ".permission_check");
         context.on('change', ".permission_check", function() {
           var permissionsOctet = {octet : _buildOctet(context)};
-          console.log(resourceType + ".chmod", resourceId, permissionsOctet)
           Sunstone.runAction(resourceType + ".chmod", resourceId, permissionsOctet);
         });
       }
@@ -75,7 +74,6 @@ define(function(require) {
                 resourceName: 'User',
                 initValue: element.UID
               });
-            console.log(element);
           });
   
         context.off("change", "#value_td_owner .resource_list_select");
@@ -95,7 +93,6 @@ define(function(require) {
                 resourceName: 'Group',
                 initValue: element.GID
               });
-            console.log(element);
           });
   
         context.off("change", "#value_td_group .resource_list_select");

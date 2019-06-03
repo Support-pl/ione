@@ -107,7 +107,6 @@ define(function(require) {
                 dataType: 'json',
                 data: JSON.stringify({"body":$('#body').val()}),
                 success: function(response) {
-                    console.log(response.response[0]);
                     if(response.response[0]){
                         $('#body_label').removeClass('is-invalid-label');
                         $('#body').removeClass('is-invalid-input');
@@ -122,7 +121,6 @@ define(function(require) {
                     }
                 },
                 error: function(response) {
-                    console.log(response);
                     return callbackError ?
                         callbackError(request, OpenNebulaError(response)) : null;
                 }
@@ -156,7 +154,6 @@ define(function(require) {
         var supported_os    = $('#supported_os').val();
         var body            = $('#body').val();
 
-        console.log(body);
         if(this.action == "create"){
             Sunstone.runAction(
                 "Ansible.create",
@@ -174,23 +171,23 @@ define(function(require) {
 
 
     function _fill(context, element) {
-      if (this.action != "update") {
-        return;
-      }
-      
-      element.ID = element.id
-      element.NAME = element.name
+        if (this.action != "update") {
+            return;
+        }
 
-      this.setHeader(element);
+        element.ID = element.id
+        element.NAME = element.name
 
-      this.resource     = element
-      this.resourceId   = element.ID;
+        this.setHeader(element);
 
-      // Fills the inputs
-      WizardFields.fillInput($("#name", context), element.name);
-      WizardFields.fillInput($("#body", context), element.body);
-      WizardFields.fillInput($("#description", context), element.description);
-      WizardFields.fillInput($("#supported_os", context), element.extra_data.SUPPORTED_OS);
+        this.resource     = element
+        this.resourceId   = element.ID;
+
+        // Fills the inputs
+        WizardFields.fillInput($("#name", context), element.name);
+        WizardFields.fillInput($("#body", context), element.body);
+        WizardFields.fillInput($("#description", context), element.description);
+        WizardFields.fillInput($("#supported_os", context), element.extra_data.SUPPORTED_OS);
 
     }
 

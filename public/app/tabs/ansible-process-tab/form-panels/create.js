@@ -177,32 +177,33 @@ define(function(require) {
             }
         });
 
-        $('#vms_wizard_process').on('click',function () {
-
-            $('.fa-times').on('click',function () {
-                $('input[value="'+$(this).parent().attr("info")+'"]').parent().remove();
-            });
-
-            $('.login-pass-vm').html('');
-            var allvm = new Object();
-            var3 = 0;
-            $('#selected_ids_row_vms_wizard_process').find('.radius.label').each(function(var1, var2) {
-                if($(var2).attr('row_id') != undefined){
-                    $('.login-pass-vm').append('<div class="large-12 column"><div class="large-4 small-3 column">'+ $(var2).attr("info") +'</div>' +
-                        '<input type="hidden" value="'+$(var2).attr("info")+'">' +
-                        '<div class="large-2 small-2 column"><input type="text" value"" name="port'+$(var2).attr('row_id')+'" id="port'+$(var2).attr('row_id')+'" placeholder="Port" value="52222" required></div>' +
-                        '<div class="large-2 small-3 column"><input type="text" value"" name="login'+$(var2).attr('row_id')+'" id="login'+$(var2).attr('row_id')+'" placeholder="Login"></div>' +
-                        '<div class="large-2 small-4 column"><input type="text" value"" name="password'+$(var2).attr('row_id')+'" id="password'+$(var2).attr('row_id')+'" placeholder="Password"></div>' +
-                        '<div></div></div>');
-                    allvm[var3] = $(var2).attr('row_id');
-                    var3 ++;
-                }
-            });
-
-        });
-
         $("#vms_wizard_process", context).on('click', 'tbody [role="row"]', function () {
-            console.log($(this).find('td').eq(0).text(),$(this).find('td').eq(1).text());
+
+            //if ($(this).find('td').eq(0).text() == 'RUNNING') {
+
+                $('.fa-times').on('click', function () {
+                    $('input[value="' + $(this).parent().attr("info") + '"]').parent().remove();
+                });
+
+                $('.login-pass-vm').html('');
+                var allvm = new Object();
+                var3 = 0;
+                $('#selected_ids_row_vms_wizard_process').find('.radius.label').each(function (var1, var2) {
+                    if ($(var2).attr('row_id') != undefined) {
+                        $('.login-pass-vm').append('<div class="large-12 column"><div class="large-4 small-3 column">' + $(var2).attr("info") + '</div>' +
+                            '<input type="hidden" value="' + $(var2).attr("info") + '">' +
+                            '<div class="large-2 small-2 column"><input type="text" value"" name="port' + $(var2).attr('row_id') + '" id="port' + $(var2).attr('row_id') + '" placeholder="Port" value="52222" required></div>' +
+                            '<div class="large-2 small-3 column"><input type="text" value"" name="login' + $(var2).attr('row_id') + '" id="login' + $(var2).attr('row_id') + '" placeholder="Login"></div>' +
+                            '<div class="large-2 small-4 column"><input type="text" value"" name="password' + $(var2).attr('row_id') + '" id="password' + $(var2).attr('row_id') + '" placeholder="Password"></div>' +
+                            '<div></div></div>');
+                        allvm[var3] = $(var2).attr('row_id');
+                        var3++;
+                    }
+                });
+            // }else{
+            //     $(this).removeClass('markrowchecked');
+            //     $('.fa-times').last().click();
+            // }
         });
 
         $('#checkbox_sshkey').on('click',function () {
@@ -243,7 +244,6 @@ define(function(require) {
         });
 
         //if (Hosts)
-        console.log(Hosts);
         opts =  {
                     playbook_id:    $("#Playbooks").val(),
                     hosts:          Hosts,

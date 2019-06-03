@@ -245,7 +245,6 @@ define(function(require) {
       series.push([123,'2019',i,Locale.months[i-1] + ' 2019',lists_month[i].total.cost.toFixed(2)]);
       showback_data.push([(new Date(2019, i-1)), lists_month[i].total.cost.toFixed(2) ]);
     }
-    console.log(series.length,series);
     if (series.length > 0){
       showback_dataTable.fnAddData(series);
     }else{
@@ -295,7 +294,6 @@ define(function(require) {
       //}
     };
 
-    console.log(showback_plot_series);
     var showback_plot = $.plot(
         $("#showback_graph", context), showback_plot_series, options);
 
@@ -384,7 +382,6 @@ define(function(require) {
 
     }
     
-    console.log(list_months);
     return list_months;
   }
 
@@ -482,7 +479,6 @@ define(function(require) {
         showback.push(pole);
       }
     }
-    //console.log(showback);
     return showback;
   };
 
@@ -511,7 +507,6 @@ define(function(require) {
 
     }
     CheckSelectLabels();
-    //console.log($(that).attr("id"),select_labels);
     return flag;
   };
 

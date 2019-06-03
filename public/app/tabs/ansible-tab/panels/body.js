@@ -55,10 +55,9 @@ define(function(require) {
     return Panel;
 
     /*
-          FUNCTION DEFINITIONS
-         */
+        FUNCTION DEFINITIONS
+    */
 
-    console.log(this.element);
 
     function _html() {
         return TemplateHTML({

@@ -46,7 +46,6 @@ define(function(require) {
             type: "multiple",
             call: OpenNebulaResource.run,
             callback: function(request, response) {
-              console.log(response);
               if(response.error){
                 Notifier.notifyError("Process didn't started: " + response.error);
               } else {

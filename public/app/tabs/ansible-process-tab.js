@@ -64,7 +64,6 @@ define(function(require) {
     tabClass: "subTab",
     parentTab: "automatization-top-tab",
   };
-  //console.log(content);
 
   return Tab;
 });

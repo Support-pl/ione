@@ -101,8 +101,6 @@ define(function(require) {
             var vm_id = $(".provision_info_vm", context).attr("vm_id");
 
             //var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
-            console.log('3');
-            console.log(Sunstone.getDialog(REINSTALL_DIALOG_ID));
             // dialog.setElement(that.element);
             // dialog.show();
 
