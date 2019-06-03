@@ -207,7 +207,7 @@ end
 post '/ansible' do # Allocates new playbook
    begin
       data = JSON.parse(@request_body)
-      r response: { :ANSIBLE => {:ID => AnsiblePlaybookModel.new(id:nil, data:data, user:@one_user).id }}
+      r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:data, user:@one_user).id }}
    rescue JSON::ParserError # If JSON.parse fails
       r error: "Broken data received, unable to parse."
    rescue => e
@@ -404,7 +404,7 @@ class AnsiblePlaybookProcessModel
  post '/ansible_process' do
     begin
        data = JSON.parse(@request_body)
-       r ANSIBLE_PROCESS: {:ID => AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }
+       r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }}
     rescue JSON::ParserError # If JSON.parse fails
        r error: "Broken data received, unable to parse."
     rescue => e
