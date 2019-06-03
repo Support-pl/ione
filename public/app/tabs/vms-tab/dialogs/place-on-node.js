@@ -77,7 +77,6 @@ define(function(require) {
                 var extra_info = {};
 
                 extra_info['enforce'] = false;
-                extra_info['ds_id'] = -1;
                 var vm_info = {}
                 OpenNebula.VM.show({data:{id:elem},success: function(r,res){
                         vm_info['vm_hypervisor'] = res.VM.USER_TEMPLATE.HYPERVISOR;
@@ -96,7 +95,13 @@ define(function(require) {
                                         break;
                                     }
                                 }
-                                Sunstone.runAction("VM.deploy_action", elem, extra_info);
+
+                                if (extra_info['ds_id'] != undefined){
+                                    Sunstone.runAction("VM.deploy_action", elem, extra_info);
+                                }else{
+                                    Notifier.notifyError('No datastor');
+                                }
+
                                 Sunstone.getDialog(DIALOG_ID).hide();
                                 Sunstone.getDialog(DIALOG_ID).reset();
                         }});
