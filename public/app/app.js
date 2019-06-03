@@ -415,7 +415,7 @@ define(function(require) {
     //source https://datatables.net/plug-ins/sorting/ip-address (modified)
     jQuery.extend( jQuery.fn.dataTableExt.oSort, {
     "ip-address-pre": function ( a ) {
-      if(a != null){
+      if(a != null && a.split){
        var ip = a.split("<br>");
         var i, item;
         if(ip.length == 1){

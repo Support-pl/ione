@@ -57,7 +57,7 @@ define(function(require) {
                 {"bVisible": false, "aTargets": ['_all']}
             ]
         };
-        
+
 
 
         this.columns = [
@@ -70,7 +70,7 @@ define(function(require) {
         ];
 
         this.selectOptions = {
-     
+
         };
 
         this.totalProcesses = 0;
@@ -94,6 +94,7 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
+
 
         this.totalProcesses++;
         return [
@@ -126,6 +127,20 @@ define(function(require) {
 
     function _postUpdateView() {
         $(".total_processes").text(this.totalProcesses);
+        if($('.odd').text().search('NaN:NaN:NaN NaN/NaN/NaN') != '-1'){
+            $('.odd').html('<td valign="top" colspan="7" class="dataTables_empty">\n' +
+                '<span class="text-center" style="font-size: 18px; color: #999">\n' +
+                '  <br>\n' +
+                '  <span class="fa-stack fa-3x" style="color: #dfdfdf"> \n' +
+                '    <i class="fa fa-cloud fa-stack-2x"></i> \n' +
+                '    <i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>\n' +
+                '  </span>\n' +
+                '  <br>\n' +
+                '  <span style=" color: #999">There is no data available</span>\n' +
+                '</span>\n' +
+                '<br>\n' +
+                '</td>')
+        }
     }
 
 });
