@@ -201,6 +201,9 @@ define(function(require) {
 
         });
 
+        $("#vms_wizard_process", context).on('click', 'tbody [role="row"]', function () {
+            console.log($(this).find('td').eq(0).text(),$(this).find('td').eq(1).text());
+        });
 
         $('#checkbox_sshkey').on('click',function () {
             if($('#checkbox_sshkey').prop('checked') == true){

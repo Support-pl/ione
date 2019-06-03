@@ -141,6 +141,8 @@ define(function(require) {
                 $('#body_label').append(file.name);
             }
             reader.readAsText(file);
+            $('#control-i-check').hide();
+            $('#ansible-tabsubmit_button button').prop('disabled', true);
         });
 
         return false;
