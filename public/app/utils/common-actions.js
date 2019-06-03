@@ -163,7 +163,7 @@ define(function(require) {
           return false;
         }
 
-        if (response.response[that.xmlRoot].ID != undefined){
+        if (response.response != undefined){
           Notifier.notifyCustom(that.createdStr,
               Navigation.link(" ID: " + response.response[that.xmlRoot].ID, that.tabId, response.response[that.xmlRoot].ID),
               false);
