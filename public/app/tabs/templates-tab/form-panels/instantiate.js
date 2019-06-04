@@ -106,56 +106,55 @@ define(function(require) {
   }
 
   function _calculateCost(){
-    Settings.cloud({success:function(r, res) {
-        settings = r.response;
-        var memory_val = parseFloat( $(".capacity_cost_div .cost_value").attr('value') )/1024;
-        var cpu_val = parseFloat( $(".vcpu_input_wrapper .vcpu_input input").val());
-        var disk_val = parseFloat( $(".provision_create_template_disk_cost_div .cost_value").attr('value') );
-        var publicip_val = 1 * $('#amt_public_ip').val();
 
-        if ($('#publicip_cost_div').length != 0){
-          var publicip_cost = settings.PUBLIC_IP_COST * publicip_val;
-        } else {
-          var publicip_cost = 0;
-        }
+    var memory_val = parseFloat( $(".capacity_cost_div .cost_value").attr('value') )/1024;
+    var cpu_val = parseFloat( $(".vcpu_input_wrapper .vcpu_input input").val());
+    var disk_val = parseFloat( $(".provision_create_template_disk_cost_div .cost_value").attr('value') );
+    var publicip_val = 1 * $('#amt_public_ip').val();
 
-        if(Number.isNaN(memory_val)){
-          memory_val = 0;
-        }
-        if(Number.isNaN(cpu_val)){
-          cpu_val = 0;
-        }
-        if(Number.isNaN(disk_val)){
-          disk_val = 0;
-        }
+    if ($('#publicip_cost_div').length != 0){
+      var publicip_cost = settings.PUBLIC_IP_COST * publicip_val;
+    } else {
+      var publicip_cost = 0;
+    }
 
-        var settings_disks_costs = JSON.parse(settings.DISK_COSTS);
+    if(Number.isNaN(memory_val)){
+      memory_val = 0;
+    }
+    if(Number.isNaN(cpu_val)){
+      cpu_val = 0;
+    }
+    if(Number.isNaN(disk_val)){
+      disk_val = 0;
+    }
 
-        var capasity_cost = JSON.parse(settings.CAPACITY_COST);
-        var memory_cost =  memory_val*capasity_cost.MEMORY_COST;
-        var cpu_cost =  cpu_val*capasity_cost.CPU_COST;
-        var disk_cost = settings_disks_costs[$('[wizard_field="DRIVE"]').val()] * disk_val;
+    var settings_disks_costs = JSON.parse(settings.DISK_COSTS);
 
-        if(Number.isNaN(disk_cost)){
-          disk_cost = 0;
-        }
+    var capasity_cost = JSON.parse(settings.CAPACITY_COST);
+    var memory_cost =  memory_val*capasity_cost.MEMORY_COST;
+    var cpu_cost =  cpu_val*capasity_cost.CPU_COST;
+    var disk_cost = settings_disks_costs[$('[wizard_field="DRIVE"]').val()] * disk_val;
 
-        var time_val = $('#CostVaribl').val()*1;
+    if(Number.isNaN(disk_cost)){
+      disk_cost = 0;
+    }
 
-        var capacity_text = ((memory_cost*1 + cpu_cost*1) * time_val).toFixed(3);
-        var disk_text = ((time_val * disk_cost)/1024).toFixed(3);
-        var publicip_text =(publicip_cost * time_val).toFixed(3);
+    var time_val = $('#CostVaribl').val()*1;
 
-        $('.capacity_cost_div span.cost_value').text(capacity_text);
-        $('.provision_create_template_disk_cost_div span.cost_value').text(disk_text);
-        $(".publicip_cost_div .cost_value").text(publicip_text);
+    var capacity_text = ((memory_cost*1 + cpu_cost*1) * time_val).toFixed(3);
+    var disk_text = ((time_val * disk_cost)/1024).toFixed(3);
+    var publicip_text =(publicip_cost * time_val).toFixed(3);
 
-        var total = capacity_text*1 + disk_text*1 + publicip_text*1;
+    $('.capacity_cost_div span.cost_value').text(capacity_text);
+    $('.provision_create_template_disk_cost_div span.cost_value').text(disk_text);
+    $(".publicip_cost_div .cost_value").text(publicip_text);
 
-        if (Config.isFeatureEnabled("showback")) {
-          $(".total_cost_div .cost_value").text( (total).toFixed(2) );
-        }
-      }});
+    var total = capacity_text*1 + disk_text*1 + publicip_text*1;
+
+    if (Config.isFeatureEnabled("showback")) {
+      $(".total_cost_div .cost_value").text( (total).toFixed(2) );
+    }
+
   }
 
   function _submitWizard(context) {
@@ -241,6 +240,7 @@ define(function(require) {
       });
 
       if (nics.length > 0) {
+        return false;
         tmp_json.NIC = nics;
       }
 
@@ -489,11 +489,12 @@ define(function(require) {
             $('#input_public_ip').click(function () {
               if ($(this).prop('checked')){
                 $('#amt_public_ip').prop('disabled',false);
+
                 $('#element_cost').append('<div id="publicip_cost_div" style="width: 100%">' +
                     '<span class="publicip_cost_div">' +
                     '<i class="fa fa-globe"></i>&nbsp;'+Locale.tr("Network")+'<br>' +
                     '<span class="cost_value" style="font-size: 1.4rem;">'+settings.PUBLIC_IP_COST+'</span>&nbsp;' +
-                    '<span>'+Locale.tr("BYN") +' / '+ Locale.tr("HOUR")+'</span>' +
+                    '<span>'+ settings.CURRENCY_MAIN +' / '+ Locale.tr("HOUR")+'</span>' +
                     '</span></div>');
                 _calculateCost();
               } else {
@@ -626,13 +627,13 @@ define(function(require) {
 
           $('#CostVaribl').change(function() {
             var val = $('#CostVaribl option[value="'+$(this).val()+'"]').text();
-            var select_time = 'BYN /'+val.split('/')[1];
+            var select_time = settings.CURRENCY_MAIN + ' /'+val.split('/')[1];
             $('.publicip_cost_div .cost_span').text(val);
 
-            $('.capacity_cost_div span:contains("BYN")').text(select_time);
-            $('.provision_create_template_disk_cost_div span:contains("BYN")').text(select_time);
-            $('.total_cost_div span:contains("BYN")').text(select_time);
-            $('.publicip_cost_div span:contains("BYN")').text(select_time);
+            $('.capacity_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
+            $('.provision_create_template_disk_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
+            $('.total_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
+            $('.publicip_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
             _calculateCost(context);
           });
 
@@ -727,6 +728,8 @@ define(function(require) {
             });
           }
 
+          $('#right_colum .cost_label').text(settings.CURRENCY_MAIN+' / '+Locale.tr('HOUR'));
+
           if ($('#left_colum').height() >= $('#right_colum').height()){
             $('#left_colum').css('padding-bottom','1%');
           } else {
@@ -750,6 +753,13 @@ define(function(require) {
 
     var templatesContext = $(".list_of_templates", context);
     templatesContext.html("");
+
+    Settings.cloud({success:function(r, res) {
+        settings = r.response;
+        if (settings.CURRENCY_MAIN == undefined){
+          settings.CURRENCY_MAIN = 'USD';
+        }
+    }});
 
     Tips.setup(context);
     return false;

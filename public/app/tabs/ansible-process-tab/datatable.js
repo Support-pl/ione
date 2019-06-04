@@ -116,7 +116,6 @@ define(function(require) {
             l = ids.length;
         else if (!$.isEmptyObject(ids))
             l = 1;
-
         return l;
     }
 

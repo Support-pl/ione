@@ -179,7 +179,7 @@ define(function(require) {
 
         $("#vms_wizard_process", context).on('click', 'tbody [role="row"]', function () {
 
-            //if ($(this).find('td').eq(0).text() == 'RUNNING') {
+            if ($(this).find('td').eq(0).text() == 'RUNNING') {
 
                 $('.fa-times').on('click', function () {
                     $('input[value="' + $(this).parent().attr("info") + '"]').parent().remove();
@@ -200,10 +200,10 @@ define(function(require) {
                         var3++;
                     }
                 });
-            // }else{
-            //     $(this).removeClass('markrowchecked');
-            //     $('.fa-times').last().click();
-            // }
+            }else{
+                $(this).removeClass('markrowchecked');
+                $('.fa-times').last().click();
+            }
         });
 
         $('#checkbox_sshkey').on('click',function () {
@@ -213,7 +213,6 @@ define(function(require) {
                 $('.ssh_key_ok').addClass('hidden');
             }
         });
-
 
 
         var that = this;

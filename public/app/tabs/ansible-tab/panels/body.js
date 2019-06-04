@@ -55,8 +55,8 @@ define(function(require) {
     return Panel;
 
     /*
-        FUNCTION DEFINITIONS
-    */
+          FUNCTION DEFINITIONS
+         */
 
 
     function _html() {

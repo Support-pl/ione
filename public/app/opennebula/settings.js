@@ -38,12 +38,10 @@ define(function(require){
         },
         "cloud" : function(params) {
             var callback = params.success;
-            var data = JSON.stringify(params);
 
             $.ajax({
                 url: 'settings',
                 type: 'GET',
-                data: data,
                 success: function(req, res){
                     return callback ? callback(req, res) : null;
                 },

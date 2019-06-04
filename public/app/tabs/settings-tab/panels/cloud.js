@@ -87,7 +87,6 @@ define(function(require) {
 
             }
         }
-
         for_hbs = [];
         for(var i in settings){
             if (settings[i] != null){
@@ -111,6 +110,7 @@ define(function(require) {
                 }
             }
         }
+
         return TemplateEasyInfo({'settings':for_hbs,'datastores':datastores_hbs});
     }
 
@@ -179,12 +179,17 @@ define(function(require) {
                 }
                 var dep = $(datastores[i]).parent().next('#deploy_switch').children().children('#togBtn').prop('checked');
                 if (datastores_hbs[i].DEPLOY != dep){
-                    if (dep == true){
-                        OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = TRUE'}});
+                    if ($(datastores[i]).val() != null){
+                        if (dep == true){
+                            OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = TRUE'}});
+                        }else{
+                            OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = FALSE'}});
+                        }
+                        Notifier.notifyMessage('Change deploy');
                     }else{
-                        OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = FALSE'}});
+                        Notifier.notifyError('Select disk type');
                     }
-                    Notifier.notifyMessage('Change deploy');
+
                 }
             }
         });

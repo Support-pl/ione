@@ -557,7 +557,7 @@ define(function(require) {
     for(var i in lists_month[month].vms){
       var percent = (100 / (total / lists_month[month].vms[i].cost)).toFixed(2);
       dataset.push({value: percent,color: Colors.names[kk]});
-      $('#test_table_graph_legend').append('<p><i class="fa fa-square" aria-hidden="true" style="color:'+ Colors.names[kk] +'"></i> '+ lists_month[month].vms[i].name +'</p>');
+      $('#test_table_graph_legend').append('<p><i class="fa fa-square" aria-hidden="true" style="color:'+ Colors.names[kk] +'"></i>  '+ i +' - '+ lists_month[month].vms[i].name +'</p>');
       if (kk != 6){
         kk++;
       }else{
