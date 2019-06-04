@@ -34,6 +34,7 @@ define(function(require) {
   var Sunstone = require('sunstone');
   var Config = require('sunstone-config');
   var OpenNebula = require('opennebula');
+  var Settings = require('opennebula/settings');
   var Notifier = require('utils/notifier');
   var Menu = require('utils/menu');
   var Locale = require('utils/locale');
@@ -151,7 +152,14 @@ define(function(require) {
                               '</div>';
 
                           $('head').append(style);
-                          $('.divfrombalance').prepend('<li role="menuitem"><span class="balance popup-open" style="cursor: pointer">Баланс: ' + text + ' BYN</span>'+str+'</li>');
+
+                          Settings.cloud({success:function(r, res) {
+                              var settings = r.response;
+                              if (settings.CURRENCY_MAIN == undefined){
+                                settings.CURRENCY_MAIN = 'USD';
+                              }
+                              $('.divfrombalance').prepend('<li role="menuitem"><span class="balance popup-open" style="cursor: pointer">Баланс: ' + text + ' '+ settings.CURRENCY_MAIN +'</span>'+str+'</li>');
+                          }});
 
 
                           $(document).ready(function($) {
