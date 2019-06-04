@@ -54,7 +54,11 @@ define(function(require) {
 
         this.element = info[XML_ROOT];
         this.percent = false;
-
+        if (this.element.STATUS == 'PENDING'){
+            $('[href="AnsibleProcess.run"]').show();
+        }else{
+            $('[href="AnsibleProcess.run"]').hide();
+        }
         //this.element.id = this.element.proc_id;
 
 

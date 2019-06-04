@@ -39,7 +39,7 @@ define(function(require) {
   var HostsTable = require('tabs/hosts-tab/datatable');
   var DatastoresTable = require('tabs/datastores-tab/datatable');
   var OpenNebula = require('opennebula');
-
+  var Settings = require('opennebula/settings');
   /*
     CONSTANTS
    */
@@ -106,10 +106,7 @@ define(function(require) {
   }
 
   function _calculateCost(){
-    $.ajax({
-      url: 'settings',
-      type: 'GET',
-      success: function(r, res) {
+    Settings.cloud({success:function(r, res) {
         settings = r.response;
         var memory_val = parseFloat( $(".capacity_cost_div .cost_value").attr('value') )/1024;
         var cpu_val = parseFloat( $(".vcpu_input_wrapper .vcpu_input input").val());
@@ -158,8 +155,7 @@ define(function(require) {
         if (Config.isFeatureEnabled("showback")) {
           $(".total_cost_div .cost_value").text( (total).toFixed(2) );
         }
-      }
-    });
+      }});
   }
 
   function _submitWizard(context) {
@@ -311,6 +307,7 @@ define(function(require) {
         }
 
         $.extend(tmp_json,  {NIC:nic});
+        console.log(tmp_json);
       }
 
       extra_info['template'] = tmp_json;
@@ -336,6 +333,9 @@ define(function(require) {
             }else if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val() == $('label:contains("Password")').children('input.repeat_pas').val()){
               Sunstone.runAction("Template."+action, [template_id], extra_info);
             } else {
+              console.log(1,$('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val());
+              console.log(2,$('label:contains("Password")').children('input.repeat_pas').val());
+
               Notifier.notifyError('Passwords doesn\'t match');
             }
           }else{
