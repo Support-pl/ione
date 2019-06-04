@@ -60,22 +60,28 @@ class Hash
     end
 end
 
+# Standard Ruby class extensions
 class Array
+    # Returns Array values converted to Symbol
     def to_sym
         self.map do | el |
             el.to_sym
         end
     end
+    # Converts Array values to Symbol
     def to_sym!
         self.map! do | el |
             el.to_sym
         end
     end
+    # Returns multiple values of array
+    # @param [Array] indexes - Collection of indexes
     def get *indexes
         indexes.collect do | index |
             self[index]
         end
     end
+    # Returns Array values without values under given indexes
     def without(*vals)
         cpy = self.dup
         vals.each do | val |

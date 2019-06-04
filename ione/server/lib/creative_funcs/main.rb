@@ -1,8 +1,4 @@
 class IONe
-    def sleep_test(timeout)
-        sleep(timeout)
-        return 'DONE'
-    end
     # Creates new user account
     # @param [String]   login       - login for new OpenNebula User
     # @param [String]   pass        - password for new OpenNebula User

@@ -12,57 +12,6 @@
 
 **3. Create your applications based on OpenNebula Cloud**
 
-## Installing
-
-**1. Using deploy script**
-
-1. Download deploy.sh script from our repository
-
-```sh
-$ sh ./deploy.sh # Run this script from the directory where you wish to IONe be placed  
-```
-
-After the scripts will end its work, you will have:
-
-* SystemD service at _/lib/systemd/system_, so you can control your server by systemctl now.
-Also, SystemD will protect server process from killing by system.
-
-```sh
-$ ls -l /lib/systemd/system/ | grep ione
-  ione.service
-```
-
-* Directory for log files at _/var/log/ione_, you may change it by configuring
-
-```sh
-$ ls /var/log/ | grep ione
-  ione
-```
-
-* IONe CLI utility at _/usr/bin_
-
-```sh
-$ ls /usr/bin/ | grep ione
-  ione
-```
-See more about IONe CLI [here](#label-Using+CLI+utility+for+IONe).
-
-**2. Setting up system variables for IONe**
-
-Also, _deploy.sh_ script will add the next lines into your ~/.bashrc file:
-
-```sh 
-# This lines are used by ruby ENV
-export IONEROOT="{directory, where you have deployed IONe}"
-export IONELOGROOT="/var/log/ione"
-
-# This lines are used by systemctl, for controling the IONe server
-systemctl set-environment IONEROOT=$IONEROOT
-systemctl set-environment IONELOGROOT=$IONELOGROOT
-```
-
-You should remember to configure the `$IONEROOT` and `$IONELOGROOT` at ~/.bashrc, if you wish to move IONe directory or IONe log directory to another place.
-
 ## Usage
 
 ### Configuring your IONe
@@ -80,12 +29,10 @@ Main config file is consists of several main keys:
 
 ```yaml
 OpenNebula:
-  credentials: 'oneadmin:secret' # oneadmin and password(or auth-token) for oneadmin
   endpoint: 'http://localhost:2633/RPC2' # RPC endpoint for OpenNebula
   users-group: 1 # Main group for Basic Users
   users-default-lang: en_US # Default locale for new users
   users-vms-ssh-port: 22 # Default SSH-port at VMs instantiated from your templates
-  default-node-id: 0 # ID of the node, vms to deploy by default
   base-vnc-port: 5900 # Base VNC-port number. VMs will get port for VNC by formula: {{ base-vnc-port }} + {{ vmid }}
 ```
 
@@ -117,7 +64,6 @@ See more, about IONe libraries [here](#label-Managing+modules+and+libraries).
 ```yaml
 Modules: # IONe modules to connect
   - 'ansible'
-  - 'freenas'
   - 'stat'
 ```
 Type names of directories, where your modules are placed.
