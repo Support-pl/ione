@@ -30,7 +30,6 @@ USERS_GROUP = CONF['OpenNebula']['users-group'] # OpenNebula users group
 TRIAL_SUSPEND_DELAY = CONF['Server']['trial-suspend-delay'] # Trial VMs suspend delay
 
 USERS_VMS_SSH_PORT = CONF['OpenNebula']['users-vms-ssh-port'] # Default SSH port at OpenNebula Virtual Machines 
-$default_host = CONF['OpenNebula']['default-node-id'] # Default host to deploy
 
 puts 'Setting up Environment(OpenNebula API)'
 ###########################################
