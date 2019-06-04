@@ -34,10 +34,12 @@ Creators:
 
 6. Fill `/usr/lib/one/sunstone/ione/modules/ansible/config.yml` for proper work of Ansible module
 
+    6.1. Add oneadmin ssh-key to Ansible authorized_hosts list
+
 7. Fill all settings using UI. Panel "Cloud" at Settings tab._(Accessible only as oneadmin)_:
 
 | Key                           | Subkey                    | Value                                     |
-|:------------------------------|:------------------        |------------------------------------------:|
+|:------------------------------|:--------------------------|------------------------------------------:|
 |__CAPACITY_COST__              | CPU_COST                  | `CPU cost per hour`                       |
 |                               | MEMORY_COST               | `RAM cost per hour`                       |
 |                               |                           |                                           |
@@ -51,6 +53,6 @@ Creators:
 | __PRIVATE_NETWORK_DEFAULTS__  | NETWORK_ID                | `Private Networks pool network ID`        |
 | __NODES_DEFAULT__             | HYPERIVSOR_0(e.g. VCENTER)| `OpenNebula host id`                      |
 |                               | HYPERIVSOR_0(e.g. KVM)    | `OpenNebula host id`                      |
-
+---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`
