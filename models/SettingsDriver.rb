@@ -13,14 +13,14 @@ begin
     end
 
     required = [
-        ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}"],
-        ['DISK_TYPES', "<comma_separated_list_of_disk_types>"],
-        ['DISK_COSTS', "{\"<disk_type>\":\"<price>\"}"],
-        ['IAAS_GROUP_ID', '<iaas_group_id>'],
-        ['NODES_DEFAULT', "{\"<hypervisor_name>\":\"<host_id>\"}"],
-        ['PUBLIC_IP_COST', "0.0"],
-        ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}"],
-        ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}"]
+        ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", ""],
+        ['DISK_TYPES', "<comma_separated_list_of_disk_types>", ""],
+        ['DISK_COSTS', "{\"<disk_type>\":\"<price>\"}", ""],
+        ['IAAS_GROUP_ID', '<iaas_group_id>', ""],
+        ['NODES_DEFAULT', "{\"<hypervisor_name>\":\"<host_id>\"}", ""],
+        ['PUBLIC_IP_COST', "0.0", ""],
+        ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}", ""],
+        ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}", ""]
     ]
     required.each do | record |
         $DB[:settings].insert(name: record[0], body: record[1], description: record[2])
