@@ -140,6 +140,21 @@ define(function(require) {
                 '<br>\n' +
                 '</td>');
         }
+        $('#dataTableAnsibleProcess').off('click', 'tbody .check_item');
+        $('[href="AnsibleProcess.run"]').hide();
+        $('#dataTableAnsibleProcess').on('click', 'tbody .check_item', function () {
+           if ($(this).prop('checked')){
+               if ($(this).parent().siblings().last().text() != 'PENDING'){
+                   $('[href="AnsibleProcess.run"]').hide();
+               }else{
+                   $('[href="AnsibleProcess.run"]').show();
+               }
+           }else{
+               $('[href="AnsibleProcess.run"]').hide();
+           }
+
+        });
+
     }
 
 });
