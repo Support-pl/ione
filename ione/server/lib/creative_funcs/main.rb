@@ -79,13 +79,14 @@ class IONe
             params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
             
             begin
-                params['iops'] = CONF['vCenter']['drive-types'][params['ds_type']]
+                params['iops'] = CONF['vCenter']['drives-iops'][params['ds_type']]
                 LOG_DEBUG "IOps: #{params['iops'].class.to_s}(#{params['iops']})"
             rescue
                 LOG_DEBUG "No vCenter configuration found"
             end
             
             params['username'] = params['username'] || 'Administrator'
+            params['extra'] = params['extra'] || {'type' => 'vcenter'}
             
 
             LOG_DEBUG 'Initializing vm object'
@@ -149,7 +150,11 @@ class IONe
             #####   PostDeploy Activity define   #####
             Thread.new do
 
-                host = params['host'].nil? ? $default_host : params['host']
+                host =  if params['host'].nil? then
+                    JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
+                else
+                    params['host']
+                end
 
                 onblock(:vm, vmid) do | vm |
                     LOG_DEBUG 'Deploying VM to the host'
@@ -226,7 +231,7 @@ class IONe
         params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
 
         begin
-            params['iops'] = params['iops'] == 0 ? CONF['vCenter']['drive-types'][params['ds-type']] : params['iops']
+            params['iops'] = params['iops'] == 0 ? CONF['vCenter']['drives-iops'][params['ds-type']] : params['iops']
         rescue
             LOG_DEBUG "No vCenter configuration found"
         end
@@ -355,7 +360,6 @@ class IONe
                 trace << "Deploying VM:#{__LINE__ + 1}"
                 vm.deploy(host, false)
             end if params['release']
-            # vm.deploy($default_host, false, params['datastore'].nil? ? ChooseDS(params['ds_type']): params['datastore']) if params['release']
         end
             ##### Creating and Configuring VM END #####            
 
@@ -403,24 +407,6 @@ class IONe
         out = { :exception => e.message, :trace => trace << 'END_TRACE' }
         LOG_DEBUG out.debug_out
         return out
-    end
-    def ReinstallTestMethod(params, vmid)
-        postDeploy = PostDeployActivities.new @client
-        #####   PostDeploy Activity define   #####
-
-            host = params['host'].nil? ? $default_host : params['host']
-
-            #AnsibleController
-            
-            if params['ansible'] && params['release'] then
-                postDeploy.AnsibleController(params, vmid, host)
-            end
-
-            #endAnsibleController
-
-        ##### PostDeploy Activity define END #####
-    rescue => e
-        return e.message
     end
     # Class for pst-deploy activities methods
     #   All methods will receive creative methods params, new vm ID, and host, where VM was deployed

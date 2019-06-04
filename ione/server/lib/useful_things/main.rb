@@ -315,6 +315,6 @@ class IONe
     end
 
     def GetvCenterIOPsConf
-        CONF['vCenter']['drive-types']
+        CONF['vCenter']['drives-iops']
     end
 end
