@@ -51,12 +51,10 @@
   <div id="showback_content" hidden>
     <div class="row showback_table">
       <div class="large-12 columns graph_legend">
-        <h3 class="subheader">{{tr "Showback"}}
-          <span class="tip" hidden>
-          {{tr "SHOWBACK"}}
-          </span>
-        </h3>
-
+        <div style="float: left;"><h3 class="subheader">{{tr "Showback"}}</h3></div>
+        <div style="float: left;margin-top: 35px">
+          <span class="tip">{{tr "Statistics show funds consumed by User per month. It's also viewable at the chart right."}}</span>
+        </div>
       </div>
       <div class="medium-6 columns" style="overflow:auto">
         <table id="showback_datatable" class="datatable hover">
@@ -105,12 +103,13 @@
       <div class="container" id="test_table_graph"></div>
     </div>
     <div class="medium-6 columns">
-      <div id="test_table_graph_legend" style="margin-top: 50px;" hidden>
+      <div id="test_table_graph_legend" style="margin-top: 50px;font-size: 15px;" hidden>
       </div>
     </div>
     <div class="row test_table" hidden>
       <div id="table_test_title" class="large-12 columns graph_legend">
         <div style="float: left"><h3 class="subheader" id="test_title">{{tr "VMs"}}</h3></div>
+        <div style="margin-top: 35px;float: left;"><span class="tip">{{tr "The statistics of funds for the selected month, items “Total”, “CPU”, “Memory”, “Disk”, “Public ip” - are the amount of funds debited from the account for the selected item, respectively, and the item “Work time” is the time of the VM in hours. You can also combine resource points."}}</span></div>
         <div id="label_work_time" class="showback_div_label" style="margin-right: 25px;cursor: pointer;padding: 0px 10px 0px 10px;float: right;text-align: center;border: 2px solid #00000036;border-radius: 100px !important;margin-top: 40px;">Work time</div>
         <div id="label_pub_ip" class="showback_div_label" style="margin-right: 25px;cursor: pointer;padding: 0px 10px 0px 10px;float: right;text-align: center;border: 2px solid #00000036;border-radius: 100px !important;margin-top: 40px;">Public ip</div>
         <div id="label_disk" class="showback_div_label" style="margin-right: 25px;cursor: pointer;padding: 0px 10px 0px 10px;float: right;text-align: center;border: 2px solid #00000036;border-radius: 100px !important;margin-top: 40px;">Disk</div>
