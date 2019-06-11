@@ -26,92 +26,7 @@
             </tr>
             </thead>
             <tbody id="datastores_body" style="border-bottom: none;">
-            <style type="text/css">
-                .tetswitch {
-                    position: relative;
-                    display: inline-block;
-                    width: 70px;
-                    height: 20px;
-                    margin-top: 5px;
-                }
 
-                .tetswitch input {display:none;}
-
-                .tetslider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: #ca2222;
-                    -webkit-transition: .4s;
-                    transition: .4s;
-                    border-radius: 34px;
-                }
-
-                .tetslider:before {
-                    position: absolute;
-                    content: "";
-                    height: 13px;
-                    width: 13px;
-                    left: 4px;
-                    bottom: 4px;
-                    background-color: white;
-                    -webkit-transition: .4s;
-                    transition: .4s;
-                    border-radius: 50%;
-                }
-
-                input:checked + .tetslider {
-                    background-color: #2ab934;
-                }
-
-                input:focus + .tetslider {
-                    box-shadow: 0 0 1px #2196F3;
-                }
-
-                input:checked + .tetslider:before {
-                    -webkit-transform: translateX(26px);
-                    -ms-transform: translateX(26px);
-                    transform: translateX(50px);
-                }
-
-                .tetslider:after
-                {
-                    content:'NO';
-                    color: white;
-                    display: block;
-                    position: absolute;
-                    transform: translate(-50%,-50%);
-                    top: 50%;
-                    left: 50%;
-                    font-size: 12px;
-                    font-family: Verdana, sans-serif;
-                }
-
-                input:checked + .tetslider:after
-                {
-                    content:'YES';
-                }
-
-            </style>
-            {{#each datastores}}
-            <tr role="row">
-                <td>{{ID}}</td>
-                <td>{{NAME}}</td>
-                <td>
-                    <select id={{ID}} style="width: 80%;" class="datastores_select_disk_type"></select>
-                </td>
-                <td id="deploy_switch">
-                    {{#if DEPLOY}}
-                    <label class="tetswitch"><input type="checkbox" id="togBtn" checked><div class="tetslider round"></div></label>
-                    {{else}}
-                    <label class="tetswitch"><input type="checkbox" id="togBtn"><div class="tetslider round"></div></label>
-                    {{/if}}
-                </td>
-            </tr>
-            {{/each}}
             </tbody>
         </table>
 
@@ -135,48 +50,7 @@
             </tr>
             </thead>
             <tbody id="settings_body" style="border-bottom: none;">
-                {{#each settings}}
-                <tr class="tr_setting_{{key}}">
-                    <td class="td_key_setting" style="font-weight: bold;">
-                        {{#if bool_tree}}
-                        <span id="setting_tree_circle">
-                            <a href="#">
-                                <i class="fa fa-circle"/>
-                            </a>
-                        </span>
-                        <span id="setting_tree_key_span" style="cursor: pointer;">{{key}}</span>
-                        {{else}}
-                        <span>&#8195;{{key}}</span>
-                        {{/if}}
-                    </td>
-                    {{#if bool_tree}}
-                        {{#each value}}
-                            <tr class="tr_setting_{{key1}}" style="display: none">
-                                <td class="td_key_setting" style="text-align: center;">{{key1}}</td>
-                                <td class="td_value_setting">{{value1}}</td>
-                                <td style="width: 60px;">
-                                    <span id="div_edit_setting">
-                                        <a id="div_edit_{{key1}}" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>
-                                    </span>
-                                    <span id="div_minus_setting">
-                                        <a id="div_minus_{{key1}}" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>
-                                    </span>
-                                </td>
-                            </tr>
-                        {{/each}}
-                    {{else}}
-                        <td class="td_value_setting">{{value}}</td>
-                        <td style="width: 60px;">
-                            <span id="div_edit_setting">
-                                <a id="div_edit_{{key}}" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>
-                            </span>
-                            <span id="div_minus_setting">
-                                <a id="div_minus_{{key}}" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>
-                            </span>
-                        </td>
-                    {{/if}}
-                </tr>
-                {{/each}}
+
             </tbody>
         </table>
         <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
@@ -184,9 +58,7 @@
                 <td class="key_setting_td">
                     <input type="text" list="settings_key_vars" name="new_key_setting" placeholder="parent key"/>
                     <datalist id="settings_key_vars">
-                        {{#each settings}}
-                        <option value="{{key}}">
-                            {{/each}}
+
                     </datalist>
                 </td>
                 <td class="key1_setting_td">

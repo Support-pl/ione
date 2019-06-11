@@ -37,16 +37,19 @@ define(function(require) {
     var PANEL_ID = require('./cloud/panelId');
     var RESOURCE = "User";
     var XML_ROOT = "USER";
-    var for_hbs = [];
+    var settings_hbs = {};
     var settings;
     var datastores_hbs = [];
-    var datastores
+    var datastores;
+
+
+    var rezerv_clone_settings;
+    var rezerv_settings_hbs;
     /*
       CONSTRUCTOR
      */
 
     function Panel(info, tabId) {
-
 
         this.tabId = tabId || TAB_ID;
         this.title = Locale.tr("Cloud");
@@ -58,16 +61,8 @@ define(function(require) {
     }
 
     Panel.PANEL_ID = PANEL_ID;
-
-    $.get("settings", function(data, status){
-        OpenNebula.Datastore.list({success: function(r,res){
-                settings = data.response;
-                datastores = res;
-                Panel.prototype.html = _html;
-                Panel.prototype.setup = _setup;
-        }});
-    });
-
+    Panel.prototype.html = _html;
+    Panel.prototype.setup = _setup;
 
     return Panel;
 
@@ -76,95 +71,23 @@ define(function(require) {
      */
 
     function _html() {
-        datastores_hbs = [];
-        for(var key in datastores){
-            if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS'){
-                if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE"){
-                    datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,DEPLOY:true});
-                }else{
-                    datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, DEPLOY:false});
-                }
 
-            }
-        }
-        for_hbs = [];
-        for(var i in settings){
-            if (settings[i] != null){
-                if (settings[i].indexOf('{') == 0){
-                    var tree = JSON.parse(settings[i]);
-                    var arr = []
-                    for(var j in tree){
-                        arr.push({key1:j,value1:tree[j]});
-                    }
-                    if(i.indexOf('COST') != -1){
-                        for_hbs.unshift({key:i,bool_tree:true,value:arr});
-                    }else{
-                        for_hbs.push({key:i,bool_tree:true,value:arr});
-                    }
-                }else{
-                    if(i.indexOf('COST') != -1){
-                        for_hbs.unshift({key:i,bool_tree:false,value:settings[i]});
-                    }else{
-                        for_hbs.push({key:i,bool_tree:false,value:settings[i]});
-                    }
-                }
-            }
-        }
-
-        return TemplateEasyInfo({'settings':for_hbs,'datastores':datastores_hbs});
+        return TemplateEasyInfo();
     }
 
     function _setup(context) {
         var that = this;
-        if (settings['DISK_TYPES'] == undefined){
-            var disk_type = [];
-        }else{
-            var disk_type = settings['DISK_TYPES'].split(',');
-        }
-
-        var datastores = $('#datastores_body .datastores_select_disk_type');
-        var len =  datastores.length;
-
-        for (var i = 0; i < len; i++) {
-            if (datastores_hbs[i].DISK_TYPE != undefined){
-                for(var k in disk_type){
-                    if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
-                        $(datastores[i]).append('<option selected>'+ disk_type[k] +'</option>');
-                    }else{
-                        $(datastores[i]).append('<option>'+ disk_type[k] +'</option>');
-                    }
-                }
-            }else{
-                $(datastores[i]).append('<option selected disabled>Select disk type</option>');
-                for(var k in disk_type){
-                    $(datastores[i]).append('<option>'+ disk_type[k] +'</option>');
-                }
-            }
-        }
-
-        $('#datastores_body #0').append('<option selected disabled>Select disk type disabled</option>');
-        $('#datastores_body #0').prop('disabled',true);
-        $('#datastores_body #0').parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
-
-
-        for(var i in for_hbs){
-            if (for_hbs[i].bool_tree == true){
-                if (for_hbs[i].value.length != 1){
-                    $('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+for_hbs[i].value[0].key1+', '+for_hbs[i].value[1].key1+'...</small>');
-                }else{
-                    $('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+for_hbs[i].value[0].key1+'</small>');
-                }
-
-            }
-        }
-
-        var rezerv_clone_settings = $('tbody#settings_body').clone();
-        var rezerv_for_hbs = JSON.parse(JSON.stringify(for_hbs));
-        set_events();
+        that.onshow = _onShow(context, that);
 
         $('#datastores_but_reset').click(function () {
+            var datastores = $('#datastores_body .datastores_select_disk_type');
+            var len =  datastores.length;
             for (var i = 0; i < len; i++) {
-                $(datastores[i]).val(datastores_hbs[i].DISK_TYPE);
+                if (datastores_hbs[i].DISK_TYPE != undefined){
+                    $(datastores[i]).val(datastores_hbs[i].DISK_TYPE);
+                }else{
+                    $(datastores[i]).val('Select disk type');
+                }
                 $(datastores[i]).parent().next('#deploy_switch').children().children('#togBtn').prop('checked',datastores_hbs[i].DEPLOY);
             }
             $('#datastores_body #0').append('<option selected disabled>Select disk type disabled</option>');
@@ -172,6 +95,8 @@ define(function(require) {
 
 
         $('#datastores_but_submit').click(function () {
+            var datastores = $('#datastores_body .datastores_select_disk_type');
+            var len =  datastores.length;
             for (var i = 0; i < len; i++) {
                 if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()){
                     OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DRIVE_TYPE = '+$(datastores[i]).val()}});
@@ -199,11 +124,11 @@ define(function(require) {
         $('#settings_but_reset').click(function () {
             $('tbody#settings_body').remove();
             $("thead#settings_thead").after(rezerv_clone_settings);
-            for_hbs = rezerv_for_hbs;
+            settings_hbs = rezerv_settings_hbs;
 
             set_events()
 
-            rezerv_for_hbs = JSON.parse(JSON.stringify(for_hbs));
+            rezerv_settings_hbs = JSON.parse(JSON.stringify(settings_hbs));
             rezerv_clone_settings = $('tbody#settings_body').clone();
         });
 
@@ -212,8 +137,7 @@ define(function(require) {
             $('datalist#settings_key1_vars').empty();
             $('#settings_key_vars option').each(function(indx, element){
                 if ($(that).val() == $(element).val()){
-                    var tree = JSON.parse(settings[$(that).val()]);
-                    for(var i in tree){
+                    for(var i in settings_hbs[$(that).val()]){
                         $('datalist#settings_key1_vars').append('<option value="'+ i +'">');
                     }
                 }
@@ -225,7 +149,7 @@ define(function(require) {
             $('datalist#settings_value_vars').empty();
             $('#settings_key1_vars option').each(function(indx, element){
                 if ($(that).val() == $(element).val()){
-                    var tree = JSON.parse(settings[$('input[name="new_key_setting"]').val()]);
+                    var tree = settings_hbs[$('input[name="new_key_setting"]').val()];
                     $('datalist#settings_value_vars').append('<option value="'+ tree[$(this).val()] +'">');
                 }
             });
@@ -235,60 +159,70 @@ define(function(require) {
             var new_key = $('input[name="new_key_setting"]').val();
             var new_key1 = $('input[name="new_key1_setting"]').val();
             var new_val =  $('input[name="new_value_setting"]').val();
-            var len = for_hbs.length;
+            var len = settings_hbs.length;
 
             if (new_key != '' && new_val != ''){
-                for (var i = 0; i < len; i++){
-                    if(for_hbs[i].key == new_key){
-                        if (for_hbs[i].bool_tree == true && new_key1 != ''){
-                            var last_itm;
-                            for(var j in for_hbs[i].value){
-                                if (for_hbs[i].value[j].key1 == new_key1){
-                                    $('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).children('.td_value_setting').text(new_val);
-                                    for_hbs[i].value[j].value1 = new_val;
-                                    set_events();
-                                    return;
-                                }
-                                last_itm = for_hbs[i].value[j].key1;
-                            }
 
-                            if ($('.tr_setting_'+last_itm).css('display') == 'none'){
-                                var styl = 'display: none;';
+                if (settings_hbs[new_key] != undefined){
+                    if (settings_hbs[new_key].bool_tree == true && new_key1 != ''){
+
+                        if (settings_hbs[new_key].value[new_key1] != undefined){
+                            $('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).children('.td_value_setting').text(new_val);
+                            settings_hbs[new_key].value[new_key1].value1 = new_val;
+                            set_events();
+                        }
+
+
+                        if ($('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).prev('tr').css('display') == 'none'){
+                            var styl = 'display: none;';
+                        }else{
+                            if ($('.tr_setting_NETWORK_DEFAULTS').nextAll('.tr_setting_NETWORK').prev('tr').find('#setting_tree_circle').length != 0){
+                                var styl = 'display: none';
                             }else{
                                 var styl = 'display: table-row';
                             }
-
-                            $('.tr_setting_'+last_itm).after('<tr class="tr_setting_'+new_key1+'" style="'+styl+'">' +
-                                '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
-                                '<td class="td_value_setting">'+new_val+'</td>' +
-                                '<td style="width: 60px;">' +
-                                '<span id="div_edit_setting">' +
-                                '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
-                                '</span>' +
-                                '<span id="div_minus_setting">' +
-                                '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
-                                '</span></td></tr>'
-                            );
-
-                            for_hbs[i].value.push({key1:new_key1,value1:new_val});
-                            $('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').children('small').remove();
-                            if ($('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').children('small').css('display') == 'none'){
-                                $('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').append('<small style="color: grey;display: none">&emsp;'+for_hbs[i].value[0].key1+', '+for_hbs[i].value[1].key1+'...</small>');
-                            }else{
-                                $('.tr_setting_'+for_hbs[i].key).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+for_hbs[i].value[0].key1+', '+for_hbs[i].value[1].key1+'...</small>');
-                            }
-
-                            set_events()
-                            return;
-                        }else{
-                            if (for_hbs[i].bool_tree == false){
-                                $('.tr_setting_'+for_hbs[i].key).children('.td_value_setting').text(new_val);
-                            }
-                            set_events()
-                            return;
                         }
+
+                        $('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).prev('tr').after('<tr class="tr_setting_'+new_key1+'" style="'+styl+'">' +
+                            '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
+                            '<td class="td_value_setting">'+new_val+'</td>' +
+                            '<td style="width: 60px;">' +
+                            '<span id="div_edit_setting">' +
+                            '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
+                            '</span>' +
+                            '<span id="div_minus_setting">' +
+                            '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
+                            '</span></td></tr>'
+                        );
+
+                        var kol = 0;
+                        var pre_name = [];
+                        for(var j in settings_hbs[new_key].value){
+                            pre_name.push(j);
+                            kol++
+                            if (kol == 2){break;}
+                        }
+
+
+                        settings_hbs[new_key].value[new_key1] = new_val;
+                        $('.tr_setting_'+new_key).children('.td_key_setting').children('small').text('');
+                        if (pre_name.length > 1){
+                            $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
+                        }else{
+                            $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]+'.</small>');
+                        }
+
+                        set_events()
+                        return;
+                    }else{
+                        if (settings_hbs[new_key].bool_tree == false){
+                            $('.tr_setting_'+new_key).children('.td_value_setting').text(new_val);
+                        }
+                        set_events()
+                        return;
                     }
                 }
+
                 if (new_key1 == ''){
                     $('tbody#settings_body').append('<tr class="tr_setting_'+new_key+'">' +
                         '<td class="td_key_setting" style="font-weight: bold;">' +
@@ -303,7 +237,7 @@ define(function(require) {
                         '<a id="div_minus_'+new_key+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                         '</span></td></tr>'
                     );
-                    for_hbs.push({key: new_key,bool_tree:false,value:new_val});
+                    settings_hbs[new_key] = {bool_tree:false,value:new_val};
                     set_events();
                 }else{
                     $('tbody#settings_body').append('<tr class="tr_setting_'+new_key+'">' +
@@ -322,7 +256,7 @@ define(function(require) {
                         '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                         '</span></td></tr>'
                     );
-                    for_hbs.push({key: new_key,bool_tree:true,value:[{key1:new_key1, value1:new_val}]});
+                    settings_hbs[new_key] = {bool_tree:true,value:{new_key1:new_val}};
                     set_events();
                 }
             }
@@ -330,19 +264,21 @@ define(function(require) {
         });
 
         $('#settings_but_submit').click(function () {
-            for(var i in for_hbs){
+            for(var i in settings_hbs){
                 var check = false;
                 for(var j in settings){
-                    if (for_hbs[i].key == j){
-                        if (for_hbs[i].bool_tree == true){
+                    if (i == j){
+                        if (settings_hbs[i].bool_tree == true){
                             var body_str = '{';
-                            var len = for_hbs[i].value.length - 1;
-                            for(var k in for_hbs[i].value){
-                                var val1 = JSON.stringify(JSON.stringify(for_hbs[i].value[k].value1));
-                                if (k != len){
-                                    body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
+                            var len = Object.keys(settings_hbs[i].value).length - 1;
+                            var kk = -1;
+                            for(var k in settings_hbs[i].value){
+                                kk++;
+                                var val1 = JSON.stringify(JSON.stringify(settings_hbs[i].value[k]));
+                                if (kk != len){
+                                    body_str += '\\"'+k+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
                                 }else{
-                                    body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
+                                    body_str += '\\"'+k+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
                                 }
                             }
                             if (body_str.replace(/\\"/g,'\"').replace(/\\\\\\"/g,'\\"') != settings[j]){
@@ -360,16 +296,16 @@ define(function(require) {
                             check = true;
                             break;
                         }else{
-                            if(for_hbs[i].value != settings[j]){
+                            if(settings_hbs[i].value != settings[j]){
                                 $.ajax({
                                     url: '/settings/'+j,
                                     type: 'POST',
-                                    data: '{"body":"'+ for_hbs[i].value +'"}',
+                                    data: '{"body":"'+ settings_hbs[i].value +'"}',
                                     success: function(msg) {
                                         Notifier.notifySubmit('Field have been added')
                                     }
                                 });
-                                settings[j] = for_hbs[i].value;
+                                settings[j] = settings_hbs[i].value;
                             }
                             check = true;
                             break;
@@ -377,22 +313,24 @@ define(function(require) {
                     }
                 }
                 if(check == false){
-                    if (for_hbs[i].bool_tree == true){
+                    if (settings_hbs[i].bool_tree == true){
                         var body_str = '{';
-                        var len = for_hbs[i].value.length - 1;
-                        for(var k in for_hbs[i].value){
-                            var val1 = JSON.stringify(JSON.stringify(for_hbs[i].value[k].value1));
-                            if (k != len){
-                                body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
+                        var len = Object.keys(settings_hbs[i].value).length - 1;
+                        var kk = -1;
+                        for(var k in settings_hbs[i].value){
+                            kk++;
+                            var val1 = JSON.stringify(JSON.stringify(settings_hbs[i].value[k]));
+                            if (kk != len){
+                                body_str += '\\"'+settings_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
                             }else{
-                                body_str += '\\"'+for_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
+                                body_str += '\\"'+settings_hbs[i].value[k].key1+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
                             }
                         }
 
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
-                            data: '{"name":"'+for_hbs[i].key+'","body":"'+ body_str +'"}',
+                            data: '{"name":"'+i+'","body":"'+ body_str +'"}',
                             success: function(msg) {
                                 Notifier.notifySubmit('Field have been added');
                                 $.get("settings", function(data, status){
@@ -404,7 +342,7 @@ define(function(require) {
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
-                            data: '{"name":"'+ for_hbs[i].key +'","body":"'+ for_hbs[i].value +'"}',
+                            data: '{"name":"'+ i +'","body":"'+ settings_hbs[i].value +'"}',
                             success: function(msg) {
                                 Notifier.notifySubmit('Field have been added');
                                 $.get("settings", function(data, status){
@@ -418,8 +356,8 @@ define(function(require) {
 
             for(var i in settings){
                 check = false;
-                for(var j in for_hbs){
-                    if (i == for_hbs[j].key){
+                for(var j in settings_hbs){
+                    if (i == j){
                         check = true
                     }
                 }
@@ -442,25 +380,155 @@ define(function(require) {
         return false;
     }
 
+    function _onShow(context, that) {
+
+        $.get("settings", function(data, status){
+            OpenNebula.Datastore.list({success: function(r,res){
+                    settings = data.response;
+                    datastores = res;
+
+                    datastores_hbs = [];
+                    var check;
+                    for(var key in datastores){
+                        if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS'){
+                            if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE"){
+                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,DEPLOY:true});
+                                check = 'checked ';
+                            }else{
+                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, DEPLOY:false});
+                                check = '';
+                            }
+                            $('#datastores_body').append('<tr role="row"><td>'+ datastores[key].DATASTORE.ID +'</td><td>'+ datastores[key].DATASTORE.NAME +'</td>' +
+                                '<td><select id="'+ datastores[key].DATASTORE.ID +'" style="width: 80%;" class="datastores_select_disk_type"></select></td>' +
+                                '<td id="deploy_switch">' +
+                                '<label class="tetswitch"><input type="checkbox" id="togBtn" '+ check +'><div class="tetslider round"></div></label></td></tr>');
+                        }
+                    }
+
+
+                    settings_hbs = {};
+                    for(var i in settings){
+                        if (settings[i] != null){
+                            if (settings[i].indexOf('{') == 0){
+                                var tree = JSON.parse(settings[i]);
+
+                                settings_hbs[i] = {bool_tree:true,value:tree};
+                            }else{
+                                settings_hbs[i] = {bool_tree:false,value:settings[i]};
+                            }
+                        }
+                    }
+
+                    var flag_circle;
+                    for(var i in settings_hbs){
+
+                        if (settings_hbs[i].bool_tree){
+                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span id="setting_tree_circle"><a href="#"><i class="fa fa-circle"/></a></span>' +
+                                '<span id="setting_tree_key_span" style="cursor: pointer;">'+ i +'</span></td>';
+                            for(var j in settings_hbs[i].value){
+                                flag_circle += '<tr class="tr_setting_'+ j +'" style="display: none">' +
+                                    '<td class="td_key_setting" style="text-align: center;">'+ j +'</td>' +
+                                    '<td class="td_value_setting">'+ settings_hbs[i].value[j] +'</td>' +
+                                    '<td style="width: 60px;">' +
+                                    '<span id="div_edit_setting">' +
+                                    '<a id="div_edit_'+ j +'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
+                                    '</span>' +
+                                    '<span id="div_minus_setting">' +
+                                    '<a id="div_minus_'+ j +'" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
+                                    '</span></td></tr>';
+                            }
+                        }else{
+                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span>&#8195;'+ i +'</span></td>' +
+                                '<td class="td_value_setting">'+ settings_hbs[i].value +'</td>' +
+                                '<td style="width: 60px;">' +
+                                '<span id="div_edit_setting">' +
+                                '<a id="div_edit_'+ i +'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
+                                '</span>' +
+                                '<span id="div_minus_setting">' +
+                                '<a id="div_minus_'+ i +'" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
+                                '</span></td>';
+                        }
+
+                        $('#settings_body').append('<tr class="tr_setting_'+ i +'">'+flag_circle+'</tr>');
+                        $('#settings_key_vars').append('<option value="'+ settings_hbs[i].value +'">');
+                    }
+
+
+                    if (settings['DISK_TYPES'] == undefined){
+                        var disk_type = [];
+                    }else{
+                        var disk_type = settings['DISK_TYPES'].split(',');
+                    }
+
+                    var datastores_select = $('#datastores_body .datastores_select_disk_type');
+                    var len =  datastores_select.length;
+
+                    for (var i = 0; i < len; i++) {
+                        if (datastores_hbs[i].DISK_TYPE != undefined){
+                            for(var k in disk_type){
+                                if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
+                                    $(datastores_select[i]).append('<option selected>'+ disk_type[k] +'</option>');
+                                }else{
+                                    $(datastores_select[i]).append('<option>'+ disk_type[k] +'</option>');
+                                }
+                            }
+                        }else{
+                            $(datastores_select[i]).append('<option selected disabled>Select disk type</option>');
+                            for(var k in disk_type){
+                                $(datastores_select[i]).append('<option>'+ disk_type[k] +'</option>');
+                            }
+                        }
+                    }
+
+                    $('#datastores_body #0').append('<option selected disabled>Select disk type disabled</option>');
+                    $('#datastores_body #0').prop('disabled',true);
+                    $('#datastores_body #0').parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
+
+
+                    for(var i in settings_hbs){
+                        if (settings_hbs[i].bool_tree == true){
+                            var kol = 0;
+                            var pre_name = [];
+                            for(var j in settings_hbs[i].value){
+                                pre_name.push(j);
+                                kol++
+                                if (kol == 2){break;}
+                            }
+                            if (settings_hbs[i].value.length != 1){
+                                $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
+                            }else{
+                                $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+'</small>');
+                            }
+                        }
+                    }
+
+                    rezerv_clone_settings = $('tbody#settings_body').clone();
+                    rezerv_settings_hbs = JSON.parse(JSON.stringify(settings_hbs));
+                    set_events();
+
+                }});
+        });
+    }
+
 
     function circle_event() {
         $('#settings_body #setting_tree_circle').click(function () {
-                if ($(this).children().children().attr('class') == 'fa fa-circle'){
-                    $(this).children().children().switchClass('fa-circle','fa-circle-o');
-                    $(this).parent().children('small').toggle();
-                }else{
-                    $(this).children().children().switchClass('fa-circle-o','fa-circle');
-                    $(this).parent().children('small').toggle();
-                }
-                var len = for_hbs.length;
-                for (var j = 0; j < len; j++) {
-                    if (for_hbs[j].key == $(this).next().text()) {
-                        for (var k in for_hbs[j].value) {
-                            $('tr.tr_setting_' + for_hbs[j].key).nextAll('tr.tr_setting_' + for_hbs[j].value[k].key1).eq(0).toggle();
-                        }
-                        return;
+            if ($(this).children().children().attr('class') == 'fa fa-circle'){
+                $(this).children().children().switchClass('fa-circle','fa-circle-o');
+                $(this).parent().children('small').toggle();
+            }else{
+                $(this).children().children().switchClass('fa-circle-o','fa-circle');
+                $(this).parent().children('small').toggle();
+            }
+
+            for (var j in settings_hbs) {
+                if (j == $(this).next().text()) {
+                    for (var k in settings_hbs[j].value) {
+                        $('tr.tr_setting_' + j).nextAll('tr.tr_setting_' + k).eq(0).toggle();
                     }
+                    return;
                 }
+            }
         });
 
         $('#settings_body #setting_tree_key_span').click(function () {
@@ -470,65 +538,61 @@ define(function(require) {
 
     function edit_event() {
         $('#settings_body #div_edit_setting').click(function () {
-                var tr_setting = $(this).parent().parent();
-                var td_value = tr_setting.children('.td_value_setting');
+            var tr_setting = $(this).parent().parent();
+            var td_value = tr_setting.children('.td_value_setting');
 
-                if (td_value.children('input').length > 0){
-                    var str = td_value.children('input.input_edit_value_setting').val();
-                    td_value.html(str);
-                    var key = tr_setting.attr('class').substring(11);
-                    for(var j in for_hbs){
-                        if (for_hbs[j].key == key){
-                            for_hbs[j].value = str;
-                            return;
-                        }else if(for_hbs[j].bool_tree == true){
-                            for(var k in for_hbs[j].value){
-                                if (for_hbs[j].value[k].key1 == key){
-                                    for_hbs[j].value[k].value1 = str;
-                                    return;
-                                }
+            if (td_value.children('input').length > 0){
+                var str = td_value.children('input.input_edit_value_setting').val();
+                td_value.html(str);
+                var key = tr_setting.attr('class').substring(11);
+                for(var j in settings_hbs){
+                    if (j == key){
+                        settings_hbs[j].value = str;
+                        return;
+                    }else if(settings_hbs[j].bool_tree == true){
+                        for(var k in settings_hbs[j].value){
+                            if (k == key){
+                                settings_hbs[j].value[k] = str;
+                                return;
                             }
                         }
                     }
-                }else{
-                    var str = td_value.text();
-                    td_value.html("<input class='input_edit_value_setting' type='text'></input>");
-                    td_value.children('input.input_edit_value_setting').val(str);
                 }
+            }else{
+                var str = td_value.text();
+                td_value.html("<input class='input_edit_value_setting' type='text'></input>");
+                td_value.children('input.input_edit_value_setting').val(str);
+            }
         });
     }
 
     function minus_event() {
 
         $('#settings_body #div_minus_setting').click(function () {
-                var key1 = $(this).parent().parent().children('.td_key_setting').text();
-                for(var j in for_hbs){
-                    if(for_hbs[j].bool_tree == true){
-                        for(var k in for_hbs[j].value){
-                            if(for_hbs[j].value[k].key1 == key1){
-                                for_hbs[j].value.splice(k,1);
-                                if (for_hbs[j].value.length == 0){
-                                    for_hbs.splice(j,1)
-                                    $(this).parent().parent().prev().remove();
-                                    $(this).parent().parent().remove();
-                                    return;
-                                }else{
-                                    $(this).parent().parent().remove();
-                                    return;
-                                }
-                            }
+            var key1 = $(this).parent().parent().children('.td_key_setting').text();
+            for(var j in settings_hbs){
+                if(settings_hbs[j].bool_tree == true){
+                    if(settings_hbs[j].value[key1] != undefined){
+                        delete settings_hbs[j].value[key1];
+                        if (Object.keys(settings_hbs[j].value).length == 0){
+                            settings_hbs.splice(j,1)
+                            $(this).parent().parent().prev().remove();
+                            $(this).parent().parent().remove();
+                            return;
+                        }else{
+                            $(this).parent().parent().remove();
+                            return;
                         }
                     }
                 }
+            }
 
-                var key = $(this).parent().parent().attr('class').substring(11);
-                for(var j in for_hbs){
-                    if (for_hbs[j].key == key){
-                        for_hbs.splice(j,1);
-                        $(this).parent().parent().remove();
-                        return;
-                    }
-                }
+            var key = $(this).parent().parent().attr('class').substring(11);
+            if (settings_hbs[key] != undefined){
+                delete settings_hbs[key];
+                $(this).parent().parent().remove();
+                return;
+            }
         });
     }
 
