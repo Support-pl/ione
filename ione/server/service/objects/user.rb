@@ -33,7 +33,7 @@ class OpenNebula::User
     end
     def alert
         alert_at = to_hash!['USER']['TEMPLATE']['ALERT'] || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
-        return balance <= alert_at, alert_at
+        return balance.to_f <= alert_at.to_f, alert_at.to_f
     end
     def alert= at
         update("ALERT = #{at}", true)
