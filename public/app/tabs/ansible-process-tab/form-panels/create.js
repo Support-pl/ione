@@ -179,7 +179,7 @@ define(function(require) {
 
         $("#vms_wizard_process", context).on('click', 'tbody [role="row"]', function () {
 
-            if ($(this).find('td').eq(0).text() == 'RUNNING') {
+            if ($(this).find('td').eq(0).text() == Locale.tr('RUNNING')) {
 
                 $('.fa-times').on('click', function () {
                     $('input[value="' + $(this).parent().attr("info") + '"]').parent().remove();
@@ -243,6 +243,7 @@ define(function(require) {
         });
 
         //if (Hosts)
+        console.log(Hosts);
         opts =  {
                     playbook_id:    $("#Playbooks").val(),
                     hosts:          Hosts,
