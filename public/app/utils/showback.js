@@ -80,7 +80,8 @@ define(function(require) {
       "sDom": "t<'row collapse'<'small-12 columns'p>>",
       "aoColumnDefs": [
           { "bVisible": false, "aTargets": [0,1,2]},
-          { "sType": "num", "aTargets": [4]}
+          { "sType": "num", "aTargets": [4]},
+          { "aDataSort": [ 2 ], "aTargets": [ 3 ] },
         ]
     });
 
@@ -177,34 +178,6 @@ define(function(require) {
       }};
       Settings.showback(param);
 
-      $('style').append('.container {\n' +
-          '  width: 300px;\n' +
-          '  height: 300px;\n' +
-          '  overflow: hidden;\n' +
-          '  border-radius: 50%;\n' +
-          '  position: relative;\n' +
-          '}\n' +
-          '\n' +
-          '.sector {\n' +
-          '  width: 50%;\n' +
-          '  height: 50%;\n' +
-          '  position: absolute;\n' +
-          '  left: 50%;\n' +
-          '  top: 0;\n' +
-          '  transform-origin: left bottom;\n' +
-          '}\n' +
-          '\n' +
-          '.container:after {\n' +
-          '  content: \'\';\n' +
-          '  position: absolute;\n' +
-          '  width: 50%;\n' +
-          '  height: 50%;\n' +
-          '  background: #fff;\n' +
-          '  border-radius: 50%;\n' +
-          '  top: 25%;\n' +
-          '  left: 25%;\n' +
-      '}');
-
       var userfilter;
       var group;
 
@@ -243,8 +216,9 @@ define(function(require) {
     var series = [];
     for(var i in lists_month){
       series.push([123,'2019',i,Locale.months[i-1] + ' 2019',lists_month[i].total.cost.toFixed(2)]);
-      showback_data.push([(new Date(2019, i-1)), lists_month[i].total.cost.toFixed(2) ]);
+      showback_data.push([(new Date(2019, i-1)), lists_month[i].total.cost.toFixed(2)]);
     }
+    //console.log(series.length,series);
     if (series.length > 0){
       showback_dataTable.fnAddData(series);
     }else{
@@ -294,6 +268,7 @@ define(function(require) {
       //}
     };
 
+    //console.log(showback_plot_series);
     var showback_plot = $.plot(
         $("#showback_graph", context), showback_plot_series, options);
 
@@ -381,7 +356,8 @@ define(function(require) {
       }
 
     }
-    
+
+    //console.log(list_months);
     return list_months;
   }
 
@@ -479,6 +455,7 @@ define(function(require) {
         showback.push(pole);
       }
     }
+    //console.log(showback);
     return showback;
   };
 
@@ -507,6 +484,7 @@ define(function(require) {
 
     }
     CheckSelectLabels();
+    //console.log($(that).attr("id"),select_labels);
     return flag;
   };
 
@@ -570,8 +548,8 @@ define(function(require) {
 
   function create_diagram(dataset) {
     var maxValue = 25;
-    $('.container').text('');
-    var container = $('.container');
+    $('#test_table_graph').text('');
+    var container = $('#test_table_graph');
 
     var addSector = function(data, startAngle, collapse) {
       var sectorDeg = 3.6 * data.value;
