@@ -168,99 +168,89 @@ define(function(require) {
 
                         if (settings_hbs[new_key].value[new_key1] != undefined){
                             $('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).children('.td_value_setting').text(new_val);
-                            settings_hbs[new_key].value[new_key1].value1 = new_val;
-                            set_events();
-                        }
-
-
-                        if ($('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).prev('tr').css('display') == 'none'){
-                            var styl = 'display: none;';
+                            settings_hbs[new_key].value[new_key1] = new_val;
+                            //set_events();
                         }else{
-                            if ($('.tr_setting_NETWORK_DEFAULTS').nextAll('.tr_setting_NETWORK').prev('tr').find('#setting_tree_circle').length != 0){
-                                var styl = 'display: none';
+                            var pre_name = [];
+                            for(var j in settings_hbs[new_key].value){
+                                pre_name.push(j);
+                            }
+                            var last_name = pre_name[pre_name.length - 1];
+                            if ($('.tr_setting_'+new_key).nextAll('.tr_setting_'+last_name).css('display') == 'none'){
+                                var styl = 'display: none;';
                             }else{
                                 var styl = 'display: table-row';
                             }
+
+                            $('.tr_setting_'+new_key).nextAll('.tr_setting_'+last_name).after('<tr class="tr_setting_'+new_key1+'" style="'+styl+'">' +
+                                '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
+                                '<td class="td_value_setting">'+new_val+'</td>' +
+                                '<td style="width: 60px;">' +
+                                '<span id="div_edit_setting">' +
+                                '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
+                                '</span>' +
+                                '<span id="div_minus_setting">' +
+                                '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
+                                '</span></td></tr>'
+                            );
+
+
+                            settings_hbs[new_key].value[new_key1] = new_val;
+                            $('.tr_setting_'+new_key).children('.td_key_setting').children('small').text('');
+                            if (pre_name.length > 1){
+                                $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'...');
+                            }else{
+                                $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]);
+                            }
+
+                            set_events();
                         }
-
-                        $('.tr_setting_'+new_key).nextAll('.tr_setting_'+new_key1).prev('tr').after('<tr class="tr_setting_'+new_key1+'" style="'+styl+'">' +
-                            '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
-                            '<td class="td_value_setting">'+new_val+'</td>' +
-                            '<td style="width: 60px;">' +
-                            '<span id="div_edit_setting">' +
-                            '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
-                            '</span>' +
-                            '<span id="div_minus_setting">' +
-                            '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
-                            '</span></td></tr>'
-                        );
-
-                        var kol = 0;
-                        var pre_name = [];
-                        for(var j in settings_hbs[new_key].value){
-                            pre_name.push(j);
-                            kol++
-                            if (kol == 2){break;}
-                        }
-
-
-                        settings_hbs[new_key].value[new_key1] = new_val;
-                        $('.tr_setting_'+new_key).children('.td_key_setting').children('small').text('');
-                        if (pre_name.length > 1){
-                            $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
-                        }else{
-                            $('.tr_setting_'+new_key).children('.td_key_setting small').append('&emsp;'+pre_name[0]+'.</small>');
-                        }
-
-                        set_events()
-                        return;
                     }else{
                         if (settings_hbs[new_key].bool_tree == false){
                             $('.tr_setting_'+new_key).children('.td_value_setting').text(new_val);
                         }
                         set_events()
-                        return;
+                    }
+                }else {
+                    if (new_key1 == '') {
+                        $('tbody#settings_body').append('<tr class="tr_setting_' + new_key + '">' +
+                            '<td class="td_key_setting" style="font-weight: bold;">' +
+                            '<span>&emsp;' + new_key + '</span>' +
+                            '</td>' +
+                            '<td class="td_value_setting">' + new_val + '</td>' +
+                            ' <td style="width: 60px;">' +
+                            '<span id="div_edit_setting">' +
+                            '<a id="div_edit_' + new_key + '" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
+                            '</span>' +
+                            '<span id="div_minus_setting">' +
+                            '<a id="div_minus_' + new_key + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
+                            '</span></td></tr>'
+                        );
+                        settings_hbs[new_key] = {bool_tree: false, value: new_val};
+                        set_events();
+                    } else {
+                        $('tbody#settings_body').append('<tr class="tr_setting_' + new_key + '">' +
+                            '<td class="td_key_setting" style="font-weight: bold;">' +
+                            '<span id="setting_tree_circle">' +
+                            '<a href="#"><i class="fa fa-arrow-circle-down"></i></a></span>' +
+                            '<span id="setting_tree_key_span" style="cursor: pointer;">' + new_key + '</span><small style="color: grey;display: none;">&emsp;' + new_key1 + '</small></td></tr>' +
+                            '<tr class="tr_setting_' + new_key1 + '">' +
+                            '<td class="td_key_setting" style="text-align: center;">' + new_key1 + '</td>' +
+                            '<td class="td_value_setting">' + new_val + '</td>' +
+                            ' <td style="width: 60px;">' +
+                            '<span id="div_edit_setting">' +
+                            '<a id="div_edit_' + new_key1 + '" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
+                            '</span>' +
+                            '<span id="div_minus_setting">' +
+                            '<a id="div_minus_' + new_key1 + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
+                            '</span></td></tr>'
+                        );
+                        settings_hbs[new_key] = {bool_tree: true, value: {}};
+                        settings_hbs[new_key].value[new_key1] = new_val;
+                        set_events();
                     }
                 }
-
-                if (new_key1 == ''){
-                    $('tbody#settings_body').append('<tr class="tr_setting_'+new_key+'">' +
-                        '<td class="td_key_setting" style="font-weight: bold;">' +
-                        '<span>&emsp;'+new_key+'</span>' +
-                        '</td>' +
-                        '<td class="td_value_setting">'+new_val+'</td>' +
-                        ' <td style="width: 60px;">' +
-                        '<span id="div_edit_setting">' +
-                        '<a id="div_edit_'+new_key+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
-                        '</span>' +
-                        '<span id="div_minus_setting">' +
-                        '<a id="div_minus_'+new_key+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
-                        '</span></td></tr>'
-                    );
-                    settings_hbs[new_key] = {bool_tree:false,value:new_val};
-                    set_events();
-                }else{
-                    $('tbody#settings_body').append('<tr class="tr_setting_'+new_key+'">' +
-                        '<td class="td_key_setting" style="font-weight: bold;">' +
-                        '<span id="setting_tree_circle">' +
-                        '<a href="#"><i class="fa fa-circle-o"></i></a></span>' +
-                        '<span id="setting_tree_key_span" style="cursor: pointer;">'+new_key+'</span><small style="color: grey;display: none;">&emsp;'+new_key1+'</small></td></tr>'+
-                        '<tr class="tr_setting_'+new_key1+'">' +
-                        '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
-                        '<td class="td_value_setting">'+new_val+'</td>' +
-                        ' <td style="width: 60px;">' +
-                        '<span id="div_edit_setting">' +
-                        '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
-                        '</span>' +
-                        '<span id="div_minus_setting">' +
-                        '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
-                        '</span></td></tr>'
-                    );
-                    settings_hbs[new_key] = {bool_tree:true,value:{new_key1:new_val}};
-                    set_events();
-                }
             }
-
         });
 
         $('#settings_but_submit').click(function () {
@@ -423,7 +413,7 @@ define(function(require) {
                     for(var i in settings_hbs){
 
                         if (settings_hbs[i].bool_tree){
-                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span id="setting_tree_circle"><a href="#"><i class="fa fa-circle"/></a></span>' +
+                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span id="setting_tree_circle"><a href="#"><i class="fa fa-arrow-circle-right"/></a></span>' +
                                 '<span id="setting_tree_key_span" style="cursor: pointer;">'+ i +'</span></td>';
                             for(var j in settings_hbs[i].value){
                                 flag_circle += '<tr class="tr_setting_'+ j +'" style="display: none">' +
@@ -494,8 +484,13 @@ define(function(require) {
                                 kol++
                                 if (kol == 2){break;}
                             }
-                            if (settings_hbs[i].value.length != 1){
-                                $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
+                            if (pre_name.length > 1){
+                                if (Object.keys(settings_hbs[j].value).length > 2){
+                                    $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
+                                }else{
+                                    $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'</small>');
+                                }
+
                             }else{
                                 $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+'</small>');
                             }
@@ -510,33 +505,31 @@ define(function(require) {
         });
     }
 
-
     function circle_event() {
+        $('#settings_body #setting_tree_circle').off('click');
         $('#settings_body #setting_tree_circle').click(function () {
-            if ($(this).children().children().attr('class') == 'fa fa-circle'){
-                $(this).children().children().switchClass('fa-circle','fa-circle-o');
+            if ($(this).children().children().attr('class') == 'fa fa-arrow-circle-right'){
+                $(this).children().children().switchClass('fa-arrow-circle-right','fa-arrow-circle-down');
                 $(this).parent().children('small').toggle();
             }else{
-                $(this).children().children().switchClass('fa-circle-o','fa-circle');
+                $(this).children().children().switchClass('fa-arrow-circle-down','fa-arrow-circle-right');
                 $(this).parent().children('small').toggle();
             }
 
-            for (var j in settings_hbs) {
-                if (j == $(this).next().text()) {
-                    for (var k in settings_hbs[j].value) {
-                        $('tr.tr_setting_' + j).nextAll('tr.tr_setting_' + k).eq(0).toggle();
-                    }
-                    return;
-                }
+            var name = $(this).next().text();
+            for (var k in settings_hbs[name].value) {
+                $('tr.tr_setting_' + name).nextAll('tr.tr_setting_' + k).eq(0).toggle();
             }
+
         });
 
         $('#settings_body #setting_tree_key_span').click(function () {
-            $(this).parent().children('#setting_tree_circle').click();
+            $(this).prev('#setting_tree_circle').click();
         });
     }
 
     function edit_event() {
+        $('#settings_body #div_edit_setting').off('click');
         $('#settings_body #div_edit_setting').click(function () {
             var tr_setting = $(this).parent().parent();
             var td_value = tr_setting.children('.td_value_setting');
@@ -567,7 +560,7 @@ define(function(require) {
     }
 
     function minus_event() {
-
+        $('#settings_body #div_minus_setting').off('click');
         $('#settings_body #div_minus_setting').click(function () {
             var key1 = $(this).parent().parent().children('.td_key_setting').text();
             for(var j in settings_hbs){
@@ -575,7 +568,7 @@ define(function(require) {
                     if(settings_hbs[j].value[key1] != undefined){
                         delete settings_hbs[j].value[key1];
                         if (Object.keys(settings_hbs[j].value).length == 0){
-                            settings_hbs.splice(j,1)
+                             delete settings_hbs[j];
                             $(this).parent().parent().prev().remove();
                             $(this).parent().parent().remove();
                             return;
