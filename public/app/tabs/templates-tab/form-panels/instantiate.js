@@ -112,7 +112,7 @@ define(function(require) {
     var disk_val = parseFloat( $(".provision_create_template_disk_cost_div .cost_value").attr('value') );
     var publicip_val = 1 * $('#amt_public_ip').val();
 
-    if ($('#publicip_cost_div').length != 0){
+    if ($('#publicip_cost_div').css('display') != 'none'){
       var publicip_cost = settings.PUBLIC_IP_COST * publicip_val;
     } else {
       var publicip_cost = 0;
@@ -191,7 +191,7 @@ define(function(require) {
       };
 
       var tmp_json = WizardFields.retrieve($(".template_user_inputs" + template_id, context));
-      //tmp_json.DRIVE = $('select[wizard_field="DRIVE"]').val();
+
       if (azure_template == true){
         for_template.OS_DISK_SIZE = $('[wizard_field="OS_DISK_SIZE"]').val();
         for_template.OS_IMAGE = $('[wizard_field="OS_IMAGE"]').val();
@@ -240,6 +240,8 @@ define(function(require) {
       });
 
       if (nics.length > 0) {
+        console.log(1,networks);
+        console.log(2,nics);
         return false;
         tmp_json.NIC = nics;
       }
@@ -287,10 +289,9 @@ define(function(require) {
           $('.provision_network_selector  legend').css({'color':'#ec5840','border-bottom-color': '#ec5840'});
 
           Notifier.notifyError(Locale.tr("У машины нет IP адреса"));
-          if (config.user_config.default_view == 'user'){
-            return false;
-          }
+          return false;
         }
+
         var nic = [];
         if ($('#input_public_ip').prop('checked') == true){
           var amt_public = $('#amt_public_ip').val() * 1;
@@ -318,8 +319,8 @@ define(function(require) {
         if (user_info.ID_GROUP != '0'){
           $('#CostVaribl').val(24);
           _calculateCost();
-          var user_balance = user_info.BALANCE * 1;
-          if (user_balance < parseFloat($(".total_cost_div .cost_value").text())){
+
+          if (user_info.BALANCE * 1 < parseFloat($(".total_cost_div .cost_value").text())){
             Notifier.notifyError(Locale.tr("Пополните баланс"));
             return false;
           }
@@ -490,19 +491,15 @@ define(function(require) {
               if ($(this).prop('checked')){
                 $('#amt_public_ip').prop('disabled',false);
 
-                $('#element_cost').append('<div id="publicip_cost_div" style="width: 100%">' +
-                    '<span class="publicip_cost_div">' +
-                    '<i class="fa fa-globe"></i>&nbsp;'+Locale.tr("Network")+'<br>' +
-                    '<span class="cost_value" style="font-size: 1.4rem;">'+settings.PUBLIC_IP_COST+'</span>&nbsp;' +
-                    '<span>'+ settings.CURRENCY_MAIN +' / '+ Locale.tr("HOUR")+'</span>' +
-                    '</span></div>');
+                $('#publicip_cost_div').show();
+                $('#publicip_cost_div .cost_value').text(settings.PUBLIC_IP_COST);
+                $('#publicip_cost_div .cost_label').text(settings.CURRENCY_MAIN +' / '+ Locale.tr("HOUR"));
+
                 _calculateCost();
               } else {
-                if ($('#publicip_cost_div').length != 0){
-                  $('#amt_public_ip').prop('disabled',true);
-                  $('#publicip_cost_div').remove();
-                  _calculateCost();
-                }
+                $('#amt_public_ip').prop('disabled',true);
+                $('#publicip_cost_div').hide();
+                _calculateCost();
               }
             });
 
@@ -630,10 +627,10 @@ define(function(require) {
             var select_time = settings.CURRENCY_MAIN + ' /'+val.split('/')[1];
             $('.publicip_cost_div .cost_span').text(val);
 
-            $('.capacity_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
-            $('.provision_create_template_disk_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
-            $('.total_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
-            $('.publicip_cost_div span:contains("'+ settings.CURRENCY_MAIN +'")').text(select_time);
+            $('.capacity_cost_div .cost_label').text(select_time);
+            $('.provision_create_template_disk_cost_div .cost_label').text(select_time);
+            $('.total_cost_div .cost_label').text(select_time);
+            $('.publicip_cost_div .cost_label').text(select_time);
             _calculateCost(context);
           });
 
@@ -755,6 +752,10 @@ define(function(require) {
     templatesContext.html("");
 
     Settings.cloud({success:function(r, res) {
+        if (r.error != undefined){
+          $('#vms-tabreset_button .reset_button').click();
+          return false;
+        }
         settings = r.response;
         if (settings.CURRENCY_MAIN == undefined){
           settings.CURRENCY_MAIN = 'USD';
@@ -782,4 +783,5 @@ define(function(require) {
       $('#SCHED_REQUIREMENTS' + id, context).val(req_string.join(" | "));
       $('#SCHED_DS_REQUIREMENTS' + id, context).val(req_ds_string.join(" | "));
   };
+
 });
