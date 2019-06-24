@@ -157,6 +157,7 @@ define(function(require) {
       callback : function(request, response) {
         if (response.error != undefined){
           Notifier.notifyError(response.error);
+          console.log(response.error);
           Sunstone.resetFormPanel(that.tabId, formPanelId);
           Sunstone.hideFormPanel(that.tabId);
           return false;

@@ -90,6 +90,7 @@ define(function(require) {
               resourceName: 'User',
               initValue: element.UID
             });
+          console.log(element);
         });
 
       context.off("change", "#value_td_owner .resource_list_select");
@@ -109,6 +110,7 @@ define(function(require) {
               resourceName: 'Group',
               initValue: element.GID
             });
+          console.log(element);
         });
 
       context.off("change", "#value_td_group .resource_list_select");

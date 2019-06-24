@@ -46,9 +46,10 @@ define(function(require) {
 
   var FORM_PANEL_ID = require('./instantiate/formPanelId');
   var TAB_ID = require('../tabId');
+
   var settings;
   var for_template;
-  var azure_template;
+  var azure_template = false;
   var user_info;
   /*
     CONSTRUCTOR
@@ -89,14 +90,9 @@ define(function(require) {
    */
 
   function _html() {
-    if (config.user_config["default_view"] == 'user'){
-      this.default_user_view = true;
-    } else {
-      this.default_user_view = false;
-    }
+
     return TemplateHTML({
-      'formPanelId': this.formPanelId,
-      'default_user_view': this.default_user_view
+      'formPanelId': this.formPanelId
     });
   }
 
@@ -326,6 +322,14 @@ define(function(require) {
           }
         }
 
+        if (azure_template == true){
+          var admin_name = $('textarea[wizard_field="VM_USER_NAME"]').val();
+          if (admin_name == 'root' || admin_name == 'admin'){
+            Notifier.notifyError(Locale.tr("Имя пользователя не может быть задано как root и admin"));
+            return false;
+          }
+        }
+
         for (var i = 0; i < n_times_int; i++) {
           extra_info['vm_name'] = vm_name.replace(/%i/gi, i);
           if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').length != 0){
@@ -405,11 +409,9 @@ define(function(require) {
           } else {
             var default_user_view = false;
           }
-
-          if (template_json.VMTEMPLATE.NAME.toLowerCase().indexOf('azure') >= 0){
+          console.log(template_json);
+          if (template_json.VMTEMPLATE.TEMPLATE.HYPERVISOR == 'AZURE'){
             azure_template = true;
-          } else {
-            azure_template = false;
           }
 
           templatesContext.append(
@@ -713,11 +715,39 @@ define(function(require) {
               $(this).children().css({'float':'right','width':'65%'});
             });
 
+            var AZURE_IMAGES = JSON.parse(settings.AZURE_IMAGES);
+            for(var i in AZURE_IMAGES){
+              $('select[wizard_field="OS_IMAGE"]').append($("<option></option>", {value: i, text: i}));
+            }
+
+            var AZURE_SKUS = JSON.parse(settings.AZURE_SKUS);
+            for(var i in AZURE_SKUS){
+              $('select[wizard_field="SIZE"]').append($("<option></option>", {value: i, text: i}));
+            }
+
+
+            $('select[wizard_field="OS_IMAGE"]').change(function() {
+              var logos = config.vm_logos;
+              var select_oc = $(this).val().toLowerCase();
+              $('#OC_name img').attr('src','');
+              for(var i in logos){
+                if (select_oc.indexOf(logos[i].name.toLowerCase().split(' ')[0]) >= 0){
+                  if (logos[i].name.toLowerCase().split(' ')[0] == 'windows'){
+                    $('#OC_name img').attr('src',logos[i*1+1].path);
+                  }else{
+                    $('#OC_name img').attr('src',logos[i].path);
+                  }
+                  break;
+                }
+              }
+            });
+
             $('select[wizard_field="SIZE"]').change(function() {
               var azure_skus = JSON.parse(settings.AZURE_SKUS);
               if (azure_skus[$(this).val()] != undefined){
-                $('.inp_cpu').val(JSON.parse(azure_skus[$(this).val()]).CPU);
-                $('.inp_ram').val(JSON.parse(azure_skus[$(this).val()]).RAM);
+                var vals = JSON.parse(azure_skus[$(this).val()]);
+                $('.inp_cpu').val(vals.CPU);
+                $('.inp_ram').val(vals.RAM);
               } else {
                 $('.inp_cpu').val(0);
                 $('.inp_ram').val(0);
