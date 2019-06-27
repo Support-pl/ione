@@ -47,7 +47,7 @@ install_patch() {
 
     grunt --gruntfile ./Gruntfile.js requirejs
 
-    mv -f dist/main.js dist/main-dist.js
+    cp -f dist/main.js dist/main-dist.js
 
     if [ "$DO_LINK" = "yes" ]; then
         mv ./main.js dist/main.js
