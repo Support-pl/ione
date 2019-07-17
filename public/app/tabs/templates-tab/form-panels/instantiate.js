@@ -46,7 +46,6 @@ define(function(require) {
 
   var FORM_PANEL_ID = require('./instantiate/formPanelId');
   var TAB_ID = require('../tabId');
-
   var settings;
   var for_template;
   var azure_template = false;
@@ -90,9 +89,14 @@ define(function(require) {
    */
 
   function _html() {
-
+    if (config.user_config["default_view"] == 'user'){
+      this.default_user_view = true;
+    } else {
+      this.default_user_view = false;
+    }
     return TemplateHTML({
-      'formPanelId': this.formPanelId
+      'formPanelId': this.formPanelId,
+      'default_user_view': this.default_user_view
     });
   }
 
@@ -236,9 +240,6 @@ define(function(require) {
       });
 
       if (nics.length > 0) {
-        console.log(1,networks);
-        console.log(2,nics);
-        return false;
         tmp_json.NIC = nics;
       }
 
@@ -310,49 +311,41 @@ define(function(require) {
       extra_info['template'] = tmp_json;
 
       OpenNebula.User.show({data:{id:config.user_id},success: function(r,res) {
-        user_info = {User_id: res.USER.ID, ID_GROUP: res.USER.GROUPS.ID, BALANCE: res.USER.TEMPLATE.BALANCE};
+          user_info = {User_id: res.USER.ID, ID_GROUP: res.USER.GROUPS.ID, BALANCE: res.USER.TEMPLATE.BALANCE};
 
-        if (user_info.ID_GROUP != '0'){
-          $('#CostVaribl').val(24);
-          _calculateCost();
+          if (user_info.ID_GROUP != '0'){
+            $('#CostVaribl').val(24);
+            _calculateCost();
 
-          if (user_info.BALANCE * 1 < parseFloat($(".total_cost_div .cost_value").text())){
-            Notifier.notifyError(Locale.tr("Пополните баланс"));
-            return false;
-          }
-        }
-
-        if (azure_template == true){
-          var admin_name = $('textarea[wizard_field="VM_USER_NAME"]').val();
-          if (admin_name == 'root' || admin_name == 'admin'){
-            Notifier.notifyError(Locale.tr("Имя пользователя не может быть задано как root и admin"));
-            return false;
-          }
-        }
-
-        for (var i = 0; i < n_times_int; i++) {
-          extra_info['vm_name'] = vm_name.replace(/%i/gi, i);
-          if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').length != 0){
-            if (config.user_config.default_view != 'user'){
-              Sunstone.runAction("Template."+action, [template_id], extra_info);
-            }else if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val() == $('label:contains("Password")').children('input.repeat_pas').val()){
-              Sunstone.runAction("Template."+action, [template_id], extra_info);
-            } else {
-              console.log(1,$('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val());
-              console.log(2,$('label:contains("Password")').children('input.repeat_pas').val());
-
-              Notifier.notifyError('Passwords doesn\'t match');
+            if (user_info.BALANCE * 1 < parseFloat($(".total_cost_div .cost_value").text())){
+              Notifier.notifyError(Locale.tr("Пополните баланс"));
+              return false;
             }
-          }else{
-            Sunstone.runAction("Template."+action, [template_id], extra_info);
           }
 
-          // OpenNebula.VM.list({success: function(r,res){
-          //     res[res.length-1].VM.ID
-          // }});
-          //OpenNebula.VM.update({ id: id, template: template })
-        }
-      }});
+          for (var i = 0; i < n_times_int; i++) {
+            extra_info['vm_name'] = vm_name.replace(/%i/gi, i);
+            if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').length != 0){
+              if (config.user_config.default_view != 'user'){
+                Sunstone.runAction("Template."+action, [template_id], extra_info);
+              }else if ($('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val() == $('label:contains("Password")').children('input.repeat_pas').val()){
+                Sunstone.runAction("Template."+action, [template_id], extra_info);
+              } else {
+                console.log(1,$('label:contains("Password")').children('input[wizard_field="PASSWORD"]').val());
+                console.log(2,$('label:contains("Password")').children('input.repeat_pas').val());
+
+                Notifier.notifyError('Passwords doesn\'t match');
+              }
+            }else{
+              Sunstone.runAction("Template."+action, [template_id], extra_info);
+            }
+
+            // OpenNebula.VM.list({success: function(r,res){
+            //     res[res.length-1].VM.ID
+            // }});
+            //OpenNebula.VM.update({ id: id, template: template })
+          }
+        }});
       return false;
     });
     return false;
@@ -360,7 +353,9 @@ define(function(require) {
 
   function _setTemplateIds(context, selected_nodes) {
     var that = this;
-
+    $('html, body').animate({
+      scrollTop: $(".list_of_templates").offset().top
+    }, 700);
     this.selected_nodes = selected_nodes;
     this.template_objects = [];
     this.template_base_objects = {};
@@ -415,14 +410,14 @@ define(function(require) {
           }
 
           templatesContext.append(
-            TemplateRowHTML(
-              { element: template_json.VMTEMPLATE,
-                capacityInputsHTML: CapacityInputs.html(),
-                hostsDatatable: that.hostsTable.dataTableHTML,
-                dsDatatable: that.datastoresTable.dataTableHTML,
-                default_user_view: default_user_view,
-                azure_template:azure_template
-              }) );
+              TemplateRowHTML(
+                  { element: template_json.VMTEMPLATE,
+                    capacityInputsHTML: CapacityInputs.html(),
+                    hostsDatatable: that.hostsTable.dataTableHTML,
+                    dsDatatable: that.datastoresTable.dataTableHTML,
+                    default_user_view: default_user_view,
+                    azure_template:azure_template
+                  }) );
 
           $(".provision_host_selector" + template_json.VMTEMPLATE.ID, context).data("hostsTable", that.hostsTable);
           $(".provision_ds_selector" + template_json.VMTEMPLATE.ID, context).data("dsTable", that.datastoresTable);
@@ -438,7 +433,7 @@ define(function(require) {
                 var hostTable = $(".provision_host_selector" + template_json.VMTEMPLATE.ID, context).data("hostsTable");
                 var dsTable = $(".provision_ds_selector" + template_json.VMTEMPLATE.ID, context).data("dsTable");
                 generateRequirements(hostTable, dsTable, context, template_json.VMTEMPLATE.ID);
-               }
+              }
             }
           }
           that.hostsTable.initialize(selectOptions);
@@ -454,7 +449,7 @@ define(function(require) {
             var host_id_regexp = /(\s|\||\b)ID=\\"([0-9]+)\\"/g;
             var hosts = [];
             while (match = host_id_regexp.exec(req)) {
-                hosts.push(match[2]);
+              hosts.push(match[2]);
             }
             var selectedResources = {
               ids : hosts
@@ -509,7 +504,7 @@ define(function(require) {
               if ($(this).prop('checked')){
                 $('#amt_private_ip').prop('disabled',false);
               } else {
-                  $('#amt_private_ip').prop('disabled',true);
+                $('#amt_private_ip').prop('disabled',true);
               }
             });
 
@@ -528,7 +523,7 @@ define(function(require) {
           }
 
           VMGroupSection.insert(template_json,
-            $(".vmgroupContext"+ template_json.VMTEMPLATE.ID, context));
+              $(".vmgroupContext"+ template_json.VMTEMPLATE.ID, context));
 
           vcenterVMFolderContext = $(".vcenterVMFolderContext"  + template_json.VMTEMPLATE.ID, context);
           VcenterVMFolder.setup(vcenterVMFolderContext);
@@ -536,10 +531,10 @@ define(function(require) {
 
           var inputs_div = $(".template_user_inputs" + template_json.VMTEMPLATE.ID, context);
 
-            UserInputs.vmTemplateInsert(
-                inputs_div,
-                template_json,
-                {text_header: '<i class="fa fa-gears"></i> ' + Locale.tr("Attributes")});
+          UserInputs.vmTemplateInsert(
+              inputs_div,
+              template_json,
+              {text_header: '<i class="fa fa-gears"></i> ' + Locale.tr("Attributes")});
 
           inputs_div.data("opennebula_id", template_json.VMTEMPLATE.ID);
 
@@ -654,25 +649,9 @@ define(function(require) {
             $('label:contains("Password")').append('Repeat password<br><input type="password" value="" class="repeat_pas" required="">');
           }
 
-
-          var logos = config.vm_logos;
-          var select_oc = template_json.VMTEMPLATE.NAME.toLowerCase();
-          $('#OC_name img').attr('src','');
-          for(var i in logos){
-            if (select_oc.indexOf(logos[i].name.toLowerCase().split(' ')[0]) >= 0){
-              if (logos[i].name.toLowerCase().split(' ')[0] == 'windows'){
-                $('#OC_name img').attr('src',logos[i*1+1].path);
-              }else{
-                $('#OC_name img').attr('src',logos[i].path);
-              }
-              break;
-            }
-          }
-
-
           if (azure_template == true){
             $('.disksContainer').append($('input[wizard_field="OS_DISK_SIZE"]').parent().parent().parent());
-            $('.OC_name_Container').append($('label select[wizard_field="OS_IMAGE"]').parent());
+            $('.OC_name_Container').append($('label [wizard_field="OS_IMAGE"]').parent());
             $('.OC_name_Container').append($('label textarea[wizard_field="USER_OS_NAME"]').parent());
 
 
@@ -725,23 +704,6 @@ define(function(require) {
               $('select[wizard_field="SIZE"]').append($("<option></option>", {value: i, text: i}));
             }
 
-
-            $('select[wizard_field="OS_IMAGE"]').change(function() {
-              var logos = config.vm_logos;
-              var select_oc = $(this).val().toLowerCase();
-              $('#OC_name img').attr('src','');
-              for(var i in logos){
-                if (select_oc.indexOf(logos[i].name.toLowerCase().split(' ')[0]) >= 0){
-                  if (logos[i].name.toLowerCase().split(' ')[0] == 'windows'){
-                    $('#OC_name img').attr('src',logos[i*1+1].path);
-                  }else{
-                    $('#OC_name img').attr('src',logos[i].path);
-                  }
-                  break;
-                }
-              }
-            });
-
             $('select[wizard_field="SIZE"]').change(function() {
               var azure_skus = JSON.parse(settings.AZURE_SKUS);
               if (azure_skus[$(this).val()] != undefined){
@@ -790,28 +752,28 @@ define(function(require) {
         if (settings.CURRENCY_MAIN == undefined){
           settings.CURRENCY_MAIN = 'USD';
         }
-    }});
+      }});
 
     Tips.setup(context);
     return false;
   }
 
   function generateRequirements(hosts_table, ds_table, context, id) {
-      var req_string=[];
-      var req_ds_string=[];
-      var selected_hosts = hosts_table.retrieveResourceTableSelect();
-      var selected_ds = ds_table.retrieveResourceTableSelect();
+    var req_string=[];
+    var req_ds_string=[];
+    var selected_hosts = hosts_table.retrieveResourceTableSelect();
+    var selected_ds = ds_table.retrieveResourceTableSelect();
 
-      $.each(selected_hosts, function(index, hostId) {
-        req_string.push('ID="'+hostId+'"');
-      });
+    $.each(selected_hosts, function(index, hostId) {
+      req_string.push('ID="'+hostId+'"');
+    });
 
-      $.each(selected_ds, function(index, dsId) {
-        req_ds_string.push('ID="'+dsId+'"');
-      });
+    $.each(selected_ds, function(index, dsId) {
+      req_ds_string.push('ID="'+dsId+'"');
+    });
 
-      $('#SCHED_REQUIREMENTS' + id, context).val(req_string.join(" | "));
-      $('#SCHED_DS_REQUIREMENTS' + id, context).val(req_ds_string.join(" | "));
+    $('#SCHED_REQUIREMENTS' + id, context).val(req_string.join(" | "));
+    $('#SCHED_DS_REQUIREMENTS' + id, context).val(req_ds_string.join(" | "));
   };
 
 });

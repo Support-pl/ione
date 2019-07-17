@@ -448,7 +448,9 @@ if $conf[:routes]
 end
 
 require 'SettingsDriver'
+
 require 'AnsibleDriver'
+require 'AzureDriver'
 require 'ShowbackDriver'
 require 'IONeCustomActions'
 

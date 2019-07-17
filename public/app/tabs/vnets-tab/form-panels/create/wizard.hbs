@@ -81,6 +81,8 @@
             {{tr "Network mode"}}
           </label>
           <select wizard_field="VN_MAD" name="network_mode" id="network_mode">
+            <option value="Please select">Please select</option>
+            <option value="azure">{{tr "Azure"}}</option>
             <option value="dummy">{{tr "Bridged"}}</option>
             <option value="fw">{{tr "Bridged & Security Groups"}}</option>
             <option value="ebtables">{{tr "Bridged & ebtables VLAN"}}</option>
@@ -202,12 +204,54 @@
           </label>
         </div>
       </div>
+
       <div class="row">
-        <div class="medium-6 columns left mode_param vcenter">
+        <div class="medium-6 columns left mode_param azure">
+          <label>
+            {{tr "Resource Group"}}
+          </label>
+          <input type="text" wizard_field="AZURE_RESOURCE_GROUP" placeholder="one-<user_id>-<username>" list="vars_resource_group" name="azure_resource_group" id="azure_resource_group"/>
+          <datalist id="vars_resource_group"></datalist>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="medium-6 columns left mode_param vcenter azure">
           <label for="vcenter_cluster_id">{{tr "OpenNebula's Host ID"}}</label>
           <div id="vcenter_cluster_id" name="vcenter_cluster_id"></div>
         </div>
       </div>
+
+      <div class="row">
+        <div class="medium-6 columns left mode_param vcenter azure">
+          <label style="margin-bottom: 10px;">
+            {{tr "Network Type"}}
+          </label>
+          <div class="network_type">
+            <div>
+              <label style="width: 22%;float: left;">{{tr "Public Network"}}</label>
+              <div id="public_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                <div class="left" style="margin-right: 20%;">
+                  <input class="switch-input" id="input_public_ip" type="checkbox">
+                  <label class="switch-paddle" for="input_public_ip">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label style="width: 22%;float: left;">{{tr "Private Network"}}</label>
+              <div id="private_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                <div class="left" style="margin-right: 20%;">
+                  <input class="switch-input" id="input_private_ip" type="checkbox">
+                  <label class="switch-paddle" for="input_private_ip">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div class="tabs-panel" id="vnetCreateARTab">
       <div class="row collapse" id="vnetCreateARTabCreate">

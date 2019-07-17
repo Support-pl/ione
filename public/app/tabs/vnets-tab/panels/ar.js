@@ -43,7 +43,6 @@ define(function(require) {
   var ADD_AR_DIALOG_ID = require('../dialogs/add-ar/dialogId');
   var UPDATE_AR_DIALOG_ID = require('../dialogs/update-ar/dialogId');
   var CONFIRM_DIALOG_ID = require('utils/dialogs/generic-confirm/dialogId');
-
   /*
     CONSTRUCTOR
    */
@@ -53,7 +52,6 @@ define(function(require) {
     this.icon = "fa-align-justify";
 
     this.element = info[XML_ROOT];
-
     this.last_selected_row_ar = "";
 
     this.secgroupTable = undefined;
@@ -165,83 +163,152 @@ define(function(require) {
       return false;
     });
 
-
-    if (Config.isTabActionEnabled("vnets-tab", "Network.remove_ar")) {
-      context.off("click", 'button#rm_ar_button');
-      context.on("click", 'button#rm_ar_button', function(){
-        var ar_id = $(this).attr('ar_id');
-
-        Sunstone.getDialog(CONFIRM_DIALOG_ID).setParams({
-          //header :
-          headerTabId: TAB_ID,
-          body : Locale.tr("This will delete all the addresses in this range"),
-          //question :
-          submit : function(){
-            var obj = {ar_id: ar_id};
-            Sunstone.runAction('Network.rm_ar',that.element.ID,obj);
-
-            return false;
-          }
-        });
-
-        Sunstone.getDialog(CONFIRM_DIALOG_ID).reset();
-        Sunstone.getDialog(CONFIRM_DIALOG_ID).show();
-
-        return false;
-      });
-    }
-
-    if (Config.isTabActionEnabled("vnets-tab", "Network.add_ar")) {
-      context.off("click", 'button#add_ar_button');
-      context.on("click", 'button#add_ar_button', function(){
-        var id = that.element.ID;
-
-        Sunstone.getDialog(ADD_AR_DIALOG_ID).setId(id);
-        Sunstone.getDialog(ADD_AR_DIALOG_ID).show();
-
-        return false;
-      });
-    }
-
-    if (Config.isTabActionEnabled("vnets-tab", "Network.update_ar")) {
-      context.off("click", 'button#update_ar_button');
-      context.on("click", 'button#update_ar_button', function(){
-        var id = that.element.ID;
-        var ar_id = $(this).attr('ar_id');
-
-        OpenNebulaNetwork.show({
-          data : {
-            id: id
-          },
-          timeout: true,
-          success: function (request, vn){
-            var vn_info = vn.VNET;
-
-            var ar = getAR(vn_info, ar_id);
-
-            if(ar != undefined){
-              Sunstone.getDialog(UPDATE_AR_DIALOG_ID).reset();
-
-              Sunstone.getDialog(UPDATE_AR_DIALOG_ID).setParams({
-                'vnetId': id,
-                'arId': ar_id,
-                'arData': $.extend({}, ar)
-              });
-
-              Sunstone.getDialog(UPDATE_AR_DIALOG_ID).show();
-
-            } else {
-              Notifier.notifyError(Locale.tr("The Address Range was not found"));
-              Sunstone.runAction("Network.show", id);
+    if (this.element.VN_MAD == 'azure' && this.element.TEMPLATE.NETWORK_TYPE == 'PRIVATE'){
+      $('#add_ar_button').hide();
+      $('#update_ar_button').hide();
+      $('#rm_ar_button').hide();
+    }else if (this.element.VN_MAD == 'azure' && this.element.TEMPLATE.NETWORK_TYPE == 'PUBLIC') {
+      $('#update_ar_button').hide();
+      $('button#add_ar_button').empty();
+      $('button#add_ar_button').append('<span class="fa fa-plus"></span> Address');
+      if (Config.isTabActionEnabled("vnets-tab", "Network.add_ar")) {
+        context.off("click", 'button#add_ar_button');
+        context.on("click", 'button#add_ar_button', function () {
+          $('#add_ar_button').after('<i id="ar_spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>');
+          $('#rm_ar_button').prop('disabled', true);
+          $('#add_ar_button').prop('disabled', true);
+          $.ajax({
+            url:'/vnet/'+that.element.ID+'/register_azure_ip',
+            method: 'post',
+            success: function (req, res) {
+              console.log(res);
+              $('#ar_spiner').remove();
+              $('#add_ar_button').prop('disabled', false);
+              Sunstone.runAction(RESOURCE+'.refresh');
+            },
+            error: function (req, res) {
+              $('#ar_spiner').remove();
+              $('#add_ar_button').prop('disabled', false);
+              Notifier.notifyError(res);
             }
-          },
-          error: Notifier.onError
+          });
+          return false;
         });
+      }
 
-        return false;
-      });
+      if (Config.isTabActionEnabled("vnets-tab", "Network.remove_ar")) {
+        context.off("click", 'button#rm_ar_button');
+        context.on("click", 'button#rm_ar_button', function () {
+          var ar_id = $(this).attr('ar_id')*1;
+          if (Array.isArray(that.element.AR_POOL.AR)){
+            for(var i in that.element.AR_POOL.AR){
+              if (that.element.AR_POOL.AR[i].AR_ID == ar_id){
+                var name = that.element.AR_POOL.AR[ar_id].AZ_NAME;
+                break;
+              }
+            }
+          }else{
+            var name = that.element.AR_POOL.AR.AZ_NAME;
+          }
+          $('#rm_ar_button').before('<i id="ar_spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>');
+          $('#rm_ar_button').prop('disabled', true);
+          $('#add_ar_button').prop('disabled', true);
+          $.ajax({
+            url:'/vnet/'+that.element.ID+'/unregister_azure_ip',
+            method: 'post',
+            data: JSON.stringify({ar_id: ar_id, name:name}),
+            success: function (req, res) {
+              console.log(res);
+              $('#ar_spiner').remove();
+              $('#add_ar_button').prop('disabled', false);
+              Sunstone.runAction(RESOURCE+'.refresh');
+            },
+            error: function (req, res) {
+              $('#ar_spiner').remove();
+              $('#add_ar_button').prop('disabled', false);
+              Notifier.notifyError(res);
+            }
+          });
+          return false;
+        });
+      }
+    }else{
+      if (Config.isTabActionEnabled("vnets-tab", "Network.remove_ar")) {
+        context.off("click", 'button#rm_ar_button');
+        context.on("click", 'button#rm_ar_button', function () {
+          var ar_id = $(this).attr('ar_id');
+
+          Sunstone.getDialog(CONFIRM_DIALOG_ID).setParams({
+            //header :
+            headerTabId: TAB_ID,
+            body: Locale.tr("This will delete all the addresses in this range"),
+            //question :
+            submit: function () {
+              var obj = {ar_id: ar_id};
+              Sunstone.runAction('Network.rm_ar', that.element.ID, obj);
+
+              return false;
+            }
+          });
+
+          Sunstone.getDialog(CONFIRM_DIALOG_ID).reset();
+          Sunstone.getDialog(CONFIRM_DIALOG_ID).show();
+
+          return false;
+        });
+      }
+
+      if (Config.isTabActionEnabled("vnets-tab", "Network.add_ar")) {
+        context.off("click", 'button#add_ar_button');
+        context.on("click", 'button#add_ar_button', function () {
+          var id = that.element.ID;
+
+          Sunstone.getDialog(ADD_AR_DIALOG_ID).setId(id);
+          Sunstone.getDialog(ADD_AR_DIALOG_ID).show();
+
+          return false;
+        });
+      }
+
+      if (Config.isTabActionEnabled("vnets-tab", "Network.update_ar")) {
+        context.off("click", 'button#update_ar_button');
+        context.on("click", 'button#update_ar_button', function () {
+          var id = that.element.ID;
+          var ar_id = $(this).attr('ar_id');
+
+          OpenNebulaNetwork.show({
+            data: {
+              id: id
+            },
+            timeout: true,
+            success: function (request, vn) {
+              var vn_info = vn.VNET;
+
+              var ar = getAR(vn_info, ar_id);
+
+              if (ar != undefined) {
+                Sunstone.getDialog(UPDATE_AR_DIALOG_ID).reset();
+
+                Sunstone.getDialog(UPDATE_AR_DIALOG_ID).setParams({
+                  'vnetId': id,
+                  'arId': ar_id,
+                  'arData': $.extend({}, ar)
+                });
+
+                Sunstone.getDialog(UPDATE_AR_DIALOG_ID).show();
+
+              } else {
+                Notifier.notifyError(Locale.tr("The Address Range was not found"));
+                Sunstone.runAction("Network.show", id);
+              }
+            },
+            error: Notifier.onError
+          });
+
+          return false;
+        });
+      }
     }
-
     return false;
   }
 
@@ -289,7 +356,7 @@ define(function(require) {
     var ar = getAR(vn_info, arId);
 
     if(ar == undefined){
-        return "";
+      return "";
     }
 
     var first_mac       = ar.MAC;
@@ -380,7 +447,7 @@ define(function(require) {
     var ar = getAR(vn_info, ar_id);
 
     if(ar == undefined){
-        return;
+      return;
     }
 
     if (this.secgroupTable != undefined){

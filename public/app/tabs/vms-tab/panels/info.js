@@ -52,7 +52,9 @@ define(function(require) {
   function Panel(info) {
     this.title = Locale.tr("Info");
     this.icon = "fa-info-circle";
-
+    if (info[XML_ROOT].USER_TEMPLATE.HYPERVISOR != 'AZURE'){
+      $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled');
+    }
     this.element = info[XML_ROOT];
 
     return this;

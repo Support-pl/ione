@@ -20,11 +20,11 @@ define(function(require) {
   var VNetsTable = require('tabs/vnets-tab/datatable');
   var RangeSlider = require('utils/range-slider');
   var UniqueId = require('utils/unique-id');
-
+  var Sunstone = require('sunstone');
   var TemplateHTML = require('hbs!./user-inputs/table');
   var RowTemplateHTML = require('hbs!./user-inputs/row');
-
-
+  var Settings = require('opennebula/settings');
+  var Notifier = require('utils/notifier');
   //==============================================================================
   // VM & Service user inputs
   //==============================================================================
@@ -654,7 +654,6 @@ define(function(require) {
    */
   function _attributeInput(attr) {
     var input;
-
     var required = (attr.mandatory ? "required" : "");
 
     var wizard_field = 'wizard_field="' + TemplateUtils.htmlEncode(attr.name) + '"';
@@ -729,6 +728,29 @@ define(function(require) {
         break;
       case "fixed":
         input = '<input type="text" value="'+value+'" '+wizard_field+' '+required+' disabled/>';
+        break;
+      case "superlist":
+        input = '<input type="button" class="button radius" value="'+attr.params+'" '+wizard_field+' '+required+'/>';
+        $('#left_colum').on("click", '[wizard_field="'+attr.name+'"]', function(){
+          Settings.cloud({success:function(r, res) {
+              if (r.error != undefined){
+                Notifier.notifyError(Locale.tr("No settings"));
+                return false;
+              }
+              settings = r.response;
+              if (settings[attr.initial] != undefined){
+                Sunstone.getDialog('superlistTemplateDialog').setParams(
+                    { tabId : 'templates-tab',
+                      resource : 'Template',
+                      dialog:{label:attr.params,name: attr.name,field_name:attr.initial, field_data:settings[attr.initial]}
+                    });
+                Sunstone.getDialog('superlistTemplateDialog').reset();
+                Sunstone.getDialog('superlistTemplateDialog').show();
+              }else{
+                Notifier.notifyError(Locale.tr("No settings field")+' '+attr.initial);
+              }
+            }});
+        });
         break;
     }
 

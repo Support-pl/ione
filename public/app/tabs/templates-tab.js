@@ -24,7 +24,8 @@ define(function(require) {
   var DATATABLE_ID = "dataTableTemplates";
 
   var _dialogs = [
-    require('./templates-tab/dialogs/clone')
+    require('./templates-tab/dialogs/clone'),
+    require('./templates-tab/dialogs/superlist')
   ];
 
   var _panels = [

@@ -30,7 +30,9 @@ define(function(require) {
   var TemplateUtils = require("utils/template-utils");
   var WizardFields = require("utils/wizard-fields");
   var ResourceSelect = require("utils/resource-select");
-
+  var OpenNebula = require('opennebula');
+  var Settings = require('opennebula/settings');
+  var Notifier = require('utils/notifier');
   /*
     TEMPLATES
    */
@@ -123,6 +125,18 @@ define(function(require) {
       return false;
     });
 
+    $('#private_ip_div').click(function() {
+      if ($('#input_private_ip').val() == 'on'){
+        $('#input_public_ip').prop('checked',false);
+      }
+    });
+
+    $('#public_ip_div').click(function() {
+      if ($('#input_public_ip').val() == 'on'){
+        $('#input_private_ip').prop('checked',false);
+      }
+    });
+
     $("#vnetCreateARTab #vnetCreateARTabUpdate", context).hide();
 
     $("#network_mode", context).change(function() {
@@ -135,7 +149,56 @@ define(function(require) {
       $("#vcenter_cluster_id", context).removeAttr("required");
       $(".sec_groups_datatable", context).show();
       $("#vnetCreateSecurityTab-label").show();
+      $('#vnetCreateQoSTab-label').show();
+      $('#vnetCreateContextTab-label').show();
+      $('#vnetCreateARTab-label').show();
+
+      if ($(this).val() == 'azure'){
+        $('#vnetCreateBridgeTab .row').eq(0).hide();
+      }else{
+        $('#bridge').val('');
+        $('#vnetCreateBridgeTab .row').eq(0).show();
+      }
+
       switch ($(this).val()) {
+        case "azure":
+          $('#bridge').val('driver');
+          $('div.mode_param.azure').show();
+          $("#vnetCreateSecurityTab-label").hide();
+          $('#vnetCreateQoSTab-label').hide();
+          $('#vnetCreateContextTab-label').hide();
+
+          $('#vnetCreateARTab-label').hide();
+          $('#ar0_size').val('1231');
+          $('#ar0_ip_start').val('1231');
+          
+          var azure_group_id;
+          Settings.cloud({success:function(r, res) {
+              azure_group_id = r.response.AZURE_GROUP_ID;
+              OpenNebula.User.list({success: function(r,res){
+                for(var i in res){
+                  var groups = res[i].USER.GROUPS.ID;
+                  if (typeof(groups) == 'object' && groups.indexOf(azure_group_id) != -1 && groups.indexOf('0') != -1){
+                    $('datalist#vars_resource_group').append('<option value="one-'+res[i].USER.ID+'-'+res[i].USER.NAME+'">');
+                  }
+                }
+              }});
+          }});
+
+          ResourceSelect.insert({
+            context: $("#vcenter_cluster_id", context),
+            resourceName: "Host",
+            emptyValue: true,
+            nameValues: false,
+            filterKey: "VM_MAD",
+            filterValue: "azure",
+            required: true,
+            callback: function(element){
+              element.attr("wizard_field", "VCENTER_ONE_HOST_ID");
+            }
+          });
+
+          break;
       case "dummy":
         $("div.mode_param.dummy", context).show();
         $("div.mode_param.dummy [wizard_field]", context).prop("wizard_field_disabled", false);
@@ -292,30 +355,50 @@ define(function(require) {
     //Fetch values
     var network_json = {};
 
-    $.extend(network_json, WizardFields.retrieve($("#vnetCreateGeneralTab", context)));
-    $.extend(network_json, WizardFields.retrieve($("#vnetCreateBridgeTab", context)));
-    $.extend(network_json, WizardFields.retrieve($("#vnetCreateQoSTab", context)));
-    $.extend(network_json, WizardFields.retrieve($("#vnetCreateContextTab", context)));
+    if ($('#network_mode').val() != 'azure') {
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateGeneralTab", context)));
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateBridgeTab", context)));
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateQoSTab", context)));
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateContextTab", context)));
 
-    var secgroups = this.securityGroupsTable.retrieveResourceTableSelect();
-    if (secgroups != undefined && secgroups.length != 0) {
-      network_json["SECURITY_GROUPS"] = secgroups.join(",");
-    }
+      var secgroups = this.securityGroupsTable.retrieveResourceTableSelect();
+      if (secgroups != undefined && secgroups.length != 0) {
+        network_json["SECURITY_GROUPS"] = secgroups.join(",");
+      }
 
-    $.extend(network_json, CustomTagsTable.retrieve($("#vnetCreateContextTab", context)));
+      $.extend(network_json, CustomTagsTable.retrieve($("#vnetCreateContextTab", context)));
 
-    $(".ar_tab", context).each(function() {
-      var ar_id = $(this).attr("ar_id");
-      var hash = that.arTabObjects[ar_id].retrieve();
+      $(".ar_tab", context).each(function () {
+        var ar_id = $(this).attr("ar_id");
+        var hash = that.arTabObjects[ar_id].retrieve();
 
-      if (!$.isEmptyObject(hash)) {
-        if (!network_json["AR"])
+        if (!$.isEmptyObject(hash)) {
+          if (!network_json["AR"])
             network_json["AR"] = [];
 
-        network_json["AR"].push(hash);
+          network_json["AR"].push(hash);
+        }
+      });
+    }else{
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateGeneralTab", context)));
+      $.extend(network_json, WizardFields.retrieve($("#vnetCreateBridgeTab", context)));
+      network_json['AZURE_HOST_ID'] = network_json.VCENTER_ONE_HOST_ID;
+      delete network_json.VCENTER_ONE_HOST_ID;
+      if ($('#azure_resource_group').val() != ''){
+        network_json['RESOURCE_GROUP'] = $('#azure_resource_group').val();
       }
-    });
+      if ($('#input_public_ip').prop('checked') == true){
+        network_json['NETWORK_TYPE'] = 'PUBLIC';
+      }else if ($('#input_private_ip').prop('checked') == true){
+        network_json['NETWORK_TYPE'] = 'PRIVATE';
+      }else{
+        Notifier.notifyError('Select Network type')
+        return false;
+      }
+      network_json.LOCATION="West Europe"
+    }
 
+    console.log(this.action, network_json);
     if (this.action == "create") {
       network_json = {
         "vnet" : network_json

@@ -88,8 +88,7 @@ define(function(require) {
                   <th>' + Locale.tr("IPv6 Global") + '</th>\
                   <th colspan="">' + Locale.tr("Actions") + '</th>\
                   <th>'                 ;
-
-    if (Config.isTabActionEnabled("vms-tab", "VM.attachnic")) {
+    if (Config.isTabActionEnabled("vms-tab", "VM.attachnic") && that.element.USER_TEMPLATE.HYPERVISOR != 'AZURE') {
       if (StateActions.enabledStateAction("VM.attachnic",
             that.element.STATE,
             that.element.LCM_STATE) &&
@@ -269,7 +268,7 @@ define(function(require) {
             actions = Locale.tr("attach/detach in progress")
           } else {
             if ( (Config.isTabActionEnabled("vms-tab", "VM.detachnic")) &&
-                 (StateActions.enabledStateAction("VM.detachnic", that.element.STATE, that.element.LCM_STATE))) {
+                 (StateActions.enabledStateAction("VM.detachnic", that.element.STATE, that.element.LCM_STATE)) && that.element.USER_TEMPLATE.HYPERVISOR != 'AZURE') {
               actions += '<a href="VM.detachnic" class="detachnic" ><i class="fa fa-times"/>' + Locale.tr("Detach") + '</a>'
             }
           }

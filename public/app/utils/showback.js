@@ -51,7 +51,8 @@ define(function(require) {
     //--------------------------------------------------------------------------
     // VM owner: all, group, user
     //--------------------------------------------------------------------------
-
+    var that = this;
+    that.onshow = _onShow(context, that);
     if (opt.fixed_user != undefined){
       $("#showback_user_container", context).hide();
     } else {
@@ -164,47 +165,25 @@ define(function(require) {
     // Submit request
     //--------------------------------------------------------------------------
 
-    $("#showback_submit", context).on("click", function(){
-      var options = {};
 
-      var uid = config.user_id;
-      var edate = Math.round(Date.now() / 1000);
+  }
 
-      var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
-          lists = req.response;
-          lists_month = create_list_months(lists);
 
-          _fillShowback(context);
+  function _onShow(context, that) {
+    var uid = config.user_id;
+    var edate = Math.round(Date.now() / 1000);
+
+    var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
+        lists = req.response;
+        lists_month = create_list_months(lists);
+
+        _fillShowback(context);
       }};
-      Settings.showback(param);
+    Settings.showback(param);
 
-      var userfilter;
-      var group;
+    Tips.setup(context);
 
-      if (opt.fixed_user != undefined){
-        userfilter = opt.fixed_user;
-      } else {
-        userfilter = $("#showback_user_select .resource_list_select", context).val();
-      }
-
-      if (opt.fixed_group != undefined){
-        group = opt.fixed_group;
-      } else {
-        group = $("#showback_group_select .resource_list_select", context).val();
-      }
-
-      if(userfilter != ""){
-        options.userfilter = userfilter;
-      }
-
-      if(group != ""){
-        options.group = group;
-      }
-
-      Tips.setup(context);
-
-      return false;
-    });
+    return false;
   }
 
   function _fillShowback(context) {
