@@ -30,7 +30,7 @@
           {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
         </span>
         </label>
-        <input type="text" name="vm_name" id="vm_name" />
+        <input type="text" name="vm_name" readonly onfocus="this.removeAttribute('readonly');" id="vm_name" />
       </div>
 
       <div class="medium-2 small-12 columns" style="width: 50%">
@@ -49,8 +49,7 @@
           <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
         </span>
         </h6>
-        <span>
-        <img id="OC_image" src="">
+        <span id="OC_image">
         </span>
         <div class="OC_name_Container">
 
@@ -163,7 +162,7 @@
       </div>
 
       <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">Создать</button></div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">{{tr "Create"}}</button></div>
     </div>
 
 
@@ -336,7 +335,7 @@
           {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
         </span>
         </label>
-        <input type="text" name="vm_name" id="vm_name" />
+        <input type="text" name="vm_name" readonly onfocus="this.removeAttribute('readonly');" id="vm_name" />
       </div>
 
       <div class="medium-2 small-12 columns" style="width: 50%">
@@ -350,7 +349,7 @@
       <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
         <h6>
           {{element.NAME}}<br>
-        <span class="total_cost_div" style="display: none">
+          <span class="total_cost_div" style="display: none">
           <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
           <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
         </span>
@@ -364,7 +363,7 @@
         <fieldset>
           <legend style="width: 100%">
             <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
-          <span class="capacity_cost_div" style="display: none">
+            <span class="capacity_cost_div" style="display: none">
             <span class="cost_value">0.00</span>
             <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
           </span>
@@ -379,36 +378,36 @@
       {{#if default_user_view}}
       <div class="small-12 columns nicsContext{{element.ID}}" style="width: 100%">
         <div class="provision_network_selector">
-        <fieldset style="padding-top: 1rem">
-          <legend style="width: 100%">
-            <i class="fa fa-globe"></i> {{tr "Network"}}<br>
-          </legend>
-          <div class="provision_network_selector_div">
-            <div>
-              <label style="width: 20%;float: left;">{{tr "Public IP"}}</label>
-              <div id="public_ip_div" style="width: 45%;float: left;margin-left: 33%;">
-                <div class="switch left" style="margin-right: 20%;">
-                  <input class="switch-input" id="input_public_ip" type="checkbox">
-                  <label class="switch-paddle" for="input_public_ip">
-                  </label>
+          <fieldset style="padding-top: 1rem">
+            <legend style="width: 100%">
+              <i class="fa fa-globe"></i> {{tr "Network"}}<br>
+            </legend>
+            <div class="provision_network_selector_div">
+              <div>
+                <label style="width: 20%;float: left;">{{tr "Public IP"}}</label>
+                <div id="public_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                  <div class="switch left" style="margin-right: 20%;">
+                    <input class="switch-input" id="input_public_ip" type="checkbox">
+                    <label class="switch-paddle" for="input_public_ip">
+                    </label>
+                  </div>
+                  <input type="number" id="amt_public_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
                 </div>
-                <input type="number" id="amt_public_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
               </div>
-            </div>
 
-            <div>
-              <label style="width: 20%;float: left;">{{tr "Private IP"}}</label>
-              <div id="private_ip_div" style="width: 45%;float: left;margin-left: 33%;">
-                <div class="switch left" style="margin-right: 20%;">
-                  <input class="switch-input" id="input_private_ip" type="checkbox">
-                  <label class="switch-paddle" for="input_private_ip">
-                  </label>
+              <div>
+                <label style="width: 20%;float: left;">{{tr "Private IP"}}</label>
+                <div id="private_ip_div" style="width: 45%;float: left;margin-left: 33%;">
+                  <div class="switch left" style="margin-right: 20%;">
+                    <input class="switch-input" id="input_private_ip" type="checkbox">
+                    <label class="switch-paddle" for="input_private_ip">
+                    </label>
+                  </div>
+                  <input type="number" id="amt_private_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
                 </div>
-                <input type="number" id="amt_private_ip" value="1" min="1" max="10" style="width: 50px;" disabled>
               </div>
             </div>
-          </div>
-        </fieldset>
+          </fieldset>
         </div>
       </div>
       {{else}}
@@ -451,20 +450,20 @@
 
       <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
         <div id="element_cost">
-        <div style="width: 100%">
+          <div style="width: 100%">
           <span class="capacity_cost_div" >
             <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
             <span class="cost_label"></span>
           </span>
-        </div>
-        <div style="width: 100%">
+          </div>
+          <div style="width: 100%">
           <span class="provision_create_template_disk_cost_div">
             <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
             <span class="cost_label"></span>
           </span>
-        </div>
+          </div>
         </div>
         <div id="publicip_cost_div" hidden style="width: 100%">
           <span class="publicip_cost_div">
@@ -485,7 +484,7 @@
       </div>
 
       <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">Создать</button></div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">{{tr "Create"}}</button></div>
     </div>
 
 
@@ -493,6 +492,83 @@
 
   {{#if default_user_view}}
   <div style="display: none">
+    {{#advancedSection (tr "Advanced options") }}
+    {{#isFeatureEnabled "show_host_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns hostContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fas fa-hdd"></i> {{tr "Deploy VM in a specific Host"}}
+          </legend>
+          <div class="provision_host_selector{{element.ID}}" data-tab-content>{{{hostsDatatable}}}</div>
+          <div class="row">
+            <div class="large-12 columns">
+              <label for="SCHED_REQUIREMENTS">
+                {{tr "Expression"}}
+                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+              </label>
+              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    {{#isFeatureEnabled "show_ds_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns dsContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fas fa-folder-open"></i> {{tr "Deploy VM in a specific Datastore"}}
+          </legend>
+          <div class="provision_ds_selector{{element.ID}}" data-tab-content>{{{dsDatatable}}}</div>
+          <div class="row">
+            <div class="large-12 columns">
+              <label for="SCHED_DS_REQUIREMENTS">
+                {{tr "Expression"}}
+                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
+              </label>
+              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    {{#isFeatureEnabled "show_vmgroup_instantiate"}}
+    <div class="row">
+      <div class="small-12 columns vmgroupContext{{element.ID}}">
+        <fieldset>
+          <legend>
+            <i class="fa fa-globe"></i> {{tr "VM Group"}}
+          </legend>
+          <div>
+            <a class="button small provision_add_vmgroup">
+              <i class="fa fa-lg fa-plus-circle add_vmgroup"></i> {{tr "VM Group"}}
+            </a>
+          </div>
+          <div class="provision_vmgroup_selector">
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    {{/isFeatureEnabled}}
+    <div class="row">
+      <div class="medium-6 small-12 columns vcenterVMFolderContext{{element.ID}}">
+        <div class="provision_vcenter_vm_folder_selector">
+        </div>
+      </div>
+    </div>
+    {{/advancedSection}}
+  </div>
+
+
+
+  {{else}}
+
+
+
+
   {{#advancedSection (tr "Advanced options") }}
   {{#isFeatureEnabled "show_host_instantiate"}}
   <div class="row">
@@ -539,83 +615,6 @@
   {{#isFeatureEnabled "show_vmgroup_instantiate"}}
   <div class="row">
     <div class="small-12 columns vmgroupContext{{element.ID}}">
-      <fieldset>
-        <legend>
-          <i class="fa fa-globe"></i> {{tr "VM Group"}}
-        </legend>
-        <div>
-          <a class="button small provision_add_vmgroup">
-            <i class="fa fa-lg fa-plus-circle add_vmgroup"></i> {{tr "VM Group"}}
-          </a>
-        </div>
-        <div class="provision_vmgroup_selector">
-        </div>
-      </fieldset>
-    </div>
-  </div>
-  {{/isFeatureEnabled}}
-  <div class="row">
-    <div class="medium-6 small-12 columns vcenterVMFolderContext{{element.ID}}">
-      <div class="provision_vcenter_vm_folder_selector">
-      </div>
-    </div>
-  </div>
-  {{/advancedSection}}
-  </div>
-
-
-
-  {{else}}
-
-
-
-
-  {{#advancedSection (tr "Advanced options") }}
-  {{#isFeatureEnabled "show_host_instantiate"}}
-  <div class="row">
-    <div class="small-12 columns hostContext{{element.ID}}">
-      <fieldset>
-        <legend>
-          <i class="fas fa-hdd"></i> {{tr "Deploy VM in a specific Host"}}
-        </legend>
-        <div class="provision_host_selector{{element.ID}}" data-tab-content>{{{hostsDatatable}}}</div>
-        <div class="row">
-            <div class="large-12 columns">
-              <label for="SCHED_REQUIREMENTS">
-                {{tr "Expression"}}
-                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
-              </label>
-              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
-            </div>
-        </div>
-      </fieldset>
-    </div>
-  </div>
-  {{/isFeatureEnabled}}
-  {{#isFeatureEnabled "show_ds_instantiate"}}
-  <div class="row">
-    <div class="small-12 columns dsContext{{element.ID}}">
-      <fieldset>
-        <legend>
-          <i class="fas fa-folder-open"></i> {{tr "Deploy VM in a specific Datastore"}}
-        </legend>
-        <div class="provision_ds_selector{{element.ID}}" data-tab-content>{{{dsDatatable}}}</div>
-        <div class="row">
-            <div class="large-12 columns">
-              <label for="SCHED_DS_REQUIREMENTS">
-                {{tr "Expression"}}
-                {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
-              </label>
-              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
-            </div>
-        </div>
-      </fieldset>
-    </div>
-  </div>
-  {{/isFeatureEnabled}}
-  {{#isFeatureEnabled "show_vmgroup_instantiate"}}
-  <div class="row">
-   <div class="small-12 columns vmgroupContext{{element.ID}}">
       <fieldset>
         <legend>
           <i class="fa fa-globe"></i> {{tr "VM Group"}}
