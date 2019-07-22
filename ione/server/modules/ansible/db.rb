@@ -271,8 +271,9 @@ class AnsiblePlaybookProcess
                 end
                 clean
                 scan
-            rescue
+            rescue => e
                 @status = 'failed'
+                @log = "Internal Error:\n" + e.message + "\n---\n---\nBacktrace:\n" + e.backtrace.join("\n")
             ensure
                 update
             end
