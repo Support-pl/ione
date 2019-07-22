@@ -26,10 +26,8 @@ post '/vm/:id/reinstall' do | id |
       image = OpenNebula::Image.new_with_id(template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID'], @one_client)
       image.info!
       
-      if @one_user.id != vm['OWNERID'].to_i then
+      if !(@one_user.id == vm['OWNERID'].to_i || @one_user.groups.include?(0)) then
          r error: "User is not OWNER for given VM"
-#      elsif vm.values.include?(nil) || data.values.include?(nil) then
-#         r error: "VM has empty values", data: data, vm: vm
       elsif vm['DRIVE'].to_i < image['/IMAGE/SIZE'].to_i then
          r error: "Drive cannot be smaller then #{image['/IMAGE/SIZE']}"
       else

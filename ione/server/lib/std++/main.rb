@@ -1,5 +1,4 @@
 require 'json'
-require 'digest/md5'
 
 puts 'Extending Hash class by out method'
 # Ruby default Hash class
@@ -12,22 +11,6 @@ class Hash
     def debug_out
         JSON.pretty_generate(self).gsub("\": ", "\" => ").gsub(" => null", " => nil")
     end
-    # @!visibility private
-    # Crypts all private keys data, such as passwords. Configurable
-    def privatize
-        result = {}
-        self.each do |key, value|
-            if value.class == Hash then
-                result[key] = value.privatize
-                next
-            elsif key.private? then
-                result[key] = Digest::MD5.hexdigest(Digest::MD5.hexdigest(Digest::MD5.hexdigest(value.to_s)))
-            else
-                result[key] = value
-            end
-        end
-        result
-    end
     # Replaces string keys with symbol keys
     # @return [Hash]
     def to_sym!
@@ -35,7 +18,7 @@ class Hash
             self[key.to_sym] = self.delete key if key.class == String
         end
         self
-    end    
+    end
     # Replaces all keys with string keys
     # @return [Hash]
     def to_s!
@@ -88,19 +71,6 @@ class Array
             cpy.delete(val) 
         end
         cpy
-    end
-end
-
-# Ruby default String class
-class String
-    # @!visibility private
-    # Checks is key configured as private
-    def private?
-        result = false
-        for key in CONF['PrivateKeys'] do
-            result = result || self.include?(key)
-        end
-        result
     end
 end
 

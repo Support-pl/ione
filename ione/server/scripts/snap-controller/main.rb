@@ -18,13 +18,13 @@ begin
                     vm.list_snapshots.each do | snap |
                         break if snap.class == Array || snap.nil?
                         age = ((Time.now.to_i - snap['TIME'].to_i) / 3600.0).round(2)
-                        out += "\t\t\t\t|  #{age >= 24 ? 'V' : 'X'}  |  #{active_state ? 'V' : 'X'}  |  #{vm.id} |   #{' ' if age < 10}#{age}  | #{snap['NAME']}\n"
+                        out += "\t|  #{age >= 24 ? 'V' : 'X'}  |  #{active_state ? 'V' : 'X'}  | #{vm.id} |   #{' ' if age < 10}#{age}  | #{snap['NAME']}\n"
                         IONe.new($client, $db).RMSnapshot(vm.id, snap['SNAPSHOT_ID'], false)  || found if age >= 24 && active_state
                     end
                 end
                 sleep(300) if found
             end
-            LOG "Detected snapshots:\n\t\t\t\t| rm? | del | vmid |   age   |          name          \n#{out}\nDeleting snapshots, which marked with 'V'", 'SnapController'
+            LOG "Detected snapshots:\n\t| rm? | del | vmid |   age   |          name          \n#{out}\nDeleting snapshots, which marked with 'V'", 'SnapController'
             $snap_controller_status = 'SLEEP'
             sleep(CONF['SnapshotController']['check-period'] - iter * 300)
         rescue => e

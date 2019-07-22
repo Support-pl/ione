@@ -16,7 +16,6 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'Suspend') }
-        return 0
         begin
             trace << "Printing debug info:#{__LINE__ + 1}"
             LOG "Suspending VM#{params['vmid']}", "Suspend" if log

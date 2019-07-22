@@ -60,6 +60,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true)
         defer { LOG_CALL(id, false, 'Reinstall') }
+            params.to_s!
             LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
             return nil if params['debug'] == 'turn_method_off'
             return { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0', 'ip_old' => '0.0.0.0' } if params['debug'] == 'data'   
@@ -68,7 +69,8 @@ class IONe
             trace << "Checking params:#{__LINE__ + 1}"
             if params.get('vmid', 'groupid', 'userid', 'templateid').include?(nil) then
                 LOG "ReinstallError - some params are nil", 'Reinstall'
-                return "ReinstallError - some params are nil"
+                LOG_DEBUG params.get('vmid', 'groupid', 'userid', 'templateid')
+                return "ReinstallError - some params are nil", params
             end
             params['vmid'], params['groupid'], params['userid'], params['templateid'] = params.get('vmid', 'groupid', 'userid', 'templateid').map { |el| el.to_i }
             
@@ -91,11 +93,12 @@ class IONe
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
             nic, context = vm.to_hash!['VM']['TEMPLATE']['NIC'], vm.to_hash['VM']['TEMPLATE']['CONTEXT']
+            vn, vn_uname = nic['NETWORK'], onblock(:vn, 'btk-inet'){|vn| vn.info!; vn['/VNET/UNAME']}
             
             LOG_DEBUG 'Initializing template obj'
             LOG_DEBUG 'Generating new template'
             trace << "Generating NIC context:#{__LINE__ + 1}"
-            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{nic['NETWORK']}\"\n]\n"
+            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{vn}\",\n\tNETWORK_UNAME=\"#{vn_uname}\"\n]\n"
             trace << "Generating template object:#{__LINE__ + 1}"            
             template = onblock(Template, params['templateid'])
             template.info!

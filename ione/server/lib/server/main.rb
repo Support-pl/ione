@@ -31,15 +31,6 @@ class IONe
         defer { LOG_CALL(id, false, 'uptime') }
         fmt_time(Time.now.to_i - STARTUP_TIME)
     end
-    # Returns CONF Hash as JSON, with crypted private data
-    # @return [String] JSON
-    def conf
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'conf') }
-        CONF.privatize.out
-    end
     # @api private
     def reboot(pa)
         `sh #{ROOT}/service/handlers/reboot_key.sh &` if pa['ss']
