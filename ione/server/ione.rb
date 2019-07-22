@@ -11,11 +11,15 @@ puts 'Getting path to the server'
 ROOT = SUNSTONE_ROOT_DIR + '/ione/server' # IONe root path
 LOG_ROOT = LOG_LOCATION # IONe logs path
 
-if ROOT.nil? || LOG_ROOT.nil? then
-    puts "Set ENV variables $IONEROOT and $IONELOGROOT at .bashrc and systemd!"
-    raise "ENV NOT SET"
+MAIN_IONE = if File.exist? "#{ROOT}/ione.lock" then
+    false
+else
+    File.open("#{ROOT}/ione.lock", 'w'){ |f| f.write 'locked' }
+    at_exit do
+        File.delete("#{ROOT}/ione.lock")
+    end
+    true
 end
-
 puts 'Parsing config file'
 CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 
@@ -148,7 +152,7 @@ begin
 rescue => e
     LOG_ERROR "ScriptsController fatal error | #{e}", 'ScriptController', 'red', 'underline'
     puts "ScriptsController fatal error | #{e}"
-end
+end if MAIN_IONE
 
 puts 'Making IONe methods deferable'
 class IONe
@@ -174,4 +178,4 @@ LOG_COLOR "Server initialized", 'none', 'green'
 puts 'Pre-init job ended, starting up server'
 Thread.new do
     server.server_loop # Server start
-end if !defined? DEBUG_LIB
+end if !defined?(DEBUG_LIB) && MAIN_IONE
