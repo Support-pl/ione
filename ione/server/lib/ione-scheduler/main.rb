@@ -8,8 +8,8 @@ def class_from_string(str)
 end
 
 @db_client = Mysql2::Client.new(
-    :username => CONF['DataBase']['user'], :password => CONF['DataBase']['pass'], 
-    :host => CONF['DataBase']['host'], :database => 'ioneschedule'
+    :username => $ione_conf['DataBase']['user'], :password => $ione_conf['DataBase']['pass'], 
+    :host => $ione_conf['DataBase']['host'], :database => 'ioneschedule'
 )
 
 # Schedules action

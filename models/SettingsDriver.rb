@@ -1,9 +1,11 @@
-require 'mysql2'
 require 'sequel'
 
-# Get this values from /etc/oned.conf
+require $ione_conf['DataBase']['gem']
 $DB = Sequel.connect({
-    adapter: :mysql2, user: 'root', password: 'opennebula', database: 'opennebula', host: 'localhost', :encoding => 'utf8' })
+        adapter: $ione_conf['DataBase']['adapter'].to_sym,
+        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
+        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
+        encoding: 'utf8mb4'   })
 
 begin
     $DB.create_table :settings do 
@@ -40,7 +42,7 @@ get '/settings' do
     begin
         r response: db_result(SETTINGS_TABLE)
     rescue => e
-        r error: e.message
+        r error: e.message, debug: e.class
     end
 end
 

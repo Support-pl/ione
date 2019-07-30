@@ -20,8 +20,8 @@ else
     end
     true
 end
-puts 'Parsing config file'
-CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+
+CONF = $ione_conf # for sure
 
 puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
@@ -29,11 +29,11 @@ include IONeLoggerKit
 
 puts 'Checking service version'
 VERSION = File.read("#{ROOT}/meta/version.txt") # IONe version
-DEBUG = CONF['Other']['debug'] # IONe debug level
-USERS_GROUP = CONF['OpenNebula']['users-group'] # OpenNebula users group
-TRIAL_SUSPEND_DELAY = CONF['Server']['trial-suspend-delay'] # Trial VMs suspend delay
+DEBUG = $ione_conf['Other']['debug'] # IONe debug level
+USERS_GROUP = $ione_conf['OpenNebula']['users-group'] # OpenNebula users group
+TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay'] # Trial VMs suspend delay
 
-USERS_VMS_SSH_PORT = CONF['OpenNebula']['users-vms-ssh-port'] # Default SSH port at OpenNebula Virtual Machines 
+USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port'] # Default SSH port at OpenNebula Virtual Machines 
 
 puts 'Setting up Environment(OpenNebula API)'
 ###########################################
@@ -44,16 +44,16 @@ require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #CONF['OpenNebula']['credentials']
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = CONF['OpenNebula']['endpoint']
+ENDPOINT = $ione_conf['OpenNebula']['endpoint']
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
-require CONF['DataBase']['adapter']
+require $ione_conf['DataBase']['adapter']
 $db = Sequel.connect({
-        adapter: CONF['DataBase']['adapter'].to_sym,
-        user: CONF['DataBase']['user'], password: CONF['DataBase']['pass'],
-        database: CONF['DataBase']['database'], host: CONF['DataBase']['host'],
+        adapter: $ione_conf['DataBase']['adapter'].to_sym,
+        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
+        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
         encoding: 'utf8mb4'   })
 
 puts 'Including on_helper funcs'
@@ -100,7 +100,7 @@ end
 puts 'Including Libs'
 LOG_COLOR 'Including Libs:', 'none', 'green', 'bold'
 begin
-    CONF['Include'].each do | lib |
+    $ione_conf['Include'].each do | lib |
         puts "\tIncluding #{lib}"    
         begin
             require "#{ROOT}/lib/#{lib}/main.rb"
@@ -109,7 +109,7 @@ begin
             LOG_COLOR "Library \"#{lib}\" was not included | Error: #{e.message}", 'LibraryController'
             puts "Library \"#{lib}\" was not included | Error: #{e.message}"
         end
-    end if CONF['Include'].class == Array
+    end if $ione_conf['Include'].class == Array
 rescue => e
     LOG_ERROR "LibraryController fatal error | #{e}", 'LibraryController', 'red', 'underline'
     puts "\tLibraryController fatal error | #{e}"
@@ -118,17 +118,17 @@ end
 puts 'Including Modules'
 LOG_COLOR 'Including Modules:', 'none', 'green', 'bold'
 begin
-    CONF['Modules'].each do | mod |
+    $ione_conf['Modules'].each do | mod |
         puts "\tIncluding #{mod}"    
         begin
-            CONF.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
+            $ione_conf.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
             require "#{ROOT}/modules/#{mod}/main.rb"
             LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
         rescue => e
             LOG_COLOR "Module \"#{mod}\" was not included | Error: #{e.message}", 'ModuleController'
             puts "Module \"#{mod}\" was not included | Error: #{e.message}"
         end
-    end if CONF['Modules'].class == Array
+    end if $ione_conf['Modules'].class == Array
 rescue => e
     LOG_ERROR "ModuleController fatal error | #{e}", 'ModuleController', 'red', 'underline'
     puts "\tModuleController fatal error | #{e}"
@@ -137,7 +137,7 @@ end
 puts 'Including Scripts'
 LOG_COLOR 'Starting scripts:', 'none', 'green', 'bold'
 begin
-    CONF['Scripts'].each do | script |
+    $ione_conf['Scripts'].each do | script |
         puts "\tIncluding #{script}"
         begin
             Thread.new do
@@ -148,7 +148,7 @@ begin
                 LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
                 puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
         end
-    end if CONF['Scripts'].class == Array
+    end if $ione_conf['Scripts'].class == Array
 rescue => e
     LOG_ERROR "ScriptsController fatal error | #{e}", 'ScriptController', 'red', 'underline'
     puts "ScriptsController fatal error | #{e}"
@@ -168,7 +168,7 @@ rpc_log_file = "#{LOG_ROOT}/rpc.log"
 
 LOG "Initializing JSON-RPC Server..."
 puts 'Initializing JSON_RPC server and logic handler'
-server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{CONF['Server']['listen-port']}", Logger.new(rpc_log_file))
+server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{$ione_conf['Server']['listen-port']}", Logger.new(rpc_log_file))
 LOG_COLOR "Server initialized", 'none', 'green'
 
 # Signal.trap('CLD') do

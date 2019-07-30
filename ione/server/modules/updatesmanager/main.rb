@@ -1,7 +1,7 @@
 class IONe
     # Updates IONe from Github
     def IONeUpdate(token, trace = ["Update Process starter:#{__LINE__}"])
-        return 'Wrong token!' if token != CONF['UpdatesManager']['update-token']
+        return 'Wrong token!' if token != $ione_conf['UpdatesManager']['update-token']
         LOG_TEST "IONe update query accepted"
         Thread.new do
             begin
@@ -13,7 +13,7 @@ class IONe
                 `cp -rf #{ROOT}/* /tmp/ione_current/` 
 
                 trace << "Cloning git repository to temporary dir:#{__LINE__ + 1}"
-                `git clone --branch #{CONF['UpdatesManager']['branch']} #{CONF['UpdatesManager']['repo']} /tmp/ione`
+                `git clone --branch #{$ione_conf['UpdatesManager']['branch']} #{$ione_conf['UpdatesManager']['repo']} /tmp/ione`
 
                 trace << "Replacing the old server:#{__LINE__ + 1}"
                 `cp -rf /tmp/ione/server/* #{ROOT}/`

@@ -4,11 +4,11 @@
 
 puts 'Initializing Ansible constants'
 # Hostname or IP-address of host where ansible installed
-ANSIBLE_HOST = CONF['AnsibleServer']['host']
+ANSIBLE_HOST = $ione_conf['AnsibleServer']['host']
 # Ansible-host SSH-port
-ANSIBLE_HOST_PORT = CONF['AnsibleServer']['port']
+ANSIBLE_HOST_PORT = $ione_conf['AnsibleServer']['port']
 # SSH user to user
-ANSIBLE_HOST_USER = CONF['AnsibleServer']['user']
+ANSIBLE_HOST_USER = $ione_conf['AnsibleServer']['user']
 require 'net/ssh'
 require 'net/sftp'
 

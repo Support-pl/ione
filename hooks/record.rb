@@ -32,12 +32,12 @@ require 'sequel'
 require 'opennebula'
 include OpenNebula
 
-CONF = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require CONF['DataBase']['adapter']
+$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+require $ione_conf['DataBase']['adapter']
 $db = Sequel.connect({
-        adapter: CONF['DataBase']['adapter'].to_sym,
-        user: CONF['DataBase']['user'], password: CONF['DataBase']['pass'],
-        database: CONF['DataBase']['database'], host: CONF['DataBase']['host']  })
+        adapter: $ione_conf['DataBase']['adapter'].to_sym,
+        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
+        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host']  })
 
 id = ARGV.first
 

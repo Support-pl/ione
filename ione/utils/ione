@@ -3,10 +3,10 @@
 require 'yaml'
 ROOT = ENV['IONEROOT']
 LOG_ROOT = ENV['IONELOGROOT']
-CONF = YAML.load(File.read("#{ROOT}/ione.conf"))
+$ione_conf = YAML.load(File.read("#{ROOT}/ione.conf"))
 
 require 'zmqjsonrpc'
-uri = "tcp://localhost:#{CONF['Server']['listen-port']}"
+uri = "tcp://localhost:#{$ione_conf['Server']['listen-port']}"
 client = ZmqJsonRpc::Client.new(uri)
 
 # Prints given log file

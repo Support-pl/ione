@@ -27,7 +27,7 @@ class IONe
             LOG_DEBUG allocation_result.message #If allocation was successful, allocate method returned nil
             return 0
         end
-        attributes = "SUNSTONE=[ LANG=\"#{locale || CONF['OpenNebula']['users-default-lang']}\" ]"
+        attributes = "SUNSTONE=[ LANG=\"#{locale || $ione_conf['OpenNebula']['users-default-lang']}\" ]"
         attributes += "AZURE_TOKEN=\"#{login}\"" if type == 'azure'
         attributes += "BALANCE=\"0\"\nLABELS=\"IaaS\"" if groupid.to_i == $db[:settings].where(:name => 'IAAS_GROUP_ID').to_a.last[:body].to_i
         user.update(attributes, true)
@@ -77,7 +77,7 @@ class IONe
             params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
             
             begin
-                params['iops'] = CONF['vCenter']['drives-iops'][params['ds_type']]
+                params['iops'] = $ione_conf['vCenter']['drives-iops'][params['ds_type']]
                 LOG_DEBUG "IOps: #{params['iops'].class.to_s}(#{params['iops']})"
             rescue
                 LOG_DEBUG "No vCenter configuration found"
@@ -230,7 +230,7 @@ class IONe
         params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
 
         begin
-            params['iops'] = params['iops'] == 0 ? CONF['vCenter']['drives-iops'][params['ds-type']] : params['iops']
+            params['iops'] = params['iops'] == 0 ? $ione_conf['vCenter']['drives-iops'][params['ds-type']] : params['iops']
         rescue
             LOG_DEBUG "No vCenter configuration found"
         end
@@ -345,7 +345,7 @@ class IONe
                 trace << "Setting VM VNC settings:#{__LINE__ + 2}"
                 begin
                     vm.updateconf(
-                        "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{(CONF['OpenNebula']['base-vnc-port'] + vmid).to_s}\", TYPE=\"VNC\" ]"
+                        "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{($ione_conf['OpenNebula']['base-vnc-port'] + vmid).to_s}\", TYPE=\"VNC\" ]"
                     ) # Configuring VNC
                 rescue => e
                     LOG_DEBUG "VNC configuring error: #{e.message}"
@@ -426,7 +426,7 @@ class IONe
                 AnsiblePlaybookProcess.new(
                     playbook_id:    params['ansible_local_id'],
                     uid:            params['userid'],
-                    hosts:          { vmid => ["#{@ione.GetIP(vmid)}:#{CONF['OpenNebula']['users-vms-ssh-port']}"]}, #!!!
+                    hosts:          { vmid => ["#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}"]}, #!!!
                     vars:           params['ansible_vars'],
                     comment:        "Post-Deploy Activity - Ansible",
                     auth:           'default'
@@ -439,7 +439,7 @@ class IONe
                 LOG_DEBUG "Starting not local playbook"
                 Thread.new do
                     @ione.AnsibleController(params.merge({
-                        'super' => '', 'host' => "#{@ione.GetIP(vmid)}:#{CONF['OpenNebula']['users-vms-ssh-port']}", 'vmid' => vmid
+                        'super' => '', 'host' => "#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}", 'vmid' => vmid
                     }))
                 end
             end
@@ -456,7 +456,7 @@ class IONe
             defer { LOG_CALL(id, false, 'LimitsController') }
             onblock(:vm, vmid) do | vm |
                 lim_res = vm.setResourcesAllocationLimits(
-                    cpu: params['cpu'] * CONF['vCenter']['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
+                    cpu: params['cpu'] * $ione_conf['vCenter']['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
                 )
                 unless lim_res.nil? then
                     err, back = lim_res.split("<|>")

@@ -315,6 +315,6 @@ class IONe
     end
 
     def GetvCenterIOPsConf
-        CONF['vCenter']['drives-iops']
+        $ione_conf['vCenter']['drives-iops']
     end
 end

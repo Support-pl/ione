@@ -259,7 +259,7 @@ If your module have some constants, you may put it to the _ione.conf_.
 So, you'll have this inside your programm:
 
 ```rb
-  puts CONF
+  puts $ione_conf
   # => {
   #   * * *
   # 'ModuleName' => {

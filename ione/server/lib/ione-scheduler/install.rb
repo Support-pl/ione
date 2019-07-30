@@ -2,13 +2,13 @@ require 'mysql2'
 require 'yaml'
 
 ROOT = ENV['IONEROOT'] # IONe root path
-CONF = YAML.load(File.read("#{ROOT}/ione.conf")) # IONe configuration constants
+$ione_conf = YAML.load(File.read("#{ROOT}/ione.conf")) # IONe configuration constants
 
 print 'Connecting to DB server...'
 begin
 client = Mysql2::Client.new(
-    :username => CONF['DataBase']['user'], :password => CONF['DataBase']['pass'], 
-    :host => CONF['DataBase']['host'] )
+    :username => $ione_conf['DataBase']['user'], :password => $ione_conf['DataBase']['pass'], 
+    :host => $ione_conf['DataBase']['host'] )
     puts ' [ OK ]'
 rescue => e
     puts " [ Error ] \n Error: #{e.message}"
@@ -26,8 +26,8 @@ end
 print 'Connecting to ioneschedule DB...'
 begin
     client = Mysql2::Client.new(
-        :username => CONF['DataBase']['user'], :password => CONF['DataBase']['pass'], 
-        :host => CONF['DataBase']['host'], :database => 'ioneschedule' )
+        :username => $ione_conf['DataBase']['user'], :password => $ione_conf['DataBase']['pass'], 
+        :host => $ione_conf['DataBase']['host'], :database => 'ioneschedule' )
         puts ' [ OK ]'
 rescue => e
     puts " [ Error ] \n Error: #{e.message}"

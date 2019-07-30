@@ -4,7 +4,7 @@ module IONeLoggerKit
     require "colorize"
 
     `echo > #{LOG_ROOT}/errors.txt && chown oneadmin:oneadmin #{LOG_ROOT}/errors.txt`
-    `echo > #{LOG_ROOT}/sys.log && chown oneadmin:oneadmin #{LOG_ROOT}/sys.log` if !CONF['Other']['key']
+    `echo > #{LOG_ROOT}/sys.log && chown oneadmin:oneadmin #{LOG_ROOT}/sys.log`
 
     $log = []
 

@@ -85,7 +85,7 @@ end
 
 get '/ione_conf' do
     begin
-        r response: CONF, ione: IONe.new($client, $db)
+        r response: $ione_conf, ione: IONe.new($client, $db)
     rescue => e
         r error: e.message
     end

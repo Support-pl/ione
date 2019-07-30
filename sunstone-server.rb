@@ -108,6 +108,12 @@ rescue Exception => e
     STDERR.puts "Error parsing config file #{CONFIGURATION_FILE}: #{e.message}"
     exit 1
 end
+begin
+    $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+rescue Exception => e
+    STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
+    exit 1
+end
 
 if $conf[:one_xmlrpc_timeout]
     ENV['ONE_XMLRPC_TIMEOUT'] = $conf[:one_xmlrpc_timeout].to_s unless ENV['ONE_XMLRPC_TIMEOUT']
@@ -447,12 +453,14 @@ if $conf[:routes]
     }
 end
 
-require 'SettingsDriver'
-
-require 'AnsibleDriver'
-require 'AzureDriver'
-require 'ShowbackDriver'
-require 'IONeCustomActions'
+ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers.each do | driver |
+    begin
+        require driver
+    rescue LoadError => e
+        puts "Driver #{driver} was not included: #{e.message}"
+    end
+end
 
 ##############################################################################
 # HTML Requests

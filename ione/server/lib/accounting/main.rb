@@ -75,4 +75,39 @@ class IONe
             'type'     => e.class
         }
     end
+    def IaaS_Gate_new params
+        LOG_DEBUG params
+        response = []
+
+        params["users"].each do | u |
+            u['vms'] = u['vms'] || []
+            showback = CalculateShowback(u['uid'], u['time'])
+            
+            user = onblock :u, u['uid']
+            user.balance = u['balance']
+            balance = user.balance
+            alert, alert_at = user.alert
+    
+            response << {
+                'showback' => showback,
+                'balance'  => balance,
+                'alert'    => alert,
+                'alert_at' => alert_at
+            }
+        end
+
+        return response
+    rescue OpenNebula::VirtualMachine::ShowbackError => e
+        return {
+            'error'    => e.message,
+            'time'     => e.params,
+            'type'     => e.class
+        }
+    rescue OpenNebula::User::UserNotExistsError => e
+        return {
+            'error'    => e.message,
+            'uid'      => params['uid'],
+            'type'     => e.class
+        }
+    end
 end
