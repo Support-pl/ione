@@ -5,11 +5,6 @@ module IONeLoggerKit
 
     `echo > #{LOG_ROOT}/errors.txt && chown oneadmin:oneadmin #{LOG_ROOT}/errors.txt`
     `echo > #{LOG_ROOT}/sys.log && chown oneadmin:oneadmin #{LOG_ROOT}/sys.log` if !CONF['Other']['key']
-    begin
-        `echo > #{LOG_ROOT}/ione.log && chown oneadmin:oneadmin #{LOG_ROOT}/ione.log` if File.read("#{LOG_ROOT}/ione.log").split("\n").size >= 1000
-    rescue
-        `echo > #{LOG_ROOT}/ione.log && chown oneadmin:oneadmin #{LOG_ROOT}/ione.log`
-    end
 
     $log = []
 
