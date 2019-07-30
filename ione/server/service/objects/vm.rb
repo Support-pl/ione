@@ -401,7 +401,7 @@ class OpenNebula::VirtualMachine
 
 
         ### Calculating Capacity ###
-        cpu     = self['/VM/TEMPLATE/CPU'].to_f
+        cpu     = self['/VM/TEMPLATE/VCPU'].to_f * self['/VM/TEMPLATE/CPU'].to_f
         memory  = self['/VM/TEMPLATE/MEMORY'].to_f / 1024
         disk    = self['/VM/TEMPLATE/DISK/SIZE'].to_f / 1024
 
