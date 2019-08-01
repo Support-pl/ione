@@ -228,7 +228,8 @@ class IONe
                 'id' => img.id, 'name' => img.name.split('(').first, :full_size => sizeConvert(img.to_hash['DATASTORE']['TOTAL_MB']),
                 'used' => sizeConvert(img.to_hash['DATASTORE']['USED_MB']),
                 'type' => img.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
-                'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY']
+                'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
+                'hypervisor' => img.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
             } if img.short_type_str == type && img.id > 2
         end
         mon

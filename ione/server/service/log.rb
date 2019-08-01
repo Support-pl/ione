@@ -42,7 +42,6 @@ module IONeLoggerKit
         File.open("#{LOG_ROOT}/suspend.log", 'a'){ |log| log.write msg + "\n" } if method == 'Suspend'
 
         $log << "#{msg} | #{destination}"
-        puts "Should be logged, params - #{method}, #{_time}, #{destination}:\n#{msg}" if DEBUG
         true
     end
     # Logging the message with choosen color and font to the one of two destinations
@@ -60,7 +59,6 @@ module IONeLoggerKit
         File.open("#{LOG_ROOT}/suspend.log", 'a'){ |log| log.write msg + "\n" } if method == 'Suspend'
 
         $log << "#{msg} | #{destination}"
-        puts "Should be logged, params - #{method}, #{_time}, #{destination}:\n#{msg}" if DEBUG
         true
     end
     alias LOG_ERROR LOG_COLOR
@@ -69,7 +67,6 @@ module IONeLoggerKit
         msg = "[ #{time()} ] #{msg}"
         File.open(destination, 'a'){ |log| log.write msg + "\n" }
         $log << "#{msg} | #{destination}"
-        puts "Should be logged, params - #{method}, #{_time}, #{destination}:\n#{msg}" if DEBUG
         true
     end
     # Logging the message to the one of three destinations
@@ -80,7 +77,7 @@ module IONeLoggerKit
     # @note If method name setted to 'DEBUG', message will be logged into debug.log
     # @param [Boolean] _time Print or not to print log time
     # @return [Boolean] true
-    def LOG_TEST(msg, method = caller_locations(1,1)[0].label, _time = true)
+    def LOG_AUTO(msg, method = caller_locations(1,1)[0].label, _time = true)
         return true unless MAIN_IONE
         case method
         when 'DEBUG'
@@ -98,7 +95,6 @@ module IONeLoggerKit
         File.open("#{LOG_ROOT}/suspend.log", 'a'){ |log| log.write msg + "\n" } if method == 'Suspend'
 
         $log << "#{msg} | #{destination}"
-        puts "Should be logged, params - #{method}, #{_time}, #{destination}:\n#{msg}" if DEBUG
         true
     end
 

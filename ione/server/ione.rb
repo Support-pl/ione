@@ -21,6 +21,7 @@ else
     true
 end
 
+$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
 CONF = $ione_conf # for sure
 
 puts 'Including log-library'
@@ -29,7 +30,6 @@ include IONeLoggerKit
 
 puts 'Checking service version'
 VERSION = File.read("#{ROOT}/meta/version.txt") # IONe version
-DEBUG = $ione_conf['Other']['debug'] # IONe debug level
 USERS_GROUP = $ione_conf['OpenNebula']['users-group'] # OpenNebula users group
 TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay'] # Trial VMs suspend delay
 
@@ -177,5 +177,10 @@ LOG_COLOR "Server initialized", 'none', 'green'
 
 puts 'Pre-init job ended, starting up server'
 Thread.new do
-    server.server_loop # Server start
+    begin
+        server.server_loop # Server start
+    rescue => e
+        LOG_ERROR "Server isn't started: #{e.message}"
+        puts "Server isn't started: #{e.message}"
+    end
 end if !defined?(DEBUG_LIB) && MAIN_IONE

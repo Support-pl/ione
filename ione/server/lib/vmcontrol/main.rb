@@ -27,7 +27,7 @@ class IONe
                     vm.suspend
                 rescue
                     trace << "Some exception raised while suspending VM:#{__LINE__ - 2}"
-                    LOG_TEST "VM wasn't suspended, but rights will be changed" if log
+                    LOG_AUTO "VM wasn't suspended, but rights will be changed" if log
                 end
                 trace << "Changing user rights:#{__LINE__ + 1}"
                 vm.chmod(

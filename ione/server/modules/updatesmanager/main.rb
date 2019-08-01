@@ -2,7 +2,7 @@ class IONe
     # Updates IONe from Github
     def IONeUpdate(token, trace = ["Update Process starter:#{__LINE__}"])
         return 'Wrong token!' if token != $ione_conf['UpdatesManager']['update-token']
-        LOG_TEST "IONe update query accepted"
+        LOG_AUTO "IONe update query accepted"
         Thread.new do
             begin
                 trace << "Creating temporary dirs:#{__LINE__ + 1}"
