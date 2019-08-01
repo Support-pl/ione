@@ -23,12 +23,14 @@ define(function(require) {
   var CommonActions = require('utils/common-actions');
   var Vnc = require('utils/vnc');
   var Spice = require('utils/spice');
+  var OpenNebula = require('opennebula');
 
   var TAB_ID = require('./tabId');
   var CREATE_DIALOG_ID           = require('./form-panels/create/formPanelId');
   var DEPLOY_DIALOG_ID           = require('./dialogs/deploy/dialogId');
   var PLACE_ON_NODE_DIALOG_ID    = require('./dialogs/place-on-node/dialogId');
   var REVERT_ZFS_SNAPSHOT_DIALOG_ID = require('./dialogs/revert-zfs-snapshot/dialogId');
+  var REINSTALL_DIALOG_ID        = require('./dialogs/reinstall/dialogId');
   var MIGRATE_DIALOG_ID          = require('./dialogs/migrate/dialogId');
   var VNC_DIALOG_ID              = require('./dialogs/vnc/dialogId');
   var SPICE_DIALOG_ID            = require('./dialogs/spice/dialogId');
@@ -240,7 +242,34 @@ define(function(require) {
         Sunstone.getDialog(REVERT_ZFS_SNAPSHOT_DIALOG_ID).show();
       }
      // _commonActions.singleAction('revert_zfs_snapshot')
-    },
+    },"VM.reinstall" : {
+      type: "custom",
+      call: function () {
+
+        var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
+        dialog.show();
+
+        $('#reinstalldialogvm').addClass('provision_info_vm');
+        $('.provision_info_vm').attr('vm_id', Sunstone.getDataTable(TAB_ID).elements()[0]);
+
+        $('.listos').html('');
+        var template;
+        OpenNebula.Template.list({data:{},success: function(a,b){template=b;
+            for (key in template){
+              if(template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE'){
+                var html = '<div class="column"> ' +
+                    '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="'+template[key].VMTEMPLATE.ID+'"> ' +
+                    '<li class="provision-title" title="' + template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION+'</span></li> ' +
+                    '<li class="provision-bullet-item"><span class="provision-logo"><img src="'+template[key].VMTEMPLATE.TEMPLATE.LOGO+'"></span></li> ' +
+                    '<li class="provision-bullet-item-last text-left"></li> ' +
+                    '</ul> ' +
+                    '</div>';
+                $('.listos').append(html);
+              }
+            };
+          }});
+      }
+    }
   };
 
   return _actions;

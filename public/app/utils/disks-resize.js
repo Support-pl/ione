@@ -221,7 +221,6 @@ define(function(require){
     $(".diskContainer", context).each(function(){
       if ($(this).data("template_disk")) {
         disk = $(this).data("template_disk");
-
         var fields = WizardFields.retrieve(this);
 
         var size = $.extend(true, [], fields.SIZE);

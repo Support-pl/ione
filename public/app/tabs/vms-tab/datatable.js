@@ -190,10 +190,10 @@ define(function(require) {
 
     $('#' + this.dataTableId).on("change", 'tbody input.check_item', function() {
       if ($(this).is(":checked")){
-        var vm_id = $(this).parent().next().text() * 1;
+        var vm_id = +$(this).val();
         OpenNebula.VM.show({data: {id:vm_id},success: function(r,res){
-          if (res.VM.USER_TEMPLATE.HYPERVISOR == "AZURE"){
-            $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled');
+          if (res.VM.USER_TEMPLATE.HYPERVISOR == "AZURE" && res.VM.STATE != "2" && res.VM.STATE != "1" && res.VM.STATE != "7"){
+            $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled').on("click.stateaction", function(e) { return false; });;
           }
         }});
         StateActions.enableStateActions($(this).attr("state"), $(this).attr("lcm_state"));

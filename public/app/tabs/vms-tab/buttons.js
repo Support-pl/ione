@@ -207,7 +207,13 @@ define(function(require) {
       type: text,
       custom_classes: "state-dependent",
       text: '<i class="fa fa-fw fa-lg fa-backward"></i>',
-    }
+    },
+    "VM.reinstall" : {
+      type: text,
+      text: Locale.tr("Reinstall"),
+      layout: "vmsplanification_buttons",
+      custom_classes : "state-dependent"
+    },
   }
 
   if (Config.isTabActionEnabled("vms-tab", "VM.place_on_node") != true){

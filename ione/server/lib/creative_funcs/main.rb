@@ -84,8 +84,16 @@ class IONe
             end
             
             params['username'] = params['username'] || 'Administrator'
-            params['extra'] = params['extra'] || {'type' => 'vcenter'}
-            
+            trace << "Checking template:#{__LINE__ + 1}"
+            template = onblock(:t, params['templateid']) do | t |
+                result = t.info!
+                if result != nil then
+                    LOG_ERROR "Error: TemplateLoadError" 
+                    return {'error' => "TemplateLoadError", 'trace' => (trace << "TemplateLoadError:#{__LINE__ - 1}")}
+                end
+                params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
+                t
+            end
 
             LOG_DEBUG 'Initializing vm object'
             trace << "Initializing old VM object:#{__LINE__ + 1}"            
@@ -99,9 +107,6 @@ class IONe
             LOG_DEBUG 'Generating new template'
             trace << "Generating NIC context:#{__LINE__ + 1}"
             context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{vn}\",\n\tNETWORK_UNAME=\"#{vn_uname}\"\n]\n"
-            trace << "Generating template object:#{__LINE__ + 1}"            
-            template = onblock(Template, params['templateid'])
-            template.info!
             trace << "Checking OS type:#{__LINE__ + 1}"            
             win = template.win?
             trace << "Generating credentials and network context:#{__LINE__ + 1}"

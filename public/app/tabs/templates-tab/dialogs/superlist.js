@@ -79,10 +79,14 @@ define(function(require) {
         $('#' + DIALOG_ID + '_datatable', context).on('click', 'tbody [role="row"]', function () {
             var cells = superlist_dataTable.fnGetData(this);
             var os_name = cells[1];
-            $('[wizard_field="OS_IMAGE"]').val(os_name);
-            $('#OC_image').empty();
-            $('#OC_image').append(cells[0]);
-            Sunstone.getDialog('superlistTemplateDialog').hide();
+            if (os_name != 'No OS to show'){
+                $('[wizard_field="OS_IMAGE"]').val(os_name.replace(/ /g, '_'));
+                $('#OC_image').empty();
+                $('#OC_image').append(cells[0]);
+                Sunstone.getDialog('superlistTemplateDialog').hide();
+            }else{
+                Sunstone.getDialog('superlistTemplateDialog').hide();
+            }
         });
 
     }
@@ -112,7 +116,10 @@ define(function(require) {
     function setSuperlist(setting_field) {
         superlist = [];
         for(var i in setting_field){
-            superlist.push([getLogo(i),i]);
+            superlist.push([getLogo(i),i.replace(/_/g, ' ')]);
+        }
+        if (superlist.length == 0){
+            superlist.push(['','No OS to show']);
         }
     }
 
@@ -144,6 +151,9 @@ define(function(require) {
             }
         }else{
             items = superlist;
+        }
+        if (items.length == 0){
+            items.push(['','No OS to show']);
         }
         return items;
     }
