@@ -163,7 +163,7 @@ module ONeHelper
     # @return [Integer]
     def ChooseDS(ds_type = nil, hypervisor = nil)
         dss = IONe.new($client, $db).DatastoresMonitoring('sys').sort! { | ds | 100 * ds['used'].to_f / ds['full_size'].to_f }
-        dss.delete_if { |ds| ds['type'] != ds_type || ds['deploy'] != 'TRUE' || ds['hypervisor'] != hypervisor} if ds_type != nil && hypervisor != nil
+        dss.delete_if { |ds| ds['type'] != ds_type || ds['deploy'] != 'TRUE' || ds['hypervisor'] != hypervisor.upcase } if ds_type != nil && hypervisor != nil
         ds = dss[rand(dss.size)]
         LOG_DEBUG "Deploying to #{ds['name']}"
         ds['id']
