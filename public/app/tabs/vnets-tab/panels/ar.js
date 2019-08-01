@@ -174,21 +174,33 @@ define(function(require) {
       if (Config.isTabActionEnabled("vnets-tab", "Network.add_ar")) {
         context.off("click", 'button#add_ar_button');
         context.on("click", 'button#add_ar_button', function () {
-          $('#add_ar_button').after('<i id="ar_spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>');
-          $('#rm_ar_button').prop('disabled', true);
-          $('#add_ar_button').prop('disabled', true);
+          $('#rm_ar_button').hide();
+          $('#add_ar_button').hide();
+
+          $('#ar_progress').css('display', 'block');
+          var timerId = setInterval(function() {
+            var vl = $('#ar_progress').val();
+            $('#ar_progress').val(vl+0.0003);
+          }, 10);
+
           $.ajax({
             url:'/vnet/'+that.element.ID+'/register_azure_ip',
             method: 'post',
             success: function (req, res) {
               console.log(res);
-              $('#ar_spiner').remove();
+              clearInterval(timerId);
+              $('#ar_progress').val(0);
+              $('#ar_progress').show();
               $('#add_ar_button').prop('disabled', false);
+              $('#rm_ar_button').show();
               Sunstone.runAction(RESOURCE+'.refresh');
             },
             error: function (req, res) {
-              $('#ar_spiner').remove();
-              $('#add_ar_button').prop('disabled', false);
+              clearInterval(timerId);
+              $('#ar_progress').val(0);
+              $('#ar_progress').css('display', 'none');
+              $('#add_ar_button').show();
+              $('#rm_ar_button').show();
               Notifier.notifyError(res);
             }
           });
@@ -210,22 +222,34 @@ define(function(require) {
           }else{
             var name = that.element.AR_POOL.AR.AZ_NAME;
           }
-          $('#rm_ar_button').before('<i id="ar_spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>');
-          $('#rm_ar_button').prop('disabled', true);
-          $('#add_ar_button').prop('disabled', true);
+          $('#rm_ar_button').hide();
+          $('#add_ar_button').hide();
+
+          $('#ar_progress').css('display', 'block');
+          var timerId = setInterval(function() {
+            var vl = $('#ar_progress').val();
+            $('#ar_progress').val(vl+0.0003);
+          }, 10);
+
           $.ajax({
             url:'/vnet/'+that.element.ID+'/unregister_azure_ip',
             method: 'post',
             data: JSON.stringify({ar_id: ar_id, name:name}),
             success: function (req, res) {
               console.log(res);
-              $('#ar_spiner').remove();
-              $('#add_ar_button').prop('disabled', false);
+              clearInterval(timerId);
+              $('#ar_progress').val(0);
+              $('#rm_ar_button').show();
+              $('#ar_progress').css('display', 'none');
+              $('#add_ar_button').show();
               Sunstone.runAction(RESOURCE+'.refresh');
             },
             error: function (req, res) {
-              $('#ar_spiner').remove();
-              $('#add_ar_button').prop('disabled', false);
+              clearInterval(timerId);
+              $('#ar_progress').val(0);
+              $('#rm_ar_button').show();
+              $('#ar_progress').css('display', 'none');
+              $('#add_ar_button').show();
               Notifier.notifyError(res);
             }
           });

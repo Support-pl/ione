@@ -165,7 +165,6 @@ define(function(require) {
       return false;
     }
 
-
     var vm_name = $('#vm_name', context).val();
     var n_times = $('#vm_n_times', context).val();
     var n_times_int = 1;
@@ -200,16 +199,32 @@ define(function(require) {
         for_template.LOCATION = $('[wizard_field="LOCATION"]').val();
         for_template.PUBLIC_IP = $('[wizard_field="PUBLIC_IP"]').val();
         for_template.ALLOW_PORTS = $('[wizard_field="ALLOW_PORTS"]').val();
+      }else{
+        var disks = DisksResize.retrieve($(".disksContext"  + template_id, context));
+        if (disks.length > 0) {
+          delete disks[0]['VCENTER_DS_REF'];
+          delete disks[0]['VCENTER_INSTANCE_ID'];
+          disks[0]['OPENNEBULA_MANAGED'] = 'NO';
+          tmp_json.DISK = disks;
+        }else {
+          if (that.template_objects['0'].VMTEMPLATE.TEMPLATE.IMAGE_UNAME != undefined) {
+            tmp_json.DISK = [{
+              IMAGE: that.template_objects['0'].VMTEMPLATE.TEMPLATE.DISK.IMAGE,
+              IMAGE_UNAME: that.template_objects['0'].VMTEMPLATE.TEMPLATE.DISK.IMAGE_UNAME,
+              OPENNEBULA_MANAGED: 'NO',
+              SIZE: (WizardFields.retrieve($(".diskContainer", context))).SIZE
+            }];
+          } else {
+            tmp_json.DISK = [{
+              IMAGE_ID: that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK.IMAGE_ID,
+              OPENNEBULA_MANAGED: 'NO',
+              SIZE: (WizardFields.retrieve($(".diskContainer", context))).SIZE
+            }];
+          }
+        }
       }
-
       for_template.DRIVE = $('[wizard_field="DRIVE"]').val();
       $.extend(tmp_json, for_template);
-      var disks = DisksResize.retrieve($(".disksContext"  + template_id, context));
-      if (disks.length > 0) {
-        delete disks[0]['VCENTER_DS_REF'];
-        delete disks[0]['VCENTER_INSTANCE_ID'];
-        tmp_json.DISK = disks;
-      }
 
       var networks = NicsSection.retrieve($(".nicsContext"  + template_id, context));
 
@@ -305,9 +320,7 @@ define(function(require) {
         }
 
         $.extend(tmp_json,  {NIC:nic});
-        console.log(tmp_json);
       }
-
       extra_info['template'] = tmp_json;
 
       OpenNebula.User.show({data:{id:config.user_id},success: function(r,res) {
@@ -404,7 +417,6 @@ define(function(require) {
           } else {
             var default_user_view = false;
           }
-          console.log(template_json);
           if (template_json.VMTEMPLATE.TEMPLATE.HYPERVISOR == 'AZURE'){
             azure_template = true;
           }
@@ -521,7 +533,7 @@ define(function(require) {
                   'securityGroups': Config.isFeatureEnabled("secgroups")
                 });
           }
-
+          $(".nicsContext"  + template_id + ' legend').css('width', '100%');
           VMGroupSection.insert(template_json,
               $(".vmgroupContext"+ template_json.VMTEMPLATE.ID, context));
 
@@ -652,6 +664,7 @@ define(function(require) {
           if (azure_template == true){
             $('.disksContainer').append($('input[wizard_field="OS_DISK_SIZE"]').parent().parent().parent());
             $('.OC_name_Container').append($('label [wizard_field="OS_IMAGE"]').parent());
+            $('label [wizard_field="OS_IMAGE"]').css('margin-left', '10px');
             $('.OC_name_Container').append($('label textarea[wizard_field="USER_OS_NAME"]').parent());
 
 
@@ -703,7 +716,7 @@ define(function(require) {
             for(var i in AZURE_SKUS){
               $('select[wizard_field="SIZE"]').append($("<option></option>", {value: i, text: i}));
             }
-
+            $('select[wizard_field="SIZE"] option').eq(0).val('').prop('disabled', true);
             $('select[wizard_field="SIZE"]').change(function() {
               var azure_skus = JSON.parse(settings.AZURE_SKUS);
               if (azure_skus[$(this).val()] != undefined){

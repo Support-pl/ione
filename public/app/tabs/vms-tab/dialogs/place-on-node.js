@@ -25,7 +25,7 @@ define(function(require) {
     var Notifier = require('utils/notifier');
     var Tips = require('utils/tips');
     var OpenNebula = require('opennebula');
-
+    var Settings = require('opennebula/settings');
     /*
       CONSTANTS
      */
@@ -47,12 +47,17 @@ define(function(require) {
     Dialog.DIALOG_ID = DIALOG_ID;
     Dialog.prototype = Object.create(BaseDialog.prototype);
     Dialog.prototype.constructor = Dialog;
-    $.get("settings", function(data, status){
-        settings = data.response;
-        Dialog.prototype.html = _html;
-        Dialog.prototype.onShow = _onShow;
-        Dialog.prototype.setup = _setup;
-    });
+
+    Settings.cloud({success:function(r, res) {
+            if (r.error != undefined){
+                Notifier.notifyError(r.error);
+                return false;
+            }
+            settings = r.response;
+            Dialog.prototype.html = _html;
+            Dialog.prototype.onShow = _onShow;
+            Dialog.prototype.setup = _setup;
+    }});
 
     return Dialog;
 
@@ -70,7 +75,6 @@ define(function(require) {
         var that = this;
 
         Tips.setup(context);
-
         $('#' + DIALOG_ID + 'Form', context).submit(function() {
 
             $.each(Sunstone.getDataTable(TAB_ID).elements(), function(index, elem) {

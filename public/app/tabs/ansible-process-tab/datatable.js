@@ -143,7 +143,7 @@ define(function(require) {
         $('[href="AnsibleProcess.run"]').hide();
         $('#dataTableAnsibleProcess').on('click', 'tbody .check_item', function () {
            if ($(this).prop('checked')){
-               if ($(this).parent().siblings().last().text() != 'PENDING'){
+               if ($(this).parent().siblings().last().text() != Locale.tr('PENDING')){
                    $('[href="AnsibleProcess.run"]').hide();
                }else{
                    $('[href="AnsibleProcess.run"]').show();

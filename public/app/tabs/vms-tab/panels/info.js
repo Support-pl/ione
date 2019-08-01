@@ -52,8 +52,8 @@ define(function(require) {
   function Panel(info) {
     this.title = Locale.tr("Info");
     this.icon = "fa-info-circle";
-    if (info[XML_ROOT].USER_TEMPLATE.HYPERVISOR != 'AZURE'){
-      $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled');
+    if (info[XML_ROOT].USER_TEMPLATE.HYPERVISOR == 'AZURE' && info[XML_ROOT].STATE != 2 && info[XML_ROOT].STATE != 1 && info[XML_ROOT].STATE != 7){
+      $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled').on("click.stateaction", function(e) { return false; });;
     }
     this.element = info[XML_ROOT];
 
