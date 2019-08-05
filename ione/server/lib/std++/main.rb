@@ -36,10 +36,31 @@ class Hash
         end
     end
 
+    # Returns Hash copy without given keys
     def without(*keys)
         cpy = self.dup
         keys.each { |key| cpy.delete(key) }
         cpy
+    end
+    def to_one_template
+        result = ""
+        self.each do | key, value |
+            if value.class == String || value.class == Fixnum then
+                result += "#{key}=\"#{value.to_s.gsub("\"", "\\\"")}\"\n"
+            elsif value.class == Hash then
+                result += "#{key}=[\n"
+                size = value.size - 1
+                value.each_with_index do | el, i |
+                    result += "  #{el[0]}=\"#{el[1].to_s.gsub("\"", "\\\"")}\"#{i == size ? '' : ",\n"}"
+                end
+                result += " ]\n"
+            elsif value.class == Array then
+                value.each do | el |
+                    result += { key => el}.to_one_template + "\n"
+                end
+            end
+        end
+        result.chomp!
     end
 end
 

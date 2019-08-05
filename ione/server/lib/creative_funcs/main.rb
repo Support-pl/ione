@@ -89,40 +89,53 @@ class IONe
                 result = t.info!
                 if result != nil then
                     LOG_ERROR "Error: TemplateLoadError" 
-                    return {'error' => "TemplateLoadError", 'trace' => (trace << "TemplateLoadError:#{__LINE__ - 1}")}
+                    return {'error' => "TemplateLoadError", 'trace' => (trace << "TemplateLoadError:#{__LINE__ - 3}")}
                 end
                 params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
                 t
             end
+            win = template.win?
 
             LOG_DEBUG 'Initializing vm object'
             trace << "Initializing old VM object:#{__LINE__ + 1}"            
-            vm = onblock(VirtualMachine, params['vmid'])
+            vm = onblock(:vm, params['vmid'])
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
-            nic, context = vm.to_hash!['VM']['TEMPLATE']['NIC'], vm.to_hash['VM']['TEMPLATE']['CONTEXT']
-            vn, vn_uname = nic['NETWORK'], onblock(:vn, 'btk-inet'){|vn| vn.info!; vn['/VNET/UNAME']}
+            context = vm.to_hash!['VM']['TEMPLATE']
             
-            LOG_DEBUG 'Initializing template obj'
             LOG_DEBUG 'Generating new template'
-            trace << "Generating NIC context:#{__LINE__ + 1}"
-            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{vn}\",\n\tNETWORK_UNAME=\"#{vn_uname}\"\n]\n"
-            trace << "Checking OS type:#{__LINE__ + 1}"            
-            win = template.win?
             trace << "Generating credentials and network context:#{__LINE__ + 1}"
-            context += "CONTEXT = [\n\tPASSWORD=\"#{params['passwd']}\",\n\tETH0_IP=\"#{nic['IP']}\",\n\tETH0_GATEWAY=\"#{nic['GATEWAY']}\",\n\tETH0_DNS=\"#{nic['DNS']}\",\n\tNETWORK=\"YES\"#{ win ? ",\n\tUSERNAME = \"#{params['username']}\"" : nil}\t]\n"
+            context['CONTEXT'] = {
+                'PASSWORD' => params['passwd'],
+                'NETWORK' => context['CONTEXT']['NETWORK'],
+                'SSH_PUBLIC_KEY' => context['CONTEXT']['SSH_PUBLIC_KEY']
+            }
+            context['CONTEXT']['USERNAME'] = params['username'] if win
+            context['NIC'].map! do |nic| 
+                nic.without(
+                    'TARGET', 'MAC', 'NAME', 'SECURITY_GROUPS',
+                    'BRIDGE', 'BRIDGE_TYPE', 'NIC_ID', 'VN_MAD',
+                    'CLUSTER_ID', 'AR_ID', 'NETWORK', 'NETWORK_UNAME'
+                )
+            end
             trace << "Generating specs configuration:#{__LINE__ + 1}"
-            context += "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n" \
-                        "DRIVE = \"#{params['ds_type']}\"\n" \
-                        "DISK = [ \n" \
-                        "IMAGE_ID = \"#{template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
-                        "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
+            context.merge!({
+                "VCPU" => params['cpu'],
+                "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                "DRIVE" => params['ds_type'],
+                "DISK" => {
+                    "IMAGE_ID" => template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                    "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                    "OPENNEBULA_MANAGED" => "NO"
+                }
+            })
+            context['TEMPLATE_ID'] = params['templateid']
+
+            context = context.without('GRAPHICS').to_one_template
             LOG_DEBUG "Resulting capacity template:\n#{context}"
             
             trace << "Terminating VM:#{__LINE__ + 1}"            
-            vm.terminate(true)
+            r = vm.terminate(true)
             LOG_COLOR 'Waiting until terminate process will over', 'Reinstall', 'light_yellow'
             trace << ":#{__LINE__ + 1}"            
             until STATE_STR(params['vmid']) == 'DONE' do
@@ -142,8 +155,8 @@ class IONe
                     vmid = template.instantiate(params['login'] + '_vm', false, context)
                 end
             rescue => e
-                return vmid, vmid.class, vmid.message if vmid.class != Fixnum
-                return vmid, vmid.class
+                return vmid.class, vmid.message if vmid.class != Fixnum
+                return vmid.class
             end           
 
             return vmid.message if vmid.class != Fixnum
@@ -169,13 +182,6 @@ class IONe
 
                 postDeploy = PostDeployActivities.new @client
 
-                #LimitsController
-
-                #LOG_DEBUG "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}"
-                #trace << "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}:#{__LINE__ + 1}"
-                #postDeploy.LimitsController(params, vmid, host)
-
-                #endLimitsController
                 #TrialController
                 if params['trial'] then
                     trace << "Creating trial counter thread:#{__LINE__ + 1}"
@@ -194,7 +200,7 @@ class IONe
             end if params['release']
             ##### PostDeploy Activity define END #####
 
-            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid), 'ip_old' => nic['IP'] }
+            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid), 'ip_old' => GetIP(vm) }
         rescue => e
             LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
             return e.message, trace
@@ -290,30 +296,38 @@ class IONe
             t.info!
             specs = ""
             if !t['/VMTEMPLATE/TEMPLATE/CAPACITY'] && t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == "VCENTER" then
-                specs = "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n" \
-                        "DRIVE = \"#{params['ds_type']}\"\n" \
-                        "DISK = [ \n" \
-                        "IMAGE_ID = \"#{t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
-                        "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
+                specs = {
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                            "DRIVE" => params['ds_type'],
+                            "DISK" => {
+                                "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                                "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                                "OPENNEBULA_MANAGED" => "NO"
+                            }
+                        }
             elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'AZURE' then
-                specs = "OS_DISK_SIZE = \"#{params['drive']}\"\n" \
-                        "SIZE = \"#{params['extra']['instance_size']}\"\n" \
-                        "VM_USER_NAME = \"#{params['username']}\"\n" \
-                        "PASSWORD = \"#{params['passwd']}\"\n" \
-                        "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n"
+                specs = {
+                            "OS_DISK_SIZE" => params['drive'],
+                            "SIZE" => params['extra']['instance_size'],
+                            "VM_USER_NAME" => params['username'],
+                            "PASSWORD" => params['passwd'],
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1)
+                        }
             elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'KVM' then
-                specs = "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n" \
-                        "DRIVE = \"#{params['ds_type']}\"\n" \
-                        "DISK = [ \n" \
-                        "IMAGE_ID = \"#{t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
-                        "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "DEV_PREFIX = \"vd\",\n" \
-                        "DRIVER = \"qcow2\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
+                specs = {
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                            "DRIVE" => params['ds_type'],
+                            "DISK" => {
+                                "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                                "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                                "DEV_PREFIX" => "vd",
+                                "DRIVER" => "qcow2",
+                                "OPENNEBULA_MANAGED" => "NO"
+                            }
+                        }
             end
             trace << "Updating user quota:#{__LINE__ + 1}"
             user.update_quota_by_vm(
@@ -321,6 +335,7 @@ class IONe
                 'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
                 'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
             ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
+            specs = specs.to_one_template
             LOG_DEBUG "Resulting capacity template:\n" + specs
             vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
         end
