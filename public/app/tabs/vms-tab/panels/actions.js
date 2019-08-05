@@ -113,9 +113,59 @@ define(function(require) {
          <td>\
             <button id="submit_scheduling_action" class="button small secondary radius" >'              + Locale.tr("Add") + '</button>\
          </td>\
-         <td colspan=2></td>\
+         <td colspan=3></td>\
        </tr>');
 
+      return false;
+    });
+
+    context.on('click', '#select_new_action', function() {
+      var str = '';
+      switch($(this).val()) {
+        case 'hold':
+          str = 'Sets VM State to HOLD';
+          break;
+        case 'release':
+          str = 'Makes VM ready to be deployed(State PENDING)';
+          break;
+        case 'stop':
+          str = 'Stops VM, saves its state and deallocates resources from host(State STOPPED)';
+          break;
+        case 'suspend':
+          str = 'Stops VM, saves its state and keeps resources on host(State SUSPENDED)';
+          break;
+        case 'resume':
+          str = 'Resumes VM from any state(State RUNNING)';
+          break;
+        case 'reboot':
+          str = 'Reboots VM using guest OS';
+          break;
+        case 'reboot-hard':
+          str = 'Reboots VM using hardware reboot';
+          break;
+        case 'poweroff':
+          str = 'Turns VM off using guest OS(State POWEROFF)';
+          break;
+        case 'poweroff-hard':
+          str = 'Turns VM off using hardware shutdown(State POWEROFF)';
+          break;
+        case 'undeploy':
+          str = 'Removes VM resources from host after turning it off(State PENDING)';
+          break;
+        case 'undeploy-hard':
+          str = 'Removes VM resources from host(State PENDING)';
+          break;
+        case 'snapshot-create':
+          str = 'Creates Snapshot';
+          break;
+        case 'terminate':
+          str = 'Deletes VM after turning it off(State DONE)';
+          break;
+        case 'terminate-hard':
+          str = 'Deletes VM immediately(State DONE)';
+          break;
+      }
+      $('#scheduling_actions_table td[colspan="3"]').text(Locale.tr(str));
       return false;
     });
 

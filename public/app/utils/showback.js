@@ -94,9 +94,11 @@ define(function(require) {
       var month = cells[2];
 
       var vms = update_table_template(month);
-
-      create_diagram(getDataset(month));
-      $('#test_table_graph_legend').show();
+      if (lists_month[month].total.cost > 0){
+        create_diagram(getDataset(month));
+        $('#test_table_graph').show();
+        $('#test_table_graph_legend').show();
+      }
 
       test_dataTable = $("#test_datatable", context).dataTable({
         scrollX: true,
@@ -172,12 +174,11 @@ define(function(require) {
   function _onShow(context, that) {
     var uid = config.user_id;
     var edate = Math.round(Date.now() / 1000);
-
     var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
         lists = req.response;
         lists_month = create_list_months(lists);
-
         _fillShowback(context);
+
       }};
     Settings.showback(param);
 
@@ -197,11 +198,13 @@ define(function(require) {
       series.push([123,'2019',i,Locale.months[i-1] + ' 2019',lists_month[i].total.cost.toFixed(2)]);
       showback_data.push([(new Date(2019, i-1)), lists_month[i].total.cost.toFixed(2)]);
     }
-    //console.log(series.length,series);
+
     if (series.length > 0){
       showback_dataTable.fnAddData(series);
     }else{
-      Notifier.notifyMessage('No info');
+      $('#showback_placeholder i').eq(0).remove();
+      $('#showback_placeholder i').eq(0).removeClass('fa-stack-3x').addClass('fa-stack-2x');
+      $('#showback_no_data').show();
       return false;
     }
 
@@ -247,7 +250,7 @@ define(function(require) {
       //}
     };
 
-    //console.log(showback_plot_series);
+
     var showback_plot = $.plot(
         $("#showback_graph", context), showback_plot_series, options);
 
@@ -268,7 +271,7 @@ define(function(require) {
     var list_months = {};
 
     for(var i in lists){
-      if (lists[i].TOTAL > 0){
+      //if (lists[i].TOTAL > 0){
         for(var j in lists[i].showback){
           var day = lists[i].showback[j].date.split('/')[0] * 1;
           var month = lists[i].showback[j].date.split('/')[1] * 1;
@@ -332,7 +335,7 @@ define(function(require) {
           }
 
         }
-      }
+      // }
 
     }
 
