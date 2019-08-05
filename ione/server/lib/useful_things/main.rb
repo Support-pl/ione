@@ -309,10 +309,12 @@ class IONe
     end
     def UserDelete uid
         u = onblock(:u, uid)
-        u.vms.each do | vm |
+        u.vms.nil? || u.vms.each do | vm |
             vm.terminate true
         end
         u.delete
+    rescue => e
+        LOG_DEBUG e.message
     end
 
     def GetvCenterIOPsConf
