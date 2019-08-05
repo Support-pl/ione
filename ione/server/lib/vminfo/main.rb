@@ -30,8 +30,17 @@ class IONe
              end['VM']
         begin
             # If VM was created using OpenNebula template
-            ip = IPAddr.new vm['TEMPLATE']['NIC']['IP']
-            return ip.to_s if ip.ipv4? && !ip.local?
+            nic = vm['TEMPLATE']['NIC']
+            if nic.class == Hash then
+                nic = [ nic ]
+            elsif nic.class != Array then
+                raise
+            end
+            nic.map! { |el| IPAddr.new el['IP'] }
+            nic.delete_if { |el| !(el.ipv4? && !el.local?) }
+            nic.map! { |el| el.to_s}
+            
+            return nic.size == 1 ? nic.last : nic
         rescue # If not, this action will raise HashRead exception
         end
         begin
