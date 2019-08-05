@@ -249,8 +249,7 @@ class AnsiblePlaybookProcess
                 Net::SSH.start( ANSIBLE_HOST, ANSIBLE_HOST_USER, :port => ANSIBLE_HOST_PORT ) do | ssh |
                     # Create local Playbook version
                     File.open("/tmp/#{@install_id}.yml", 'w') do |file|
-                        file.write(
-                            @runnable.gsub('<%group%>', @install_id) )
+                        file.write( @runnable.gsub('<%group%>', @install_id) )
                     end
                     # Upload Playbook to Ansible host
                     ssh.sftp.upload!("/tmp/#{@install_id}.yml", "/tmp/#{@install_id}.yml")
