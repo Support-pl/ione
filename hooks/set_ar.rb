@@ -53,7 +53,7 @@ end
 vnet = VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new)
 vnet.info!
 begin
-ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
+    ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
 rescue
     puts ar_pool.inspect
     exit -1
@@ -64,25 +64,29 @@ end
 
 ar = ar_pool.sample
 
-user_vnet = vnet.clone
-user_vnet.allocate("
-    NAME = \"user-#{user.id}-vnet\"
-    BRIDGE = \"user-#{user.id}-vnet\"
-    VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
-    VCENTER_SWITCH_NAME = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NAME']}\"
-    VCENTER_SWITCH_NPORTS = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NPORTS']}\"
-    VLAN_ID = \"#{ar['VLAN_ID']}\"
-    VN_MAD = \"vcenter\"
-    TYPE = \"PRIVATE\"
-    VCENTER_ONE_HOST_ID = \"#{JSON.parse(conf['NODES_DEFAULT'])['VCENTER']}\"", conf['DEFAULT_CLUSTER'].to_i)
+if vnet['VN_MAD'] == 'vcenter' then
+    user_vnet = vnet.clone
+    user_vnet.allocate("
+        NAME = \"user-#{user.id}-vnet\"
+        BRIDGE = \"user-#{user.id}-vnet\"
+        VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
+        VCENTER_SWITCH_NAME = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NAME']}\"
+        VCENTER_SWITCH_NPORTS = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NPORTS']}\"
+        VLAN_ID = \"#{ar['VLAN_ID']}\"
+        VN_MAD = \"vcenter\"
+        TYPE = \"PRIVATE\"
+        VCENTER_ONE_HOST_ID = \"#{JSON.parse(conf['NODES_DEFAULT'])['VCENTER']}\"", conf['DEFAULT_CLUSTER'].to_i)
 
-user_vnet.add_ar("AR = [
-    IP = \"#{ar['IP']}\",
-    SIZE = \"#{ar['SIZE']}\",
-    TYPE = \"#{ar['TYPE']}\" ]")
+    user_vnet.add_ar("AR = [
+        IP = \"#{ar['IP']}\",
+        SIZE = \"#{ar['SIZE']}\",
+        TYPE = \"#{ar['TYPE']}\" ]")
 
-vnet.rm_ar ar['AR_ID']
+    vnet.rm_ar ar['AR_ID']
+else
+    user_vnet = vnet.reserve("user-#{user.id}-vnet", ar['SIZE'], ar['AR_ID'], nil, nil)
+    user_vnet = VirtualNetwork.new_with_id(user_vnet, Client.new)
+end
 
 user_vnet.chown(user.id, conf['IAAS_GROUP_ID'].to_i)
-
 puts "Virtual Network for User##{user.id} successfuly created with id #{user_vnet.id}"
