@@ -7,6 +7,9 @@ $DB = Sequel.connect({
         database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
         encoding: 'utf8mb4'   })
 
+$DB.extension(:connection_validator)
+$DB.pool.connection_validation_timeout = -1
+
 begin
     $DB.create_table :settings do 
         String :name, size: 128, primary_key: true
@@ -16,13 +19,13 @@ begin
 
     required = [
         ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", ""],
-        ['DISK_TYPES', "<comma_separated_list_of_disk_types>", ""],
-        ['DISK_COSTS', "{\"<disk_type>\":\"<price>\"}", ""],
-        ['IAAS_GROUP_ID', '<iaas_group_id>', ""],
-        ['NODES_DEFAULT', "{\"<hypervisor_name>\":\"<host_id>\"}", ""],
+        ['DISK_TYPES', "{{comma_separated_list_of_disk_types}}", ""],
+        ['DISK_COSTS', "{\"{{disk_type}}\":\"{{price}}\"}", ""],
+        ['IAAS_GROUP_ID', '{{iaas_group_id}}', ""],
+        ['NODES_DEFAULT', "{\"{{hypervisor_name}}\":\"{{host_id}}\"}", ""],
         ['PUBLIC_IP_COST', "0.0", ""],
-        ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}", ""],
-        ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"<network_id>\"}", ""],
+        ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"{{network_id}}\"}", ""],
+        ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"{{network_id}}\"}", ""],
         ['CURRENCY_MAIN', "€", ""]
     ]
     required.each do | record |
