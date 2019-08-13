@@ -25,7 +25,6 @@ module IONeLoggerKit
     # @param [Boolean] _time Print or not to print log time
     # @return [Boolean] true
     def LOG(msg, method = "none", _time = true)
-        return true unless MAIN_IONE
         case method
         when 'DEBUG'
             destination = "#{LOG_ROOT}/debug.log"
@@ -47,7 +46,6 @@ module IONeLoggerKit
     # Logging the message with choosen color and font to the one of two destinations
     # Check out 'colorize' gem for available colors and fonts 
     def LOG_COLOR(msg, method = caller_locations(1,1)[0].label.dup, color = 'red', font = 'bold')
-        return true unless MAIN_IONE
         destination = "#{LOG_ROOT}/ione.log"
         destination = "#{LOG_ROOT}/snapshot.log" if method == "SnapController"
         msg = msg.to_s.send(color).send(font)
@@ -78,7 +76,6 @@ module IONeLoggerKit
     # @param [Boolean] _time Print or not to print log time
     # @return [Boolean] true
     def LOG_AUTO(msg, method = caller_locations(1,1)[0].label, _time = true)
-        return true unless MAIN_IONE
         case method
         when 'DEBUG'
             destination = "#{LOG_ROOT}/debug.log"

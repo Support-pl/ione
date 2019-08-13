@@ -11,15 +11,7 @@ puts 'Getting path to the server'
 ROOT = SUNSTONE_ROOT_DIR + '/ione/server' # IONe root path
 LOG_ROOT = LOG_LOCATION # IONe logs path
 
-MAIN_IONE = if File.exist? "#{ROOT}/ione.lock" then
-    false
-else
-    File.open("#{ROOT}/ione.lock", 'w'){ |f| f.write 'locked' }
-    at_exit do
-        File.delete("#{ROOT}/ione.lock")
-    end
-    true
-end
+MAIN_IONE = Process.ppid == 1
 
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
 CONF = $ione_conf # for sure
@@ -55,6 +47,9 @@ $db = Sequel.connect({
         user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
         database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
         encoding: 'utf8mb4'   })
+
+$db.extension(:connection_validator)
+$db.pool.connection_validation_timeout = -1
 
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
@@ -171,16 +166,12 @@ puts 'Initializing JSON_RPC server and logic handler'
 server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{$ione_conf['Server']['listen-port']}", Logger.new(rpc_log_file))
 LOG_COLOR "Server initialized", 'none', 'green'
 
-# Signal.trap('CLD') do
-#   LOG 'Trying to force stop Sinatra', 'SignalHandler'
-# end
-
 puts 'Pre-init job ended, starting up server'
 Thread.new do
     begin
         server.server_loop # Server start
     rescue => e
-        LOG_ERROR "Server isn't started: #{e.message}"
-        puts "Server isn't started: #{e.message}"
+        LOG_ERROR "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
+        puts "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
     end
 end if !defined?(DEBUG_LIB) && MAIN_IONE
