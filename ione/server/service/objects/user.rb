@@ -26,22 +26,20 @@ class OpenNebula::User
     end
 
     def balance
-        to_hash!['USER']['TEMPLATE']['BALANCE']
+        info! || self['TEMPLATE/BALANCE']
     end
     def balance= num
         update("BALANCE = #{num}", true)
     end
     def alert
-        alert_at = to_hash!['USER']['TEMPLATE']['ALERT'] || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
+        alert_at = (info! || self['TEMPLATE/ALERT']) || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
         return balance.to_f <= alert_at.to_f, alert_at.to_f
     end
     def alert= at
         update("ALERT = #{at}", true)
     end
-    def vms
-        vm_pool = VirtualMachinePool.new(@client, id)
-        vm_pool.info!
-        vm_pool.to_a
+    def vms db
+        db[:vm_pool].where(uid: @pe_id).exclude(:state => 6).select(:oid).to_a.map { |row| onblock(:vm, row[:oid]){|vm| vm.info! || vm} }
     rescue
         nil
     end

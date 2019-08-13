@@ -309,7 +309,7 @@ class IONe
     end
     def UserDelete uid
         u = onblock(:u, uid)
-        u.vms.nil? || u.vms.each do | vm |
+        u.vms(@db).each do | vm |
             vm.terminate true
         end
         u.delete

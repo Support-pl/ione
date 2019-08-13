@@ -60,7 +60,7 @@ class IONe
         LOG "Suspend Query for User##{uid} received", "Suspend"
 
         user = onblock :u, uid
-        user.vms.each do | vm |
+        user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
                 LOG "Suspending VM##{vm.id}", "Suspend"
@@ -124,12 +124,12 @@ class IONe
         LOG "Unsuspend Query for User##{uid} received", "Unsuspend"
 
         user = onblock :u, uid
-        user.vms.each do | vm |
+        user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
                 LOG "Unsuspending VM##{vm.id}", "Unsuspend"
                 vm.chmod(
-                    -1,  1, -1,
+                    1,  1, 1,
                     -1, -1, -1,
                     -1, -1, -1  )
                 vm.resume

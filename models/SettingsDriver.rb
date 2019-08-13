@@ -18,6 +18,7 @@ begin
     end
 
     required = [
+        ['ALERT', "0.0", ""],
         ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", ""],
         ['DISK_TYPES', "{{comma_separated_list_of_disk_types}}", ""],
         ['DISK_COSTS', "{\"{{disk_type}}\":\"{{price}}\"}", ""],
