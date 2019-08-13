@@ -239,8 +239,7 @@ helpers do
             rescue
             end
         end
-
-        session[:csrftoken] && session[:csrftoken] == csrftoken
+        (session[:csrftoken] && session[:csrftoken] == csrftoken) || $ione_conf['APIAccessList'].include?(request.ip)
     end
 
     def authorized?
@@ -420,7 +419,7 @@ before do
             end
          }
 
-         if !found
+        if !found
             msg = "Zone #{zone_name_header} does not exist"
             logger.error { msg }
             halt [404, OpenNebula::Error.new(msg).to_json]
@@ -896,10 +895,14 @@ end
 # IONe Actions
 ##############################################################################
 
-begin
-    require 'ione/server/ione.rb'
-rescue => e
-    puts e.message, e.backtrace
+require 'ione/server/ione.rb'
+post '/ione/:method' do
+    begin
+        r = IONe.new($cloud_auth.client(session[:user], session[:active_zone_endpoint]), $db).send(params['method'], *JSON.parse(@request_body)['params'])
+    rescue => e
+        r = e.message
+    end
+    JSON.pretty_generate response: r
 end
 
 Sinatra::Application.run! if(!defined?(WITH_RACKUP))
