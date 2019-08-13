@@ -427,6 +427,7 @@ class IONe
     rescue => e
         out = { :exception => e.message, :trace => trace << 'END_TRACE' }
         LOG_DEBUG out.debug_out
+        out[:params] = params
         return out
     end
     # Class for pst-deploy activities methods
