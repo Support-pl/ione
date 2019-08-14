@@ -24,14 +24,15 @@
     <div class="confirm-resources-header"></div>
     <div class="reveal-body">
         <form id="{{dialogId}}Form" action="">
-            <p>Ваш сервер будет размещен в дата-центре, после чего начнется списание ваших средств!</p>
+            <p>{{tr "Your server will be located in the data center, after which your funds will be debited!"}}</p>
             <div class="form_buttons reveal-footer" style="text-align: center">
                 <div class="form_buttons">
-                    <button class="button radius center success" id="place_on_node_vm_proceed">{{tr "Place on node"}}</button>
+                    <button class="button radius center success"
+                        id="place_on_node_vm_proceed">{{tr "Place on node"}}</button>
                 </div>
             </div>
             <button class="close-button" data-close aria-label="{{tr "Close modal"}}" type="button">
-            <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true">&times;</span>
             </button>
         </form>
     </div>
