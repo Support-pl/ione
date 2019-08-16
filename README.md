@@ -27,6 +27,8 @@ Creators:
 3. Run install script as root:
 
     `sudo ruby install.rb`
+> Note:
+> Works only with CentOS for now.
 
 4. Wait for complection.
 
