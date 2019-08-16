@@ -2,7 +2,7 @@ require 'json'
 puts 'Parsing statistics data'
 begin
     $data = JSON.parse(File.read("#{ROOT}/modules/stat/data.json"))
-rescue => e
+rescue
     $data = {}
 end
 puts 'Binding "at_exit" actions for statistics-helper'

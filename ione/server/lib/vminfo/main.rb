@@ -36,8 +36,8 @@ class IONe
         end
         begin
             # Also IP can be stored at the another place in monitoring, but here all IP's are stored 
-            ips = vm['MONITORING']['GUEST_IP_ADDRESSES'].split(',').map! { |ip| IPAddr.new ip }
-            return ips.detect { |ip| ip.ipv4? && !ip.local? }.to_s
+            ips = vm['MONITORING']['GUEST_IP_ADDRESSES'].split(',').map! { |val| IPAddr.new val }
+            return ips.detect { |ip_obj| ip_obj.ipv4? && !ip_obj.local? }.to_s
         rescue
         end
         begin

@@ -182,7 +182,7 @@ rescue => e
     logger.error {
         "Error initializing authentication system" }
     logger.error { e.message }
-    exit -1
+    exit(-1)
 end
 
 set :cloud_auth, $cloud_auth
@@ -420,7 +420,7 @@ before do
             end
          }
 
-         if !found
+        if !found
             msg = "Zone #{zone_name_header} does not exist"
             logger.error { msg }
             halt [404, OpenNebula::Error.new(msg).to_json]
@@ -789,11 +789,7 @@ post '/upload_chunk' do
     info = env['rack.request.form_hash']
     chunk_number = info['resumableChunkNumber'].to_i - 1
     chunk_size = info['resumableChunkSize'].to_i
-    chunk_current_size = info['resumableCurrentChunkSize'].to_i
     chunk_start = chunk_number * chunk_size
-    chunk_end = chunk_start + chunk_current_size - 1
-    identifier = info['']
-    size = info['resumableTotalSize'].to_i
 
     file_name = info['resumableIdentifier']
     file_path = File.join(Dir.tmpdir, file_name)

@@ -1,8 +1,0 @@
-UpdatesManager:
-  update: true # Will not update anything if false
-  autoupdate-on-startup: true # Checks updates on server startup if true
-  
-  repo: 'https://github.com/ione-cloud/ione-cloud-core.git' # Git repo supported URL to %reponame%.git
-  branch: 'stable' # Branch, where get updates
-
-  update-token: "up5Bxkoma9lnM"

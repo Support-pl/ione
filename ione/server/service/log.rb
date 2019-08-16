@@ -119,8 +119,8 @@ module IONeLoggerKit
                 level += 1
                 next
             end
-            $methods.each do | method |
-                if loc.include? method then
+            $methods.each do | m |
+                if loc.include? m then
                     level += 1 
                     break
                 end
@@ -128,7 +128,7 @@ module IONeLoggerKit
         end
         msg = "[ #{time()} ] Method #{called ? $PROC.push("#{method}:#{id}").last : $PROC.delete("#{method}:#{id}")} #{called ? 'called' : 'closed'}\n" if level < 2
         if level > 1  || !called then
-            tabs = (0..(level - 3)).to_a.inject("                             "){|tabs, i| tabs +  "    "}
+            tabs = (0..(level - 3)).to_a.inject("                             "){|t, i| t +  "    "}
             msg = "#{tabs}|-- Method #{method.to_s}:#{id} #{called ? 'called' : 'closed'}\n"
         end
 

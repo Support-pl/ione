@@ -271,7 +271,7 @@ class SunstoneServer < CloudServer
 
             begin
                 log = File.read(vm_log_file)
-            rescue Exception => e
+            rescue Exception
                 msg = "Log for VM #{id} not available"
                 return [200, {:vm_log => msg}.to_json]
             end

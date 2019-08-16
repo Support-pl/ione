@@ -46,7 +46,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                  when "update"        then self.update(action_hash['params'])
                  when "chown"         then self.chown(action_hash['params'])
                  when "chmod"         then self.chmod_octet(action_hash['params'])
@@ -57,7 +57,7 @@ module OpenNebulaJSON
                      error_msg = "#{action_hash['perform']} action not " <<
                          " available for this resource"
                      OpenNebula::Error.new(error_msg)
-                 end
+            end
         end
 
         def update(params=Hash.new)

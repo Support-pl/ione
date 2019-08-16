@@ -245,7 +245,6 @@ get '/vcenter/template/:vcenter_ref/:template_id' do
         t[:one]           = ""
         template_copy_ref = nil
         template          = nil
-        append            = true
         lc_error          = nil
 
         ref               = params[:vcenter_ref]

@@ -42,7 +42,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                  when "add_group"   then self.add_group(action_hash['params'])
                  when "del_group"   then self.del_group(action_hash['params'])
                  when "add_cluster" then self.add_cluster(action_hash['params'])
@@ -60,7 +60,7 @@ module OpenNebulaJSON
                      error_msg = "#{action_hash['perform']} action not " <<
                          " available for this resource"
                      OpenNebula::Error.new(error_msg)
-                 end
+            end
         end
 
         def add_group(params=Hash.new)

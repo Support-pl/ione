@@ -162,11 +162,11 @@ class OpenNebula::VirtualMachine
     end
     # Checks if vm is on given vCenter Datastore
     def is_at_ds?(ds_name)
-        query, host = {}, onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+        host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
         datacenter = get_vcenter_dc(host)
         begin
             datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
-        rescue => e
+        rescue
             return 'Invalid DS name.'
         end
         self.info!
@@ -179,7 +179,7 @@ class OpenNebula::VirtualMachine
     # Gets the datastore, where VM allocated is
     # @return [String] DS name
     def get_vms_vcenter_ds
-        query, host = {}, onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+        host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
         datastores = get_vcenter_dc(host).datastoreFolder.children
         
         self.info!
@@ -470,8 +470,8 @@ class OpenNebula::VirtualMachine
                 }
             end
             timeline = timeline.group_by { | r | r['date'] }
-            timeline = timeline.map do | date, records |
-                result = records.inject({
+            timeline = timeline.map do | date, date_records |
+                result = date_records.inject({
                     'date' => date,
                     'work_time' => 0,
                     'requested_time' => 0,
@@ -480,17 +480,17 @@ class OpenNebula::VirtualMachine
                     'DISK' => 0,
                     'PUBLIC_IP' => 0,
                     'TOTAL' => 0
-                }) do | result, record |
+                }) do | showback, record |
                     requested_time = record['requested_time'] / 3600.0
                     work_time = record['state'] == 'on' ? requested_time : 0
-                    result['work_time'] += work_time
-                    result['requested_time'] += record['requested_time']
-                    result['CPU'] += cpu_cost * work_time
-                    result['MEMORY'] += memory_cost * work_time
-                    result['DISK'] +=  disk_cost * requested_time if record['state'] != 'pnd'
-                    result['PUBLIC_IP'] += public_ip_cost * requested_time
+                    showback['work_time'] += work_time
+                    showback['requested_time'] += record['requested_time']
+                    showback['CPU'] += cpu_cost * work_time
+                    showback['MEMORY'] += memory_cost * work_time
+                    showback['DISK'] +=  disk_cost * requested_time if record['state'] != 'pnd'
+                    showback['PUBLIC_IP'] += public_ip_cost * requested_time
                     
-                    result
+                    showback
                 end
 
                 result['TOTAL'] += (result['CPU'] + result['MEMORY'] + result['DISK'] + result['PUBLIC_IP'])

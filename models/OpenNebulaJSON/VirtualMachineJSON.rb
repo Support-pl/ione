@@ -34,7 +34,7 @@ module OpenNebulaJSON
             end
 
             self.allocate(template)
-       end
+        end
 
         def perform_action(template_json)
             action_hash = parse_json(template_json,'action')
@@ -42,7 +42,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                  when "deploy"       then self.deploy(action_hash['params'])
                  when "hold"         then self.hold
                  when "livemigrate"  then self.migrate(action_hash['params'], true)
@@ -81,7 +81,7 @@ module OpenNebulaJSON
                      error_msg = "#{action_hash['perform']} action not " <<
                          " available for this resource"
                      OpenNebula::Error.new(error_msg)
-                 end
+            end
         end
 
         def deploy(params=Hash.new)

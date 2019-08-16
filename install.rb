@@ -1,7 +1,7 @@
 whoami = `whoami`.chomp
 unless whoami == 'root' then
     puts "You must be oneadmin to avoid problems with installing packages"
-    exit -1
+    exit(-1)
 end
 
 `gem install shell`

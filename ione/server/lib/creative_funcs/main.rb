@@ -93,7 +93,7 @@ class IONe
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
             nic, context = vm.to_hash!['VM']['TEMPLATE']['NIC'], vm.to_hash['VM']['TEMPLATE']['CONTEXT']
-            vn, vn_uname = nic['NETWORK'], onblock(:vn, 'btk-inet'){|vn| vn.info!; vn['/VNET/UNAME']}
+            vn, vn_uname = nic['NETWORK'], onblock(:vn, 'btk-inet'){|vn_obj| vn.info!; vn_obj['/VNET/UNAME']}
             
             LOG_DEBUG 'Initializing template obj'
             LOG_DEBUG 'Generating new template'
@@ -155,11 +155,11 @@ class IONe
                     params['host']
                 end
 
-                onblock(:vm, vmid) do | vm |
+                onblock(:vm, vmid) do | vm_obj |
                     LOG_DEBUG 'Deploying VM to the host'
-                    vm.deploy(host, false, ChooseDS(params['ds_type']))
+                    vm_obj.deploy(host, false, ChooseDS(params['ds_type']))
                     LOG_DEBUG 'Waiting until VM will be deployed'
-                    vm.wait_for_state
+                    vm_obj.wait_for_state
                 end
 
                 postDeploy = PostDeployActivities.new @client

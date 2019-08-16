@@ -35,8 +35,6 @@ class SunstoneViews
     def initialize
         @views_config = YAML.load_file(VIEWS_CONFIGURATION_FILE)
 
-        base_path = SUNSTONE_ROOT_DIR+'/public/js/'
-
         @views = Hash.new
 
         Dir[VIEWS_CONFIGURATION_DIR+'*.yaml'].each do |p_path|

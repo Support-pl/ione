@@ -26,7 +26,7 @@ class AnsiblePlaybook
     def initialize **args
         args.to_s!
         if args['id'].nil? then
-            @uid, @gid, @name, @description, @body, @extra_data = args.get *FIELDS
+            @uid, @gid, @name, @description, @body, @extra_data = args.get(*FIELDS)
             @uid, @gid, @extra_data = @uid || 0, @gid || 0, @extra_data || {}
 
             @extra_data['PERMISSIONS'] = @extra_data['PERMISSIONS'] || {"PERMISSIONS" => "111000000"}
@@ -316,13 +316,13 @@ class AnsiblePlaybookProcess
             end
         end
         
-        if codes.values.inject(0){|sum, codes| sum +=  codes['failed']} != 0 then
+        if codes.values.inject(0){|sum, vals| sum +=  vals['failed']} != 0 then
             @status = 'failed'
-        elsif codes.values.inject(0){|sum, codes| sum +=  codes['unreachable']} != 0 then
+        elsif codes.values.inject(0){|sum, vals| sum +=  vals['unreachable']} != 0 then
             @status = 'unreachable'
         else
             @status = codes.values.last.keys.map do | key |
-                { key => codes.values.inject(0){|sum, codes| sum +=  codes[key]} }
+                { key => codes.values.inject(0){|sum, vals| sum +=  vals[key]} }
             end.sort_by{|attribute| attribute.values.last }.last.keys.last
         end
         
