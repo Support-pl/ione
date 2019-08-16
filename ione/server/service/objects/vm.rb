@@ -508,7 +508,7 @@ class OpenNebula::VirtualMachine
             }
 
         end
-    rescue OpenNebula::Records::NoRecordsError => e
+    rescue OpenNebula::Records::NoRecordsError
         return {
             "work_time" => 0,
             "time_period_requested" => etime_req - stime_req,
