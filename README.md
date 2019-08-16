@@ -6,7 +6,7 @@
 [GitHub](https://github.com/ione-cloud)
 Creators:
 [Support.pl](https://support.pl)
-[slnt_opp](https://slnt-opp.xyz)
+[slnt_opp](http://slnt-opp.xyz)
 
 
 ## Main additional features
