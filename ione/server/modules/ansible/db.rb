@@ -256,7 +256,15 @@ class AnsiblePlaybookProcess
                     # Create local Hosts File
                     File.open("/tmp/#{@install_id}.ini", 'w') do |file|
                         file.write("[#{@install_id}]\n")
-                        @hosts.values.each {|host| file.write("#{host[0]}\n") }
+                        @hosts.values.each do |host|
+                            unless host[1].nil? then
+                                cred = host[1].split ':'
+                                cred = "ansible_user=#{cred[0]} ansible_password=#{cred[1]}"
+                            else
+                                cred = ''
+                            end
+                            file.write("#{host[0]} #{cred}\n")
+                        end
                     end
                     # Upload Hosts file
                     ssh.sftp.upload!("/tmp/#{@install_id}.ini", "/tmp/#{@install_id}.ini")
