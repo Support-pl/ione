@@ -79,6 +79,14 @@ define(function(require) {
         var that = this;
         that.onshow = _onShow(context, that);
 
+        // datastore_dataTable = $("#cloud_datactores_datatable", context).dataTable({
+        //     "bInfo": false,
+        //     "bPaginate": false,
+        //     "aoColumnDefs": [
+        //         { 'bSortable': false, 'aTargets': [2,4] }
+        //     ]
+        // });
+
         datastore_init();
         settings_init();
 
@@ -97,20 +105,23 @@ define(function(require) {
                     for(var key in datastores){
                         if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS'){
                             if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE"){
-                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,DEPLOY:true});
+                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,HYPERVISOR:datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,DEPLOY:true});
                                 check = 'checked ';
                             }else{
-                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, DEPLOY:false});
+                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,HYPERVISOR:datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,DEPLOY:false});
                                 check = '';
                             }
                             $('#datastores_body').append('<tr role="row"><td>'+ datastores[key].DATASTORE.ID +'</td><td>'+ datastores[key].DATASTORE.NAME +'</td>' +
                                 '<td><select id="'+ datastores[key].DATASTORE.ID +'" style="width: 80%;" class="datastores_select_disk_type"></select></td>' +
+                                '<td id="datastore_huper'+datastores[key].DATASTORE.ID+'" class="hypervisor_datastore"><input type="text" value="'+datastores[key].DATASTORE.TEMPLATE.HYPERVISOR+'"></td>'+
                                 '<td id="deploy_switch">' +
                                 '<label class="tetswitch"><input type="checkbox" id="togBtn" '+ check +'><div class="tetslider round"></div></label></td></tr>');
                         }
                     }
 
-
+                    // datastore_dataTable.fnClearTable();
+                    // datastore_dataTable.fnAddData();
+                    console.log(datastores,datastores_hbs);
                     settings_hbs = {};
                     for(var i in settings){
                         if (settings[i] != null){
@@ -165,7 +176,8 @@ define(function(require) {
                     }
 
                     var datastores_select = $('#datastores_body .datastores_select_disk_type');
-                    var len =  datastores_select.length;for (var i = 0; i < len; i++) {
+                    var len =  datastores_select.length;
+                    for (var i = 0; i < len; i++) {
                         if (datastores_hbs[i].DISK_TYPE != undefined){
                             for(var k in disk_type){
                                 if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
@@ -175,17 +187,17 @@ define(function(require) {
                                 }
                             }
                         }else{
-                            $(datastores_select[i]).append('<option selected disabled>Select disk type</option>');
+                            $(datastores_select[i]).append('<option selected disabled>'+Locale.tr('Select disk type')+'</option>');
                             for(var k in disk_type){
                                 $(datastores_select[i]).append('<option>'+ disk_type[k] +'</option>');
                             }
                         }
                     }
 
-                    $('#datastores_body #0').append('<option selected disabled>Select disk type disabled</option>');
+                    $('#datastores_body #0').append('<option selected disabled>'+Locale.tr('Select disk type disabled')+'</option>');
                     $('#datastores_body #0').prop('disabled',true);
-                    $('#datastores_body #0').parent().next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
-
+                    $('#datastore_huper0').next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
+                    $('#datastore_huper0 input').attr('disabled','disabled');
 
                     for(var i in settings_hbs){
                         if (settings_hbs[i].bool_tree == true){
@@ -216,6 +228,19 @@ define(function(require) {
                     rezerv_settings_hbs = JSON.parse(JSON.stringify(settings_hbs));
 
                     set_events();
+
+                    if (datastores_hbs.length == 0 && settings_hbs.length == 0){
+                        $('#cloud_placeholder i').eq(0).remove();
+                        $('#cloud_no_data').show();
+                    }else{
+                        $('#cloud_placeholder').hide();
+                        if (datastores_hbs.length != 0){
+                            $('#datastore_row').show();
+                        }
+                        if (settings_hbs.length != 0){
+                            $('#settings_row').show();
+                        }
+                    }
 
                 }});
         });
@@ -346,14 +371,14 @@ define(function(require) {
         $('#datastores_but_submit').click(function () {
             console.log(datastores_hbs, datastores);
             var datastores = $('#datastores_body .datastores_select_disk_type');
-            var len =  datastores.length;
+            var len =  datastores.length-1;
             for (var i = 0; i < len; i++) {
                 if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()){
                     OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DRIVE_TYPE = '+$(datastores[i]).val()}});
                     datastores_hbs[i].DISK_TYPE = $(datastores[i]).val();
-                    Notifier.notifyMessage('Changed disk type');
+                    Notifier.notifyMessage(Locale.tr('Changed disk type'));
                 }
-                var dep = $(datastores[i]).parent().next('#deploy_switch').children().children('#togBtn').prop('checked');
+                var dep = $(datastores[i]).parent().parent().children('#deploy_switch').children().children('#togBtn').prop('checked');
                 if (datastores_hbs[i].DEPLOY != dep){
                     if ($(datastores[i]).val() != null){
                         if (dep == true){
@@ -362,11 +387,17 @@ define(function(require) {
                             OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = FALSE'}});
                         }
                         datastores_hbs[i].DEPLOY = dep;
-                        Notifier.notifyMessage('Changed deploy');
+                        Notifier.notifyMessage(Locale.tr('Changed deploy'));
                     }else{
-                        Notifier.notifyError('Select disk type');
+                        Notifier.notifyError(Locale.tr('Select disk type'));
                     }
 
+                }
+                var hyper_value = $('#datastore_huper'+datastores_hbs[i].ID+' input').val();
+                if (datastores_hbs[i].HYPERVISOR != hyper_value && hyper_value != 'undefined'){
+                    OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'HYPERVISOR = '+hyper_value}});
+                    datastores_hbs[i].HYPERVISOR = hyper_value;
+                    Notifier.notifyMessage(Locale.tr('Changed hypervisor'));
                 }
             }
             rezerv_clone_datastores = $('tbody#datastores_body').clone();
