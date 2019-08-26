@@ -89,7 +89,7 @@ rescue => e
     logger.error {
         "Error initializing authentication system" }
     logger.error { e.message }
-    exit -1
+    exit(-1)
 end
 
 DEBUG_LIB = true
