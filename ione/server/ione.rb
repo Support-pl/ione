@@ -20,7 +20,7 @@ else
     end
     true
 end
-
+$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
 CONF = $ione_conf # for sure
 
 puts 'Including log-library'
