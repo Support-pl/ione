@@ -19,7 +19,7 @@ class IONe
     # Returns VM's IP by ID
     # @param [Integer] vm_ref - VM ID
     # @return [String] IP address
-    def GetIP(vm_ref)
+    def GetIP(vm_ref, private_allowed = false)
         vm = case vm_ref
              when OpenNebula::VirtualMachine
                 vm_ref.to_hash
@@ -37,7 +37,7 @@ class IONe
                 raise
             end
             nic.map! { |el| IPAddr.new el['IP'] }
-            nic.delete_if { |el| !(el.ipv4? && !el.local?) }
+            nic.delete_if { |el| !(el.ipv4? && (!el.local? || private_allowed)) }
             nic.map! { |el| el.to_s}
             
             return nic.size == 1 ? nic.last : nic
@@ -46,14 +46,14 @@ class IONe
         begin
             # Also IP can be stored at the another place in monitoring, but here all IP's are stored 
             ips = vm['MONITORING']['GUEST_IP_ADDRESSES'].split(',').map! { |ip| IPAddr.new ip }
-            return ips.detect { |ip| ip.ipv4? && !ip.local? }.to_s
+            return ips.detect { |ip| ip.ipv4? && (!ip.local? || private_allowed) }.to_s
         rescue
         end
         begin
             # If VM was imported correctly, IP address will be readed by the monitoring system
             ip = IPAddr.new vm['MONITORING']['GUEST_IP']
             # Monitoring can read IPv6 address, so let us make the check
-            return ip.to_s if ip.ipv4? && !ip.local?
+            return ip.to_s if ip.ipv4? && (!ip.local? || private_allowed)
         rescue
         end
         return ""
