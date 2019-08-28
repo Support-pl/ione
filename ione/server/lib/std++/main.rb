@@ -116,7 +116,7 @@ end
 
 class IPAddr
     def local?
-        a, b, c, d = self.to_s.split('.')
+        a, b = self.to_s.split('.')[0..1]
         return (a == '10') || (a == '192' && b == '168') || (a == '172' && (16..31) === b.to_i )
     end
 end

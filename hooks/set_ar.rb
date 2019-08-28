@@ -56,7 +56,7 @@ begin
     ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
 rescue
     puts ar_pool.inspect
-    exit -1
+    exit(-1)
 end
 ar_pool.select! do | ar |
     ar['USED_LEASES'] == "0"

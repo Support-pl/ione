@@ -35,7 +35,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                  when "addhost" then self.addhost(action_hash['params'])
                  when "delhost" then self.delhost(action_hash['params'])
                  when "adddatastore" then self.adddatastore(action_hash['params'])
@@ -49,7 +49,7 @@ module OpenNebulaJSON
                      error_msg = "#{action_hash['perform']} action not " <<
                          " available for this resource"
                      OpenNebula::Error.new(error_msg)
-                 end
+            end
         end
 
         def addhost(params=Hash.new)

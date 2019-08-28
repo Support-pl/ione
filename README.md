@@ -6,7 +6,7 @@
 [GitHub](https://github.com/ione-cloud)
 Creators:
 [Support.pl](https://support.pl)
-[slnt_opp](https://slnt_opp.xyz)
+[slnt_opp](http://slnt-opp.xyz)
 
 
 ## Main additional features
@@ -27,6 +27,8 @@ Creators:
 3. Run install script as root:
 
     `sudo ruby install.rb`
+> Note:
+> Works only with CentOS for now.
 
 4. Wait for complection.
 
@@ -40,7 +42,7 @@ Creators:
 
 | Key                           | Subkey                    | Value                                     |
 |:------------------------------|:--------------------------|------------------------------------------:|
-|__CAPACITY_COST__              | CPU_COST                  | `CPU cost per hour`                       |
+| __CAPACITY_COST__             | CPU_COST                  | `CPU cost per hour`                       |
 |                               | MEMORY_COST               | `RAM cost per hour`                       |
 |                               |                           |                                           |
 | __DISK_COSTS__                | DISKTYPE_0(e.g. SSD)      | `cost per hour`                           |
@@ -53,6 +55,7 @@ Creators:
 | __PRIVATE_NETWORK_DEFAULTS__  | NETWORK_ID                | `Private Networks pool network ID`        |
 | __NODES_DEFAULT__             | HYPERIVSOR_0(e.g. VCENTER)| `OpenNebula host id`                      |
 |                               | HYPERIVSOR_0(e.g. KVM)    | `OpenNebula host id`                      |
+| __CURRENCY_MAIN__             |                           | `$/€/etc... this will be shown to user`   |
 ---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`

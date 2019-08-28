@@ -16,6 +16,7 @@
 
 <div id="datastore_row" class="row" hidden>
     <div class="large-12 columns">
+<<<<<<< HEAD
         <table id="cloud_datactores_datatable" class="datatable hover" >
             <thead id="datastores_thead">
             <tr role="row">
@@ -25,6 +26,17 @@
                 <th>{{tr "HYPERVISOR"}}</th>
                 <th>{{tr "DEPLOY"}}</th>
             </tr>
+=======
+        <table id="cloud_datactores_datatable" class="datatable hover">
+            <thead id="datastores_thead">
+                <tr role="row">
+                    <th>{{tr "ID"}}</th>
+                    <th>{{tr "NAME"}}</th>
+                    <th>{{tr "DISK TYPE"}}</th>
+                    <th>{{tr "HYPERVISOR"}}</th>
+                    <th>{{tr "DEPLOY"}}</th>
+                </tr>
+>>>>>>> master
             </thead>
             <tbody id="datastores_body" style="border-bottom: none;">
 
@@ -32,7 +44,11 @@
         </table>
 
         <div style="text-align: right">
+<<<<<<< HEAD
             <button id="datastores_but_reset"class="button radius info" type="button">{{tr "Reset"}}</button>
+=======
+            <button id="datastores_but_reset" class="button radius info" type="button">{{tr "Reset"}}</button>
+>>>>>>> master
             <button id="datastores_but_submit" class="button radius success" type="button">{{tr "Submit"}}</button>
         </div>
     </div>
@@ -46,9 +62,9 @@
     <div class="large-12 columns">
         <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
             <thead id="settings_thead">
-            <tr>
-                <th colspan="3">{{tr "Cloud settings"}}</th>
-            </tr>
+                <tr>
+                    <th colspan="3">{{tr "Cloud settings"}}</th>
+                </tr>
             </thead>
             <tbody id="settings_body" style="border-bottom: none;">
 
@@ -57,26 +73,32 @@
         <table class="dataTable" cellpadding="0" cellspacing="0" border="0">
             <tr>
                 <td class="key_setting_td">
-                    <input type="text" list="settings_key_vars" name="new_key_setting" placeholder="parent key"/>
+                    <input type="text" list="settings_key_vars" name="new_key_setting" placeholder="parent key" />
                     <datalist id="settings_key_vars">
 
                     </datalist>
                 </td>
                 <td class="key1_setting_td">
-                    <input type="text"  list="settings_key1_vars" name="new_key1_setting" placeholder="subkey(optional)"/>
+                    <input type="text" list="settings_key1_vars" name="new_key1_setting"
+                        placeholder="subkey(optional)" />
                     <datalist id="settings_key1_vars"></datalist>
                 </td>
                 <td class="value_setting_td">
-                    <input type="text"  list="settings_value_vars" name="new_value_setting" placeholder="value"/>
+                    <input type="text" list="settings_value_vars" name="new_value_setting" placeholder="value" />
                     <datalist id="settings_value_vars"></datalist>
                 </td>
                 <td style="text-align: center">
-                    <button type="button" id="setting_new_field" class="button small secondary"><i class="fa fa-lg fa-plus-circle"></i></button>
+                    <button type="button" id="setting_new_field" class="button small secondary"><i
+                            class="fa fa-lg fa-plus-circle"></i></button>
                 </td>
             </tr>
         </table>
         <div style="text-align: right">
+<<<<<<< HEAD
             <button id="settings_but_reset"class="button radius info" type="button">{{tr "Reset"}}</button>
+=======
+            <button id="settings_but_reset" class="button radius info" type="button">{{tr "Reset"}}</button>
+>>>>>>> master
             <button id="settings_but_submit" class="button radius success" type="button">{{tr "Submit"}}</button>
         </div>
     </div>
@@ -86,10 +108,17 @@
     <div class="row">
         <div class="large-8 large-centered columns">
             <div class="text-center">
+<<<<<<< HEAD
         <span class="fa-stack fa-5x" style="color: #dfdfdf">
           <i class="fa fa-cog fa-spin fa-stack-2x fa-3x fa-fw"></i>
           <i class="fa fa-cloud fa-stack-1x" style="color: white"></i>
         </span>
+=======
+                <span class="fa-stack fa-5x" style="color: #dfdfdf">
+                    <i class="fa fa-cog fa-spin fa-stack-2x fa-3x fa-fw"></i>
+                    <i class="fa fa-cloud fa-stack-1x" style="color: white"></i>
+                </span>
+>>>>>>> master
                 <div id="cloud_no_data" hidden>
                     <br>
                     <p style="font-size: 18px; color: #999">

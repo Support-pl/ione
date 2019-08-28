@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   require('jquery');
   require('jquery-ui');
 
@@ -53,14 +53,14 @@ define(function(require) {
   //   $('#loading').hide();
   //});
 
-  $(document).ready(function() {
+  $(document).ready(function () {
     Sunstone.addDialogs(_commonDialogs);
     Sunstone.addMainTabs();
     Sunstone.insertTabs();
 
-    if (Config.isTabEnabled(PROVISION_TAB_ID)){
+    if (Config.isTabEnabled(PROVISION_TAB_ID)) {
       Menu.insertProvision();
-    }else{
+    } else {
       Menu.insert();
       Sunstone.setupNavigoRoutes();
     }
@@ -77,13 +77,13 @@ define(function(require) {
   });
 
   function _setupCloseDropdownsOnClick() {
-    $(document).on("click", '.is-dropdown-submenu-item > a', function() {
+    $(document).on("click", '.is-dropdown-submenu-item > a', function () {
       $('.is-active > a', $(this).closest('.dropdown')).trigger('click');
     });
   }
 
   function _setupAccordion() {
-    $(document).on("click", ".accordion_advanced_toggle", function() {
+    $(document).on("click", ".accordion_advanced_toggle", function () {
       if ($(this).hasClass("active")) {
         $(this).removeClass("active");
       } else {
@@ -100,91 +100,93 @@ define(function(require) {
 
     this.idGroup = -2; /*All*/
     Config.changeFilter(false);
-      if(config.user_config.default_view == 'user') {
-          var text;
-          OpenNebula.User.show({
-              data: {'id': config.user_id}, success: function (a, b) {
-                  template = b;
-                  if (template.USER.TEMPLATE.BALANCE != undefined){
-                      text = template.USER.TEMPLATE.BALANCE;
-                          var style = '<style>' +
-                              '.popup-fade {' +
-                              'display: none;' +
-                              '}' +
-                              '.popup-fade:before {' +
-                              'content: \'\';' +
-                              'position: fixed; ' +
-                              'left: 0;' +
-                              'top: 0;' +
-                              'width: 100%; ' +
-                              'height: 100%;' +
-                              'opacity: 0.7;' +
-                              'z-index: 9999;' +
-                              '}' +
-                              '.popup {' +
-                              'max-height: 400px;' +
-                              'overflow-x: hidden;' +
-                              'position: absolute;' +
-                              'box-shadow: 0 20px 40px 0 rgba(0,0,0,.3);' +
-                              'left: 75%;' +
-                              'top: 45px;' +
-                              'width: 278px;' +
-                              'margin-left: -200px;' +
-                              'background: #fff;' +
-                              'border: 1px solid #c5d0db;' +
-                              'border-radius: 4px; ' +
-                              'z-index: 99999;' +
-                              'opacity: 1;    ' +
-                              '}' + '.popup_title{border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;padding: 5px 10px;}'+
-                              '.popup_body{max-height: 300px;    overflow-x: auto;}.popup_item{padding: 5px 5px 5px 10px;border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;}'+
-                              '.popup_footer{text-align: center;border-top-style: ridge;border-top-width: inherit;border-top-color: #c5d0db;cursor: pointer;padding: 5px 0;}</style>';
-                          var str = '<div class="popup-fade">' +
-                              '    <div class="popup">' +
-                              '        <div class="popup_title"><span style="font-weight: bold">Ваши уведомления</span><span style="float: right;cursor: pointer">Настройки</span>' +
-                              '</div><div class="popup_body"><div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><div style="padding-right: 10px;float: left;font-size: 23px;color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i></div><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
-                              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div></div> ' +
-                              '<div class="popup_footer">Показать все</div></div>' +
-                              '</div>';
+    if (config.user_config.default_view == 'user') {
+      var text;
+      OpenNebula.User.show({
+        data: { 'id': config.user_id }, success: function (a, b) {
+          template = b;
+          if (template.USER.TEMPLATE.BALANCE != undefined) {
+            text = template.USER.TEMPLATE.BALANCE;
+            var style = '<style>' +
+              '.popup-fade {' +
+              'display: none;' +
+              '}' +
+              '.popup-fade:before {' +
+              'content: \'\';' +
+              'position: fixed; ' +
+              'left: 0;' +
+              'top: 0;' +
+              'width: 100%; ' +
+              'height: 100%;' +
+              'opacity: 0.7;' +
+              'z-index: 9999;' +
+              '}' +
+              '.popup {' +
+              'max-height: 400px;' +
+              'overflow-x: hidden;' +
+              'position: absolute;' +
+              'box-shadow: 0 20px 40px 0 rgba(0,0,0,.3);' +
+              'left: 75%;' +
+              'top: 45px;' +
+              'width: 278px;' +
+              'margin-left: -200px;' +
+              'background: #fff;' +
+              'border: 1px solid #c5d0db;' +
+              'border-radius: 4px; ' +
+              'z-index: 99999;' +
+              'opacity: 1;    ' +
+              '}' + '.popup_title{border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;padding: 5px 10px;}' +
+              '.popup_body{max-height: 300px;    overflow-x: auto;}.popup_item{padding: 5px 5px 5px 10px;border-bottom-style: ridge;border-bottom-width: 1px;border-bottom-color: #c5d0db;}' +
+              '.popup_footer{text-align: center;border-top-style: ridge;border-top-width: inherit;border-top-color: #c5d0db;cursor: pointer;padding: 5px 0;}</style>';
+            var str = '<div class="popup-fade">' +
+              '    <div class="popup">' +
+              '        <div class="popup_title"><span style="font-weight: bold">Ваши уведомления</span><span style="float: right;cursor: pointer">Настройки</span>' +
+              '</div><div class="popup_body"><div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><div style="padding-right: 10px;float: left;font-size: 23px;color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i></div><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div>' +
+              '<div class="popup_item"><span>Ваш баланс пополнен на <span style="font-weight: bold;color: green;">150</span> BYN</span><br><small style="color: #939393;font-size: inherit">09.04.2019 в 22:30</small></div></div> ' +
+              '<div class="popup_footer">Показать все</div></div>' +
+              '</div>';
 
-                          $('head').append(style);
+            $('head').append(style);
 
-                          Settings.cloud({success:function(r, res) {
-                              var settings = r.response;
-                              if (settings.CURRENCY_MAIN == undefined){
-                                settings.CURRENCY_MAIN = 'USD';
-                              }
-                              $('.divfrombalance').prepend('<li role="menuitem"><span class="balance popup-open" style="cursor: pointer">Баланс: ' + text + ' '+ settings.CURRENCY_MAIN +'</span>'+str+'</li>');
-                          }});
-
-
-                          $(document).ready(function($) {
-                              $('.popup-open').click(function() {
-                                  $('.popup-fade').fadeIn(0);
-                                  return false;
-                              });
-
-                              $(document).keydown(function(e) {
-                                  if (e.keyCode === 27) {
-                                      e.stopPropagation();
-                                      $('.popup-fade').fadeOut(0);
-                                  }
-                              });
-
-                              $('.popup-fade').click(function(e) {
-                                  if ($(e.target).closest('.popup').length == 0) {
-                                      $(this).fadeOut(0);
-                                  }
-                              });
-                          });
-                  }
+            Settings.cloud({
+              success: function (r, res) {
+                var settings = r.response;
+                if (settings.CURRENCY_MAIN == undefined) {
+                  settings.CURRENCY_MAIN = 'USD';
+                }
+                $('.divfrombalance').prepend('<li role="menuitem"><span class="balance popup-open" style="cursor: pointer">' + Locale.tr("Balance") + ': ' + text + ' ' + settings.CURRENCY_MAIN + '</span>' + str + '</li>');
               }
-          });
-      }
+            });
+
+
+            $(document).ready(function ($) {
+              $('.popup-open').click(function () {
+                $('.popup-fade').fadeIn(0);
+                return false;
+              });
+
+              $(document).keydown(function (e) {
+                if (e.keyCode === 27) {
+                  e.stopPropagation();
+                  $('.popup-fade').fadeOut(0);
+                }
+              });
+
+              $('.popup-fade').click(function (e) {
+                if ($(e.target).closest('.popup').length == 0) {
+                  $(this).fadeOut(0);
+                }
+              });
+            });
+          }
+        }
+      });
+    }
 
 
     $(".user-zone-info").html(UserAndZoneTemplate({
@@ -199,15 +201,15 @@ define(function(require) {
     groupsRefresh();
 
     $('.quickconf_view[view="' + config['user_config']["default_view"] + '"] i').addClass('fa-check');
-    $(".user-zone-info a.quickconf_view_header").click(function() {
+    $(".user-zone-info a.quickconf_view_header").click(function () {
       var context = $(this).closest('ul');
       $(".quickconf_view", context).toggle();
 
       return false;
     });
 
-    $(".user-zone-info a.quickconf_view").click(function() {
-      var sunstone_setting = {DEFAULT_VIEW : $(this).attr("view")};
+    $(".user-zone-info a.quickconf_view").click(function () {
+      var sunstone_setting = { DEFAULT_VIEW: $(this).attr("view") };
       Sunstone.runAction("User.append_sunstone_setting_refresh", -1, sunstone_setting);
     });
 
@@ -216,7 +218,7 @@ define(function(require) {
 
       OpenNebula.User.show({
         timeout: true,
-        data : {
+        data: {
           id: config['user_id']
         },
         success: function (request, obj_user) {
@@ -224,12 +226,12 @@ define(function(require) {
           this.primaryGroup = obj_user.USER.GID;
           var groupsHTML = "<li class='groups' value='-2'> <a href='#' value='-2' id='-2'> \
               <i class='fa fa-fw'></i>" + Locale.tr("All") + "</a></li>";
-          if(this.idGroup == -2){
+          if (this.idGroup == -2) {
             var groupsHTML = "<li class='groups' value='-2'> <a href='#' value='-2' id='-2'> \
               <i class='fa fa-fw fa-check'></i>" + Locale.tr("All") + "</a></li>";
           }
 
-          if (!$.isArray(groups)){
+          if (!$.isArray(groups)) {
             groups = groups.toString();
             groups = [groups];
           }
@@ -237,13 +239,13 @@ define(function(require) {
           that = this;
           OpenNebula.Group.list({
             timeout: true,
-            success: function(request, group_list) {
-              var group_list_aux = group_list; 
-              $.each(groups, function(key, value){
+            success: function (request, group_list) {
+              var group_list_aux = group_list;
+              $.each(groups, function (key, value) {
                 var id = value;
-                $.each(group_list_aux, function(key, value){
-                  if(id == value.GROUP.ID){
-                    if(id == that.idGroup){
+                $.each(group_list_aux, function (key, value) {
+                  if (id == value.GROUP.ID) {
+                    if (id == that.idGroup) {
                       groupsHTML += "<li class='groups' value='" + id + "'id='" + id + "'> \
                         <a href='#'><i class='fa fa-fw fa-check'></i>" + value.GROUP.NAME + "\
                         </a></li>";
@@ -260,15 +262,15 @@ define(function(require) {
             error: Notifier.onError
           });
 
-          $('#userselector').on('click', function(){
+          $('#userselector').on('click', function () {
             $('.groups-menu').empty();
             $('.groups-menu').append(groupsHTML);
             var primaryGroupChar = '<span class="fa fa-asterisk fa-fw" id="primary-char" \
                                     style="float: right"></span>';
-            $('#'+ that.primaryGroup + ' a').append(primaryGroupChar);
-            $('.groups').on('click', function(){
+            $('#' + that.primaryGroup + ' a').append(primaryGroupChar);
+            $('.groups').on('click', function () {
               that.idGroup = $(this).attr('value');
-              if(that.idGroup != -2){
+              if (that.idGroup != -2) {
                 $('#primary-char').remove();
                 Sunstone.runAction("User.chgrp", [parseInt(config['user_id'])], parseInt(that.idGroup));
                 $('a', this).append(primaryGroupChar);
@@ -276,7 +278,7 @@ define(function(require) {
                 var filterName = $(this).text();
                 $('#filter-view').show();
                 $('.filter-name').html(filterName);
-              } else {                
+              } else {
                 $('#filter-view').hide();
                 Config.changeFilter(false);
               }
@@ -289,7 +291,7 @@ define(function(require) {
           });
         },
         error: Notifier.onError
-      }); 
+      });
     }
 
     function zoneRefresh() {
@@ -298,10 +300,10 @@ define(function(require) {
         timeout: true,
         success: function (request, obj_list) {
           $('.zone-ul').empty();
-          $.each(obj_list, function() {
+          $.each(obj_list, function () {
             var icon;
 
-            if(this.ZONE.NAME == config['zone_name']){
+            if (this.ZONE.NAME == config['zone_name']) {
               icon = '<i class="fa fa-fw fa-check"></i>'
             } else {
               icon = '<i class="fa fa-fw"></i>'
@@ -315,46 +317,45 @@ define(function(require) {
       });
     }
 
-    $('#zonelector').on("click", function() {
+    $('#zonelector').on("click", function () {
       zoneRefresh();
     });
 
-    $(".user-zone-info").on("click", 'a.zone-choice', function() {
-       $.ajax({
-         url: 'config',
-         type: "GET",
-         headers: {
-           "ZONE_NAME" : this.id
-         },
-         dataType: "json",
-         success: function() {
-           window.location.href = ".";
-         },
-         error: function(response) {
-           Notifier.onError(null, OpenNebula.Error(response))
-         }
-       });
-     });
+    $(".user-zone-info").on("click", 'a.zone-choice', function () {
+      $.ajax({
+        url: 'config',
+        type: "GET",
+        headers: {
+          "ZONE_NAME": this.id
+        },
+        dataType: "json",
+        success: function () {
+          window.location.href = ".";
+        },
+        error: function (response) {
+          Notifier.onError(null, OpenNebula.Error(response))
+        }
+      });
+    });
 
-    $("a.logout", $(".user-zone-info ")).click(function() {
+    $("a.logout", $(".user-zone-info ")).click(function () {
       OpenNebula.Auth.logout({
-          success: function() {
-            window.location.href = "login";
-          },
-          error: Notifier.onError
-        });
+        success: function () {
+          window.location.href = "login";
+        },
+        error: Notifier.onError
+      });
 
       return false;
     });
 
-    $(".user-zone-info a.configuration").click(function() {
+    $(".user-zone-info a.configuration").click(function () {
       //$(document).foundation('dropdown', 'closeall');
       Sunstone.showTab(SETTINGS_TAB_ID);
     });
   }
 
-  function _checkIP( sData )
-  {
+  function _checkIP(sData) {
     if (/^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/.test(sData)) {
       return 'ip-address';
     }
@@ -362,10 +363,10 @@ define(function(require) {
   }
 
   function _setupDataTableSearch() {
-    $.fn.dataTable.ext.type.order['file-size-pre'] = function ( data ) {
-      var matches = data.match( /^(\d+(?:\.\d+)?)\s*([a-z]+)/i );
+    $.fn.dataTable.ext.type.order['file-size-pre'] = function (data) {
+      var matches = data.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)/i);
       var multipliers = {
-        B:  1,
+        B: 1,
         KB: 1024,
         MB: 1048576,
         GB: 1073741824,
@@ -376,43 +377,42 @@ define(function(require) {
 
       if (matches) {
         var multiplier = multipliers[matches[2]];
-        return parseFloat( matches[1] ) * multiplier;
+        return parseFloat(matches[1]) * multiplier;
       } else {
         return -1;
       }
     }
 
-    jQuery.extend( jQuery.fn.dataTableExt.oSort, {
-      "date-euro-pre": function ( a ) {
-          var x;
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+      "date-euro-pre": function (a) {
+        var x;
 
-          if ( $.trim(a) !== '' ) {
-              var frDatea = $.trim(a).split(' ');
-              var frTimea = (undefined != frDatea[1]) ? frDatea[1].split(':') : [00,00,00];
-              var frDatea2 = frDatea[0].split('/');
-              x = (frDatea2[2] + frDatea2[1] + frDatea2[0] + frTimea[0] + frTimea[1] + ((undefined != frTimea[2]) ? frTimea[2] : 0)) * 1;
-          }
-          else {
-              x = Infinity;
-          }
+        if ($.trim(a) !== '') {
+          var frDatea = $.trim(a).split(' ');
+          var frTimea = (undefined != frDatea[1]) ? frDatea[1].split(':') : [00, 00, 00];
+          var frDatea2 = frDatea[0].split('/');
+          x = (frDatea2[2] + frDatea2[1] + frDatea2[0] + frTimea[0] + frTimea[1] + ((undefined != frTimea[2]) ? frTimea[2] : 0)) * 1;
+        }
+        else {
+          x = Infinity;
+        }
 
-          return x;
+        return x;
       },
 
-      "date-euro-asc": function ( a, b ) {
-          return a - b;
+      "date-euro-asc": function (a, b) {
+        return a - b;
       },
 
-      "date-euro-desc": function ( a, b ) {
-          return b - a;
+      "date-euro-desc": function (a, b) {
+        return b - a;
       }
 
     });
 
     //source https://cdn.datatables.net/plug-ins/1.10.12/type-detection/ip-address.js (modified)
     jQuery.fn.dataTableExt.aTypes.unshift(
-      function ( sData )
-      {
+      function (sData) {
         if (/^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/.test(sData)) {
           return 'ip-address';
         }
@@ -421,31 +421,31 @@ define(function(require) {
     );
 
     //source https://datatables.net/plug-ins/sorting/ip-address (modified)
-    jQuery.extend( jQuery.fn.dataTableExt.oSort, {
-      "ip-address-pre": function ( a ) {
-        if(a != null && a.split){
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+      "ip-address-pre": function (a) {
+        if (a != null && a.split) {
           var ip = a.split("<br>");
           var i, item;
-          if(ip.length == 1){
+          if (ip.length == 1) {
             var m = a.split("."),
-                n = a.split(":");
+              n = a.split(":");
           }
-          else if(ip.length > 1){
+          else if (ip.length > 1) {
             var m = ip[0].split("."),
-                n = ip[0].split(":");
+              n = ip[0].split(":");
           }
           var x = "",
-              xa = "";
+            xa = "";
 
           if (m.length == 4) {
             // IPV4
-            for(i = 0; i < m.length; i++) {
+            for (i = 0; i < m.length; i++) {
               item = m[i];
 
-              if(item.length == 1) {
+              if (item.length == 1) {
                 x += "00" + item;
               }
-              else if(item.length == 2) {
+              else if (item.length == 2) {
                 x += "0" + item;
               }
               else {
@@ -456,25 +456,25 @@ define(function(require) {
           else if (n.length > 0) {
             // IPV6
             var count = 0;
-            for(i = 0; i < n.length; i++) {
+            for (i = 0; i < n.length; i++) {
               item = n[i];
 
               if (i > 0) {
                 xa += ":";
               }
 
-              if(item.length === 0) {
+              if (item.length === 0) {
                 count += 0;
               }
-              else if(item.length == 1) {
+              else if (item.length == 1) {
                 xa += "000" + item;
                 count += 4;
               }
-              else if(item.length == 2) {
+              else if (item.length == 2) {
                 xa += "00" + item;
                 count += 4;
               }
-              else if(item.length == 3) {
+              else if (item.length == 3) {
                 xa += "0" + item;
                 count += 4;
               }
@@ -492,7 +492,7 @@ define(function(require) {
               item = n[i];
 
               if (item.length === 0 && paddDone === 0) {
-                for (var padding = 0 ; padding < (32-count) ; padding++) {
+                for (var padding = 0; padding < (32 - count); padding++) {
                   x += "0";
                   paddDone = 1;
                 }
@@ -504,16 +504,16 @@ define(function(require) {
           }
 
           return x;
-        }else return a;
+        } else return a;
       },
-    "ip-address-asc": function ( a, b ) {
+      "ip-address-asc": function (a, b) {
         return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    },
- 
-    "ip-address-desc": function ( a, b ) {
+      },
+
+      "ip-address-desc": function (a, b) {
         return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    }
-});
+      }
+    });
   }
 
   $.fn.dataTableExt.errMode = 'ignore';

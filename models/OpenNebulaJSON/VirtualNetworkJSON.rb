@@ -41,7 +41,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                  when "publish"   then self.publish
                  when "unpublish" then self.unpublish
                  when "update"    then self.update(action_hash['params'])

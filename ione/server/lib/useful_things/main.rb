@@ -164,7 +164,6 @@ class IONe
                     vn = vn.to_hash!["VNET"]["AR_POOL"]["AR"][0]
                     next if (vn['IP'] && vn['SIZE']).nil?
                     pool = ((vn["IP"].split('.').last.to_i)..(vn["IP"].split('.').last.to_i + vn["SIZE"].to_i)).to_a.map! { |item| vn['IP'].split('.').slice(0..2).join('.') + "." + item.to_s }
-                    leases = vn['LEASES']['LEASE'].map {|lease| lease['IP']}
                     vn['LEASES']['LEASE'].each do | lease |
                         pool.delete(lease['IP'])
                     end

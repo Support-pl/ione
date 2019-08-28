@@ -53,7 +53,7 @@ class IONe
                         LOG 'PB and hosts have been generated', 'AnsibleController' 
                         err = "Line #{__LINE__ + 1}: Error while executing playbook occured"
                         LOG 'Executing PB', 'AnsibleController' 
-                        pbexec = ssh.exec!("ansible-playbook /tmp/#{installid}.yml -i /tmp/#{installid}.ini")
+                        ssh.exec!("ansible-playbook /tmp/#{installid}.yml -i /tmp/#{installid}.ini")
                         LOG 'PB has been Executed', 'AnsibleController' 
                         LOG "#{service} installed on #{ip}", "AnsibleController"
                         LOG 'Wiping hosts and pb files', 'AnsibleController' 

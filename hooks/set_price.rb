@@ -65,7 +65,7 @@ begin
     if vm.to_hash['VM']['USER_TEMPLATE']['HOOK_VARS']['SET_COST'] != "TRUE" then
         raise
     end
-rescue => exception
+rescue
     puts "Attribute HOOK_VARS/SET_COST is FALSE or not set. Skipping..."
     exit 0
 end

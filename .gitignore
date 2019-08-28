@@ -1,3 +1,4 @@
 
 public/dist/
 .vscode/
+ione/server/modules/ansible/config.yml

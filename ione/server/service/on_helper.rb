@@ -76,11 +76,10 @@ module ONeHelper
             next if ds.name != name
             begin
                 return ds.info.nas.remoteHost, ds.info.nas.remotePath
-            rescue => e
-                return nil
+            rescue
+                nil
             end
         end
-        nil
     end
 
     # Prints given objects classes

@@ -92,12 +92,12 @@ helpers do
             comment = zrequest.comments.delete_at(0)
             one_zrequest["html_description"] = comment.html_body
 
-            zrequest.comments.each{ |comment|
+            zrequest.comments.each{ |c|
                 one_zrequest["comments"] << {
-                    "created_at" => comment.created_at,
-                    "html_body" => comment.html_body,
-                    "author_id" => comment.author_id,
-                    "body" => comment.body
+                    "created_at" => c.created_at,
+                    "html_body" => c.html_body,
+                    "author_id" => c.author_id,
+                    "body" => c.body
                 }
             }
         end
@@ -165,7 +165,7 @@ post '/support/request' do
 
     body_hash = JSON.parse(@request_body)
 
-    zrequest = ticket = ZendeskAPI::Request.new(zendesk_client, {
+    zrequest = ZendeskAPI::Request.new(zendesk_client, {
             :subject => body_hash['subject'],
             :comment => { :value => body_hash['description'] },
             :custom_fields => [
@@ -187,7 +187,7 @@ post '/support/request/:id/action' do
 
     body_hash = JSON.parse(@request_body)
     if body_hash["action"]["params"]['comment']
-        comment_value = body_hash["action"]["params"]['comment']['value']
+        #comment_value = body_hash["action"]["params"]['comment']['value']
     else
         logger.error("[OpenNebula Support] Missing comment message")
         error = Error.new(e.message)

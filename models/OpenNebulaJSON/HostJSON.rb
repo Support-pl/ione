@@ -26,7 +26,7 @@ module OpenNebulaJSON
                 return host_hash
             end
 
-            id = self.allocate(host_hash['name'],
+            self.allocate(host_hash['name'],
                           host_hash['im_mad'],
                           host_hash['vm_mad'],
                           host_hash['cluster_id'].to_i)
@@ -55,7 +55,7 @@ module OpenNebulaJSON
                 return action_hash
             end
 
-            rc = case action_hash['perform']
+            case action_hash['perform']
                 when "enable"  then self.enable
                 when "disable" then self.disable
                 when "offline" then self.offline

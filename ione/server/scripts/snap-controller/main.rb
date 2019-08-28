@@ -32,7 +32,7 @@ begin
             sleep(30)
         end
     end
-rescue => e
+rescue
     LOG "SnapController fatal error, service is crashed", 'SnapControllerThread'
     $snap_controller_status = 'FAIL'    
 end

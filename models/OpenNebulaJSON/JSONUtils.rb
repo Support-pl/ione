@@ -70,13 +70,13 @@ module OpenNebulaJSON
                  ind_tab=' '
              end
 
-             str = attributes.collect do |key, value|
+            str = attributes.collect do |key, value|
                  next if value.nil? || value.empty?
                  
                  str_line = ""
 
-                 case value
-                 when Array
+                case value
+                when Array
                      value.each do |i|
                         next if i.nil? || i.empty?
 
@@ -112,9 +112,9 @@ module OpenNebulaJSON
              end.compact.join("\n")
 
              str
-         end
+        end
 
-         def hash_to_str(template_hash, delete_values)
+        def hash_to_str(template_hash, delete_values)
             for del in delete_values
                 template_hash.delete(del)
             end
@@ -126,8 +126,8 @@ module OpenNebulaJSON
                         template_str << key.to_s.upcase << " = \["
                         for obj in value
                             if obj.kind_of?(Hash)
-                                obj.collect do |key,value|
-                                    template_str << key.to_s.upcase << " = \""<< value.to_s << "\"\n"
+                                obj.collect do |k,v|
+                                    template_str << k.to_s.upcase << " = \""<< v.to_s << "\"\n"
                                 end
                             end
                         end
@@ -139,5 +139,5 @@ module OpenNebulaJSON
             end
             return template_str
         end
-     end
+    end
 end
