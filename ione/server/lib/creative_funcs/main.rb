@@ -135,7 +135,7 @@ class IONe
             LOG_DEBUG "Resulting capacity template:\n#{context}"
             
             trace << "Terminating VM:#{__LINE__ + 1}"            
-            r = vm.terminate(true)
+            vm.terminate(true)
             LOG_COLOR 'Waiting until terminate process will over', 'Reinstall', 'light_yellow'
             trace << ":#{__LINE__ + 1}"            
             until STATE_STR(params['vmid']) == 'DONE' do
@@ -173,12 +173,11 @@ class IONe
                     params['host']
                 end
 
-                onblock(:vm, vmid) do | vm |
-                    LOG_DEBUG 'Deploying VM to the host'
-                    vm.deploy(host, false, ChooseDS(params['ds_type']))
-                    LOG_DEBUG 'Waiting until VM will be deployed'
-                    vm.wait_for_state
-                end
+                vm = onblock(:vm, vmid)
+                LOG_DEBUG 'Deploying VM to the host'
+                vm.deploy(host, false, ChooseDS(params['ds_type']))
+                LOG_DEBUG 'Waiting until VM will be deployed'
+                vm.wait_for_state
 
                 postDeploy = PostDeployActivities.new @client
 
@@ -200,7 +199,7 @@ class IONe
             end if params['release']
             ##### PostDeploy Activity define END #####
 
-            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid), 'ip_old' => GetIP(vm) }
+            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid, true), 'ip_old' => GetIP(vm) }
         rescue => e
             LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
             return e.message, trace
@@ -251,7 +250,7 @@ class IONe
         
         LOG_AUTO "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
         
-        LOG_DEBUG "Params: #{params.out}"
+        LOG_DEBUG "Params: #{params.debug_out}"
         
         trace << "Checking template:#{__LINE__ + 1}"
         onblock(:t, params['templateid']) do | t |
