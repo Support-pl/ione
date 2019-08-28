@@ -32,7 +32,6 @@ class IONe
     def AnsibleController(params)
         LOG_DEBUG params.merge!({:method => __method__.to_s}).debug_out
         host, playbooks = params['host'], params['services']
-        return if DEBUG
         ip, err = host.split(':').first, ""
         Thread.new do
             playbooks.each do |service, playbook|

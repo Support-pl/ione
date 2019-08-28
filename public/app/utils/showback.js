@@ -101,10 +101,17 @@ define(function(require) {
       var month = cells[2];
 
       var vms = update_table_template(month);
+<<<<<<< HEAD
+      if (lists_month[month].total.cost > 0){
+        create_diagram(getDataset(month));
+        $('#test_table_graph').show();
+        $('#test_table_graph_legend').show();
+=======
       if (lists_month[month].total.cost > 0) {
         create_diagram(getDataset(month));
         $("#test_table_graph").show();
         $("#test_table_graph_legend").show();
+>>>>>>> master
       }
 
       test_dataTable = $("#test_datatable", context).dataTable({
@@ -206,6 +213,14 @@ define(function(require) {
   function _onShow(context, that) {
     var uid = config.user_id;
     var edate = Math.round(Date.now() / 1000);
+<<<<<<< HEAD
+    var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
+        lists = req.response;
+        lists_month = create_list_months(lists);
+        _fillShowback(context);
+
+      }};
+=======
     var param = {
       uid: uid,
       stime: 0,
@@ -217,6 +232,7 @@ define(function(require) {
         _fillShowback(context);
       }
     };
+>>>>>>> master
     Settings.showback(param);
 
     Tips.setup(context);
@@ -245,6 +261,14 @@ define(function(require) {
       ]);
     }
 
+<<<<<<< HEAD
+    if (series.length > 0){
+      showback_dataTable.fnAddData(series);
+    }else{
+      $('#showback_placeholder i').eq(0).remove();
+      $('#showback_placeholder i').eq(0).removeClass('fa-stack-3x').addClass('fa-stack-2x');
+      $('#showback_no_data').show();
+=======
     if (series.length > 0) {
       showback_dataTable.fnAddData(series);
     } else {
@@ -256,6 +280,7 @@ define(function(require) {
         .removeClass("fa-stack-3x")
         .addClass("fa-stack-2x");
       $("#showback_no_data").show();
+>>>>>>> master
       return false;
     }
 
@@ -300,6 +325,10 @@ define(function(require) {
       //}
     };
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
     var showback_plot = $.plot(
       $("#showback_graph", context),
       showback_plot_series,
@@ -317,6 +346,23 @@ define(function(require) {
   function create_list_months(lists) {
     var list_months = {};
 
+<<<<<<< HEAD
+    for(var i in lists){
+      //if (lists[i].TOTAL > 0){
+        for(var j in lists[i].showback){
+          var day = lists[i].showback[j].date.split('/')[0] * 1;
+          var month = lists[i].showback[j].date.split('/')[1] * 1;
+
+          var cost = lists[i].showback[j].TOTAL * 1;
+          var cpu = lists[i].showback[j].CPU * 1;
+          var disk = lists[i].showback[j].DISK * 1;
+          var memor = lists[i].showback[j].MEMORY * 1;
+          var pub_ip = lists[i].showback[j].PUBLIC_IP * 1;
+          var work_time = lists[i].showback[j].work_time * 1;
+
+          if (list_months[month] == undefined){
+            list_months[month] = {};
+=======
     for (var i in lists) {
       //if (lists[i].TOTAL > 0){
       for (var j in lists[i].showback) {
@@ -343,6 +389,7 @@ define(function(require) {
           };
         } else {
           if (list_months[month][day] == undefined) {
+>>>>>>> master
             list_months[month][day] = {};
             list_months[month][day][i] = {
               cost: cost,
@@ -431,8 +478,13 @@ define(function(require) {
             list_months[month]["vms"][i]["work_time"] += work_time;
           }
         }
+<<<<<<< HEAD
+      // }
+
+=======
       }
       // }
+>>>>>>> master
     }
 
     //console.log(list_months);

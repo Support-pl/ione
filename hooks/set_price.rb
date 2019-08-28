@@ -74,21 +74,22 @@ db = $db[:settings].as_hash(:name, :body)
 
 costs = {}
 
-costs.merge!(
-    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
-    'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f
-)
-
-
-unless vm['/VM/TEMPLATE/DISK'].nil? then
+if %(vcenter kvm).include?(vm['USER_TEMPLATE/HYPERVISOR'].downcase) then
     costs.merge!(
-        'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f
-    )
-end
-
-unless vm['/VM/TEMPLATE/NIC'].nil? then
-    costs.merge!(
+        'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
+        'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f,
+        'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f,
         'PUBLIC_IP_COST' => db['PUBLIC_IP_COST'].to_f
+    )
+elsif vm['USER_TEMPLATE/HYPERVISOR'].downcase == 'azure' then
+    sku = JSON.parse(
+        JSON.parse( db['AZURE_SKUS'] )[ vm['USER_TEMPLATE/PUBLIC_CLOUD/INSTANCE_TYPE'] ]
+    )
+
+    costs.merge!(
+        'CPU_COST' => sku['PRICE'].to_f / 2,
+        'MEMORY_COST' => sku['PRICE'].to_f / 2,
+        'DISK_COST' => JSON.parse(db['AZURE_DISK_COSTS'])[vm['USER_TEMPLATE/DRIVE']].to_f
     )
 end
 

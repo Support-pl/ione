@@ -27,7 +27,7 @@ class IONe
                     vm.suspend
                 rescue
                     trace << "Some exception raised while suspending VM:#{__LINE__ - 2}"
-                    LOG_TEST "VM wasn't suspended, but rights will be changed" if log
+                    LOG_AUTO "VM wasn't suspended, but rights will be changed" if log
                 end
                 trace << "Changing user rights:#{__LINE__ + 1}"
                 vm.chmod(
@@ -60,7 +60,7 @@ class IONe
         LOG "Suspend Query for User##{uid} received", "Suspend"
 
         user = onblock :u, uid
-        user.vms.each do | vm |
+        user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
                 LOG "Suspending VM##{vm.id}", "Suspend"
@@ -124,12 +124,12 @@ class IONe
         LOG "Unsuspend Query for User##{uid} received", "Unsuspend"
 
         user = onblock :u, uid
-        user.vms.each do | vm |
+        user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
                 LOG "Unsuspending VM##{vm.id}", "Unsuspend"
                 vm.chmod(
-                    -1,  1, -1,
+                    1,  1, 1,
                     -1, -1, -1,
                     -1, -1, -1  )
                 vm.resume

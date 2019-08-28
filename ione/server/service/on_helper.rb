@@ -160,9 +160,9 @@ module ONeHelper
     # @note Remember to configure DRIVE_TYPE(HDD|SSD) and DEPLOY(TRUE|FALSE) attributes at your Datastores
     # @param [String] ds_type   - Datastore type, may be HDD or SSD, returns any DS if not given
     # @return [Integer]
-    def ChooseDS(ds_type = nil)
+    def ChooseDS(ds_type = nil, hypervisor = nil)
         dss = IONe.new($client, $db).DatastoresMonitoring('sys').sort! { | ds | 100 * ds['used'].to_f / ds['full_size'].to_f }
-        dss.delete_if { |ds| ds['type'] != ds_type || ds['deploy'] != 'TRUE' } if ds_type != nil
+        dss.delete_if { |ds| ds['type'] != ds_type || ds['deploy'] != 'TRUE' || ds['hypervisor'] != hypervisor.upcase } if ds_type != nil && hypervisor != nil
         ds = dss[rand(dss.size)]
         LOG_DEBUG "Deploying to #{ds['name']}"
         ds['id']

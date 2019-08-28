@@ -227,7 +227,8 @@ class IONe
                 'id' => img.id, 'name' => img.name.split('(').first, :full_size => sizeConvert(img.to_hash['DATASTORE']['TOTAL_MB']),
                 'used' => sizeConvert(img.to_hash['DATASTORE']['USED_MB']),
                 'type' => img.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
-                'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY']
+                'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
+                'hypervisor' => img.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
             } if img.short_type_str == type && img.id > 2
         end
         mon
@@ -307,10 +308,12 @@ class IONe
     end
     def UserDelete uid
         u = onblock(:u, uid)
-        u.vms.each do | vm |
+        u.vms(@db).each do | vm |
             vm.terminate true
         end
         u.delete
+    rescue => e
+        LOG_DEBUG e.message
     end
 
     def GetvCenterIOPsConf

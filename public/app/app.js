@@ -515,4 +515,6 @@ define(function (require) {
       }
     });
   }
+
+  $.fn.dataTableExt.errMode = 'ignore';
 });

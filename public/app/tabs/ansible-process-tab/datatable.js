@@ -94,8 +94,8 @@ define(function(require) {
 
     function _elementArray(element_json) {
         var element = element_json[XML_ROOT];
-
         this.totalProcesses++;
+
         return [
 
             '<input class="check_item" type="checkbox" id="'+RESOURCE.toLowerCase()+'_' +
@@ -124,8 +124,8 @@ define(function(require) {
     }
 
     function _postUpdateView() {
-        $(".total_processes").text(this.totalProcesses);
         if($('.odd').text().search('NaN:NaN:NaN NaN/NaN/NaN') != '-1'){
+            this.totalProcesses = 0;
             $('.odd').html('<td valign="top" colspan="7" class="dataTables_empty">\n' +
                 '<span class="text-center" style="font-size: 18px; color: #999">\n' +
                 '  <br>\n' +
@@ -139,6 +139,7 @@ define(function(require) {
                 '<br>\n' +
                 '</td>');
         }
+        $(".total_processes").text(this.totalProcesses);
         $('#dataTableAnsibleProcess').off('click', 'tbody .check_item');
         $('[href="AnsibleProcess.run"]').hide();
         $('#dataTableAnsibleProcess').on('click', 'tbody .check_item', function () {

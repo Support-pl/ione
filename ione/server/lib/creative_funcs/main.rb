@@ -84,36 +84,54 @@ class IONe
             end
             
             params['username'] = params['username'] || 'Administrator'
-            params['extra'] = params['extra'] || {'type' => 'vcenter'}
-            
+            trace << "Checking template:#{__LINE__ + 1}"
+            template = onblock(:t, params['templateid']) do | t |
+                result = t.info!
+                if result != nil then
+                    LOG_ERROR "Error: TemplateLoadError" 
+                    return {'error' => "TemplateLoadError", 'trace' => (trace << "TemplateLoadError:#{__LINE__ - 3}")}
+                end
+                params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
+                t
+            end
+            win = template.win?
 
             LOG_DEBUG 'Initializing vm object'
             trace << "Initializing old VM object:#{__LINE__ + 1}"            
-            vm = onblock(VirtualMachine, params['vmid'])
+            vm = onblock(:vm, params['vmid'])
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
-            nic, context = vm.to_hash!['VM']['TEMPLATE']['NIC'], vm.to_hash['VM']['TEMPLATE']['CONTEXT']
-            vn, vn_uname = nic['NETWORK'], onblock(:vn, 'btk-inet'){|vn_obj| vn.info!; vn_obj['/VNET/UNAME']}
+            context = vm.to_hash!['VM']['TEMPLATE']
             
-            LOG_DEBUG 'Initializing template obj'
             LOG_DEBUG 'Generating new template'
-            trace << "Generating NIC context:#{__LINE__ + 1}"
-            context = "NIC = [\n\tIP=\"#{nic['IP']}\",\n\tDNS=\"#{nic['DNS']}\",\n\tGATEWAY=\"#{nic['GATEWAY']}\",\n\tNETWORK=\"#{vn}\",\n\tNETWORK_UNAME=\"#{vn_uname}\"\n]\n"
-            trace << "Generating template object:#{__LINE__ + 1}"            
-            template = onblock(Template, params['templateid'])
-            template.info!
-            trace << "Checking OS type:#{__LINE__ + 1}"            
-            win = template.win?
             trace << "Generating credentials and network context:#{__LINE__ + 1}"
-            context += "CONTEXT = [\n\tPASSWORD=\"#{params['passwd']}\",\n\tETH0_IP=\"#{nic['IP']}\",\n\tETH0_GATEWAY=\"#{nic['GATEWAY']}\",\n\tETH0_DNS=\"#{nic['DNS']}\",\n\tNETWORK=\"YES\"#{ win ? ",\n\tUSERNAME = \"#{params['username']}\"" : nil}\t]\n"
+            context['CONTEXT'] = {
+                'PASSWORD' => params['passwd'],
+                'NETWORK' => context['CONTEXT']['NETWORK'],
+                'SSH_PUBLIC_KEY' => context['CONTEXT']['SSH_PUBLIC_KEY']
+            }
+            context['CONTEXT']['USERNAME'] = params['username'] if win
+            context['NIC'].map! do |nic| 
+                nic.without(
+                    'TARGET', 'MAC', 'NAME', 'SECURITY_GROUPS',
+                    'BRIDGE', 'BRIDGE_TYPE', 'NIC_ID', 'VN_MAD',
+                    'CLUSTER_ID', 'AR_ID', 'NETWORK', 'NETWORK_UNAME'
+                )
+            end
             trace << "Generating specs configuration:#{__LINE__ + 1}"
-            context += "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n" \
-                        "DRIVE = \"#{params['ds_type']}\"\n" \
-                        "DISK = [ \n" \
-                        "IMAGE_ID = \"#{template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
-                        "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
+            context.merge!({
+                "VCPU" => params['cpu'],
+                "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                "DRIVE" => params['ds_type'],
+                "DISK" => {
+                    "IMAGE_ID" => template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                    "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                    "OPENNEBULA_MANAGED" => "NO"
+                }
+            })
+            context['TEMPLATE_ID'] = params['templateid']
+
+            context = context.without('GRAPHICS').to_one_template
             LOG_DEBUG "Resulting capacity template:\n#{context}"
             
             trace << "Terminating VM:#{__LINE__ + 1}"            
@@ -137,8 +155,8 @@ class IONe
                     vmid = template.instantiate(params['login'] + '_vm', false, context)
                 end
             rescue => e
-                return vmid, vmid.class, vmid.message if vmid.class != Fixnum
-                return vmid, vmid.class
+                return vmid.class, vmid.message if vmid.class != Fixnum
+                return vmid.class
             end           
 
             return vmid.message if vmid.class != Fixnum
@@ -155,22 +173,14 @@ class IONe
                     params['host']
                 end
 
-                onblock(:vm, vmid) do | vm_obj |
-                    LOG_DEBUG 'Deploying VM to the host'
-                    vm_obj.deploy(host, false, ChooseDS(params['ds_type']))
-                    LOG_DEBUG 'Waiting until VM will be deployed'
-                    vm_obj.wait_for_state
-                end
+                vm = onblock(:vm, vmid)
+                LOG_DEBUG 'Deploying VM to the host'
+                vm.deploy(host, false, ChooseDS(params['ds_type']))
+                LOG_DEBUG 'Waiting until VM will be deployed'
+                vm.wait_for_state
 
                 postDeploy = PostDeployActivities.new @client
 
-                #LimitsController
-
-                #LOG_DEBUG "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}"
-                #trace << "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}:#{__LINE__ + 1}"
-                #postDeploy.LimitsController(params, vmid, host)
-
-                #endLimitsController
                 #TrialController
                 if params['trial'] then
                     trace << "Creating trial counter thread:#{__LINE__ + 1}"
@@ -189,7 +199,7 @@ class IONe
             end if params['release']
             ##### PostDeploy Activity define END #####
 
-            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid), 'ip_old' => nic['IP'] }
+            return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid, true), 'ip_old' => GetIP(vm) }
         rescue => e
             LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
             return e.message, trace
@@ -236,21 +246,20 @@ class IONe
         end
 
         params['username'] = params['username'] || 'Administrator'
-        params['extra'] = params['extra'] || {'type' => 'vcenter'}
         ###################### Doing some important system stuff ###############################################################
         
-        return nil if DEBUG
-        LOG_TEST "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
+        LOG_AUTO "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
         
-        LOG_DEBUG "Params: #{params.out}"
+        LOG_DEBUG "Params: #{params.debug_out}"
         
         trace << "Checking template:#{__LINE__ + 1}"
         onblock(:t, params['templateid']) do | t |
             result = t.info!
-            if params['templateid'] == 0 || result != nil then
+            if result != nil then
                 LOG_ERROR "Error: TemplateLoadError" 
                 return {'error' => "TemplateLoadError", 'trace' => (trace << "TemplateLoadError:#{__LINE__ - 1}")}
             end
+            params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
         end
             
         #####################################################################################################################
@@ -261,7 +270,7 @@ class IONe
         
         
         #####   Creating new User   #####
-        LOG_TEST "Creating new user for #{params['login']}"
+        LOG_AUTO "Creating new user for #{params['login']}"
         if params['nouser'].nil? || !params['nouser'] then
             trace << "Creating new user:#{__LINE__ + 1}"
             userid, user =
@@ -275,31 +284,49 @@ class IONe
             userid, user = params['userid'], onblock(:u, params['userid'])
         end
         params['user_id'] = userid
-        LOG_TEST "New User account created"
+        LOG_AUTO "New User account created"
 
         ##### Creating new User END #####
         
         #####   Creating and Configuring VM   #####
-        LOG_TEST "Creating VM for #{params['login']}"
+        LOG_AUTO "Creating VM for #{params['login']}"
         trace << "Creating new VM:#{__LINE__ + 1}"
         onblock(:t, params['templateid']) do | t |
             t.info!
             specs = ""
             if !t['/VMTEMPLATE/TEMPLATE/CAPACITY'] && t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == "VCENTER" then
-                specs = "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n" \
-                        "DRIVE = \"#{params['ds_type']}\"\n" \
-                        "DISK = [ \n" \
-                        "IMAGE_ID = \"#{t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID']}\",\n" \
-                        "SIZE = \"#{params['drive'] * (params['units'] == 'GB' ? 1024 : 1)}\",\n" \
-                        "OPENNEBULA_MANAGED = \"NO\"\t]"
-            elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'] == 'AZURE' then
-                specs = "OS_DISK_SIZE = \"#{params['drive']}\"\n" \
-                        "SIZE = \"#{params['extra']['instance_size']}\"\n" \
-                        "VM_USER_NAME = \"#{params['username']}\"\n" \
-                        "PASSWORD = \"#{params['passwd']}\"\n" \
-                        "VCPU = #{params['cpu']}\n" \
-                        "MEMORY = #{params['ram'] * (params['units'] == 'GB' ? 1024 : 1)}\n"
+                specs = {
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                            "DRIVE" => params['ds_type'],
+                            "DISK" => {
+                                "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                                "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                                "OPENNEBULA_MANAGED" => "NO"
+                            }
+                        }
+            elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'AZURE' then
+                specs = {
+                            "OS_DISK_SIZE" => params['drive'],
+                            "SIZE" => params['extra']['instance_size'],
+                            "VM_USER_NAME" => params['username'],
+                            "PASSWORD" => params['passwd'],
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1)
+                        }
+            elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'KVM' then
+                specs = {
+                            "VCPU" => params['cpu'],
+                            "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+                            "DRIVE" => params['ds_type'],
+                            "DISK" => {
+                                "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+                                "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+                                "DEV_PREFIX" => "vd",
+                                "DRIVER" => "qcow2",
+                                "OPENNEBULA_MANAGED" => "NO"
+                            }
+                        }
             end
             trace << "Updating user quota:#{__LINE__ + 1}"
             user.update_quota_by_vm(
@@ -307,6 +334,7 @@ class IONe
                 'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
                 'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
             ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
+            specs = specs.to_one_template
             LOG_DEBUG "Resulting capacity template:\n" + specs
             vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
         end
@@ -319,7 +347,7 @@ class IONe
                     params['host']
                 end
 
-        LOG_TEST 'Configuring VM Template'
+        LOG_AUTO 'Configuring VM Template'
         trace << "Configuring VM Template:#{__LINE__ + 1}"            
         onblock(:vm, vmid) do | vm |
             trace << "Changing VM owner:#{__LINE__ + 1}"
@@ -330,7 +358,7 @@ class IONe
                 LOG_DEBUG "CHOWN error, params: #{userid}, #{vm}"
             end
 
-            if params['extra']['type'] == 'vcenter' then
+            if %w(VCENTER KVM).include? params['extra']['type'].upcase then
                 win = onblock(:t, params['templateid']).win?
                 LOG_DEBUG "Instantiating VM as#{win ? nil : ' not'} Windows"
                 trace << "Setting VM context:#{__LINE__ + 2}"
@@ -352,9 +380,9 @@ class IONe
                 end
             end
 
-            if params['extra']['type'] == 'vcenter' then
+            if %w(VCENTER KVM).include? params['extra']['type'].upcase then
                 trace << "Deploying VM:#{__LINE__ + 1}"
-                vm.deploy(host, false, ChooseDS(params['ds_type']))
+                vm.deploy(host, false, ChooseDS(params['ds_type'], params['extra']['type']))
             else
                 trace << "Deploying VM:#{__LINE__ + 1}"
                 vm.deploy(host, false)
@@ -373,13 +401,6 @@ class IONe
 
             postDeploy = PostDeployActivities.new @client
 
-            #LimitsController
-
-            #LOG_DEBUG "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}"
-            #trace << "Executing LimitsController for VM#{vmid} | Cluster type: #{ClusterType(host)}:#{__LINE__ + 1}"
-            #postDeploy.LimitsController(params, vmid, host)
-
-            #endLimitsController
             #TrialController
 
             if params['trial'] then
@@ -400,11 +421,12 @@ class IONe
         end if params['release']
         ##### PostDeploy Activity define END #####
 
-        LOG_TEST 'Post-Deploy joblist defined, basic installation job ended'
+        LOG_AUTO 'Post-Deploy joblist defined, basic installation job ended'
         return out = {'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid)}
     rescue => e
         out = { :exception => e.message, :trace => trace << 'END_TRACE' }
         LOG_DEBUG out.debug_out
+        out[:params] = params
         return out
     end
     # Class for pst-deploy activities methods

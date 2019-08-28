@@ -183,6 +183,12 @@ File.open('/etc/one/oned.conf', 'a') do | conf |
     conf << hooks
 end
 
+puts "Creating log files"
+sh.system "touch /var/log/one/ione.log"
+sh.system "touch /var/log/one/debug.log"
+sh.system "chown oneadmin:oneadmin /var/log/one/*"
+sh.system "chmod 700 /var/log/one/*"
+
 puts "Restarting one.d, Sunstone and httpd"
 sh.system "sudo systemctl restart opennebula && systemctl status opennebula"
 sh.system "sudo systemctl restart opennebula-sunstone && systemctl status opennebula-sunstone"

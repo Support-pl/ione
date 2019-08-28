@@ -190,6 +190,25 @@ define(function(require) {
       return false;
     });
 
+<<<<<<< HEAD
+    $('#' + this.dataTableId).on("change", 'tbody input.check_item', function() {
+      if ($(this).is(":checked")){
+        var vm_id = +$(this).val();
+        OpenNebula.VM.show({data: {id:vm_id},success: function(r,res){
+          if (res.VM.USER_TEMPLATE.HYPERVISOR == "AZURE" && res.VM.STATE != "2" && res.VM.STATE != "1" && res.VM.STATE != "7"){
+            $('[href="VM.terminate_hard"]').switchClass('vm-action-enabled','vm-action-disabled').on("click.stateaction", function(e) { return false; });;
+          }
+        }});
+        StateActions.enableStateActions($(this).attr("state"), $(this).attr("lcm_state"));
+      } else {
+        // First disable all actions
+        StateActions.disableAllStateActions();
+        // Enable actions available to any of the selected VMs
+        var nodes = $('tr', that.dataTable); //visible nodes only
+        $.each($('input.check_item:checked', nodes), function(){
+          StateActions.enableStateActions($(this).attr("state"), $(this).attr("lcm_state"));
+        });
+=======
     $("#" + this.dataTableId).on(
       "change",
       "tbody input.check_item",
@@ -229,6 +248,7 @@ define(function(require) {
             );
           });
         }
+>>>>>>> master
 
         return true;
       }

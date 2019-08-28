@@ -77,7 +77,7 @@ vnet_pool.each do | vnet |
             "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
             "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
             "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
-        )
+        ) if vnet['VN_MAD'] == 'vcenter' then
     
         vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID']
     end

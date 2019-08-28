@@ -249,15 +249,22 @@ class AnsiblePlaybookProcess
                 Net::SSH.start( ANSIBLE_HOST, ANSIBLE_HOST_USER, :port => ANSIBLE_HOST_PORT ) do | ssh |
                     # Create local Playbook version
                     File.open("/tmp/#{@install_id}.yml", 'w') do |file|
-                        file.write(
-                            @runnable.gsub('<%group%>', @install_id) )
+                        file.write( @runnable.gsub('<%group%>', @install_id) )
                     end
                     # Upload Playbook to Ansible host
                     ssh.sftp.upload!("/tmp/#{@install_id}.yml", "/tmp/#{@install_id}.yml")
                     # Create local Hosts File
                     File.open("/tmp/#{@install_id}.ini", 'w') do |file|
                         file.write("[#{@install_id}]\n")
-                        @hosts.values.each {|host| file.write("#{host[0]}\n") }
+                        @hosts.values.each do |host|
+                            unless host[1].nil? then
+                                cred = host[1].split ':'
+                                cred = "ansible_user=#{cred[0]} ansible_password=#{cred[1]}"
+                            else
+                                cred = ''
+                            end
+                            file.write("#{host[0]} #{cred}\n")
+                        end
                     end
                     # Upload Hosts file
                     ssh.sftp.upload!("/tmp/#{@install_id}.ini", "/tmp/#{@install_id}.ini")
