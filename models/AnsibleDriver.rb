@@ -9,10 +9,10 @@ def ansible_check_permissions pb, u, uma # Checks permissions for given playbook
     perm = pb['extra_data']['PERMISSIONS'].split('')
     mod = perm.values_at( *Array.new(3){ |i| uma + 3 * i }).map{| value | value == '1' ? true : false }
     return (
-        (  u.id == pb['uid'] && mod[0]                ) ||
+        (  u.id == pb['uid'] && mod[0]            ) ||
         (  u.groups.include?(pb['gid']) && mod[1] ) ||
-        (                      mod[2]                        ) ||
-        (             u.groups.include?(0)              )
+        (                      mod[2]             ) ||
+        (             u.groups.include?(0)        )
     )
 end
 

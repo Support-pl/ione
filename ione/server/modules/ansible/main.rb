@@ -142,11 +142,12 @@ class IONe
         AnsiblePlaybook.check_syntax body
     end
     # Creates Process instance with given playbook, host and variables
-    # @param [Fixnum] id - Playbook ID
+    # @param [Fixnum] playbook_id - Playbook ID
     # @param [Fixnum] uid - User ID who initialized playbook
     # @param [Array<String>] hosts - Array of hosts where to run playbook
     # @param [Hash] vars - Hash with playbook variables values
-    
+    # @param [String] comment
+    # @param [String] auth - auth driver
     def AnsiblePlaybookToProcess playbook_id, uid, hosts = [], vars = {}, comment = '', auth = 'default'
         AnsiblePlaybookProcess.new(
             playbook_id: playbook_id,

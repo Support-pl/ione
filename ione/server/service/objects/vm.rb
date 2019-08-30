@@ -335,8 +335,8 @@ class OpenNebula::VirtualMachine
         self.info! || self.lcm_state_str
     end
     # Calculates VMs Showback
-    # @param [Integer] stime - Point from which calculation starts(timestamp)
-    # @param [Integer] etime - Point at which calculation stops(timestamp)
+    # @param [Integer] stime_req - Point from which calculation starts(timestamp)
+    # @param [Integer] etime_req - Point at which calculation stops(timestamp)
     # @param [Boolean] group_by_day - Groups showbacks by days
     # @return [Hash]
     def calculate_showback stime_req, etime_req, group_by_day = false
