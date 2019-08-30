@@ -31,10 +31,6 @@ class IONe
         defer { LOG_CALL(id, false, 'uptime') }
         fmt_time(Time.now.to_i - STARTUP_TIME)
     end
-    # @api private
-    def reboot(pa)
-        `sh #{ROOT}/service/handlers/reboot_key.sh &` if pa['ss']
-    end
     # Returns active processes list
     def proc
         $PROC
