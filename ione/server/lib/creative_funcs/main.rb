@@ -428,6 +428,9 @@ class IONe
         LOG_DEBUG out.debug_out
         out[:params] = params
         return out
+    ensure
+        onblock(:u, vmid).recover(3)    if defined? vmid
+        onblock(:u, userid).delete      if defined? userid
     end
     # Class for pst-deploy activities methods
     #   All methods will receive creative methods params, new vm ID, and host, where VM was deployed
