@@ -44,10 +44,8 @@ Creators:
 |:------------------------------|:--------------------------|------------------------------------------:|
 | __CAPACITY_COST__             | CPU_COST                  | `CPU cost per hour`                       |
 |                               | MEMORY_COST               | `RAM cost per hour`                       |
-|                               |                           |                                           |
 | __DISK_COSTS__                | DISKTYPE_0(e.g. SSD)      | `cost per hour`                           |
 |                               | DISKTYPE_1(e.g. HDD)      | `cost per hour`                           |
-|                               |                           |                                           |
 | __DISK_TYPES__                |                           | `comma separated list of types: SSD,HDD`  |
 | __PUBLIC_IP_COST__            |                           | `cost per hour`                           |
 | __IAAS_GROUP_ID__             |                           | `ID of group for IaaS Users`              |
