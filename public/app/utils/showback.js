@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var TemplateHTML = require("hbs!./showback/html");
   var Locale = require("utils/locale");
   var OpenNebulaVM = require("opennebula/vm");
@@ -95,23 +95,16 @@ define(function(require) {
 
     showback_dataTable.fnSort([[3, "desc"]]);
 
-    showback_dataTable.on("click", "tbody tr", function() {
+    showback_dataTable.on("click", "tbody tr", function () {
       var cells = showback_dataTable.fnGetData(this);
       var year = cells[1];
       var month = cells[2];
 
       var vms = update_table_template(month);
-<<<<<<< HEAD
-      if (lists_month[month].total.cost > 0){
-        create_diagram(getDataset(month));
-        $('#test_table_graph').show();
-        $('#test_table_graph_legend').show();
-=======
       if (lists_month[month].total.cost > 0) {
         create_diagram(getDataset(month));
         $("#test_table_graph").show();
         $("#test_table_graph_legend").show();
->>>>>>> master
       }
 
       test_dataTable = $("#test_datatable", context).dataTable({
@@ -132,7 +125,7 @@ define(function(require) {
       $("#table_test_title", context).on(
         "click",
         ".showback_div_label",
-        function() {
+        function () {
           if (getSelectLabel(this)) {
             test_dataTable.fnClearTable();
             test_dataTable.fnAddData(getShowback(month, vms));
@@ -166,7 +159,7 @@ define(function(require) {
       $("#test_datatable", context).on(
         "click",
         'tbody [role="row"]',
-        function() {
+        function () {
           var cells = test_dataTable.fnGetData(this);
           var day = cells[0];
           if ($(this).hasClass("Shown")) {
@@ -213,26 +206,17 @@ define(function(require) {
   function _onShow(context, that) {
     var uid = config.user_id;
     var edate = Math.round(Date.now() / 1000);
-<<<<<<< HEAD
-    var param = {uid:uid,stime:0,etime:edate,group_by_day:true,success:function (req, res) {
-        lists = req.response;
-        lists_month = create_list_months(lists);
-        _fillShowback(context);
-
-      }};
-=======
     var param = {
       uid: uid,
       stime: 0,
       etime: edate,
       group_by_day: true,
-      success: function(req, res) {
+      success: function (req, res) {
         lists = req.response;
         lists_month = create_list_months(lists);
         _fillShowback(context);
       }
     };
->>>>>>> master
     Settings.showback(param);
 
     Tips.setup(context);
@@ -261,14 +245,6 @@ define(function(require) {
       ]);
     }
 
-<<<<<<< HEAD
-    if (series.length > 0){
-      showback_dataTable.fnAddData(series);
-    }else{
-      $('#showback_placeholder i').eq(0).remove();
-      $('#showback_placeholder i').eq(0).removeClass('fa-stack-3x').addClass('fa-stack-2x');
-      $('#showback_no_data').show();
-=======
     if (series.length > 0) {
       showback_dataTable.fnAddData(series);
     } else {
@@ -280,7 +256,6 @@ define(function(require) {
         .removeClass("fa-stack-3x")
         .addClass("fa-stack-2x");
       $("#showback_no_data").show();
->>>>>>> master
       return false;
     }
 
@@ -325,10 +300,6 @@ define(function(require) {
       //}
     };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     var showback_plot = $.plot(
       $("#showback_graph", context),
       showback_plot_series,
@@ -346,23 +317,6 @@ define(function(require) {
   function create_list_months(lists) {
     var list_months = {};
 
-<<<<<<< HEAD
-    for(var i in lists){
-      //if (lists[i].TOTAL > 0){
-        for(var j in lists[i].showback){
-          var day = lists[i].showback[j].date.split('/')[0] * 1;
-          var month = lists[i].showback[j].date.split('/')[1] * 1;
-
-          var cost = lists[i].showback[j].TOTAL * 1;
-          var cpu = lists[i].showback[j].CPU * 1;
-          var disk = lists[i].showback[j].DISK * 1;
-          var memor = lists[i].showback[j].MEMORY * 1;
-          var pub_ip = lists[i].showback[j].PUBLIC_IP * 1;
-          var work_time = lists[i].showback[j].work_time * 1;
-
-          if (list_months[month] == undefined){
-            list_months[month] = {};
-=======
     for (var i in lists) {
       //if (lists[i].TOTAL > 0){
       for (var j in lists[i].showback) {
@@ -389,7 +343,6 @@ define(function(require) {
           };
         } else {
           if (list_months[month][day] == undefined) {
->>>>>>> master
             list_months[month][day] = {};
             list_months[month][day][i] = {
               cost: cost,
@@ -478,13 +431,8 @@ define(function(require) {
             list_months[month]["vms"][i]["work_time"] += work_time;
           }
         }
-<<<<<<< HEAD
-      // }
-
-=======
       }
       // }
->>>>>>> master
     }
 
     //console.log(list_months);
@@ -703,12 +651,12 @@ define(function(require) {
       dataset.push({ value: percent, color: Colors.names[kk] });
       $("#test_table_graph_legend").append(
         '<p><i class="fa fa-square" aria-hidden="true" style="color:' +
-          Colors.names[kk] +
-          '"></i>  ' +
-          i +
-          " - " +
-          lists_month[month].vms[i].name +
-          "</p>"
+        Colors.names[kk] +
+        '"></i>  ' +
+        i +
+        " - " +
+        lists_month[month].vms[i].name +
+        "</p>"
       );
       if (kk != 6) {
         kk++;
@@ -725,7 +673,7 @@ define(function(require) {
     $("#test_table_graph").text("");
     var container = $("#test_table_graph");
 
-    var addSector = function(data, startAngle, collapse) {
+    var addSector = function (data, startAngle, collapse) {
       var sectorDeg = 3.6 * data.value;
       var skewDeg = 90 + sectorDeg;
       var rotateDeg = startAngle;
@@ -744,7 +692,7 @@ define(function(require) {
       return startAngle + sectorDeg;
     };
 
-    dataset.reduce(function(prev, curr) {
+    dataset.reduce(function (prev, curr) {
       return (function addPart(data, angle) {
         if (data.value <= maxValue) {
           return addSector(data, angle, false);

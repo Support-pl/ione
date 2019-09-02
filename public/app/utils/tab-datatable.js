@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -51,7 +51,7 @@ define(function(require) {
   /* Set the defaults for DataTables initialisation */
   $.extend(true, $.fn.dataTable.defaults, {
     dom:
-      "t"+
+      "t" +
       "<'row'<'small-6 columns'li><'small-6 columns'p>>",
     renderer: 'foundation',
     autoWidth: false,
@@ -59,7 +59,7 @@ define(function(require) {
       "sLengthMenu": "_MENU_",
       "emptyTable": TemplateEmptyTable()
     }
-  } );
+  });
 
   //$.extend(true, $.fn.dataTable.defaults, {
   //  dom: "t<'row collapse'<'small-6 columns'i><'small-6 columns'lp>>",
@@ -120,14 +120,14 @@ define(function(require) {
 
       that.selectOptions.fixed_ids_map_orig = {};
       if (that.selectOptions.fixed_ids != undefined) {
-        $.each(that.selectOptions.fixed_ids, function() {
+        $.each(that.selectOptions.fixed_ids, function () {
           that.selectOptions.fixed_ids_map_orig[this] = true;
         });
       }
 
       that.selectOptions.starred_ids_map = {};
       if (that.selectOptions.starred_ids != undefined) {
-        $.each(that.selectOptions.starred_ids, function() {
+        $.each(that.selectOptions.starred_ids, function () {
           that.selectOptions.starred_ids_map[this] = true;
         });
 
@@ -142,10 +142,11 @@ define(function(require) {
     }
 
     that.dataTableHTML = TemplateDataTableHTML({
-                          'dataTableId': this.dataTableId,
-                          'columns': this.columns,
-                          'conf': this.conf,
-                          'selectOptions': this.selectOptions});
+      'dataTableId': this.dataTableId,
+      'columns': this.columns,
+      'conf': this.conf,
+      'selectOptions': this.selectOptions
+    });
 
     that.searchInputHTML = TemplateSearchInputHTML({
       'dataTableSearchId': this.dataTableId + 'Search',
@@ -203,29 +204,29 @@ define(function(require) {
 
     // Remember page length only for non selectable datatables
     if (!this.conf.select) {
-      this.dataTable.on( 'length.dt', function ( e, settings, len ) {
-        if (config['user_config']['page_length'] != len){
+      this.dataTable.on('length.dt', function (e, settings, len) {
+        if (config['user_config']['page_length'] != len) {
           config['user_config']['page_length'] = len;
-          var sunstone_setting = {'TABLE_DEFAULT_PAGE_LENGTH': len};
+          var sunstone_setting = { 'TABLE_DEFAULT_PAGE_LENGTH': len };
           Sunstone.runAction("User.append_sunstone_setting", config['user_id'], sunstone_setting);
         }
       });
     }
 
-    $('#' + this.dataTableId + 'Search').on('input', function() {
+    $('#' + this.dataTableId + 'Search').on('input', function () {
       that.dataTable.fnFilter($(this).val());
       return false;
     });
 
-    if(that.conf.searchDropdownHTML != undefined){
+    if (that.conf.searchDropdownHTML != undefined) {
       var context = $('#' + this.dataTableId + 'Search-wrapper');
-      if (that.setupSearch != undefined){
+      if (that.setupSearch != undefined) {
         that.setupSearch(context);
       } else {
         _setupSearch(that, context);
       }
 
-      $("a.advanced-search-clear", context).on('click', function(){
+      $("a.advanced-search-clear", context).on('click', function () {
         $("input,select", context).val("").trigger("input");
 
         that.clearLabelsFilter();
@@ -233,14 +234,14 @@ define(function(require) {
         $("button.advanced-search", context).click();
       });
 
-      $("input", context).on("keypress", function(e) {
+      $("input", context).on("keypress", function (e) {
         var code = e.keyCode || e.which;
-        if (code  == 13) {
+        if (code == 13) {
           $("button.advanced-search", context).click();
         }
       });
 
-      $("button.advanced-search", context).on('click', function(){
+      $("button.advanced-search", context).on('click', function () {
         $('#' + that.dataTableId + 'Search-dropdown', context).foundation('close');
         that.dataTable.fnDraw(true);
 
@@ -248,7 +249,7 @@ define(function(require) {
       });
     }
 
-    this.dataTable.on('draw.dt', function() {
+    this.dataTable.on('draw.dt', function () {
       that.recountCheckboxes();
     })
 
@@ -272,7 +273,7 @@ define(function(require) {
       this.infoListener(_defaultTrListener);
     } else if (this.conf.customTrListener) {
       this.infoListener(this.conf.customTrListener);
-    } else if (!this.conf.select){
+    } else if (!this.conf.select) {
       this.infoListener();
     }
 
@@ -283,12 +284,12 @@ define(function(require) {
     if (this.conf.minColumns == true) {
       var n_columns = that.columns.length + 1;
 
-      for(var i = 1; i < n_columns; i += 1){
-        if ( i == that.selectOptions.id_index ||
-             i == that.selectOptions.name_index ){
+      for (var i = 1; i < n_columns; i += 1) {
+        if (i == that.selectOptions.id_index ||
+          i == that.selectOptions.name_index) {
 
           that.dataTable.fnSetColumnVis(i, true);
-        }else{
+        } else {
           that.dataTable.fnSetColumnVis(i, false);
         }
       }
@@ -307,50 +308,50 @@ define(function(require) {
   function _setupSearch(that, context) {
     that.searchFields = [];
 
-    $("[search-field]", context).each(function(){
-      that.searchFields.push( $(this).attr("search-field") );
+    $("[search-field]", context).each(function () {
+      that.searchFields.push($(this).attr("search-field"));
     });
 
     that.searchVals = {};
-    that.searchFields.forEach(function(name){
+    that.searchFields.forEach(function (name) {
       that.searchVals[name] = "";
     });
 
     that.searchOps = {};
-    that.searchFields.forEach(function(name){
-      var op = $("[search-field="+name+"]", context).attr("search-operation");
+    that.searchFields.forEach(function (name) {
+      var op = $("[search-field=" + name + "]", context).attr("search-operation");
 
-      if (op == undefined){
+      if (op == undefined) {
         op = "match";
       }
 
       that.searchOps[name] = op;
     });
 
-    $("[search-field]", context).on('input change', function(){
+    $("[search-field]", context).on('input change', function () {
       var name = $(this).attr("search-field");
 
-      if($(this).attr("type") == "date"){
+      if ($(this).attr("type") == "date") {
         var val = $(this).val();
 
-        if(val == ""){
+        if (val == "") {
           that.searchVals[name] = "";
         } else {
-          that.searchVals[name] = parseInt( new Date(val).getTime() ) / 1000;
+          that.searchVals[name] = parseInt(new Date(val).getTime()) / 1000;
         }
-      }else{
+      } else {
         that.searchVals[name] = $(this).val();
       }
     });
 
-    that.dataTable.on('search.dt', function() {
+    that.dataTable.on('search.dt', function () {
       var empty = true;
 
-      for(var i=0; i < that.searchFields.length; i++){
+      for (var i = 0; i < that.searchFields.length; i++) {
         var name = that.searchFields[i];
-        empty = $("[search-field="+name+"]", context).val() == "";
+        empty = $("[search-field=" + name + "]", context).val() == "";
 
-        if(!empty){
+        if (!empty) {
           break;
         }
       }
@@ -368,54 +369,54 @@ define(function(require) {
     });
 
     $.fn.dataTable.ext.search.push(
-      function( settings, data, dataIndex ) {
+      function (settings, data, dataIndex) {
         // This is a global search function, we need to apply it only if the
         // search is triggered for the current table
-        if(that.dataTableId != settings.nTable.id){
+        if (that.dataTableId != settings.nTable.id) {
           return true;
         }
 
         try {
-          var values = JSON.parse( decodeURIComponent(escape(atob(data[that.searchColumn]))) );
+          var values = JSON.parse(decodeURIComponent(escape(atob(data[that.searchColumn]))));
 
           var match = true;
 
-          for(var i=0; i < that.searchFields.length; i++){
+          for (var i = 0; i < that.searchFields.length; i++) {
             var name = that.searchFields[i];
 
-            switch(that.searchOps[name]){
+            switch (that.searchOps[name]) {
               case "match":
-                match = (values[name].match( that.searchVals[name] ) != null);
+                match = (values[name].match(that.searchVals[name]) != null);
                 break;
               case "<=":
                 match = (that.searchVals[name] == "") ||
-                        (values[name] <= that.searchVals[name]);
+                  (values[name] <= that.searchVals[name]);
                 break;
               case ">=":
                 match = (that.searchVals[name] == "") ||
-                        (values[name] >= that.searchVals[name]);
+                  (values[name] >= that.searchVals[name]);
                 break;
               case ">":
                 match = (that.searchVals[name] == "") ||
-                        (values[name] > that.searchVals[name]);
+                  (values[name] > that.searchVals[name]);
                 break;
               case "<":
                 match = (that.searchVals[name] == "") ||
-                        (values[name] < that.searchVals[name]);
+                  (values[name] < that.searchVals[name]);
                 break;
               case "==":
                 match = (that.searchVals[name] == "") ||
-                        (values[name] == that.searchVals[name]);
+                  (values[name] == that.searchVals[name]);
                 break;
             }
 
-            if (!match){
+            if (!match) {
               break;
             }
           }
 
           return match;
-        } catch (err) {}
+        } catch (err) { }
 
         return true;
       }
@@ -437,7 +438,7 @@ define(function(require) {
   //Shows run a custom action when clicking on rows.
   function _infoListener(info_action) {
     var that = this;
-    this.dataTable.on("click", 'tbody tr', function(e) {
+    this.dataTable.on("click", 'tbody tr', function (e) {
       if ($(e.target).is('input') || $(e.target).is('select') || $(e.target).is('option')) {
         return true;
       }
@@ -461,7 +462,7 @@ define(function(require) {
   //check and uncheck all the checkboxes of its elements.
   function _initCheckAllBoxes() {
     var that = this;
-    this.dataTable.on("change", '.check_all', function() {
+    this.dataTable.on("change", '.check_all', function () {
       var table = $(this).closest('.dataTables_wrapper');
       if ($(this).is(":checked")) { //check all
         $('tbody input.check_item', table).prop('checked', true).change();
@@ -497,6 +498,7 @@ define(function(require) {
 
     if (checked_length) { //at least 1 element checked
       //enable action buttons
+
       $('.top_button, .list_button', context).prop('disabled', false);
 
 
@@ -508,6 +510,7 @@ define(function(require) {
       };
 
       if (checked_length > 1) $("[href^='Ansible.run']", context).prop('disabled', true);
+      $("[href^='Ansible.update_dialog']", context).prop('disabled', true);
 
     } else { //no elements cheked
       //disable action buttons, uncheck checkAll
@@ -524,7 +527,6 @@ define(function(require) {
   function _tableCheckboxesListener() {
     //Initialization - disable all buttons
     var context = this.conf.customTabContext || this.dataTable.parents('.tab');
-
     $('.last_action_button', context).prop('disabled', true);
     $('.top_button, .list_button', context).prop('disabled', true);
     //These are always enabled
@@ -533,7 +535,7 @@ define(function(require) {
 
     //listen to changes in the visible inputs
     var that = this;
-    this.dataTable.on("change", 'tbody input.check_item', function() {
+    this.dataTable.on("change", 'tbody input.check_item', function () {
       var datatable = $(this).parents('table');
 
       if ($(this).is(":checked")) {
@@ -552,7 +554,7 @@ define(function(require) {
 
   function _onlyOneCheckboxListener() {
     var that = this;
-    this.dataTable.on("change", 'tbody input.check_item', function() {
+    this.dataTable.on("change", 'tbody input.check_item', function () {
       var checked = $(this).is(':checked');
       $('td', that.dataTable).removeClass('markrowchecked');
       $('input.check_item:checked', that.dataTable).prop('checked', false);
@@ -573,13 +575,13 @@ define(function(require) {
       that.preUpdateView();
     }
 
-    if(that.conf.searchDropdownHTML != undefined){
+    if (that.conf.searchDropdownHTML != undefined) {
       that.searchSets = {};
       try {
-        that.searchFields.forEach(function(name){
+        that.searchFields.forEach(function (name) {
           that.searchSets[name] = new Set();
         });
-      } catch(e){}
+      } catch (e) { }
     }
 
     that.dataTable.DataTable().page.len(parseInt(config['user_config']['page_length']));
@@ -587,7 +589,7 @@ define(function(require) {
     var row_id_index = this.dataTable.attr("row_id");
 
     if (row_id_index != undefined) {
-      $.each($(that.dataTable.fnGetNodes()), function() {
+      $.each($(that.dataTable.fnGetNodes()), function () {
         if ($('td.markrow', this).length != 0) {
           var aData = that.dataTable.fnGetData(this);
 
@@ -597,7 +599,7 @@ define(function(require) {
       });
     }
 
-    $.each($(that.dataTable.fnGetNodes()), function() {
+    $.each($(that.dataTable.fnGetNodes()), function () {
       if ($('td.markrowchecked', this).length != 0) {
         if (!isNaN($($('td', $(this))[1]).html())) {
           checked_row_ids.push($($('td', $(this))[1]).html());
@@ -621,19 +623,19 @@ define(function(require) {
         item_list = list;
       } else {
         item_list = [];
-        $.each(list, function() {
+        $.each(list, function () {
           var item = that.elementArray(this);
-          if (item){
+          if (item) {
             item_list.push(item);
 
-            if(that.searchColumn != undefined){
-              try{
-                var values = JSON.parse( decodeURIComponent(escape(atob(item[that.searchColumn]))) );
+            if (that.searchColumn != undefined) {
+              try {
+                var values = JSON.parse(decodeURIComponent(escape(atob(item[that.searchColumn]))));
 
-                that.searchFields.forEach(function(name){
+                that.searchFields.forEach(function (name) {
                   that.searchSets[name].add(values[name]);
                 });
-              }catch(e){}
+              } catch (e) { }
             }
           }
         });
@@ -647,9 +649,9 @@ define(function(require) {
 
       if (new_start > item_list.length - 1) {
         if (item_list.length > 0)
-            new_start = item_list.length - 1;
+          new_start = item_list.length - 1;
         else
-            new_start = 0;
+          new_start = 0;
       }
 
       dTable_settings.iInitDisplayStart = new_start;
@@ -658,7 +660,7 @@ define(function(require) {
     };
 
     if (selected_row_id != undefined) {
-      $.each($(that.dataTable.fnGetNodes()), function() {
+      $.each($(that.dataTable.fnGetNodes()), function () {
 
         var aData = that.dataTable.fnGetData(this);
 
@@ -669,7 +671,7 @@ define(function(require) {
     }
 
     if (checked_row_ids.length != 0) {
-      $.each($(that.dataTable.fnGetNodes()), function() {
+      $.each($(that.dataTable.fnGetNodes()), function () {
         var current_id = $($('td', this)[1]).html();
 
         if (isNaN(current_id)) {
@@ -686,13 +688,13 @@ define(function(require) {
     }
 
     if (that.labelsColumn &&
-        SunstoneConfig.isTabEnabled(that.tabId) &&
-        $("#" + that.tabId).is(':visible')) {
+      SunstoneConfig.isTabEnabled(that.tabId) &&
+      $("#" + that.tabId).is(':visible')) {
 
       LabelsUtils.insertLabelsDropdown(that.tabId);
 
-      if (SunstoneConfig.isTabActionEnabled(that.tabId, that.resource+".menu_labels")){
-        LabelsUtils.insertLabelsMenu({'tabName': that.tabId});
+      if (SunstoneConfig.isTabActionEnabled(that.tabId, that.resource + ".menu_labels")) {
+        LabelsUtils.insertLabelsMenu({ 'tabName': that.tabId });
       }
     }
 
@@ -700,22 +702,22 @@ define(function(require) {
       that.postUpdateView();
     }
 
-    if(that.conf.searchDropdownHTML != undefined){
+    if (that.conf.searchDropdownHTML != undefined) {
       try {
-        that.searchFields.forEach(function(name){
+        that.searchFields.forEach(function (name) {
           var st = "";
 
-          var dlist = $("datalist[search-datalist="+name+"]", $("#"+that.tabId));
+          var dlist = $("datalist[search-datalist=" + name + "]", $("#" + that.tabId));
 
-          if(dlist.length > 0){
-            that.searchSets[name].forEach(function(val){
+          if (dlist.length > 0) {
+            that.searchSets[name].forEach(function (val) {
               st += '<option value="' + val + '"></option>';
             });
 
             dlist.html(st);
           }
         });
-      } catch(e){}
+      } catch (e) { }
     }
   }
 
@@ -766,17 +768,17 @@ define(function(require) {
       } else {
         //Which rows of the datatable are checked?
         var nodes = $('tbody input.check_item:checked', this.dataTable);
-        $.each(nodes, function() {
+        $.each(nodes, function () {
           selected_nodes.push($(this).val());
         });
       }
     };
 
-    if (opts && opts.names){
+    if (opts && opts.names) {
       var pairs = [];
 
-      $.each(selected_nodes, function(){
-        pairs.push({id: this, name: OpenNebula[that.resource].getName(this)});
+      $.each(selected_nodes, function () {
+        pairs.push({ id: this, name: OpenNebula[that.resource].getName(this) });
       });
 
       return pairs;
@@ -810,15 +812,15 @@ define(function(require) {
     }
 
     if (that.selectOptions.select_callback == undefined) {
-      that.selectOptions.select_callback = function() {};
+      that.selectOptions.select_callback = function () { };
     }
 
     if (that.selectOptions.unselect_callback == undefined) {
-      that.selectOptions.unselect_callback = function() {};
+      that.selectOptions.unselect_callback = function () { };
     }
 
     if (that.selectOptions.multiple_choice) {
-      that.dataTableOptions.fnRowCallback = function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+      that.dataTableOptions.fnRowCallback = function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         var row_id = aData[that.selectOptions.id_index];
 
         var ids = $('#selected_ids_row_' + that.dataTableId, section).data("ids");
@@ -831,7 +833,7 @@ define(function(require) {
         }
       };
     } else {
-      that.dataTableOptions.fnRowCallback = function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+      that.dataTableOptions.fnRowCallback = function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         var row_id = aData[that.selectOptions.id_index];
 
         var selected_id = $('#selected_resource_id_' + that.dataTableId, section).val();
@@ -847,12 +849,12 @@ define(function(require) {
     }
 
     $('#refresh_button_' + that.dataTableId, section).off("click");
-    section.on('click', '#refresh_button_' + that.dataTableId, function() {
+    section.on('click', '#refresh_button_' + that.dataTableId, function () {
       that.updateFn();
       return false;
     });
 
-    $('#' + that.dataTableId + '_search', section).on('input', function() {
+    $('#' + that.dataTableId + '_search', section).on('input', function () {
       that.dataTable.fnFilter($(this).val());
       return false;
     })
@@ -911,15 +913,15 @@ define(function(require) {
             $("td", row).addClass('markrowchecked');
             $('input.check_item', row).prop('checked', true);
           }
-            if (that.dataTableId == 'vms_wizard_process'){
-                row_name = aData[1] + ' : ' + aData[2];
-                ip = aData[9].split('<br>');
-                all_info = aData[1] + '  ' + aData[2] + '  ' + ip[0];
+          if (that.dataTableId == 'vms_wizard_process') {
+            row_name = aData[1] + ' : ' + aData[2];
+            ip = aData[9].split('<br>');
+            all_info = aData[1] + '  ' + aData[2] + '  ' + ip[0];
 
-                $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label" info="'+ all_info +'">' + row_name + '<span class="fa fa-times blue"></span></span> ');
-            }else{
-                $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label">' + row_name + '<span class="fa fa-times blue"></span></span> ');
-            }
+            $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label" info="' + all_info + '">' + row_name + '<span class="fa fa-times blue"></span></span> ');
+          } else {
+            $('#selected_ids_row_' + that.dataTableId, section).append('<span row_id="' + row_id + '" class="radius label">' + row_name + '<span class="fa fa-times blue"></span></span> ');
+          }
 
 
           that.selectOptions.select_callback(aData, that.selectOptions);
@@ -936,22 +938,22 @@ define(function(require) {
         return true;
       };
 
-      $('#' + that.dataTableId + ' tbody', section).on("click", "tr", function(e) {
+      $('#' + that.dataTableId + ' tbody', section).on("click", "tr", function (e) {
         var aData = that.dataTable.fnGetData(this);
 
-        if(aData != undefined){
+        if (aData != undefined) {
           row_click(this, aData);
         }
       });
 
-      $(section).on("click", '#selected_ids_row_' + that.dataTableId + ' span.fa.fa-times', function() {
+      $(section).on("click", '#selected_ids_row_' + that.dataTableId + ' span.fa.fa-times', function () {
         var row_id = $(this).parent("span").attr('row_id');
 
         var found = false;
 
         var aData = that.dataTable.fnGetData();
         // TODO: improve preformance, linear search
-        $.each(aData, function(index, row) {
+        $.each(aData, function (index, row) {
           if (row[that.selectOptions.id_index] == row_id) {
             found = true;
             row_click(that.dataTable.fnGetNodes(index), row);
@@ -976,14 +978,14 @@ define(function(require) {
         that.selectOptions.unselect_callback(aData, that.selectOptions);
       });
     } else {
-      $('#' + that.dataTableId + ' tbody', section).delegate("tr", "click", function(e) {
+      $('#' + that.dataTableId + ' tbody', section).delegate("tr", "click", function (e) {
         that.dataTable.unbind("draw");
         var aData = that.dataTable.fnGetData(this);
 
         $("td.markrow", that.dataTable).removeClass('markrow');
         $('tbody input.check_item', that.dataTable).prop('checked', false);
 
-        if (aData != undefined){
+        if (aData != undefined) {
           $("td", this).addClass('markrow');
           $('input.check_item', this).prop('checked', true);
 
@@ -1037,7 +1039,7 @@ define(function(require) {
 
       var arr = [];
 
-      $.each(ids, function(key, val) {
+      $.each(ids, function (key, val) {
         arr.push(key);
       });
 
@@ -1094,7 +1096,7 @@ define(function(require) {
 
       // TODO: {name, uname} support for multiple_choice
 
-      $.each(selectedResources.ids, function(index, row_id) {
+      $.each(selectedResources.ids, function (index, row_id) {
         if (isNaN(row_id)) {
           return true;
         }
@@ -1141,9 +1143,9 @@ define(function(require) {
         row_name = selectedResources.names.name;
         var row_uname = selectedResources.names.uname;
 
-        $.each(that.dataTable.fnGetData(), function(index, row) {
+        $.each(that.dataTable.fnGetData(), function (index, row) {
           if (row[that.selectOptions.name_index] == row_name &&
-             row[that.selectOptions.uname_index] == row_uname) {
+            row[that.selectOptions.uname_index] == row_uname) {
 
             row_id = row[that.selectOptions.id_index];
             return false;
@@ -1176,7 +1178,7 @@ define(function(require) {
 
       var fixed_ids_map = $.extend({}, that.selectOptions.fixed_ids_map_orig);
 
-      $.each(resource_list, function() {
+      $.each(resource_list, function () {
         var add = true;
 
         if (that.selectOptions.filter_fn) {
@@ -1195,15 +1197,15 @@ define(function(require) {
         }
 
         if (add) {
-          if (that.selectOptions.starred_ids != undefined){
-            if (that.selectOptions.starred_ids_map[this[that.xmlRoot].ID]){
+          if (that.selectOptions.starred_ids != undefined) {
+            if (that.selectOptions.starred_ids_map[this[that.xmlRoot].ID]) {
               elementArray[that.selectOptions.name_index] =
-                  (that.selectOptions.starred_icon + ' ' +
-                    elementArray[that.selectOptions.name_index]);
+                (that.selectOptions.starred_icon + ' ' +
+                  elementArray[that.selectOptions.name_index]);
             } else {
               elementArray[that.selectOptions.name_index] =
-                  ('<i class="fa fa-fw"></i> ' +
-                    elementArray[that.selectOptions.name_index]);
+                ('<i class="fa fa-fw"></i> ' +
+                  elementArray[that.selectOptions.name_index]);
             }
           }
 
@@ -1215,7 +1217,7 @@ define(function(require) {
 
       var n_columns = that.columns.length + 1;
 
-      $.each(fixed_ids_map, function(id, v) {
+      $.each(fixed_ids_map, function (id, v) {
         var empty = [];
 
         for (var i = 0; i <= n_columns; i++) {
@@ -1231,27 +1233,27 @@ define(function(require) {
 
       var section = $('#' + that.dataTableId + 'Container');
       var selectedResources = $('#selected_resource_id_' + that.dataTableId, section).data("pending_select");
-      if (selectedResources != undefined){
+      if (selectedResources != undefined) {
         $('#selected_resource_id_' + that.dataTableId, section).removeData("pending_select");
         that.selectResourceTableSelect(selectedResources);
       }
     }
 
-    var error_func = function(request, error_json, container) {
+    var error_func = function (request, error_json, container) {
       success_func(request, []);
       Notifier.onError(request, error_json, container);
     }
-    var pool_filter = SunstoneConfig.isChangedFilter()? -4 : -2;
+    var pool_filter = SunstoneConfig.isChangedFilter() ? -4 : -2;
     if (that.selectOptions.zone_id == undefined) {
       OpenNebula[that.resource].list({
-        data : {pool_filter : pool_filter},
+        data: { pool_filter: pool_filter },
         timeout: true,
         success: success_func,
         error: error_func
       });
     } else {
       OpenNebula[that.resource].list_in_zone({
-        data: {zone_id: that.selectOptions.zone_id, pool_filter : pool_filter},
+        data: { zone_id: that.selectOptions.zone_id, pool_filter: pool_filter },
         timeout: true,
         success: success_func,
         error: error_func
@@ -1262,10 +1264,10 @@ define(function(require) {
   // TODO: This is probably duplicated somewhere
   function _list() {
     var that = this;
-    var pool_filter = SunstoneConfig.isChangedFilter()? -4 : -2;
+    var pool_filter = SunstoneConfig.isChangedFilter() ? -4 : -2;
     OpenNebula[that.resource].list({
-      data : {pool_filter : pool_filter},
-      success: function(req, resp) {
+      data: { pool_filter: pool_filter },
+      success: function (req, resp) {
         that.updateView(req, resp);
       },
       error: Notifier.onError
@@ -1274,7 +1276,7 @@ define(function(require) {
 
   function _clearLabelsFilter() {
     LabelsUtils.clearLabelsFilter(this.dataTable, this.labelsColumn);
-    LabelsUtils.insertLabelsMenu({'tabName': this.tabId});
+    LabelsUtils.insertLabelsMenu({ 'tabName': this.tabId });
   }
 
   function _getLabelsFilter() {

@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
     /*
       DEPENDENCIES
      */
@@ -68,6 +68,16 @@ define(function(require) {
 
         };
 
+        this.element.updateTrue = false;
+        var owner = this.element.UID == config.user_id ? true : false;
+        var g_id = this.element.GID == config.user_gid ? true : false;
+        if (
+            (permissions.OTHER_M + permissions.OTHER_A == '11') ||
+            (owner && permissions.OWNER_M + permissions.OWNER_A == '11') ||
+            (g_id && permissions.GROUP_M + permissions.GROUP_A == '11')) {
+            this.element.updateTrue = true;
+        }
+
         this.element.ID = this.element.id;
         this.element.UID = this.element.uid;
         this.element.UNAME = this.element.uname;
@@ -83,9 +93,9 @@ define(function(require) {
         var unshownKeys = [
             "id", "uid", "uname", "UNAME", "gname",
             "GNAME", "gid", "body", "description", "name",
-            "ID", "UID", "GID","PERMISSIONS"
+            "ID", "UID", "GID", "PERMISSIONS"
         ];
-        $.each(that.element, function(key, value) {
+        $.each(that.element, function (key, value) {
             if ($.inArray(key, unshownKeys) > -1) {
                 that.unshownTemplate[key] = value;
             } else {
@@ -111,23 +121,25 @@ define(function(require) {
         var renameTrHTML = RenameTr.html(TAB_ID, RESOURCE, this.element.name);
         var permissionsTableHTML = PermissionsTable.html(TAB_ID, RESOURCE, this.element);
         var blocksupportedos = '';
-
-        if(this.element.extra_data.SUPPORTED_OS != null) {
+        if (!this.element.updateTrue) {
+            $("button[href='Ansible.update_dialog']").prop('disabled', true);
+        }
+        if (this.element.extra_data.SUPPORTED_OS != null) {
             var supported_os = this.element.extra_data.SUPPORTED_OS.split(',');
-            for (var i = 0; i < supported_os.length; i++){
+            for (var i = 0; i < supported_os.length; i++) {
                 r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
-                if(r_col.length == 6){
+                if (r_col.length == 6) {
                     r_col += '0';
                 }
-                blocksupportedos += '<div class="" style="margin-left: 10px; padding: 0px 10px 0px 10px; float: left; text-align: center; border: 2px solid '+ r_col +';\n' +
+                blocksupportedos += '<div class="" style="margin-left: 10px; padding: 0px 10px 0px 10px; float: left; text-align: center; border: 2px solid ' + r_col + ';\n' +
                     '    border-radius: 100px !important; margin-bottom: 5px;">' + supported_os[i] + '</div>';
             }
-        }else{
+        } else {
             r_col = "#" + ((1 << 24) * Math.random() | 0).toString(16);
-            if(r_col.length == 6){
+            if (r_col.length == 6) {
                 r_col += '0';
             }
-            blocksupportedos += '<div class="" style="margin-left: 10px; float: left; padding: 0px 10px 0px 10px; border: 2px solid; text-align: center;'+ r_col +';\n' +
+            blocksupportedos += '<div class="" style="margin-left: 10px; float: left; padding: 0px 10px 0px 10px; border: 2px solid; text-align: center;' + r_col + ';\n' +
                 '    border-radius: 100px !important;margin-bottom: 5px;">404 (NOT FOUND)</div>';
         }
         blocksupportedos += '<div class"large-2 columns"></div>';
