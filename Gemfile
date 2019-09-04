@@ -1,7 +1,7 @@
 gem 'nori', '2.6.0'
 gem 'net-ssh', '4.2.0'
 gem 'net-sftp', '2.1.2'
-gem 'json', '1.7.7'
+gem 'json'
 gem 'zmqjsonrpc', '0.1.1'
 gem 'colorize'
 gem 'rbvmomi', '1.11.6'
