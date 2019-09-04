@@ -14,6 +14,22 @@ Creators:
  * Balance
  * Modified user interface for VDC
 
+## System requirements
+|   Package/Service/App     |   Version         |   Optional?   |
+|:--------------------------|:-----------------:|:-------------:|
+|   CentOS	                |   6/7             |               |
+|   OpenNebula	            |   5.4+            |               |
+|   Sunstone	            |   ^^^^            |               |
+|   MySQL MariaDB Server	|   ~5.5            |               |
+|   Ruby	                |   2.0.0           |               |
+|   Ansible             	|   2.x.x           |   yes         |
+|   vCenter             	|   6.0/6.5/6.7     |   yes         |
+|   KVM-QEMU            	|   latest          |   yes         |
+|   Azure (ASM)             |	—               |   yes         |
+|   Azure (ARM)             |	—               |   yes         |
+|   Amazon EC2              |	—               |   yes         |
+
+
 ## Install
 
 1. Download this repo using:
