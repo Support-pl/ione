@@ -523,6 +523,7 @@ class OpenNebula::VirtualMachine
         }
     end
 
+    # Error while processing(calculating) showback Exception
     class ShowbackError < StandardError
 
         attr_reader :params

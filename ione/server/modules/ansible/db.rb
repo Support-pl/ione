@@ -1,9 +1,13 @@
 require 'mysql2'
 require 'sequel'
 
+# AnsiblePlaybook model implementation
 class AnsiblePlaybook
-    FIELDS = %w(uid gid name description body extra_data create_time)
+    # DB Table name
     TABLE = 'ansible_playbook'
+    # DB Table columns names
+    FIELDS = %w(uid gid name description body extra_data create_time)
+    # Creating table if doesn't exists
     begin
         $db.create_table TABLE.to_sym do 
             primary_key :id, :integer, null: false
@@ -18,11 +22,19 @@ class AnsiblePlaybook
     rescue
         puts "Table #{TABLE.to_sym} already exists, skipping"
     end
+    # Getting table object from DB object
     DB = $db[TABLE.to_sym]
 
     attr_reader :id
     attr_accessor :name, :uid, :gid, :description, :body, :extra_data, :create_time
 
+    # @param [Hash] args
+    # @option args [Fixnum] uid - Playbooks owner user ID
+    # @option args [Fixnum] gid - Playbooks group ID
+    # @option args [String] name - Playbooks name
+    # @option args [String] description - Playbooks description(only latin supported)
+    # @option args [String] body - Playbooks YAML written body
+    # @option args [Hash] extra_data - Any data you want to specify, usually only PERMISSIONS are mandatory
     def initialize **args
         args.to_s!
         if args['id'].nil? then
@@ -46,16 +58,19 @@ class AnsiblePlaybook
         end
         raise "Unhandlable, id is nil" if @id.nil?
     end
+    # Synchronizes object from DB
     def sync
         get_me.each do |var, value|
             instance_variable_set('@' + var, value)
         end
     end
     
+    # Deletes object from DB
     def delete
         DB.where(id: @id).delete
         nil
     end
+    # Writes object to DB
     def update
         r, msg = self.class.check_syntax(@body)
         raise RuntimeError.new(msg) unless r
@@ -71,6 +86,7 @@ class AnsiblePlaybook
 
         nil
     end
+    # Lists variables from Playbook
     def vars
         sync
         body = YAML.load(@body).first
@@ -80,7 +96,13 @@ class AnsiblePlaybook
             raise "SyntaxError: Check if here is now hyphens at the playbook beginning. Playbook parse result should be Hash"
         end
     end
-
+    # Checks Playbook Syntax
+    # @param [String] body - Playbooks body written in YAML
+    # @note Playbook should be written following next rules:
+    # 1. It must be written in ruby-yaml parse-able YAML syntax
+    # 2. Playbook must be array (body should start from ' - ')
+    # 3. hosts must be equal to <%group%>
+    # 4. Using of "local_action" key is restricted
     def self.check_syntax body
         body = YAML.load(body)
         raise AnsiblePlaybookSyntaxError.new( "Playbook must be array (body should start from ' - ')" ) unless body.class == Array
@@ -95,7 +117,14 @@ class AnsiblePlaybook
         return false, 'Unknown error: ' + e.message
     end
 
-    def run host, vars:nil, password:nil, ssh_key:nil, ione:IONe.new($client)
+    # Creates AnsiblePlaybookProcess with given args
+    # @param [Hash] host - host or hosts, whereto Playbook will be deployed, see example
+    # @param [Hash] vars - variables for playbook, see example
+    # @param [IONe] ione - IONe client
+    # @example Params template:
+    # host -> {'one_vm_id' => ['IP_Address:ssh_port', 'username:password']}
+    # vars -> {'variable_name_from_playbook_vars_section' => 'value'}
+    def run host, vars:nil, ione:IONe.new($client)
         r, msg = self.class.check_syntax(@body)
         raise RuntimeError.new(msg) unless r
         
@@ -111,6 +140,7 @@ class AnsiblePlaybook
             ]
         })
     end
+    # Returns Playbook body with variables inserted
     def runnable vars={}
         r, msg = self.class.check_syntax(@body)
         raise RuntimeError.new(msg) unless r
@@ -122,10 +152,12 @@ class AnsiblePlaybook
         end
         return { @name => @body }
     end
+    # Returns AnsiblePlaybook object as Hash
     def to_hash
         get_me
     end
 
+    # Returns all AnsiblePlaybook objects from DB
     def self.list
         result = DB.all
         result.map{ |pb| pb.to_s! }
@@ -135,11 +167,13 @@ class AnsiblePlaybook
         result
     end
 
+    # Playbook has wrong syntax Exception
     class AnsiblePlaybookSyntaxError < StandardError
         def initialize msg
             super
             @msg = msg
         end
+        # Returns exception message
         def message
             @msg
         end
@@ -147,6 +181,7 @@ class AnsiblePlaybook
 
     private
 
+    # Writes object to DB
     def allocate
         args = {}
         FIELDS.each do | var |
@@ -156,6 +191,7 @@ class AnsiblePlaybook
         args[:extra_data] = JSON.generate(args[:extra_data])
         @id = DB.insert( **args )
     end
+    # Gets object from DB
     def get_me id = @id
         me = DB.where(id: @id).to_a.last.to_s!
         me['extra_data'] = JSON.parse me['extra_data']
@@ -163,10 +199,13 @@ class AnsiblePlaybook
     end
 end
 
+# Ansible Playbook run process implementation
 class AnsiblePlaybookProcess
-
-    attr_reader :id, :install_id, :hosts, :start_time, :end_time
-
+    
+    # DB Table name    
+    TABLE   = 'ansible_playbook_process'
+    
+    # DB Table columns names
     FIELDS  = %w(
         uid playbook_id install_id
         create_time start_time end_time
@@ -174,9 +213,8 @@ class AnsiblePlaybookProcess
         vars playbook_name runnable
         comment codes run_after
     )
-    
-    TABLE   = 'ansible_playbook_process'
-    
+
+    # Creating table if doesn't exists
     begin
         $db.create_table TABLE.to_sym do 
             primary_key :proc_id, :integer, null: false
@@ -200,6 +238,7 @@ class AnsiblePlaybookProcess
         puts "Table #{TABLE.to_sym} already exists, skipping"
     end
 
+    # Process states dictionary
     STATUS = {
         '0' => 'PENDING',
         '1' => 'RUNNING',
@@ -210,9 +249,28 @@ class AnsiblePlaybookProcess
         '6' => 'LOST',
         'done' => 'DONE'
     }
+    # Getting table object from DB object
     DB = $db[:ansible_playbook_process]
 
+    attr_reader :id, :install_id, :hosts, :start_time, :end_time
+
+    # @param [Fixnum] proc_id - Process will be loaded from DB if given
+    # @param [Fixnum] playbook_id - Playbook object ID to use
+    # @param [Fixnum] uid - User ID who initiates the process
+    # @param [Hash] hosts - see example
+    # @param [Hash] vars - Variables that should be inserted in PB
+    # @param [String] comment - Anything you want to tell another users or admins about this Process
+    # @param [String] auth - auth driver to use, now is only one supported - default, which uses login and password pair
+    # @param [Hash] run_after
+    # @option run_after [String] method - IONe method name to call after Ansible will end its work
+    # @option run_after [Array] params - Params for this method, see example
+    # @example Hosts example:
     # hosts: { 'vmid' => [ip:port, credentials]}
+    # @example Run After example:
+    # {
+    #     "method" => "Reboot",
+    #     "params" => 777 # vmid
+    # } # So VM will be rebooted after
     def initialize proc_id:nil, playbook_id:nil, uid:nil, hosts:{}, vars:{}, comment:'', auth:'default', run_after:{}
         if proc_id.nil? then
             @uid, @playbook_id = uid, playbook_id
@@ -238,6 +296,8 @@ class AnsiblePlaybookProcess
         allocate if @id.nil?
     end
     
+    # Start Process
+    # @param [Boolean] thread - Runs in another Thread and returns its object if true
     def run thread = true
         nil if STATUS.keys.index(@status) > 0
         @start_time, @status = Time.now.to_i, '1'
@@ -295,7 +355,8 @@ class AnsiblePlaybookProcess
     ensure
         update
     end
-
+    # Scans Ansible log file after its work end
+    # @note Normally it runs automatically, you shouldn't do it by yourself
     def scan
         return nil if STATUS.keys.index(@status) > 1
         Net::SSH.start( ANSIBLE_HOST, ANSIBLE_HOST_USER, :port => ANSIBLE_HOST_PORT ) do | ssh |
@@ -342,22 +403,27 @@ class AnsiblePlaybookProcess
     ensure
         update
     end
+    # Sets Process state to Done
     def delete
         @status = 'done'
     ensure
         update
     end
+    # Returns humanreadable Process state
     def status
         STATUS[@status]
     end
+    # Returns object as is in Hash form
     def to_hash
         get_me
     end
+    # Returns object with State to humanreadable replaced in Hash form
     def human
         r = to_hash
         r['status'] = STATUS[r['status']]
         r
     end
+    # Runs method from run_after field
     def run_after
         return if @run_after['method'].nil?
 
@@ -370,6 +436,7 @@ class AnsiblePlaybookProcess
         end
     end
 
+    # Lists all Processes from DB
     def self.list
         result = DB.all
         result.map{ |pb| pb.to_s! }
@@ -381,6 +448,7 @@ class AnsiblePlaybookProcess
     
     private
 
+    # Removes Playbook, Ansible hosts group and .retry files from host
     def clean
         Net::SSH.start( ANSIBLE_HOST, ANSIBLE_HOST_USER, :port => ANSIBLE_HOST_PORT ) do | ssh |
             ssh.sftp.remove!("/tmp/#{@install_id}.ini")
@@ -391,6 +459,7 @@ class AnsiblePlaybookProcess
         end
         nil
     end
+    # Updates object in DB
     def update
         args = {}
         FIELDS.each do | var |
@@ -402,6 +471,7 @@ class AnsiblePlaybookProcess
         DB.where(proc_id: @id).update( **args )
         nil
     end
+    # Writes object to DB
     def allocate
         args = {}
         FIELDS.each do | var |
@@ -414,11 +484,13 @@ class AnsiblePlaybookProcess
         args[:run_after] = JSON.generate(args[:run_after])
         @id = DB.insert( **args )
     end
+    # Fills objects properties from DB
     def sync
         get_me.each do |var, value|
             instance_variable_set('@' + var, value)
         end
     end
+    # Returns object directly from DB as Hash
     def get_me id = @id
         me = DB.where(proc_id: @id).to_a.last.to_s!
         me['vars'] = JSON.parse me['vars']

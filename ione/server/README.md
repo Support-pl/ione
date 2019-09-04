@@ -9,12 +9,12 @@ Creators:
 [slnt_opp](http://slnt-opp.xyz)
 
 
-## Main additional features
+### Main additional features
  * Transparent showback
  * Balance
  * Modified user interface for VDC
 
-## System requirements
+### System requirements
 |   Package/Service/App     |   Version         |   Optional?   |
 |:--------------------------|:-----------------:|:-------------:|
 |   CentOS	                |   6/7             |               |
@@ -30,7 +30,7 @@ Creators:
 |   Amazon EC2              |	—               |   yes         |
 
 
-## Install
+### Install
 
 1. Download this repo using:
 
@@ -71,5 +71,9 @@ Creators:
 |                               | HYPERIVSOR_0(e.g. KVM)    | `OpenNebula host id`                      |
 | __CURRENCY_MAIN__             |                           | `$/€/etc... this will be shown to user`   |
 ---------------------------------------------------------------------------------------------------------
+
+### Important additions
+
+1. If you're using no Ansible, you should comment it in `/etc/one/ione.conf` in modules section
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`

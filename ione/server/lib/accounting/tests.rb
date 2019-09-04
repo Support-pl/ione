@@ -1,3 +1,4 @@
+# Simple test for an #IaaS_Gate method
 def check_total r
     r.each do |key, value|
         next if key == 'TOTAL' || key == 'time_period_requested'

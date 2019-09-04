@@ -138,6 +138,9 @@ class IONe
     def ListAnsiblePlaybooks
         AnsiblePlaybook.list
     end
+    # Checks AnsiblePlaybook Syntax
+    # @see AnsiblePlaybook.check_syntax Check this method source to learn syntax special rules
+    # @return [Boolean]
     def CheckAnsiblePlaybookSyntax body
         AnsiblePlaybook.check_syntax body
     end
@@ -158,21 +161,38 @@ class IONe
             auth: auth
         ).id
     end
+    # Returns AnsblePlaybook run Process by id as Hash with humanreadable state
+    # @param [Fixnum] id - Process id
+    # @return [Hash]
     def GetAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).human
     end
+    # Deletes given AnsiblePlaybookProcess
+    # @param [Fixnum] id - Process id
+    # @return [NilClass]
     def DeleteAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).delete
     end
+    # Runs given AnsiblePlaybookProcess in PENDING state
+    # @param [Fixnum] id - Process id
+    # @return [NilClass | Thread] - returns Thread if everything's fine, nil if wrong state
     def RunAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).run
     end
+    # Returns given AnsiblePlaybookProcess state
+    # @param [Fixnum] id - Process id
+    # @return [String]
     def AnsiblePlaybookProcessStatus id
         AnsiblePlaybookProcess.new(proc_id:id).status
     end
+    # Returns AnsblePlaybook run Process by id as Hash
+    # @param [Fixnum] id - Process id
+    # @return [Hash]
     def AnsiblePlaybookProcessInfo id
         AnsiblePlaybookProcess.new(proc_id:id).to_hash
     end
+    # Returns all AnsiblePlaybook Processes as Array of Hashes
+    # @return [Array<AnsiblePlaybookProcess>]
     def ListAnsiblePlaybookProcesses
         AnsiblePlaybookProcess.list
     end
