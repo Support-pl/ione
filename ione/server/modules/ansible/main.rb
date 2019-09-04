@@ -138,15 +138,19 @@ class IONe
     def ListAnsiblePlaybooks
         AnsiblePlaybook.list
     end
+    # Checks AnsiblePlaybook Syntax
+    # @see AnsiblePlaybook.check_syntax Check this method source to learn syntax special rules
+    # @return [Boolean]
     def CheckAnsiblePlaybookSyntax body
         AnsiblePlaybook.check_syntax body
     end
     # Creates Process instance with given playbook, host and variables
-    # @param [Fixnum] id - Playbook ID
+    # @param [Fixnum] playbook_id - Playbook ID
     # @param [Fixnum] uid - User ID who initialized playbook
     # @param [Array<String>] hosts - Array of hosts where to run playbook
     # @param [Hash] vars - Hash with playbook variables values
-    
+    # @param [String] comment
+    # @param [String] auth - auth driver
     def AnsiblePlaybookToProcess playbook_id, uid, hosts = [], vars = {}, comment = '', auth = 'default'
         AnsiblePlaybookProcess.new(
             playbook_id: playbook_id,
@@ -157,21 +161,38 @@ class IONe
             auth: auth
         ).id
     end
+    # Returns AnsblePlaybook run Process by id as Hash with humanreadable state
+    # @param [Fixnum] id - Process id
+    # @return [Hash]
     def GetAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).human
     end
+    # Deletes given AnsiblePlaybookProcess
+    # @param [Fixnum] id - Process id
+    # @return [NilClass]
     def DeleteAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).delete
     end
+    # Runs given AnsiblePlaybookProcess in PENDING state
+    # @param [Fixnum] id - Process id
+    # @return [NilClass | Thread] - returns Thread if everything's fine, nil if wrong state
     def RunAnsiblePlaybookProcess id
         AnsiblePlaybookProcess.new(proc_id:id).run
     end
+    # Returns given AnsiblePlaybookProcess state
+    # @param [Fixnum] id - Process id
+    # @return [String]
     def AnsiblePlaybookProcessStatus id
         AnsiblePlaybookProcess.new(proc_id:id).status
     end
+    # Returns AnsblePlaybook run Process by id as Hash
+    # @param [Fixnum] id - Process id
+    # @return [Hash]
     def AnsiblePlaybookProcessInfo id
         AnsiblePlaybookProcess.new(proc_id:id).to_hash
     end
+    # Returns all AnsiblePlaybook Processes as Array of Hashes
+    # @return [Array<AnsiblePlaybookProcess>]
     def ListAnsiblePlaybookProcesses
         AnsiblePlaybookProcess.list
     end

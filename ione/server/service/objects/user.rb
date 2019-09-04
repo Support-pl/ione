@@ -20,33 +20,42 @@ class OpenNebula::User
                 VMS=\"#{spec['append'].nil? ? quota['VMS_USED'].to_s : (quota['VMS_USED'].to_i + 1).to_s}\" ]"
         )
     end
+    # Returns users actual name
     def name!
         info!
         name
     end
-
+    # Returns users actual balance
     def balance
         info! || self['TEMPLATE/BALANCE']
     end
+    # Sets users balance
+    # @param [Fixnum] num
     def balance= num
         update("BALANCE = #{num}", true)
     end
+    # Returns true if user balance is less than user alert point
     def alert
         alert_at = (info! || self['TEMPLATE/ALERT']) || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
         return balance.to_f <= alert_at.to_f, alert_at.to_f
     end
+    # Sets users alert point
     def alert= at
         update("ALERT = #{at}", true)
     end
+    # Returns users VMs objects array
+    # @return [Array<OpenNebula::VirtualMachine>]
     def vms db
         db[:vm_pool].where(uid: @pe_id).exclude(:state => 6).select(:oid).to_a.map { |row| onblock(:vm, row[:oid]){|vm| vm.info! || vm} }
     rescue
         nil
     end
+    # Checks if user exists
     def exists?
         self.info! == nil
     end
 
+    # User doesn't exist Exception object
     class UserNotExistsError < StandardError
         def initialize msg = "User not exists or error occurred while getting user."
            super

@@ -42,9 +42,16 @@ class Hash
         keys.each { |key| cpy.delete(key) }
         cpy
     end
+    # Transforms Hash to OpenNebula Template. Only two layers allowed
+    # @example VM hash to template
+    # {'CPU' => 2, 'DISK' => {'SIZE' => '64'}} ->
+    # CPU = "2"
+    # DISK = [
+    #   SIZE = "64" ]
     def to_one_template
         result = ""
         self.each do | key, value |
+            key = key.to_s.upcase
             if value.class == String || value.class == Fixnum then
                 result += "#{key}=\"#{value.to_s.gsub("\"", "\\\"")}\"\n"
             elsif value.class == Hash then
@@ -113,10 +120,12 @@ class NilClass
         obj
     end
 end
-
+# Public Gem class IPAddr
 class IPAddr
+    # Returns true if given IP address is private(10.x.x.x||192.168.x.x||172.(16-31).x.x)
     def local?
         a, b = self.to_s.split('.')[0..1]
         return (a == '10') || (a == '192' && b == '168') || (a == '172' && (16..31) === b.to_i )
     end
+    alias private? :local?
 end

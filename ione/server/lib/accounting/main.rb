@@ -75,6 +75,7 @@ class IONe
             'type'     => e.class
         }
     end
+    # Does more complicated things, don't think about it)))))
     def IaaS_Gate_new params
         LOG_DEBUG params
         response = []

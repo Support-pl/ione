@@ -12,6 +12,7 @@ module IONeLoggerKit
         File.open("#{LOG_ROOT}/old.log", 'a') { |file| file.write($log.join("\n")) }
     end
 
+    # Table with log locations linked to method name or given label
     DESTINATIONS = Hash.new('ione.log')
     DESTINATIONS.merge!({
         'DEBUG' => 'debug.log'        
@@ -60,6 +61,7 @@ module IONeLoggerKit
         true
     end
     alias LOG_ERROR LOG_COLOR
+    # Logging the message directly into LOG_LOCATION/debug.log
     def LOG_DEBUG(msg, method = 'DEBUG', _time = true)
         destination = "#{LOG_ROOT}/debug.log"
         msg = "[ #{time()} ] #{msg}"

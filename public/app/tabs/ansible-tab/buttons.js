@@ -14,54 +14,59 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Locale = require('utils/locale');
+  var Config = require('sunstone-config');
 
   var Buttons = {
-    "Ansible.refresh" : {
+    "Ansible.refresh": {
       type: "action",
       layout: "refresh",
       alwaysActive: true
     },
-    "Ansible.create_dialog" : {
+    "Ansible.create_dialog": {
       type: "create_dialog",
       layout: "create"
     },
-    "Ansible.update_dialog" : {
+    "Ansible.update_dialog": {
       type: "action",
       layout: "main",
       text: Locale.tr("Update")
     },
-    "Ansible.run" : {
+    "Ansible.run": {
       type: "action",
       layout: "main",
       text: Locale.tr("Run")
     },
-    "Ansible.chown" : {
+    "Ansible.chown": {
       type: "confirm_with_select",
       text: Locale.tr("Change owner"),
       layout: "user_select",
       select: "User",
       tip: Locale.tr("Select the new owner"),
     },
-    "Ansible.chgrp" : {
+    "Ansible.chgrp": {
       type: "confirm_with_select",
       text: Locale.tr("Change group"),
       layout: "user_select",
       select: "Group",
       tip: Locale.tr("Select the new group"),
     },
-    "Ansible.clone_dialog" : {
+    "Ansible.clone_dialog": {
       type: "action",
       layout: "main",
       text: Locale.tr("Clone")
     },
-    "Ansible.delete" : {
+    "Ansible.delete": {
       type: "action",
       layout: "del",
       text: Locale.tr("Delete")
     }
   };
+
+  if (Config.isTabActionEnabled("ansible-tab", "Ansible.update_dialog") != true) {
+    delete Buttons["Ansible.update_dialog"];
+  }
 
   return Buttons;
 })

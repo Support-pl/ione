@@ -51,7 +51,7 @@ IONe.SetVMResourcesLimits(
     {
         'cpu' => vm['/VM/TEMPLATE/CPU'].to_i,
         'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-        'iops' => IONe.GetvCenterIOPsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+        'iops' => IONe.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
     }
 ) if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter'
 

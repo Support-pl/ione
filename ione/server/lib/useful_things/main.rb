@@ -303,9 +303,11 @@ class IONe
         params.to_sym!
         onblock(:vm, params[:vmid]).hot_resize(params)
     end
+    # Checks if User exists
     def user_exists uid
         onblock(:u, uid).exists?
     end
+    # Deletes user and all his VMs
     def UserDelete uid
         u = onblock(:u, uid)
         u.vms(@db).each do | vm |
@@ -316,7 +318,8 @@ class IONe
         LOG_DEBUG e.message
     end
 
-    def GetvCenterIOPsConf
+    # Returns current IOps conf from `/etc/one/ione.conf`
+    def GetvCenterIOpsConf
         $ione_conf['vCenter']['drives-iops']
     end
 end

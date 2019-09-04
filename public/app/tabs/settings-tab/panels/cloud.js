@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* —------------------------------------------------------------------------ */
 
-define(function(require) {
+define(function (require) {
     /*
       DEPENDENCIES
      */
@@ -95,128 +95,129 @@ define(function(require) {
 
     function _onShow(context, that) {
 
-        $.get("settings", function(data, status){
-            OpenNebula.Datastore.list({success: function(r,res){
+        $.get("settings", function (data, status) {
+            OpenNebula.Datastore.list({
+                success: function (r, res) {
                     settings = data.response;
                     datastores = res;
 
                     datastores_hbs = [];
                     var check;
-                    for(var key in datastores){
-                        if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS'){
-                            if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE"){
-                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,HYPERVISOR:datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,DEPLOY:true});
+                    for (var key in datastores) {
+                        if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS') {
+                            if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE") {
+                                datastores_hbs.push({ ID: datastores[key].DATASTORE.ID, NAME: datastores[key].DATASTORE.NAME, DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR, DEPLOY: true });
                                 check = 'checked ';
-                            }else{
-                                datastores_hbs.push({ID:datastores[key].DATASTORE.ID, NAME:datastores[key].DATASTORE.NAME,DISK_TYPE:datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,HYPERVISOR:datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,DEPLOY:false});
+                            } else {
+                                datastores_hbs.push({ ID: datastores[key].DATASTORE.ID, NAME: datastores[key].DATASTORE.NAME, DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR, DEPLOY: false });
                                 check = '';
                             }
-                            $('#datastores_body').append('<tr role="row"><td>'+ datastores[key].DATASTORE.ID +'</td><td>'+ datastores[key].DATASTORE.NAME +'</td>' +
-                                '<td><select id="'+ datastores[key].DATASTORE.ID +'" style="width: 80%;" class="datastores_select_disk_type"></select></td>' +
-                                '<td id="datastore_huper'+datastores[key].DATASTORE.ID+'" class="hypervisor_datastore"><input type="text" value="'+datastores[key].DATASTORE.TEMPLATE.HYPERVISOR+'"></td>'+
+                            $('#datastores_body').append('<tr role="row"><td>' + datastores[key].DATASTORE.ID + '</td><td>' + datastores[key].DATASTORE.NAME + '</td>' +
+                                '<td><select id="' + datastores[key].DATASTORE.ID + '" style="width: 80%;" class="datastores_select_disk_type"></select></td>' +
+                                '<td id="datastore_huper' + datastores[key].DATASTORE.ID + '" class="hypervisor_datastore"><input type="text" value="' + datastores[key].DATASTORE.TEMPLATE.HYPERVISOR + '"></td>' +
                                 '<td id="deploy_switch">' +
-                                '<label class="tetswitch"><input type="checkbox" id="togBtn" '+ check +'><div class="tetslider round"></div></label></td></tr>');
+                                '<label class="tetswitch"><input type="checkbox" id="togBtn" ' + check + '><div class="tetslider round"></div></label></td></tr>');
                         }
                     }
 
                     // datastore_dataTable.fnClearTable();
                     // datastore_dataTable.fnAddData();
-                    console.log(datastores,datastores_hbs);
+                    console.log(datastores, datastores_hbs);
                     settings_hbs = {};
-                    for(var i in settings){
-                        if (settings[i] != null){
-                            if (settings[i].indexOf('{') == 0){
+                    for (var i in settings) {
+                        if (settings[i] != null) {
+                            if (settings[i].indexOf('{') == 0) {
                                 var tree = JSON.parse(settings[i]);
-                                settings_hbs[i] = {bool_tree:true,value:tree};
-                            }else{
-                                settings_hbs[i] = {bool_tree:false,value:settings[i]};
+                                settings_hbs[i] = { bool_tree: true, value: tree };
+                            } else {
+                                settings_hbs[i] = { bool_tree: false, value: settings[i] };
                             }
                         }
                     }
                     console.log(settings_hbs);
                     var flag_circle;
-                    for(var i in settings_hbs){
+                    for (var i in settings_hbs) {
 
-                        if (settings_hbs[i].bool_tree){
+                        if (settings_hbs[i].bool_tree) {
                             flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span id="setting_tree_circle"><a href="#"><i class="fa fa-arrow-circle-right"/></a></span>' +
-                                '<span id="setting_tree_key_span" style="cursor: pointer;">'+ i +'</span></td>';
-                            for(var j in settings_hbs[i].value){
-                                flag_circle += '<tr class="tr_setting_'+ j +'" style="display: none">' +
-                                    '<td class="td_key_setting" style="text-align: center;">'+ j +'</td>' +
-                                    '<td class="td_value_setting">'+ settings_hbs[i].value[j] +'</td>' +
+                                '<span id="setting_tree_key_span" style="cursor: pointer;">' + i + '</span></td>';
+                            for (var j in settings_hbs[i].value) {
+                                flag_circle += '<tr class="tr_setting_' + j + '" style="display: none">' +
+                                    '<td class="td_key_setting" style="text-align: center;">' + j + '</td>' +
+                                    '<td class="td_value_setting">' + settings_hbs[i].value[j] + '</td>' +
                                     '<td style="width: 60px;">' +
                                     '<span id="div_edit_setting">' +
-                                    '<a id="div_edit_'+ j +'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
+                                    '<a id="div_edit_' + j + '" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
                                     '</span>' +
                                     '<span id="div_minus_setting">' +
-                                    '<a id="div_minus_'+ j +'" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
+                                    '<a id="div_minus_' + j + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
                                     '</span></td></tr>';
                             }
-                        }else{
-                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span>&#8195;'+ i +'</span></td>' +
-                                '<td class="td_value_setting">'+ settings_hbs[i].value +'</td>' +
+                        } else {
+                            flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span>&#8195;' + i + '</span></td>' +
+                                '<td class="td_value_setting">' + settings_hbs[i].value + '</td>' +
                                 '<td style="width: 60px;">' +
                                 '<span id="div_edit_setting">' +
-                                '<a id="div_edit_'+ i +'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
+                                '<a id="div_edit_' + i + '" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"/></a>' +
                                 '</span>' +
                                 '<span id="div_minus_setting">' +
-                                '<a id="div_minus_'+ i +'" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
+                                '<a id="div_minus_' + i + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"/></a>' +
                                 '</span></td>';
                         }
 
-                        $('#settings_body').append('<tr class="tr_setting_'+ i +'">'+flag_circle+'</tr>');
-                        $('#settings_key_vars').append('<option value="'+ i +'">');
+                        $('#settings_body').append('<tr class="tr_setting_' + i + '">' + flag_circle + '</tr>');
+                        $('#settings_key_vars').append('<option value="' + i + '">');
                     }
 
 
-                    if (settings.DISK_TYPES == undefined){
+                    if (settings.DISK_TYPES == undefined) {
                         var disk_type = [];
-                    }else{
+                    } else {
                         var disk_type = settings['DISK_TYPES'].split(',');
                     }
 
                     var datastores_select = $('#datastores_body .datastores_select_disk_type');
-                    var len =  datastores_select.length;
+                    var len = datastores_select.length;
                     for (var i = 0; i < len; i++) {
-                        if (datastores_hbs[i].DISK_TYPE != undefined){
-                            for(var k in disk_type){
-                                if (datastores_hbs[i].DISK_TYPE == disk_type[k]){
-                                    $(datastores_select[i]).append('<option selected>'+ disk_type[k] +'</option>');
-                                }else{
-                                    $(datastores_select[i]).append('<option>'+ disk_type[k] +'</option>');
+                        if (datastores_hbs[i].DISK_TYPE != undefined) {
+                            for (var k in disk_type) {
+                                if (datastores_hbs[i].DISK_TYPE == disk_type[k]) {
+                                    $(datastores_select[i]).append('<option selected>' + disk_type[k] + '</option>');
+                                } else {
+                                    $(datastores_select[i]).append('<option>' + disk_type[k] + '</option>');
                                 }
                             }
-                        }else{
-                            $(datastores_select[i]).append('<option selected disabled>'+Locale.tr('Select disk type')+'</option>');
-                            for(var k in disk_type){
-                                $(datastores_select[i]).append('<option>'+ disk_type[k] +'</option>');
+                        } else {
+                            $(datastores_select[i]).append('<option selected disabled>' + Locale.tr('Select disk type') + '</option>');
+                            for (var k in disk_type) {
+                                $(datastores_select[i]).append('<option>' + disk_type[k] + '</option>');
                             }
                         }
                     }
 
-                    $('#datastores_body #0').append('<option selected disabled>'+Locale.tr('Select disk type disabled')+'</option>');
-                    $('#datastores_body #0').prop('disabled',true);
-                    $('#datastore_huper0').next('#deploy_switch').children().children('#togBtn').prop('disabled',true);
-                    $('#datastore_huper0 input').attr('disabled','disabled');
+                    $('#datastores_body #0').append('<option selected disabled>' + Locale.tr('Select disk type disabled') + '</option>');
+                    $('#datastores_body #0').prop('disabled', true);
+                    $('#datastore_huper0').next('#deploy_switch').children().children('#togBtn').prop('disabled', true);
+                    $('#datastore_huper0 input').attr('disabled', 'disabled');
 
-                    for(var i in settings_hbs){
-                        if (settings_hbs[i].bool_tree == true){
+                    for (var i in settings_hbs) {
+                        if (settings_hbs[i].bool_tree == true) {
                             var kol = 0;
                             var pre_name = [];
-                            for(var j in settings_hbs[i].value){
+                            for (var j in settings_hbs[i].value) {
                                 pre_name.push(j);
                                 kol++
-                                if (kol == 2){break;}
+                                if (kol == 2) { break; }
                             }
-                            if (pre_name.length > 1){
-                                if (Object.keys(settings_hbs[i].value).length > 2){
-                                    $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');
-                                }else{
-                                    $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+', '+pre_name[1]+'</small>');
+                            if (pre_name.length > 1) {
+                                if (Object.keys(settings_hbs[i].value).length > 2) {
+                                    $('.tr_setting_' + i).children('.td_key_setting').append('<small style="color: grey;">&emsp;' + pre_name[0] + ', ' + pre_name[1] + '...</small>');
+                                } else {
+                                    $('.tr_setting_' + i).children('.td_key_setting').append('<small style="color: grey;">&emsp;' + pre_name[0] + ', ' + pre_name[1] + '</small>');
                                 }
 
-                            }else{
-                                $('.tr_setting_'+i).children('.td_key_setting').append('<small style="color: grey;">&emsp;'+pre_name[0]+'</small>');
+                            } else {
+                                $('.tr_setting_' + i).children('.td_key_setting').append('<small style="color: grey;">&emsp;' + pre_name[0] + '</small>');
                             }
                         }
                     }
@@ -229,20 +230,21 @@ define(function(require) {
 
                     set_events();
 
-                    if (datastores_hbs.length == 0 && settings_hbs.length == 0){
+                    if (datastores_hbs.length == 0 && settings_hbs.length == 0) {
                         $('#cloud_placeholder i').eq(0).remove();
                         $('#cloud_no_data').show();
-                    }else{
+                    } else {
                         $('#cloud_placeholder').hide();
-                        if (datastores_hbs.length != 0){
+                        if (datastores_hbs.length != 0) {
                             $('#datastore_row').show();
                         }
-                        if (settings_hbs.length != 0){
+                        if (settings_hbs.length != 0) {
                             $('#settings_row').show();
                         }
                     }
 
-                }});
+                }
+            });
         });
     }
 
@@ -251,17 +253,17 @@ define(function(require) {
         $('#settings_body #setting_tree_key_span').off('click');
 
         $('#settings_body #setting_tree_circle').click(function () {
-            if ($(this).children().children().attr('class') == 'fa fa-arrow-circle-right'){
-                $(this).children().children().switchClass('fa-arrow-circle-right','fa-arrow-circle-down');
+            if ($(this).children().children().attr('class') == 'fa fa-arrow-circle-right') {
+                $(this).children().children().switchClass('fa-arrow-circle-right', 'fa-arrow-circle-down');
                 $(this).parent().children('small').toggle();
-            }else{
-                $(this).children().children().switchClass('fa-arrow-circle-down','fa-arrow-circle-right');
+            } else {
+                $(this).children().children().switchClass('fa-arrow-circle-down', 'fa-arrow-circle-right');
                 $(this).parent().children('small').toggle();
             }
 
             var name = $(this).next().text();
             for (var k in settings_hbs[name].value) {
-                $('tr.tr_setting_' + name).nextAll('tr.tr_setting_' + k.replace(/\./g,'\\.')).eq(0).toggle();
+                $('tr.tr_setting_' + name).nextAll('tr.tr_setting_' + k.replace(/\./g, '\\.')).eq(0).toggle();
             }
 
         });
@@ -276,24 +278,24 @@ define(function(require) {
         $('#settings_body #div_edit_setting').click(function () {
             var tr_setting = $(this).parent().parent();
             var td_value = tr_setting.children('.td_value_setting');
-            if (td_value.children('input').length > 0){
+            if (td_value.children('input').length > 0) {
                 var str = td_value.children('input.input_edit_value_setting').val();
                 td_value.html(str);
                 var key = tr_setting.attr('class').substring(11);
-                for(var j in settings_hbs){
-                    if (j == key){
+                for (var j in settings_hbs) {
+                    if (j == key) {
                         settings_hbs[j].value = str;
                         return;
-                    }else if(settings_hbs[j].bool_tree == true){
-                        for(var k in settings_hbs[j].value){
-                            if (k == key){
+                    } else if (settings_hbs[j].bool_tree == true) {
+                        for (var k in settings_hbs[j].value) {
+                            if (k == key) {
                                 settings_hbs[j].value[k] = str;
                                 return;
                             }
                         }
                     }
                 }
-            }else{
+            } else {
                 var str = td_value.text();
                 td_value.html("<input class='input_edit_value_setting' type='text'></input>");
                 td_value.children('input.input_edit_value_setting').val(str);
@@ -308,32 +310,32 @@ define(function(require) {
             var key = $(this).parent().parent().prevAll('tr').has('small').eq(0).attr('class').substring(11);
             var key1 = $(this).parent().parent().attr('class').substring(11);
 
-            if (settings_hbs[key] != undefined){
-                if(settings_hbs[key].bool_tree == true){
-                    if(settings_hbs[key].value[key1] != undefined){
+            if (settings_hbs[key] != undefined) {
+                if (settings_hbs[key].bool_tree == true) {
+                    if (settings_hbs[key].value[key1] != undefined) {
                         delete settings_hbs[key].value[key1];
                         var pre_name = Object.keys(settings_hbs[key].value);
-                        if (pre_name.length == 0){
+                        if (pre_name.length == 0) {
                             delete settings_hbs[key];
                             $(this).parent().parent().prev().remove();
                             $(this).parent().parent().remove();
-                        }else{
+                        } else {
                             $(this).parent().parent().remove();
-                            $('.tr_setting_'+key).children('.td_key_setting').children('small').text('');
-                            if (pre_name.length > 1){
-                                if (pre_name.length > 2){
-                                    $('.tr_setting_'+key).children('.td_key_setting').children('small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'...</small>');;
-                                }else{
-                                    $('.tr_setting_'+key).children('.td_key_setting').children('small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'</small>');;
+                            $('.tr_setting_' + key).children('.td_key_setting').children('small').text('');
+                            if (pre_name.length > 1) {
+                                if (pre_name.length > 2) {
+                                    $('.tr_setting_' + key).children('.td_key_setting').children('small').append('&emsp;' + pre_name[0] + ', ' + pre_name[1] + '...</small>');;
+                                } else {
+                                    $('.tr_setting_' + key).children('.td_key_setting').children('small').append('&emsp;' + pre_name[0] + ', ' + pre_name[1] + '</small>');;
                                 }
-                            }else{
-                                $('.tr_setting_'+key).children('.td_key_setting').children('small').append('&emsp;'+pre_name[0]+'</small>');;
+                            } else {
+                                $('.tr_setting_' + key).children('.td_key_setting').children('small').append('&emsp;' + pre_name[0] + '</small>');;
                             }
                         }
                     }
                 }
             }
-            if (settings_hbs[key1] != undefined){
+            if (settings_hbs[key1] != undefined) {
                 $(this).parent().parent().remove();
                 delete settings_hbs[key1];
             }
@@ -356,11 +358,11 @@ define(function(require) {
             rezerv_clone_datastores = $('tbody#datastores_body').clone();
 
             var datastores = $('#datastores_body .datastores_select_disk_type');
-            var len =  datastores.length;
+            var len = datastores.length;
             for (var i = 0; i < len; i++) {
-                if (datastores_hbs[i].DISK_TYPE != undefined){
+                if (datastores_hbs[i].DISK_TYPE != undefined) {
                     $(datastores[i]).val(datastores_hbs[i].DISK_TYPE);
-                }else{
+                } else {
                     $(datastores[i]).val('Select disk type');
                 }
             }
@@ -371,31 +373,31 @@ define(function(require) {
         $('#datastores_but_submit').click(function () {
             console.log(datastores_hbs, datastores);
             var datastores = $('#datastores_body .datastores_select_disk_type');
-            var len =  datastores.length-1;
+            var len = datastores.length - 1;
             for (var i = 0; i < len; i++) {
-                if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()){
-                    OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DRIVE_TYPE = '+$(datastores[i]).val()}});
+                if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()) {
+                    OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DRIVE_TYPE = ' + $(datastores[i]).val() } });
                     datastores_hbs[i].DISK_TYPE = $(datastores[i]).val();
                     Notifier.notifyMessage(Locale.tr('Changed disk type'));
                 }
                 var dep = $(datastores[i]).parent().parent().children('#deploy_switch').children().children('#togBtn').prop('checked');
-                if (datastores_hbs[i].DEPLOY != dep){
-                    if ($(datastores[i]).val() != null){
-                        if (dep == true){
-                            OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = TRUE'}});
-                        }else{
-                            OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'DEPLOY = FALSE'}});
+                if (datastores_hbs[i].DEPLOY != dep) {
+                    if ($(datastores[i]).val() != null) {
+                        if (dep == true) {
+                            OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DEPLOY = TRUE' } });
+                        } else {
+                            OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DEPLOY = FALSE' } });
                         }
                         datastores_hbs[i].DEPLOY = dep;
                         Notifier.notifyMessage(Locale.tr('Changed deploy'));
-                    }else{
+                    } else {
                         Notifier.notifyError(Locale.tr('Select disk type'));
                     }
 
                 }
-                var hyper_value = $('#datastore_huper'+datastores_hbs[i].ID+' input').val();
-                if (datastores_hbs[i].HYPERVISOR != hyper_value && hyper_value != 'undefined'){
-                    OpenNebula.Datastore.append({data:{id:datastores_hbs[i].ID,extra_param:'HYPERVISOR = '+hyper_value}});
+                var hyper_value = $('#datastore_huper' + datastores_hbs[i].ID + ' input').val();
+                if (datastores_hbs[i].HYPERVISOR != hyper_value && hyper_value != 'undefined') {
+                    OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'HYPERVISOR = ' + hyper_value } });
                     datastores_hbs[i].HYPERVISOR = hyper_value;
                     Notifier.notifyMessage(Locale.tr('Changed hypervisor'));
                 }
@@ -417,29 +419,29 @@ define(function(require) {
             rezerv_clone_settings = $('tbody#settings_body').clone();
         });
 
-        $('input[name="new_key_setting"]').keyup(function(){
+        $('input[name="new_key_setting"]').keyup(function () {
             var that = this;
             $('datalist#settings_key1_vars').empty();
             var key = $(that).val();
-            if (settings_hbs[key] != undefined){
-                if (settings_hbs[key].bool_tree == true){
-                    for(var i in settings_hbs[key].value){
-                        $('datalist#settings_key1_vars').append('<option value="'+ i +'">');
+            if (settings_hbs[key] != undefined) {
+                if (settings_hbs[key].bool_tree == true) {
+                    for (var i in settings_hbs[key].value) {
+                        $('datalist#settings_key1_vars').append('<option value="' + i + '">');
                     }
-                }else{
-                    $('datalist#settings_value_vars').append('<option value="'+ settings_hbs[key].value +'">');
+                } else {
+                    $('datalist#settings_value_vars').append('<option value="' + settings_hbs[key].value + '">');
                 }
             }
         });
 
-        $('input[name="new_key1_setting"]').keyup(function(){
+        $('input[name="new_key1_setting"]').keyup(function () {
             var that = this;
             $('datalist#settings_value_vars').empty();
             var key = $('input[name="new_key_setting"]').val();
             var key1 = $(that).val();
-            if (settings_hbs[key] != undefined){
-                if (settings_hbs[key].value[key1] != undefined){
-                    $('datalist#settings_value_vars').append('<option value="'+ settings_hbs[key].value[key1] +'">');
+            if (settings_hbs[key] != undefined) {
+                if (settings_hbs[key].value[key1] != undefined) {
+                    $('datalist#settings_value_vars').append('<option value="' + settings_hbs[key].value[key1] + '">');
                 }
             }
         });
@@ -447,57 +449,57 @@ define(function(require) {
         $('button#setting_new_field').click(function () {
             var new_key = $('input[name="new_key_setting"]').val();
             var new_key1 = $('input[name="new_key1_setting"]').val();
-            var new_val =  $('input[name="new_value_setting"]').val();
+            var new_val = $('input[name="new_value_setting"]').val();
             var len = settings_hbs.length;
 
-            if (new_key != '' && new_val != ''){
+            if (new_key != '' && new_val != '') {
 
-                if (settings_hbs[new_key] != undefined){
-                    if (settings_hbs[new_key].bool_tree == true && new_key1 != ''){
-                        if (settings_hbs[new_key].value[new_key1] != undefined){
-                            $('.tr_setting_'+new_key.replace(/\./g,'\\.')).nextAll('.tr_setting_'+new_key1.replace(/\./g,'\\.')).children('.td_value_setting').text(new_val);
+                if (settings_hbs[new_key] != undefined) {
+                    if (settings_hbs[new_key].bool_tree == true && new_key1 != '') {
+                        if (settings_hbs[new_key].value[new_key1] != undefined) {
+                            $('.tr_setting_' + new_key.replace(/\./g, '\\.')).nextAll('.tr_setting_' + new_key1.replace(/\./g, '\\.')).children('.td_value_setting').text(new_val);
                             settings_hbs[new_key].value[new_key1] = new_val;
                             //set_events();
-                        }else{
+                        } else {
                             var pre_name = [];
-                            for(var j in settings_hbs[new_key].value){
+                            for (var j in settings_hbs[new_key].value) {
                                 pre_name.push(j);
                             }
                             var last_name = pre_name[pre_name.length - 1];
-                            if ($('.tr_setting_'+new_key.replace(/\./g,'\\.')).nextAll('.tr_setting_'+last_name.replace(/\./g,'\\.')).css('display') == 'none'){
+                            if ($('.tr_setting_' + new_key.replace(/\./g, '\\.')).nextAll('.tr_setting_' + last_name.replace(/\./g, '\\.')).css('display') == 'none') {
                                 var styl = 'display: none;';
-                            }else{
+                            } else {
                                 var styl = 'display: table-row';
                             }
 
-                            $('.tr_setting_'+new_key.replace(/\./g,'\\.')).nextAll('.tr_setting_'+last_name.replace(/\./g,'\\.')).after('<tr class="tr_setting_'+new_key1+'" style="'+styl+'">' +
-                                '<td class="td_key_setting" style="text-align: center;">'+new_key1+'</td>' +
-                                '<td class="td_value_setting">'+new_val+'</td>' +
+                            $('.tr_setting_' + new_key.replace(/\./g, '\\.')).nextAll('.tr_setting_' + last_name.replace(/\./g, '\\.')).after('<tr class="tr_setting_' + new_key1 + '" style="' + styl + '">' +
+                                '<td class="td_key_setting" style="text-align: center;">' + new_key1 + '</td>' +
+                                '<td class="td_value_setting">' + new_val + '</td>' +
                                 '<td style="width: 60px;">' +
                                 '<span id="div_edit_setting">' +
-                                '<a id="div_edit_'+new_key1+'" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
+                                '<a id="div_edit_' + new_key1 + '" class="edit_e" href="#"> <i class="fa fa-pencil-square-o"></i></a>' +
                                 '</span>' +
                                 '<span id="div_minus_setting">' +
-                                '<a id="div_minus_'+new_key1+'" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
+                                '<a id="div_minus_' + new_key1 + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                                 '</span></td></tr>'
                             );
 
                             settings_hbs[new_key].value[new_key1] = new_val;
-                            $('.tr_setting_'+new_key.replace(/\./g,'\\.')).children('.td_key_setting').children('small').text('');
-                            if (pre_name.length > 1){
-                                $('.tr_setting_'+new_key.replace(/\./g,'\\.')).children('.td_key_setting').children('small').append('&emsp;'+pre_name[0]+', '+pre_name[1]+'...');
-                            }else{
-                                $('.tr_setting_'+new_key.replace(/\./g,'\\.')).children('.td_key_setting').children('small').append('&emsp;'+pre_name[0]+', '+new_key1);
+                            $('.tr_setting_' + new_key.replace(/\./g, '\\.')).children('.td_key_setting').children('small').text('');
+                            if (pre_name.length > 1) {
+                                $('.tr_setting_' + new_key.replace(/\./g, '\\.')).children('.td_key_setting').children('small').append('&emsp;' + pre_name[0] + ', ' + pre_name[1] + '...');
+                            } else {
+                                $('.tr_setting_' + new_key.replace(/\./g, '\\.')).children('.td_key_setting').children('small').append('&emsp;' + pre_name[0] + ', ' + new_key1);
                             }
                             set_events();
                         }
-                    }else{
-                        if (settings_hbs[new_key].bool_tree == false){
-                            $('.tr_setting_'+new_key.replace(/\./g,'\\.')).children('.td_value_setting').text(new_val);
+                    } else {
+                        if (settings_hbs[new_key].bool_tree == false) {
+                            $('.tr_setting_' + new_key.replace(/\./g, '\\.')).children('.td_value_setting').text(new_val);
                         }
                         set_events();
                     }
-                }else {
+                } else {
                     if (new_key1 == '') {
                         $('tbody#settings_body').append('<tr class="tr_setting_' + new_key + '">' +
                             '<td class="td_key_setting" style="font-weight: bold;">' +
@@ -512,9 +514,9 @@ define(function(require) {
                             '<a id="div_minus_' + new_key + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                             '</span></td></tr>'
                         );
-                        settings_hbs[new_key] = {bool_tree: false, value: new_val};
+                        settings_hbs[new_key] = { bool_tree: false, value: new_val };
                         set_events();
-                    }else{
+                    } else {
                         $('tbody#settings_body').append('<tr class="tr_setting_' + new_key + '">' +
                             '<td class="td_key_setting" style="font-weight: bold;">' +
                             '<span id="setting_tree_circle">' +
@@ -531,7 +533,7 @@ define(function(require) {
                             '<a id="div_minus_' + new_key1 + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                             '</span></td></tr>'
                         );
-                        settings_hbs[new_key] = {bool_tree: true, value: {}};
+                        settings_hbs[new_key] = { bool_tree: true, value: {} };
                         settings_hbs[new_key].value[new_key1] = new_val;
                         set_events();
                     }
@@ -540,88 +542,88 @@ define(function(require) {
         });
 
         $('#settings_but_submit').click(function () {
-            for(var i in settings_hbs){
-                if (settings[i] != undefined){
-                    if (settings_hbs[i].bool_tree == true){
-                        if (JSON.stringify(settings_hbs[i].value) != settings[i]){
+            for (var i in settings_hbs) {
+                if (settings[i] != undefined) {
+                    if (settings_hbs[i].bool_tree == true) {
+                        if (JSON.stringify(settings_hbs[i].value) != settings[i]) {
 
-                            var keys = {'added':[],'changed':[],'deleted':[]};
+                            var keys = { 'added': [], 'changed': [], 'deleted': [] };
                             var obj_sett = JSON.parse(settings[i]);
-                            for(var j in settings_hbs[i].value){
-                                if (obj_sett[j] == undefined){
+                            for (var j in settings_hbs[i].value) {
+                                if (obj_sett[j] == undefined) {
                                     keys.added.push(j);
-                                }else if (settings_hbs[i].value[j] != obj_sett[j]){
+                                } else if (settings_hbs[i].value[j] != obj_sett[j]) {
                                     keys.changed.push(j);
                                 }
                             }
-                            for(var j in obj_sett){
-                                if (settings_hbs[i].value[j] == undefined){
+                            for (var j in obj_sett) {
+                                if (settings_hbs[i].value[j] == undefined) {
                                     keys.deleted.push(j);
                                 }
                             }
                             $.ajax({
-                                url: '/settings/'+i,
+                                url: '/settings/' + i,
                                 type: 'POST',
-                                data: '{"body":"'+ getBodyStr(settings_hbs[i].value) +'"}',
-                                success: function(msg) {
+                                data: '{"body":"' + getBodyStr(settings_hbs[i].value) + '"}',
+                                success: function (msg) {
 
                                 }
                             });
-                            for(var j in keys){
-                                if (keys[j].length != 0){
-                                    Notifier.notifySubmit('Field have been '+ j,keys[j],i);
+                            for (var j in keys) {
+                                if (keys[j].length != 0) {
+                                    Notifier.notifySubmit('Field have been ' + j, keys[j], i);
                                 }
                             }
                             settings[i] = JSON.stringify(settings_hbs[i].value);
                         }
-                    }else{
-                        if (settings_hbs[i].value != settings[i]){
+                    } else {
+                        if (settings_hbs[i].value != settings[i]) {
                             $.ajax({
-                                url: '/settings/'+i,
+                                url: '/settings/' + i,
                                 type: 'POST',
-                                data: '{"body":"'+ settings_hbs[i].value +'"}',
-                                success: function(msg) {
+                                data: '{"body":"' + settings_hbs[i].value + '"}',
+                                success: function (msg) {
 
                                 }
                             });
-                            Notifier.notifySubmit('Field have been changed',i);
+                            Notifier.notifySubmit('Field have been changed', i);
                             settings[i] = settings_hbs[i].value;
                         }
                     }
-                }else{
-                    if (settings_hbs[i].bool_tree == true){
+                } else {
+                    if (settings_hbs[i].bool_tree == true) {
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
-                            data: '{"name":"'+i+'","body":"'+  getBodyStr(settings_hbs[i].value) +'"}',
-                            success: function(msg) {
+                            data: '{"name":"' + i + '","body":"' + getBodyStr(settings_hbs[i].value) + '"}',
+                            success: function (msg) {
 
                             }
                         });
-                        Notifier.notifySubmit('Field have been added',Object.keys(settings_hbs[i].value),i);
+                        Notifier.notifySubmit('Field have been added', Object.keys(settings_hbs[i].value), i);
                         settings[i] = JSON.stringify(settings_hbs[i].value);
-                    }else{
+                    } else {
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
-                            data: '{"name":"'+ i +'","body":"'+ settings_hbs[i].value +'"}',
-                            success: function(msg) {
+                            data: '{"name":"' + i + '","body":"' + settings_hbs[i].value + '"}',
+                            success: function (msg) {
 
                             }
                         });
-                        Notifier.notifySubmit('Field have been added',i);
+                        Notifier.notifySubmit('Field have been added', i);
                         settings[i] = settings_hbs[i].value;
                     }
                 }
             }
             var del_key = [];
-            for(var i in settings){
-                if (settings_hbs[i] == undefined){
+            for (var i in settings) {
+                if (settings_hbs[i] == undefined) {
                     $.ajax({
-                        url: '/settings/'+i,
+                        url: '/settings/' + i,
                         type: 'DELETE',
-                        data: '{"name":"'+i+'"}',
-                        success: function(msg) {
+                        data: '{"name":"' + i + '"}',
+                        success: function (msg) {
 
                         }
                     });
@@ -629,8 +631,8 @@ define(function(require) {
                     delete settings[i];
                 }
             }
-            if (del_key.length != 0){
-                Notifier.notifySubmit('Field has been deleted',del_key);
+            if (del_key.length != 0) {
+                Notifier.notifySubmit('Field has been deleted', del_key);
             }
 
             rezerv_clone_settings = $('tbody#settings_body').clone();
@@ -643,14 +645,14 @@ define(function(require) {
     function getBodyStr(obj) {
         var body_str = '{';
         var keys = Object.keys(obj);
-        var last_item = keys[keys.length -1];
+        var last_item = keys[keys.length - 1];
         var val1;
-        for(var k in obj){
+        for (var k in obj) {
             val1 = JSON.stringify(JSON.stringify(obj[k]));
-            if (last_item != k){
-                body_str += '\\"'+k+'\\":\\"'+val1.slice(3,val1.length-3)+'\\",';
-            }else{
-                body_str += '\\"'+k+'\\":\\"'+val1.slice(3,val1.length-3)+'\\"}';
+            if (last_item != k) {
+                body_str += '\\"' + k + '\\":\\"' + val1.slice(3, val1.length - 3) + '\\",';
+            } else {
+                body_str += '\\"' + k + '\\":\\"' + val1.slice(3, val1.length - 3) + '\\"}';
             }
         }
         return body_str;

@@ -11,6 +11,7 @@ puts 'Getting path to the server'
 ROOT = SUNSTONE_ROOT_DIR + '/ione/server' # IONe root path
 LOG_ROOT = LOG_LOCATION # IONe logs path
 
+# Shows if current IONe Sunstone process was started by systemd(first time so). True or False
 MAIN_IONE = Process.ppid == 1
 
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)

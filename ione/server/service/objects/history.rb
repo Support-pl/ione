@@ -1,13 +1,17 @@
+# VMs History Records representation class(linked to VM)
 class OpenNebula::History
     require 'nori'
 
     attr_reader :id, :records
 
+    # @param [Fixnum] id - VM ID
+    # @param [OpenNebula::Client] client
     def initialize id, client
         @client = client
         @id = id
         @parser = Nori.new
     end
+    # Getting history records from DB[table :history] and parsing them(from XML)
     def info
         rc = System.new(@client).sql_query_command("SELECT body FROM history WHERE vid=#{@id}")
         rc = @parser.parse rc
@@ -26,5 +30,6 @@ class OpenNebula::History
     end
     alias_method :info!, :info
 
+    # No records in DB Exception    
     class NoRecordsError < StandardError; end
 end
