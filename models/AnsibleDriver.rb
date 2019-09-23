@@ -47,7 +47,7 @@ end
 
 class AnsiblePlaybookModel
 
-    attr_reader     :method, :id
+    attr_reader    :method, :id
     attr_accessor  :body
 
     # Each number is corresponds to position at ACTIONS
@@ -55,10 +55,10 @@ class AnsiblePlaybookModel
         'chown'          => 2,
         'chgrp'          => 2,
         'chmod'          => 2,
-        'run'             => 0,
+        'run'            => 0,
         'update'         => 1,
         'delete'         => 2,
-        'vars'            => 0,
+        'vars'           => 0,
         'clone'          => 0,
         'rename'         => 1  }
 
@@ -71,10 +71,10 @@ class AnsiblePlaybookModel
             @params = data
             begin
                 # Check if mandatory params are not nil
-                check =  @params['name'].nil?                             ||
-                            @params['body'].nil?                             ||
-                            @params['extra_data'].nil?                     ||
-                            @params['extra_data']['PERMISSIONS'].nil?
+                check = @params['name'].nil?                       ||
+                        @params['body'].nil?                       ||
+                        @params['extra_data'].nil?                 ||
+                        @params['extra_data']['PERMISSIONS'].nil?
             rescue
                 raise ParamsError.new @params # Custom error if extra_data is nil
             end
@@ -350,7 +350,7 @@ class AnsiblePlaybookProcessModel
      class NoAccessError < StandardError # Custom error for no access exceptions. Returns string contain which action is blocked
          def initialize action
              super()
-             @action = AnsiblePlaybook::ACTIONS[action]
+             @action = AnsiblePlaybookModel::ACTIONS[action]
          end
          def message
              "Not enough rights to perform action: #{@action}!"

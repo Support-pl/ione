@@ -90,11 +90,10 @@ class OpenNebula::VirtualMachine
     # @return [Boolean]
     def wait_for_state(s = 3, lcm_s = 3)
         i = 0
-        until state() == s && lcm_state() == lcm_s do
+        until state!() == s && lcm_state!() == lcm_s do
             return false if i >= 3600
             sleep(1)
             i += 1
-            self.info!
         end
         true
     end

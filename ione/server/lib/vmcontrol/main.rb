@@ -169,22 +169,24 @@ class IONe
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'Terminate') }
                   
-        begin
-            LOG "Terminate query call params: {\"userid\" => #{userid}, \"vmid\" => #{vmid}}", "Terminate"
-            # If userid will be nil oneadmin account can be broken
-            if userid == nil || vmid == nil then
-                LOG "Terminate query rejected! 1 of 2 params is nilClass!", "Terminate"
-                return 1
-            elsif userid == 0 then
-                LOG "Terminate query rejected! Tryed to delete root-user(oneadmin)", "Terminate"
-            end
-            Delete(userid)
-            LOG "Terminating VM#{vmid}", "Terminate"
-            onblock(VirtualMachine, vmid).recover 3
-        rescue => err
-            return err
+        LOG "Terminate query call params: {\"userid\" => #{userid}, \"vmid\" => #{vmid}}", "Terminate"
+        # If userid will be nil oneadmin account can be broken
+        if userid == nil || vmid == nil then
+            LOG "Terminate query rejected! 1 of 2 params is nilClass!", "Terminate"
+            return 1
+        elsif userid == 0 then
+            LOG "Terminate query rejected! Tryed to delete root-user(oneadmin)", "Terminate"
         end
-        0
+        Delete(userid)
+        LOG "Terminating VM#{vmid}", "Terminate"
+        Thread.new do
+            vm = onblock(:vm, vmid)
+            vm.poweroff
+            vm.wait_for_state 8, 0
+            onblock(VirtualMachine, vmid).recover 3
+        end
+    rescue => err
+        return err
     end
     # Powering off VM
     # @note Don't user OpenNebula::VirtualMachine#shutdown - this method deletes VM's
