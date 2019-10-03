@@ -181,10 +181,14 @@ class IONe
         LOG "Terminating VM#{vmid}", "Terminate"
         Thread.new do
             vm = onblock(:vm, vmid)
-            vm.poweroff
-            vm.wait_for_state 8, 0
-            onblock(VirtualMachine, vmid).recover 3
+            begin
+                vm.poweroff
+                vm.wait_for_state 8, 0
+            ensure
+                onblock(:vm, vmid).recover(3)
+            end
         end
+        true
     rescue => err
         return err
     end
