@@ -314,6 +314,7 @@ class IONe
             vm.terminate true
         end
         u.delete
+        true
     rescue => e
         LOG_DEBUG e.message
     end
