@@ -38,6 +38,7 @@ class IONe
     # @param [Hash] params - all needed data for VM reinstall
     # @option params [Integer] :vmid - VirtualMachine for Reinstall ID
     # @option params [Integer] :userid - new Virtual Machine owner
+    # @option params [Integer] :groupid - new Virtual Machine group
     # @option params [String] :username - Administrator username for Windows Machines
     # @option params [String] :passwd Password for new Virtual Machine 
     # @option params [Integer] :templateid - templateid for Instantiate
@@ -111,6 +112,7 @@ class IONe
                 'SSH_PUBLIC_KEY' => context['CONTEXT']['SSH_PUBLIC_KEY']
             }
             context['CONTEXT']['USERNAME'] = params['username'] if win
+            context['NIC'] = [context['NIC']] if context['NIC'].class == Hash
             context['NIC'].map! do |nic| 
                 nic.without(
                     'TARGET', 'MAC', 'NAME', 'SECURITY_GROUPS',
@@ -118,6 +120,7 @@ class IONe
                     'CLUSTER_ID', 'AR_ID', 'NETWORK', 'NETWORK_UNAME'
                 )
             end
+            context['NIC'] = context['NIC'].last if context['NIC'].size == 1
             trace << "Generating specs configuration:#{__LINE__ + 1}"
             context.merge!({
                 "VCPU" => params['cpu'],
@@ -203,6 +206,88 @@ class IONe
         rescue => e
             LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
             return e.message, trace
+    end
+    def ReinstallTest params, trace
+        vmid = params['vmid']
+        
+        vm = onblock :vm, vmid
+
+        vm.info!
+        raise "Multi-disk VMs aren't supported" if vm.to_hash['VM']['TEMPLATE']['DISK'].class != Hash
+
+        # Deleting old VM
+        vm.recover 4
+        vm.wait_for_state 1, 0
+        vm.info!
+
+        # Getting VM template
+        body = @db[:vm_pool].where(oid: vmid).select(:body).to_a.last[:body]
+        body = Nokogiri::XML(body)
+        body_old = body.clone
+
+        # Collecting data
+        host = get_vm_host vm, true
+        template = onblock :t, params['templateid']
+        template.info!
+        img = onblock :i, template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID']
+        img.info!
+        ds = onblock :ds, img['/IMAGE/DATASTORE_ID']
+        ds.info!
+
+        modify = {
+            '//DEPLOY_ID' => '',
+            '//TEMPLATE/VCPU' => params['cpu'],
+            '//TEMPLATE/MEMORY' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+            '//TEMPLATE/TEMPLATE_ID' => params['templateid'],
+            '//TEMPLATE/DISK/CLUSTER_ID' => ds.to_hash['DATASTORE']['CLUSTERS']['ID'].join(','),
+            '//TEMPLATE/DISK/DATASTORE' => ds.name,
+            '//TEMPLATE/DISK/DATASTORE_ID' => ds.id,
+            '//TEMPLATE/DISK/IMAGE' => img.name,
+            '//TEMPLATE/DISK/IMAGE_ID' => img.id,
+            '//TEMPLATE/DISK/SOURCE' => img['/IMAGE/SOURCE']
+        }
+        remove = [
+            # '//TEMPLATE/DISK'
+        ]
+        
+        modify.each do | at, to |
+            body.at(at).content = to
+        end
+        remove.each do | at |
+            body.at(at).remove unless body.at(at).nil?
+        end
+
+        # disk_node = Nokogiri::XML::Node.new("DISK", body)
+        # disk_attrs = {
+        #     'IMAGE_ID' => img.id,
+        #     'SIZE' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+        #     'OPENNEBULA_MANAGED' => 'NO',
+        #     'VCENTER_DS_REF' => ds['/DATASTORE/TEMPLATE/VCENTER_DS_REF'],
+        #     'VCENTER_INSTANCE_ID' => ds['/DATASTORE/TEMPLATE/VCENTER_INSTANCE_ID'],
+        #     'SOURCE' => img['/IMAGE/SOURCE'],
+        #     'DATASTORE_ID' => ds.id,
+
+        # }
+        # disk_attrs.each do | attr, val |
+        #     node = Nokogiri::XML::Node.new(attr, body)
+        #     node.content = val
+        #     disk_node.add_child node
+        # end
+
+        # body.at('//TEMPLATE').add_child(disk_node)
+
+        puts body = body.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION | Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS).strip
+ 
+        unless Nokogiri::XML(body).errors.empty?
+            puts body
+            raise "XML-build failed"
+        end
+
+        @db[:vm_pool].where(oid: vmid).update(body: body)
+
+        vm.deploy(host.last, false, ChooseDS(params['ds_type']))
+
+        return { 'vmid' => vmid, 'ip' => GetIP(vmid, true), 'old_body' => body_old }
     end
     # Creates new virtual machine from the given OS template and resize it to given specs, and new user account, which becomes owner of this VM 
     # @param [Hash] params - all needed data for new User and VM creation
@@ -423,14 +508,16 @@ class IONe
 
         LOG_AUTO 'Post-Deploy joblist defined, basic installation job ended'
         return out = {'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid)}
-    rescue => e
-        out = { :exception => e.message, :trace => trace << 'END_TRACE' }
-        LOG_DEBUG out.debug_out
-        out[:params] = params
-        return out
-    ensure
-        onblock(:u, vmid).recover(3)    if defined? vmid
-        onblock(:u, userid).delete      if defined? userid
+    rescue => err
+        begin
+            out = { :exception => err.message, :trace => trace << 'END_TRACE' }
+            LOG_DEBUG out.debug_out
+            out[:params] = params
+            return out
+        ensure
+            onblock(:vm, vmid).recover(3)    if defined? vmid
+            onblock(:u, userid).delete      if defined? userid
+        end
     end
     # Class for pst-deploy activities methods
     #   All methods will receive creative methods params, new vm ID, and host, where VM was deployed
