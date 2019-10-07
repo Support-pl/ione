@@ -505,7 +505,6 @@ class OpenNebula::VirtualMachine
                 "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
                 "TOTAL" => timeline.inject(0){|total, record| total + record['TOTAL']}
             }
-
         end
     rescue OpenNebula::Records::NoRecordsError
         return {
@@ -521,7 +520,17 @@ class OpenNebula::VirtualMachine
             "TOTAL" => 0
         }
     end
+    def JSONObject ione
+        info!
+        res = {}
+        res['id'] = id
+        res['name'] = name
+        res['ip'] = ione.GetIP self
+        res['state'] = state_str
+        res['lcm_state'] = lcm_state_str
 
+        JSON.generate res
+    end
     # Error while processing(calculating) showback Exception
     class ShowbackError < StandardError
 

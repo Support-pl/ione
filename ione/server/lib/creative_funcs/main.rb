@@ -58,9 +58,6 @@ class IONe
     #   Debug return fake data: { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0', 'ip_old' => '0.0.0.0' } 
     def Reinstall(params, trace = ["Reinstall method called:#{__LINE__}"])
         LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true)
-        defer { LOG_CALL(id, false, 'Reinstall') }
             params.to_s!
             LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
             return nil if params['debug'] == 'turn_method_off'
@@ -177,7 +174,7 @@ class IONe
                 end
 
                 vm = onblock(:vm, vmid)
-                LOG_DEBUG 'Deploying VM to the host'
+                LOG_DEBUG "Deploying VM to the host ##{host}"
                 vm.deploy(host, false, ChooseDS(params['ds_type']))
                 LOG_DEBUG 'Waiting until VM will be deployed'
                 vm.wait_for_state
@@ -575,7 +572,7 @@ class IONe
                     LOG_ERROR "Limits was not set, error: #{err}"
                     LOG_DEBUG "Limits was not set, error: #{err}\n#{back}"
                 end
-            end if ClusterType(host) == 'vcenter'
+            end if ClusterType(host.id) == 'vcenter'
         end
         # If VM is trial, starts time and schedule suspend method
         def TrialController(params, vmid, host = nil)

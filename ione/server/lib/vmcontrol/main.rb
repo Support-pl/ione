@@ -182,10 +182,14 @@ class IONe
         Thread.new do
             vm = onblock(:vm, vmid)
             begin
-                vm.poweroff
-                vm.wait_for_state 8, 0
+                rc = vm.resume
+                raise rc if rc.class == OpenNebula::Error
+                vm.wait_for_state
+            rescue
             ensure
-                onblock(:vm, vmid).recover(3)
+                vm.recover(4)
+                vm.wait_for_state 1, 0
+                vm.terminate(true)
             end
         end
         true

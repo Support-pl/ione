@@ -169,11 +169,61 @@ server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{$ione_conf['S
 LOG_COLOR "Server initialized", 'none', 'green'
 
 puts 'Pre-init job ended, starting up server'
-Thread.new do
-    begin
-        server.server_loop # Server start
-    rescue => e
-        LOG_ERROR "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
-        puts "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
+if !defined?(DEBUG_LIB) && MAIN_IONE then
+    Thread.new do
+        begin
+            server.server_loop # Server start
+        rescue => e
+            LOG_ERROR "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
+            puts "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
+        end
     end
-end if !defined?(DEBUG_LIB) && MAIN_IONE
+
+    IONeAPIServerThread = Thread.new do
+        require 'pry-remote'
+        class IONeAPIServer < Sinatra::Base
+            set :bind, '0.0.0.0'
+            set :port, 8009
+
+            before do
+                @request_body = request.body.read
+            end
+
+            get '/' do
+                'Hello, World! via IONe Web API'
+            end
+            post '/ione/:method' do | method |
+                begin
+                    args = JSON.parse(@request_body)
+                    u = User.new_with_id(-1, Client.new(args['auth']))
+                    rc = u.info!
+                    if OpenNebula.is_error?(rc)
+                        raise "False Credentials given"
+                    end
+                    RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
+                    r = IONe.new(Client.new(params['auth']), $db).send(method, *args['params'])
+                rescue => e
+                    r = e.message
+                    backtrace = e.backtrace
+                end
+                RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+                RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+                JSON.pretty_generate response: r
+            end
+            get %r{one\.(\w+)\.(\w+)} do
+                JSON.pretty_generate params[:captures]
+            end
+        end
+
+        RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
+        begin
+            run IONeAPIServer.run!
+        rescue StandardError => e
+            RPC_LOGGER.debug e.message
+        end
+    end
+
+    at_exit do
+        IONeAPIServerThread.kill
+    end
+end
