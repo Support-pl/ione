@@ -22,10 +22,16 @@ post '/vm/:id/reinstall' do | id |
       vm = IONe.new($client, $db).get_vm_data(id.to_i)
 
       template = OpenNebula::Template.new_with_id(data['template_id'], @one_client)
-      template.info!
+      r = template.info!
+      if OpenNebula.is_error? r then
+         raise "Access Error, contact support."
+      end
       image = OpenNebula::Image.new_with_id(template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID'], @one_client)
-      image.info!
-      
+      r = image.info!
+      if OpenNebula.is_error? r then
+         raise "Access Error, contact support."
+      end
+
       if !(@one_user.id == vm['OWNERID'].to_i || @one_user.groups.include?(0)) then
          r error: "User is not OWNER for given VM"
       elsif vm['DRIVE'].to_i < image['/IMAGE/SIZE'].to_i then

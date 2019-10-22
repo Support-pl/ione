@@ -136,13 +136,11 @@ begin
     $ione_conf['Scripts'].each do | script |
         puts "\tIncluding #{script}"
         begin
-            Thread.new do
-                require "#{ROOT}/scripts/#{script}/main.rb"
-            end
-                LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
-            rescue => e
-                LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
-                puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
+            Thread.new { require "#{ROOT}/scripts/#{script}/main.rb" }
+            LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
+        rescue => e
+            LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
+            puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
         end
     end if $ione_conf['Scripts'].class == Array
 rescue => e

@@ -200,9 +200,9 @@ class IONe
             ##### PostDeploy Activity define END #####
 
             return { 'vmid' => vmid, 'vmid_old' => params['vmid'], 'ip' => GetIP(vmid, true), 'ip_old' => GetIP(vm) }
-        rescue => e
-            LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
-            return e.message, trace
+    rescue => e
+        LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
+        return e.message, trace
     end
     def ReinstallTest params, trace
         vmid = params['vmid']

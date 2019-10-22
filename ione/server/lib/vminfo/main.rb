@@ -13,7 +13,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'VM_XML') }
-        vm = onblock(VirtualMachine, vmid)
+        vm = onblock(:vm, vmid)
         vm.info! || vm.to_xml
     end
     # Returns VM's IP by ID
@@ -106,6 +106,8 @@ class IONe
     # @return [Hash] Data(name, owner-name, owner-id, group id, ip, host, state, cpu, ram, datastore type, disk size imported)
     def get_vm_data(vm)
         vm = onblock(:vm, vm) if vm.class == Fixnum || vm.class == String
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
         vmid = vm.id
         vm_hash = vm.to_hash!['VM']
         hostname, host_id = get_vm_host(vm, true)
@@ -128,6 +130,8 @@ class IONe
             # VM creation hist
             'IMPORTED' => vm_hash['TEMPLATE']['IMPORTED'].nil? ? 'NO' : 'YES'
         }
+    rescue => e
+        return e.message
     end
     # Getting snapshot list for given VM
     # @param [Integer] vmid - VM ID
@@ -138,6 +142,6 @@ class IONe
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'GetSnapshotList') }
              
-        onblock(VirtualMachine, vmid).list_snapshots
+        onblock(:vm, vmid).list_snapshots
     end
 end

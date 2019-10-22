@@ -21,7 +21,9 @@ class IONe
             LOG "Suspending VM#{params['vmid']}", "Suspend" if log
             LOG "Params: #{params.inspect} | log = #{log}", "Suspend" if log
             trace << "Creating VM object:#{__LINE__ + 1}"
-            onblock(VirtualMachine, params['vmid'].to_i) do | vm |
+            onblock(:vm, params['vmid'].to_i) do | vm |
+                r = vm.info!
+                raise r if OpenNebula.is_error? r
                 begin
                     trace << "Suspending VM:#{__LINE__ + 1}"
                     vm.suspend
@@ -46,7 +48,11 @@ class IONe
     # @param [Integer] vmid - VirtualMachine ID
     # @return [NilClass]
     def SuspendVM(vmid)
-        onblock(VirtualMachine, vmid.to_i).suspend
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        onblock(:vm, vmid.to_i).suspend
+    rescue => e
+        return e.message
     end
     # Suspends all given users VMs
     # @param [Integer] uid - User ID
@@ -95,7 +101,9 @@ class IONe
             begin
                 LOG "Resuming VM ##{params['vmid']}", "Resume"
                 trace << "Creating VM object:#{__LINE__ + 1}"            
-                onblock(VirtualMachine, params['vmid'].to_i) do | vm |
+                onblock(:vm, params['vmid'].to_i) do | vm |
+                    r = vm.info!
+                    raise r if OpenNebula.is_error? r
                     trace << "Resuming VM:#{__LINE__ + 1}"                
                     vm.resume
                     trace << "Changing user rights:#{__LINE__ + 1}"                
@@ -157,7 +165,12 @@ class IONe
         return "VMID cannot be nil!" if vmid.nil?     
         LOG "Rebooting VM#{vmid}", "Reboot"
         LOG "Params: vmid = #{vmid}, hard = #{hard}", "DEBUG" #if DEBUG
-        onblock(VirtualMachine, vmid.to_i).reboot(hard) # reboots 'hard' if true
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.reboot(hard) # reboots 'hard' if true
+    rescue => e
+        return e.message
     end
     # Terminates(deletes) user account and VM
     # @param [Integer] userid - user to delete
@@ -179,11 +192,13 @@ class IONe
         end
         Delete(userid)
         LOG "Terminating VM#{vmid}", "Terminate"
+        vm = onblock(:vm, vmid)
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
         Thread.new do
-            vm = onblock(:vm, vmid)
             begin
                 rc = vm.resume
-                raise rc if rc.class == OpenNebula::Error
+                raise rc if OpenNebula.is_error? rc
                 vm.wait_for_state
             rescue
             ensure
@@ -194,7 +209,7 @@ class IONe
         end
         true
     rescue => err
-        return err
+        return err.messages
     end
     # Powering off VM
     # @note Don't user OpenNebula::VirtualMachine#shutdown - this method deletes VM's
@@ -207,7 +222,12 @@ class IONe
         defer { LOG_CALL(id, false, 'Shutdown') }
                 
         LOG "Shutting down VM#{vmid}", "Shutdown"
-        onblock(VirtualMachine, vmid).poweroff
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.poweroff
+    rescue => e
+        return e.message
     end
     # @!visibility private
     # Releases hold-state VM
@@ -218,7 +238,12 @@ class IONe
         defer { LOG_CALL(id, false, 'Release') }
 
         LOG "New Release Order Accepted!", "Release"
-        onblock(VirtualMachine, vmid).release
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.release
+    rescue => e
+        return e.message
     end
     # Deletes given user by ID
     # @param [Integer] userid
@@ -233,7 +258,7 @@ class IONe
             LOG "Delete query rejected! Tryed to delete root-user(oneadmin)", "Delete"
         end
         LOG "Deleting User ##{userid}", "Delete"
-        onblock(User, userid).delete
+        onblock(:u, userid).delete
     end
     # Powers On given VM if powered off, or unsuspends if suspended by ID
     # @param [Integer] vmid
@@ -244,10 +269,14 @@ class IONe
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'Resume') }
 
-        onblock(VirtualMachine, vmid.to_i) do | vm |
+        onblock(:vm, vmid.to_i) do | vm |
+            r = vm.info!
+            raise r if OpenNebula.is_error? r
             vm.unschedule(0) if trial
             vm.resume
         end
+    rescue => e
+        return e.message
     end
     # Removes choosen snapshot for given VM
     # @param [Integer] vmid - VM ID
@@ -261,7 +290,7 @@ class IONe
         defer { LOG_CALL(id, false, 'RMSnapshot') }
 
         LOG "Deleting snapshot(ID: #{snapid.to_s}) for VM#{vmid.to_s}", "SnapController" if log
-        onblock(VirtualMachine, vmid.to_i).snapshot_delete(snapid.to_i)
+        onblock(:vm, vmid.to_i).snapshot_delete(snapid.to_i)
     end
     # Making new snapshot for given VM with given name
     # @param [Integer] vmid - VM ID
@@ -275,7 +304,12 @@ class IONe
         defer { LOG_CALL(id, false, 'MKSnapshot') }
 
         LOG "Snapshot create-query accepted", 'SnapController' if log
-        onblock(VirtualMachine, vmid.to_i).snapshot_create(name)
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.snapshot_create(name)
+    rescue => e
+        return e.message
     end
     # Reverts choosen snapshot for given VM
     # @param [Integer] vmid - VM ID
@@ -289,7 +323,12 @@ class IONe
         defer { LOG_CALL(id, false, 'RevSnapshot') }
         
         LOG "Snapshot revert-query accepted", 'SnapController' if log
-        onblock(VirtualMachine, vmid.to_i).snapshot_revert(snapid.to_i)
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.snapshot_revert(snapid.to_i)
+    rescue => e
+        return e.message
     end
 
     # temp

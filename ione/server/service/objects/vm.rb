@@ -120,7 +120,7 @@ class OpenNebula::VirtualMachine
         LOG_DEBUG spec.debug_out
         return 'Unsupported query' if IONe.new($client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'        
         
-        query, host = {}, onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+        query, host = {}, onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
         datacenter = get_vcenter_dc(host)
 
         vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
@@ -161,7 +161,7 @@ class OpenNebula::VirtualMachine
     end
     # Checks if vm is on given vCenter Datastore
     def is_at_ds?(ds_name)
-        host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+        host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
         datacenter = get_vcenter_dc(host)
         begin
             datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
@@ -178,7 +178,7 @@ class OpenNebula::VirtualMachine
     # Gets the datastore, where VM allocated is
     # @return [String] DS name
     def get_vms_vcenter_ds
-        host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+        host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
         datastores = get_vcenter_dc(host).datastoreFolder.children
         
         self.info!
@@ -199,7 +199,7 @@ class OpenNebula::VirtualMachine
     def hot_resize(spec = {:name => nil})
         return false if !self.hotAddEnabled?
         begin
-            host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+            host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
 
             vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
@@ -239,7 +239,7 @@ class OpenNebula::VirtualMachine
     # @return [true | String]
     def hotResourcesControlConf(spec = {:cpu => true, :ram => true, :name => nil})
         begin
-            host, name = onblock(Host, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
+            host, name = onblock(:h, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
             datacenter = get_vcenter_dc(host)
 
             vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
@@ -274,7 +274,7 @@ class OpenNebula::VirtualMachine
     # @return [Hash | String] Returns limits Hash if success or exception message if fails
     def getResourcesAllocationLimits(name = nil)
         begin
-            host = onblock(Host, IONe.new($client, $db).get_vm_host(self.id))
+            host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
 
             vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
