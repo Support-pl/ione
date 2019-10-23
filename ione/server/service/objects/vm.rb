@@ -17,6 +17,10 @@ class OpenNebula::VirtualMachine
         undeploy-hard
         snapshot-create
     )
+    BILLING_PERIODS = [
+        "0", # Pay-as-you-Go -- default
+        /\d/, # Number of days
+    ]
     # Generates template for OpenNebula scheduler record
     def generate_schedule_str(id, action, time)
         "\nSCHED_ACTION=[\n" + 
@@ -383,6 +387,17 @@ class OpenNebula::VirtualMachine
 
         records = OpenNebula::Records.new(id).records
     
+        unless self['//BILLING_PERIOD'].to_i == 0 then
+            
+            stime = records.select{|r| r[:state] != 'pnd'}.sort_by{|r| r[:time]}.first[:time]
+            periods = 1
+            periods += (etime - stime) / (self['//BILLING_PERIOD'].to_i * 86400)
+            
+            return {"work_time" => etime - stime, "EXCEPTION" => "Billed per #{self['//BILLING_PERIOD'].to_i} days", "TOTAL" => periods * self['//PRICE'].to_f}
+        end
+
+        
+
         ### Generating Timeline ###
         timeline = []
         records.each_with_index do | record, i |
