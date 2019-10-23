@@ -32,7 +32,19 @@ $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
 require 'zmqjsonrpc'
-require '/usr/lib/one/sunstone/debug_lib.rb'
+
+def suppress_output
+    original_stderr = $stderr.clone
+    original_stdout = $stdout.clone
+    $stderr.reopen(File.new('/dev/null', 'w'))
+    $stdout.reopen(File.new('/dev/null', 'w'))
+    yield
+ensure
+    $stdout.reopen(original_stdout)
+    $stderr.reopen(original_stderr)
+end
+
+suppress_output{ require '/usr/lib/one/sunstone/debug_lib.rb' }
 $ione = IONe.new($client, $db)
 
 id = ARGV.first.to_i
