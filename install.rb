@@ -17,12 +17,21 @@ src_dir = sh.pwd
 #####################################
 # Installing packages
 #####################################
+sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel)
+begin
+    puts "Installing required system libs and tools"
+    sh.system "sudo yum install -y #{sys_packages.join(' ')}"
+rescue => e
+    puts "An error occurred while installing system libs and tools.\nError:\t#{e.message}\nFix this and try again."
+    exit(-1)
+end
 
-puts "Installing NPM and zeromq"
-sh.system 'sudo yum install -y npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel'
-
-puts "Installing bower and grunt"
-sh.system 'sudo npm install -g bower grunt grunt-cli'
+begin
+    puts "Installing bower and grunt"
+    sh.system 'sudo npm install -g bower grunt grunt-cli'
+rescue => e
+    puts "An error occurred while installing bower and grunt through npm.\nError:\t#{e.message}\nFix this and try again."
+end
 
 puts "Setting hooks up"
 sh.system "sudo cp -rf hooks /var/lib/one/remotes/"
@@ -38,6 +47,7 @@ sunstone.each do | files |
 end
 sh.system "sudo cp sunstone-server.rb /usr/lib/one/sunstone/"
 sh.system "sudo cp config.ru /usr/lib/one/sunstone/"
+sh.system "sudo cp debug_lib.rb /usr/lib/one/sunstone/"
 sh.system "sudo chown oneadmin:oneadmin -R /usr/lib/one/sunstone"
 
 sh.system "sudo cp -f sunstone-views.yaml /etc/one/"
