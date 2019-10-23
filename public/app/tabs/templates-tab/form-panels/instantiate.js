@@ -733,6 +733,7 @@ define(function (require) {
             $(".vmgroupContext" + template_json.VMTEMPLATE.ID, context)
           );
 
+
           vcenterVMFolderContext = $(
             ".vcenterVMFolderContext" + template_json.VMTEMPLATE.ID,
             context
@@ -904,6 +905,11 @@ define(function (require) {
             $('label:contains("Password")').append(
               'Repeat password<br><input type="password" value="" class="repeat_pas" required="">'
             );
+          }
+
+          if (template_id == 560) {
+            $('#capacityContext').after($('#right_colum .template_user_inputs560'));
+            $('.template_user_inputs560 legend').css('width', '100%');
           }
 
           if (azure_template == true) {

@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
 
   var Locale = require('utils/locale');
   var Sunstone = require('sunstone');
@@ -22,7 +22,7 @@ define(function(require) {
 
   //Escape doublequote in a string and return it
   function _escapeDoubleQuotes(string) {
-    if (string != undefined && typeof(string) == "string") {
+    if (string != undefined && typeof (string) == "string") {
       // Recursive to deal with strings like: 'aa""b"'
       // The second " would not match
 
@@ -58,27 +58,26 @@ define(function(require) {
   function _convert_template_to_string(template_json, unshown_values) {
     if (unshown_values)
       template_json = $.extend({}, template_json, unshown_values);
-
     var template_str = "";
-    $.each(template_json, function(key, value) {
+    $.each(template_json, function (key, value) {
       if (!value) {
         template_str += key + " = \"\"\n";
       } else {
         var values;
 
-        if ($.isArray(value)){
+        if ($.isArray(value)) {
           values = value;
-        }else{
+        } else {
           values = [value];
         }
 
-        $.each(values, function(index, element) {
+        $.each(values, function (index, element) {
           if (!element) return true;
           // current value can be an object
           if (typeof element == 'object') {
             template_str += key + " = [\n";
 
-            template_str += Object.keys(element).map(function(k){
+            template_str += Object.keys(element).map(function (k) {
               return "  " + k + " = \"" + _escapeDoubleQuotes(element[k].toString()) + "\"";
             }).join(",\n")
 
@@ -99,74 +98,68 @@ define(function(require) {
     var characters = [];
     var symbols = [];
     var key, sub_key, value;
-    var template_json = {}, obj_aux = {};
+    var template_json = {},
+      obj_aux = {};
     var array = false;
-    while (i <= string_json.length-1){
-      var symbol = symbols[symbols.length-1];
-      if(string_json[i] != " " && string_json[i] != "," && string_json[i] != "\n" || symbol == '"'){
-        if(string_json[i] == "=" && symbol != '"' && characters.length > 0 && (!symbol || (symbol && symbol == "["))){
+    while (i <= string_json.length - 1) {
+      var symbol = symbols[symbols.length - 1];
+      if (string_json[i] != " " && string_json[i] != "," && string_json[i] != "\n" || symbol == '"') {
+        if (string_json[i] == "=" && symbol != '"' && characters.length > 0 && (!symbol || (symbol && symbol == "["))) {
           var key_aux = "";
-          while(characters.length > 0){
+          while (characters.length > 0) {
             key_aux += characters.shift();
           }
-          if(!symbol){
+          if (!symbol) {
             key = key_aux;
-            if(template_json[key]){ //exists key, generate Array
-              if(!Array.isArray(template_json[key])){
+            if (template_json[key]) { //exists key, generate Array
+              if (!Array.isArray(template_json[key])) {
                 var obj = template_json[key];
                 template_json[key] = [];
                 template_json[key].push(obj);
               }
               array = true;
-            }else{
+            } else {
               template_json[key] = {};
               array = false;
             }
-          }else{
+          } else {
             sub_key = key_aux;
           }
-        }
-        else if(string_json[i] == '"' && symbol && symbol == '"' && characters[characters.length-1] != "\\"){
+        } else if (string_json[i] == '"' && symbol && symbol == '"' && characters[characters.length - 1] != "\\") {
           symbols.pop();
           var value_aux = "";
-          while(characters.length > 0){
+          while (characters.length > 0) {
             value_aux += characters.shift();
           }
-          if(sub_key){
+          if (sub_key) {
             if (array) {
               obj_aux[sub_key] = value_aux;
-            }
-            else{
+            } else {
               template_json[key][sub_key] = value_aux;
             }
             sub_key = undefined;
-          }else{
+          } else {
             template_json[key] = value_aux;
           }
-        }
-        else if(string_json[i] == '[' && !symbol){
+        } else if (string_json[i] == '[' && !symbol) {
           symbols.push("[");
-        }
-        else if(string_json[i] == '"' && characters[characters.length-1] != "\\"){
+        } else if (string_json[i] == '"' && characters[characters.length - 1] != "\\") {
           symbols.push('"');
-        }
-        else if(string_json[i] == ']' && symbol && symbol == '['){
+        } else if (string_json[i] == ']' && symbol && symbol == '[') {
           symbols.pop();
-          if(array){
+          if (array) {
             template_json[key].push(obj_aux);
             obj_aux = {};
           }
-        }
-        else{
-          if(JSON.stringify(template_json[key]) === '{}' && symbols.length <= 0){ //Empty
+        } else {
+          if (JSON.stringify(template_json[key]) === '{}' && symbols.length <= 0) { //Empty
             return false;
-          }
-          else{
+          } else {
             characters.push(string_json[i]);
           }
         }
       }
-      i+=1;
+      i += 1;
     }
     return template_json;
   }
@@ -179,4 +172,3 @@ define(function(require) {
     'escapeDoubleQuotes': _escapeDoubleQuotes
   };
 });
-

@@ -94,7 +94,6 @@ define(function (require) {
     }
 
     function _onShow(context, that) {
-
         $.get("settings", function (data, status) {
             OpenNebula.Datastore.list({
                 success: function (r, res) {
