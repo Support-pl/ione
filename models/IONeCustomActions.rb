@@ -22,13 +22,13 @@ post '/vm/:id/reinstall' do | id |
       vm = IONe.new($client, $db).get_vm_data(id.to_i)
 
       template = OpenNebula::Template.new_with_id(data['template_id'], @one_client)
-      r = template.info!
-      if OpenNebula.is_error? r then
+      res = template.info!
+      if OpenNebula.is_error? res then
          raise "Access Error, contact support."
       end
       image = OpenNebula::Image.new_with_id(template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID'], @one_client)
-      r = image.info!
-      if OpenNebula.is_error? r then
+      res = image.info!
+      if OpenNebula.is_error? res then
          raise "Access Error, contact support."
       end
 
@@ -78,9 +78,12 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       elsif data['previous'].nil? then
          r error: 'Snapshot not given'
       else
-         IONe.new($client, $db).RevertZFSSnapshot(id, data['previous']) == true ?
-            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
+         result = IONe.new($client, $db).RevertZFSSnapshot(id, data['previous'])
+         if result.first then
+            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted", id: result.last)
+         else
             r(response: "Contact Technical Support to make sure revert process started")
+         end
       end
    rescue => e
       msg = e.message

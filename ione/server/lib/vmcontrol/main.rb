@@ -212,7 +212,7 @@ class IONe
         return err.messages
     end
     # Powering off VM
-    # @note Don't user OpenNebula::VirtualMachine#shutdown - this method deletes VM's
+    # @note Don't use OpenNebula::VirtualMachine#shutdown - thoose method deletes VM's
     # @param [Integer] vmid - VM to shutdown
     # @return [nil | OpenNebula::Error]
     def Shutdown(vmid)

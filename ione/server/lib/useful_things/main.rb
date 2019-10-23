@@ -91,7 +91,7 @@ class IONe
           history = vm.to_hash!['VM']["HISTORY_RECORDS"]['HISTORY'] # Searching hostname at VM allocation history
           history = history.last if history.class == Array # If history consists of 2 or more lines - returns last
           return hid ? [history['HOSTNAME'], history['HID']] : history['HOSTNAME']
-        rescue
+    rescue
           return nil # Returns NilClass if did not found anything - possible if vm is at HOLD or PENDING state
     end
     # Returns datastore name, where VM has been deployed
@@ -192,7 +192,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'GetUserInfo') }
-        onblock(User, userid) do |user|
+        onblock(:u, userid) do |user|
             user.info!
             user.to_xml
         end
