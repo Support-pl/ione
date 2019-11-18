@@ -894,7 +894,7 @@ end
 require 'ione/server/ione.rb'
 post '/ione/:method' do
     begin
-        RPC_LOGGER.debug "IONeAPI calls proxy method #{params['method']}(#{JSON.parse(@request_body)['params'].collect {|p| p.inspect}.join(", ")})"
+        RPC_LOGGER.debug "IONeAPI calls proxy method #{params['method']}(#{JSON.parse(@request_body)['params'].collect {|p| p.inspect}.join(", ")}) | from #{session[:ip]}"
         r = IONe.new($cloud_auth.client(session[:user], session[:active_zone_endpoint]), $db).send(params['method'], *JSON.parse(@request_body)['params'])
     rescue => e
         r = e.message
