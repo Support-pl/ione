@@ -28,7 +28,7 @@ class IONe
         vmp = VirtualMachinePool.new(@client)
         vmp.info_all!
         vmp.each do | vm |
-            return vm.id.to_i if vm.uid(false, true) == uid
+            return vm.id.to_i if vm.uid(false) == uid
         end
         'none'
     end
@@ -77,7 +77,11 @@ class IONe
         defer { LOG_CALL(id, false, 'get_vm_by_uname') }
         userid = get_uid_by_name(name)
         vmid = get_vm_by_uid(userid)
-        { :vmid => vmid, :userid => userid, :ip => GetIP(vmid) }
+        unless vmid.nil? then
+            { :vmid => vmid, :userid => userid, :ip => GetIP(vmid) }
+        else
+            nil
+        end
     end
     # Returns host name, where VM has been deployed
     # @param [Integer] vm - VM ID
@@ -141,7 +145,7 @@ class IONe
             vm_pool.each do |vm| # Creating VM list from VirtualMachine Pool Object
                 begin
                 info << {
-                    :vmid => vm.id, :userid => vm.uid(false, true), :host => get_vm_host(vm.id),
+                    :vmid => vm.id, :userid => vm.uid(false), :host => get_vm_host(vm.id),
                     :login => vm.uname(false, true), :ip => GetIP(vm), :state => (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
                 }
                 rescue

@@ -3,3 +3,4 @@ public/dist/
 .vscode/
 ione/server/modules/ansible/config.yml
 ione/server/.yardopts
+tests/zfs_snap_acc.rb
