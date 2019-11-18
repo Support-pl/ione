@@ -31,7 +31,6 @@ end
 $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
-require 'zmqjsonrpc'
 
 def suppress_output
     original_stderr = $stderr.clone

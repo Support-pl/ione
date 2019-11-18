@@ -1,5 +1,3 @@
-require 'zmqjsonrpc'
-
 def r **result
    JSON.pretty_generate result
 end
@@ -60,7 +58,6 @@ post '/vm/:id/reinstall' do | id |
       end
    rescue => e
       msg = e.message
-      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
       r error: e.message, backtrace: e.backtrace
    end
 end
@@ -87,7 +84,6 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       end
    rescue => e
       msg = e.message
-      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
       r error: e.message, backtrace: e.backtrace
    end
 end

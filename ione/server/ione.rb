@@ -1,4 +1,3 @@
-require 'zmqjsonrpc'
 require 'yaml'
 require 'ipaddr'
 require 'sequel'
@@ -159,24 +158,13 @@ $methods = IONe.instance_methods(false).map { | method | method.to_s }
 
 rpc_log_file = "#{LOG_ROOT}/rpc.log"
 `touch #{rpc_log_file}` unless File.exist? rpc_log_file
+# Logger instance for rpc calls
 RPC_LOGGER = Logger.new(rpc_log_file)
-
-LOG "Initializing JSON-RPC Server..."
-puts 'Initializing JSON_RPC server and logic handler'
-server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{$ione_conf['Server']['listen-port']}", RPC_LOGGER)
-LOG_COLOR "Server initialized", 'none', 'green'
 
 puts 'Pre-init job ended, starting up server'
 if !defined?(DEBUG_LIB) && MAIN_IONE then
-    Thread.new do
-        begin
-            server.server_loop # Server start
-        rescue => e
-            LOG_ERROR "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
-            puts "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
-        end
-    end
 
+    # Public API bindings
     IONeAPIServerThread = Thread.new do
         require 'pry-remote'
         class IONeAPIServer < Sinatra::Base

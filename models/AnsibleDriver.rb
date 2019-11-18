@@ -1,5 +1,3 @@
-require 'zmqjsonrpc'
-
 def r **result # Generates response
     JSON.pretty_generate result
 end
@@ -199,7 +197,6 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
         })
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -212,7 +209,6 @@ post '/ansible' do # Allocates new playbook
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         @one_user.info!
         r error: e.message, backtrace: e.backtrace, data:data
     end
@@ -228,7 +224,6 @@ delete '/ansible/:id' do |id| # Deletes given playbook
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -245,7 +240,6 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
         r ANSIBLE: pb.body
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -256,7 +250,6 @@ get '/ansible/:id/vars' do | id | # I think it's not needed here, rly
         r vars: pb.call
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -271,7 +264,6 @@ post '/ansible/:id/action' do | id | # Performs action
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -289,7 +281,6 @@ post '/ansible/:action' do | action | # Performs actions, which are defined as d
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -396,8 +387,7 @@ end
          })
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -409,8 +399,7 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         @one_user.info!
+          @one_user.info!
          r error: e.message, backtrace: e.backtrace, data:data
      end
  end
@@ -426,8 +415,7 @@ end
          r ANSIBLE_PROCESS: apc.body
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -441,8 +429,7 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -456,7 +443,6 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
