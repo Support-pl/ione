@@ -204,7 +204,16 @@ class IONe
         LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
         return e.message, trace
     end
-    def ReinstallTest params, trace
+    # Reinstall method based on vm.recover(recreate)
+    # @param [Hash] params
+    # @option params [Integer] vmid
+    # @option params [Integer] templateid
+    # @option params [Integer] cpu - CPU cores
+    # @option params [Integer] ram - RAM in MB or GB depending on 'units'
+    # @option params [String] units - GB or MB
+    # @option params [String] ds_type - Datastore type to choose from, e.g. SSD/HDD
+    # @param [Array] trace
+    def ReinstallTest params, trace = []
         vmid = params['vmid']
         
         vm = onblock :vm, vmid
