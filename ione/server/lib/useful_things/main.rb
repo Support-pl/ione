@@ -327,4 +327,35 @@ class IONe
     def GetvCenterIOpsConf
         $ione_conf['vCenter']['drives-iops']
     end
+
+    # Returns all vms available with given credentials
+    # @param [Integer] chunks - number of chunks per page
+    # @param [Integer] page - page number(shift)
+    # @return [Array<Integer>]
+    def get_available_vms chunks = nil, page = 0
+        vmp = VirtualMachinePool.new(@client)
+        vmp.info_all!
+    
+        if chunks.nil? then
+            vmp.inject([]) do |r, vm|
+                r << {
+                    id: vm.id,
+                    name: vm.name,
+                    ip: GetIP(vm),
+                    state: vm.state_str,
+                    lcm_state: vm.lcm_state_str
+                }
+            end
+        else
+            vmp.inject([]){ |r, vm| r << vm }.each_slice(chunks).to_a[page].map do | vm |
+                {
+                    id: vm.id,
+                    name: vm.name,
+                    ip: GetIP(vm),
+                    state: vm.state_str,
+                    lcm_state: vm.lcm_state_str
+                }
+            end
+        end
+    end
 end
