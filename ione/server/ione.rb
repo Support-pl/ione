@@ -196,8 +196,11 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
                 RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
                 JSON.pretty_generate response: r
             end
-            get %r{one\.(\w+)\.(\w+)} do
-                JSON.pretty_generate params[:captures]
+            post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
+                body = JSON.parse(@request_body)
+                JSON.pretty_generate(r:
+                    onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method << excl, *body['args'])
+                )
             end
         end
 
