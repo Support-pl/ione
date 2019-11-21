@@ -1,3 +1,6 @@
+require 'date'
+require 'time'
+
 # OpenNebula::VirtualMachine class
 class OpenNebula::VirtualMachine
     # Actions supported by OpenNebula scheduler
@@ -389,7 +392,23 @@ class OpenNebula::VirtualMachine
 
         records = OpenNebula::Records.new(id).records
     
-        unless self['//BILLING_PERIOD'].to_i == 0 then
+        if self['//BILLING_PERIOD'] == 'month' then
+            first = records.select{|r| r[:state] != 'pnd'}.sort_by{|r| r[:time]}.first[:time]
+
+            unless group_by_day then
+                stime = Time.at(stime).to_datetime
+                first = Time.at(first).to_datetime
+                etime = Time.at(etime).to_datetime
+                current, periods = stime > first ? stime : first, 0
+
+                while current <= etime do
+                    periods += 1
+                    current = current >> 1
+                end
+
+                return {"id" => id, "name" => name, "work_time" => etime.to_time.to_i - first.to_time.to_i, "EXCEPTION" => "Billed by calendar month", "TOTAL" => (periods * self['//PRICE'].to_f).round(2)}
+            end
+        elsif self['//BILLING_PERIOD'].to_i != 0 then
             
             first = records.select{|r| r[:state] != 'pnd'}.sort_by{|r| r[:time]}.first[:time]
             delta = self['//BILLING_PERIOD'].to_i * 86400
@@ -399,7 +418,7 @@ class OpenNebula::VirtualMachine
                 periods = stime > first ? 0 : 1
                 periods += (etime - first) / delta
                 
-                return {"id" => id, "name" => name, "work_time" => first - stime, "EXCEPTION" => "Billed per #{self['//BILLING_PERIOD'].to_i} days", "TOTAL" => (periods * self['//PRICE'].to_f).round(2)}
+                return {"id" => id, "name" => name, "work_time" => etime - first, "EXCEPTION" => "Billed per #{self['//BILLING_PERIOD'].to_i} days", "TOTAL" => (periods * self['//PRICE'].to_f).round(2)}
             else
                 showback = []
 
