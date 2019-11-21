@@ -52,7 +52,19 @@ class OpenNebula::User
     end
     # Checks if user exists
     def exists?
-        self.info! == nil
+        info! == nil
+    end
+    # Returns User sunstone language
+    def lang
+        info! || self['//LANG']
+    end
+    # Sets User sunstone language
+    # @param [String] lang - lang code, like en_US/ru_RU/etc
+    def lang= l
+        sunstone = to_hash!['USER']['TEMPLATE']['SUNSTONE']
+        sunstone['LANG'] = l
+
+        update({"SUNSTONE" => sunstone}.to_one_template, true)
     end
 
     # User doesn't exist Exception object
