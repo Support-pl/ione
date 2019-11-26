@@ -299,13 +299,15 @@ class AnsiblePlaybookProcess
     # Start Process
     # @param [Boolean] thread - Runs in another Thread and returns its object if true
     def run thread = true
-        nil if STATUS.keys.index(@status) > 0
+        return nil if STATUS.keys.index(@status) > 0
         @start_time, @status = Time.now.to_i, '1'
         
         update
 
         process = Proc.new do
+            attempt = 0
             begin
+                attempt += 1
                 Net::SSH.start( ANSIBLE_HOST, ANSIBLE_HOST_USER, :port => ANSIBLE_HOST_PORT ) do | ssh |
                     # Create local Playbook version
                     File.open("/tmp/#{@install_id}.yml", 'w') do |file|
@@ -340,7 +342,10 @@ class AnsiblePlaybookProcess
                 scan
             rescue => e
                 @status = 'failed'
-                @log = "Internal Error:\n" + e.message + "\n---\n---\nBacktrace:\n" + e.backtrace.join("\n")
+                @log += "\nAttempt #{attempt}:\nInternal Error #{e.class}:\n" + e.message + "\n#{'-' * 20}\nBacktrace:\n" + e.backtrace.join("\n")
+                @comment = "STRESSTEST with ATTEMPTS"
+                update
+                retry if attempt < 3
             ensure
                 update
             end
