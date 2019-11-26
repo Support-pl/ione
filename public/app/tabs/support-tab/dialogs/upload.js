@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -76,7 +76,7 @@ define(function(require) {
   function _setup(context) {
     var that = this;
 
-    var tabContext = $("#"+TAB_ID);
+    var tabContext = $("#" + TAB_ID);
 
     if (BrowserInfo.getInternetExplorerVersion() > -1) {
       $(".upload_support_file_form_button", context).text("Uploading files through IE is not supported");
@@ -84,7 +84,7 @@ define(function(require) {
     } else {
       var uploader = new Resumable({
         target: 'upload_chunk',
-        chunkSize: 10*1024*1024,
+        chunkSize: 10 * 1024 * 1024,
         maxFiles: 1,
         testChunks: false,
         query: {
@@ -97,7 +97,7 @@ define(function(require) {
       var fileName = '';
       var file_input = false;
 
-      uploader.on('fileAdded', function(file){
+      uploader.on('fileAdded', function (file) {
         $(".upload_support_file_form_button", context).removeAttr("disabled");
         fileName = file.fileName;
         file_input = fileName;
@@ -106,28 +106,28 @@ define(function(require) {
         $("#support_file-uploader-label", context).html(file.fileName);
       });
 
-      uploader.on('uploadStart', function() {
+      uploader.on('uploadStart', function () {
         $(".upload_support_file_form_button", context).attr("disabled", "disabled");
         $('.support_upload_progress_bars', tabContext).append(
-          '<div id="'+fileName+'progressBar" class="row" style="margin-bottom:10px">\
-            <div id="'+fileName+'-info" class="medium-2 columns">\
+          '<div id="' + fileName + 'progressBar" class="row" style="margin-bottom:10px">\
+            <div id="' + fileName + '-info" class="medium-2 columns">\
               Uploading...\
             </div>\
             <div class="medium-10 columns">\
-              <div class="progressbar">'+
-                ProgressBar.html(0, 1, fileName) + '\
+              <div class="progressbar">' +
+          ProgressBar.html(0, 1, fileName) + '\
               </div>\
             </div>\
           </div>');
       });
 
-      uploader.on('progress', function() {
+      uploader.on('progress', function () {
         $('div.progressbar', $('div[id="' + fileName + 'progressBar"]', tabContext)).html(
-                              ProgressBar.html(this.progress(), 1, fileName) );
+          ProgressBar.html(this.progress(), 1, fileName));
       });
 
-      uploader.on('fileSuccess', function(file) {
-        $('div[id="'+fileName+'-info"]', tabContext).text('Registering in OpenNebula');
+      uploader.on('fileSuccess', function (file) {
+        $('div[id="' + fileName + '-info"]', tabContext).text('Registering in OpenNebula');
         $.ajax({
           url: 'support/request/' + that.requestId + '/upload',
           type: "POST",
@@ -136,21 +136,21 @@ define(function(require) {
             file: fileName,
             tempfile: file.uniqueIdentifier
           },
-          success: function(){
+          success: function () {
             Notifier.notifyMessage("File uploaded correctly");
-            $('div[id="'+fileName+'progressBar"]', tabContext).remove();
+            $('div[id="' + fileName + 'progressBar"]', tabContext).remove();
             Sunstone.runAction("Support.refresh");
 
             Sunstone.getDialog(DIALOG_ID).hide();
           },
-          error: function(response){
+          error: function (response) {
             Notifier.onError({}, OpenNebulaError(response));
-            $('div[id="'+fileName+'progressBar"]', tabContext).remove();
+            $('div[id="' + fileName + 'progressBar"]', tabContext).remove();
           }
         });
       });
 
-      $('#' + DIALOG_ID + 'Form', context).on("submit", function(){
+      $('#' + DIALOG_ID + 'Form', context).on("submit", function () {
         uploader.upload();
         Sunstone.getDialog(DIALOG_ID).hide();
         return false;

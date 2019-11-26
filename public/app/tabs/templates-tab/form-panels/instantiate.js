@@ -49,6 +49,8 @@ define(function (require) {
   var settings;
   var for_template;
   var azure_template = false;
+  var isp_templ = false;
+  var isp_templ_user;
   var user_info;
   /*
     CONSTRUCTOR
@@ -103,94 +105,6 @@ define(function (require) {
     var that = this;
   }
 
-  function _calculateCost() {
-    var memory_val =
-      parseFloat($(".capacity_cost_div .cost_value").attr("value")) / 1024;
-    var cpu_val = parseFloat($(".vcpu_input_wrapper .vcpu_input input").val());
-    var disk_val = parseFloat(
-      $(".provision_create_template_disk_cost_div .cost_value").attr("value")
-    );
-    var publicip_val = 1 * $("#amt_public_ip").val();
-
-    if (Number.isNaN(memory_val)) {
-      memory_val = 0;
-    }
-    if (Number.isNaN(cpu_val)) {
-      cpu_val = 0;
-    }
-    if (Number.isNaN(disk_val)) {
-      disk_val = 0;
-    }
-
-    if ($("#publicip_cost_div").css("display") != "none") {
-      var publicip_cost = settings.PUBLIC_IP_COST * publicip_val;
-    } else {
-      var publicip_cost = 0;
-    }
-    var settings_disks_costs = JSON.parse(settings.DISK_COSTS);
-
-    var capasity_cost = JSON.parse(settings.CAPACITY_COST);
-    var memory_cost = memory_val * capasity_cost.MEMORY_COST;
-    var cpu_cost = cpu_val * capasity_cost.CPU_COST;
-    var disk_cost =
-      settings_disks_costs[$('[wizard_field="DRIVE"]').val()] * disk_val;
-
-    if (Number.isNaN(disk_cost)) {
-      disk_cost = 0;
-    }
-
-    var time_val = $("#CostVaribl").val() * 1;
-
-    var capacity_text = ((memory_cost * 1 + cpu_cost * 1) * time_val).toFixed(
-      3
-    );
-    var disk_text = ((time_val * disk_cost) / 1024).toFixed(3);
-    var publicip_text = (publicip_cost * time_val).toFixed(3);
-
-    $(".capacity_cost_div span.cost_value").text(capacity_text);
-    $(".provision_create_template_disk_cost_div span.cost_value").text(
-      disk_text
-    );
-    $(".publicip_cost_div .cost_value").text(publicip_text);
-
-    var total = capacity_text * 1 + disk_text * 1 + publicip_text * 1;
-
-    if (Config.isFeatureEnabled("showback")) {
-      $(".total_cost_div .cost_value").text(total.toFixed(2));
-    }
-  }
-
-  function azure_CalculateCost() {
-    var standart = $('select[wizard_field="SIZE"]').val();
-    var drive_type = $('select[wizard_field="DRIVE"]').val();
-    var disk_val = $('input[wizard_field="OS_DISK_SIZE"]').val();
-    var time_val = $("#CostVaribl").val() * 1;
-
-    var standart_cost = 0;
-    if (standart != "Select Instance Size") {
-      var azure_skus = JSON.parse(settings.AZURE_SKUS);
-      var stand = JSON.parse(azure_skus[standart]);
-      standart_cost = stand.PRICE;
-    }
-    var pub_ip_cost = parseFloat(
-      settings.AZURE_PUBLIC_IP_COST.replace(",", ".").replace(" ", "")
-    );
-
-    var setting_drive_costs = JSON.parse(settings.AZURE_DISK_COSTS);
-    var disk_cost = setting_drive_costs[drive_type] * disk_val;
-
-    var total_cost = (standart_cost * 1 + disk_cost + pub_ip_cost) * time_val;
-
-    $(".capacity_cost_div span.cost_value").text(
-      (standart_cost * time_val).toFixed(3)
-    );
-    $(".provision_create_template_disk_cost_div span.cost_value").text(
-      (disk_cost * time_val).toFixed(3)
-    );
-    $(".publicip_cost_div .cost_value").text(pub_ip_cost.toFixed(3));
-    $(".total_cost_div .cost_value").text(total_cost.toFixed(2));
-  }
-
   function _submitWizard(context) {
     var that = this;
     if (!this.selected_nodes || this.selected_nodes.length == 0) {
@@ -226,7 +140,6 @@ define(function (require) {
       var tmp_json = WizardFields.retrieve(
         $(".template_user_inputs" + template_id, context)
       );
-
       if (azure_template == true) {
         for_template.OS_DISK_SIZE = $('[wizard_field="OS_DISK_SIZE"]').val();
         for_template.OS_IMAGE = $('[wizard_field="OS_IMAGE"]').val();
@@ -249,27 +162,20 @@ define(function (require) {
             that.template_objects["0"].VMTEMPLATE.TEMPLATE.IMAGE_UNAME !=
             undefined
           ) {
-            tmp_json.DISK = [
-              {
-                IMAGE:
-                  that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK.IMAGE,
-                IMAGE_UNAME:
-                  that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK
-                    .IMAGE_UNAME,
-                OPENNEBULA_MANAGED: "NO",
-                SIZE: WizardFields.retrieve($(".diskContainer", context)).SIZE
-              }
-            ];
+            tmp_json.DISK = [{
+              IMAGE: that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK.IMAGE,
+              IMAGE_UNAME: that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK
+                .IMAGE_UNAME,
+              OPENNEBULA_MANAGED: "NO",
+              SIZE: WizardFields.retrieve($(".diskContainer", context)).SIZE
+            }];
           } else {
             if (that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK != undefined) {
-              tmp_json.DISK = [
-                {
-                  IMAGE_ID:
-                    that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK.IMAGE_ID,
-                  OPENNEBULA_MANAGED: "NO",
-                  SIZE: WizardFields.retrieve($(".diskContainer", context)).SIZE
-                }
-              ];
+              tmp_json.DISK = [{
+                IMAGE_ID: that.template_objects["0"].VMTEMPLATE.TEMPLATE.DISK.IMAGE_ID,
+                OPENNEBULA_MANAGED: "NO",
+                SIZE: WizardFields.retrieve($(".diskContainer", context)).SIZE
+              }];
             }
           }
         }
@@ -360,12 +266,8 @@ define(function (require) {
 
       capacityContext = $(".capacityContext" + template_id, context);
       $.extend(tmp_json, CapacityInputs.retrieveChanges(capacityContext));
-
-      if (config.user_config.default_view == "user") {
-        if (
-          $("#input_private_ip").prop("checked") == false &&
-          $("#input_public_ip").prop("checked") == false
-        ) {
+      if (config.user_config.default_view == "user" && !isp_templ) {
+        if ($("#input_private_ip").prop("checked") == false && $("#input_public_ip").prop("checked") == false) {
           $(".nicsContext" + template_id + " .provision_network_selector").css({
             "padding-left": "5px",
             border: "0.1rem solid #ec5840",
@@ -385,22 +287,38 @@ define(function (require) {
           var amt_public = $("#amt_public_ip").val() * 1;
           var publ_net_def = JSON.parse(settings.PUBLIC_NETWORK_DEFAULTS);
           for (var i = 0; i < amt_public; i++) {
-            nic.push({ NETWORK_ID: publ_net_def.NETWORK_ID });
+            nic.push({
+              NETWORK_ID: publ_net_def.NETWORK_ID
+            });
           }
         }
         if ($("#input_private_ip").prop("checked") == true) {
           var amt_private = $("#amt_private_ip").val() * 1;
           for (var i = 0; i < amt_private; i++) {
-            nic.push({ NETWORK: "user-" + config.user_id + "-vnet" });
+            nic.push({
+              NETWORK: "user-" + config.user_id + "-vnet"
+            });
           }
         }
 
-        $.extend(tmp_json, { NIC: nic });
+        $.extend(tmp_json, {
+          NIC: nic
+        });
+      }
+      if ($('[wizard_field="BILLING_PERIOD"]').prop('checked') == false) {
+        tmp_json["BILLING_PERIOD"] = "30";
       }
       extra_info["template"] = tmp_json;
-
+      if ($('#input_bil_per_vcentre').prop('checked')) {
+        $("#CostVaribl").val(706).change();
+        let price = parseFloat($(".total_cost_div .cost_value").text()) * 0.9;
+        extra_info["template"]["PRICE"] = price.toFixed(2) + '';
+        extra_info["template"]["BILLING_PERIOD"] = "1";
+      }
       OpenNebula.User.show({
-        data: { id: config.user_id },
+        data: {
+          id: config.user_id
+        },
         success: function (r, res) {
           user_info = {
             User_id: res.USER.ID,
@@ -408,8 +326,8 @@ define(function (require) {
             BALANCE: res.USER.TEMPLATE.BALANCE
           };
 
-          if (user_info.ID_GROUP != "0") {
-            $("#CostVaribl").val(24);
+          if (user_info.ID_GROUP != "0" && !isp_templ) {
+            $("#CostVaribl").val(24).change();
             if (azure_template == true) {
               azure_CalculateCost();
             } else {
@@ -467,6 +385,59 @@ define(function (require) {
 
                 Notifier.notifyError("Passwords doesn't match");
               }
+            } else if (isp_templ) {
+              let for_isp_templ = {
+                PRICE: isp_templ_user.PRICE * 1,
+                ISP_VARS: {
+
+                }
+              };
+
+              for (let key in isp_templ_user.SetVal) {
+                for_isp_templ.ISP_VARS[key.toUpperCase()] = isp_templ_user.SetVal[key];
+              }
+
+              for (let key in isp_templ_user.InputsVal) {
+                if (isp_templ_user.InputsVal[key].hasOwnProperty('tmpl_key')) {
+
+                  if (isp_templ_user.InputsVal[key].hasOwnProperty('keys')) {
+                    for_isp_templ[isp_templ_user.InputsVal[key].tmpl_key.toUpperCase()] = isp_templ_user.InputsVal[key].keys[$('[wizard_field="' + key + '"]').val()].key;
+                    for_isp_templ.ISP_VARS[key.toUpperCase()] = isp_templ_user.InputsVal[key].keys[$('[wizard_field="' + key + '"]').val()].key;
+                    for_isp_templ.PRICE += isp_templ_user.InputsVal[key].keys[$('[wizard_field="' + key + '"]').val()].price;
+                  } else {
+                    for_isp_templ[isp_templ_user.InputsVal[key].tmpl_key.toUpperCase()] = $('[wizard_field="' + key + '"]').val();
+                    for_isp_templ.ISP_VARS[key.toUpperCase()] = $('[wizard_field="' + key + '"]').val();
+                    for_isp_templ.PRICE += isp_templ_user.InputsVal[key].price;
+                  }
+
+                } else {
+
+                  if (isp_templ_user.InputsVal[key].hasOwnProperty('keys')) {
+                    for_isp_templ.ISP_VARS[key.toUpperCase()] = isp_templ_user.InputsVal[key].keys[$('[wizard_field="' + key + '"]').val()].key;
+                    for_isp_templ.PRICE += isp_templ_user.InputsVal[key].keys[$('[wizard_field="' + key + '"]').val()].price;
+                  } else {
+                    for_isp_templ.ISP_VARS[key.toUpperCase()] = $('[wizard_field="' + key + '"]').val();
+                    for_isp_templ.PRICE += isp_templ_user.InputsVal[key].price;
+                  }
+
+                }
+
+              }
+              for (let key in isp_templ_user.Dependens) {
+                for_isp_templ.ISP_VARS[key.toUpperCase()] = $('[wizard_field="' + key + '"]').val();
+              }
+              for_isp_templ.PRICE += "";
+              for_isp_templ.PRICE = $('.total_cost_div:nth-child(1) .cost_value').text() * 1;
+              extra_info.template = for_isp_templ;
+              if ($('[wizard_field="BILLING_PERIOD"]').prop('checked') == false) {
+                extra_info.template["BILLING_PERIOD"] = "30";
+              }
+              console.log(222222, extra_info);
+              Sunstone.runAction(
+                "Template." + action,
+                [template_id],
+                extra_info
+              );
             } else {
               Sunstone.runAction(
                 "Template." + action,
@@ -489,10 +460,11 @@ define(function (require) {
 
   function _setTemplateIds(context, selected_nodes) {
     var that = this;
-    $("html, body").animate(
-      {
-        scrollTop: $(".list_of_templates").offset().top
-      },
+    azure_template = false;
+    isp_templ = false;
+    $("html, body").animate({
+      scrollTop: $(".list_of_templates").offset().top
+    },
       700
     );
     this.selected_nodes = selected_nodes;
@@ -504,21 +476,6 @@ define(function (require) {
     var idsLength = this.selected_nodes.length;
     var idsDone = 0;
 
-    $.each(this.selected_nodes, function (index, template_id) {
-      OpenNebulaTemplate.show({
-        data: {
-          id: template_id,
-          extended: false
-        },
-        timeout: true,
-        success: function (request, template_json) {
-          that.template_base_objects[
-            template_json.VMTEMPLATE.ID
-          ] = template_json;
-        }
-      });
-    });
-
     templatesContext.html("");
     $.each(this.selected_nodes, function (index, template_id) {
       OpenNebulaTemplate.show({
@@ -528,6 +485,25 @@ define(function (require) {
         },
         timeout: true,
         success: function (request, template_json) {
+          if (template_id == 560) {
+            let atobed = decodeURIComponent(atob(template_json.VMTEMPLATE.TEMPLATE.ISP_RAW_DATA));
+            isp_templ_user = JSON.parse(atobed);
+            for (let key in isp_templ_user.InputsVal) {
+              // if (isp_templ_user.InputsVal[key].hasOwnProperty('tmpl_key')){
+              // }else{
+              // }
+              template_json.VMTEMPLATE.TEMPLATE.USER_INPUTS[key] = isp_templ_user.InputsVal[key].input;
+            }
+            isp_templ_user["PRICE"] = template_json.VMTEMPLATE.TEMPLATE.PRICE;
+            console.log(11111, template_json);
+            console.log(222, isp_templ_user);
+            isp_templ = true;
+          }
+
+          that.template_base_objects[
+            template_json.VMTEMPLATE.ID
+          ] = template_json;
+
           that.template_objects.push(template_json);
 
           var options = {
@@ -568,14 +544,8 @@ define(function (require) {
             })
           );
 
-          $(
-            ".provision_host_selector" + template_json.VMTEMPLATE.ID,
-            context
-          ).data("hostsTable", that.hostsTable);
-          $(
-            ".provision_ds_selector" + template_json.VMTEMPLATE.ID,
-            context
-          ).data("dsTable", that.datastoresTable);
+          $(".provision_host_selector" + template_json.VMTEMPLATE.ID, context).data("hostsTable", that.hostsTable);
+          $(".provision_ds_selector" + template_json.VMTEMPLATE.ID, context).data("dsTable", that.datastoresTable);
 
           var selectOptions = {
             selectOptions: {
@@ -636,8 +606,7 @@ define(function (require) {
             that.hostsTable.selectResourceTableSelect(selectedResources);
           }
 
-          var dsReqJSON =
-            template_json.VMTEMPLATE.TEMPLATE.SCHED_DS_REQUIREMENTS;
+          var dsReqJSON = template_json.VMTEMPLATE.TEMPLATE.SCHED_DS_REQUIREMENTS;
           if (dsReqJSON) {
             $(
               "#SCHED_DS_REQUIREMENTS" + template_json.VMTEMPLATE.ID,
@@ -657,8 +626,7 @@ define(function (require) {
 
           if (azure_template == false) {
             DisksResize.insert({
-              template_base_json:
-                that.template_base_objects[template_json.VMTEMPLATE.ID],
+              template_base_json: that.template_base_objects[template_json.VMTEMPLATE.ID],
               template_json: template_json,
               disksContext: $(
                 ".disksContext" + template_json.VMTEMPLATE.ID,
@@ -673,10 +641,12 @@ define(function (require) {
           }
 
           if (default_user_view == true) {
+            $("#amt_public_ip").val(0);
+            $("#amt_private_ip").val(0);
             $("#input_public_ip").click(function () {
               if ($(this).prop("checked")) {
                 $("#amt_public_ip").prop("disabled", false);
-
+                $("#amt_public_ip").val(1);
                 $("#publicip_cost_div").show();
                 $("#publicip_cost_div .cost_value").text(
                   settings.PUBLIC_IP_COST
@@ -687,6 +657,7 @@ define(function (require) {
 
                 _calculateCost();
               } else {
+                $("#amt_public_ip").val(0);
                 $("#amt_public_ip").prop("disabled", true);
                 $("#publicip_cost_div").hide();
                 _calculateCost();
@@ -695,36 +666,42 @@ define(function (require) {
 
             $("#input_private_ip").click(function () {
               if ($(this).prop("checked")) {
+                $("#amt_private_ip").val(1);
                 $("#amt_private_ip").prop("disabled", false);
               } else {
+                $("#amt_private_ip").val(0);
                 $("#amt_private_ip").prop("disabled", true);
               }
             });
             if (azure_template == true) {
               NicsSection.insert(
                 template_json,
-                $(".nicsContext" + template_json.VMTEMPLATE.ID, context),
-                {
-                  forceIPv4: true,
-                  securityGroups: Config.isFeatureEnabled("secgroups")
-                }
+                $(".nicsContext" + template_json.VMTEMPLATE.ID, context), {
+                forceIPv4: true,
+                securityGroups: Config.isFeatureEnabled("secgroups")
+              }
               );
             }
             $("#amt_public_ip").change(function () {
               _calculateCost();
             });
-          } else {
+          } else if (!isp_templ) {
             $(".cpu_input_wrapper").css("width", "100%");
-            $(".cpu_input_wrapper label").css({ float: "left", width: "45%" });
-            $(".cpu_input_wrapper div").css({ float: "left", width: "45%" });
+            $(".cpu_input_wrapper label").css({
+              float: "left",
+              width: "45%"
+            });
+            $(".cpu_input_wrapper div").css({
+              float: "left",
+              width: "45%"
+            });
 
             NicsSection.insert(
               template_json,
-              $(".nicsContext" + template_json.VMTEMPLATE.ID, context),
-              {
-                forceIPv4: true,
-                securityGroups: Config.isFeatureEnabled("secgroups")
-              }
+              $(".nicsContext" + template_json.VMTEMPLATE.ID, context), {
+              forceIPv4: true,
+              securityGroups: Config.isFeatureEnabled("secgroups")
+            }
             );
           }
           $(".nicsContext" + template_id + " legend").css("width", "100%");
@@ -748,34 +725,28 @@ define(function (require) {
             ".template_user_inputs" + template_json.VMTEMPLATE.ID,
             context
           );
-
           UserInputs.vmTemplateInsert(inputs_div, template_json, {
-            text_header:
-              '<i class="fa fa-gears"></i> ' + Locale.tr("Attributes")
+            text_header: '<i class="fa fa-gears"></i> ' + Locale.tr("Attributes")
           });
-
+          if (template_json.VMTEMPLATE.TEMPLATE.CHOOSE_BILLING_PERIOD == "true") {
+            $('#right_colum div button').parent().before('<div class="switch" style="border: 2px solid #9a9a9a;padding: 10px 0;border-radius: 10px;text-align: center;margin-top: 20px;">' +
+              '<div style="color: black;font-weight: 400;">Экономьте до 70% с оплатой по мере использования</div>' +
+              '<input class="switch-input" wizard_field="BILLING_PERIOD" id="input_bil_per" checked type="checkbox"><label for="input_bil_per" class="switch-paddle"></label></div>');
+          }
           inputs_div.data("opennebula_id", template_json.VMTEMPLATE.ID);
 
-          capacityContext = $(
-            ".capacityContext" + template_json.VMTEMPLATE.ID,
-            context
-          );
-          CapacityInputs.setup(capacityContext);
-          CapacityInputs.fill(capacityContext, template_json.VMTEMPLATE);
-
-          if (template_json.VMTEMPLATE.TEMPLATE.HYPERVISOR == "vcenter") {
-            $(".memory_input .mb_input input", context).attr(
-              "pattern",
-              "^([048]|\\d*[13579][26]|\\d*[24680][048])$"
+          if (!isp_templ) {
+            capacityContext = $(
+              ".capacityContext" + template_json.VMTEMPLATE.ID,
+              context
             );
-          } else {
-            $(".memory_input .mb_input input", context).removeAttr("pattern");
+            CapacityInputs.setup(capacityContext);
+            CapacityInputs.fill(capacityContext, template_json.VMTEMPLATE);
           }
 
           var cpuCost = template_json.VMTEMPLATE.TEMPLATE.CPU_COST;
           var memoryCost = template_json.VMTEMPLATE.TEMPLATE.MEMORY_COST;
-          var memoryUnitCost =
-            template_json.VMTEMPLATE.TEMPLATE.MEMORY_UNIT_COST;
+          var memoryUnitCost = template_json.VMTEMPLATE.TEMPLATE.MEMORY_UNIT_COST;
 
           if (memoryCost && memoryUnitCost && memoryUnitCost == "GB") {
             memoryCost = (memoryCost * 1024).toString();
@@ -795,7 +766,7 @@ define(function (require) {
 
           if (
             (cpuCost != 0 || memoryCost != 0) &&
-            Config.isFeatureEnabled("showback")
+            Config.isFeatureEnabled("showback") && !isp_templ
           ) {
             CapacityInputs.setCallback(capacityContext, function (values) {
               var cost = 0;
@@ -812,7 +783,7 @@ define(function (require) {
               $(".cost_value", capacityContext).attr("value", cost.toFixed(3));
               if (azure_template == true) {
                 azure_CalculateCost();
-              } else {
+              } else if (!isp_templ) {
                 _calculateCost(context);
               }
             });
@@ -867,7 +838,7 @@ define(function (require) {
             $(".publicip_cost_div .cost_label").text(select_time);
             if (azure_template == true) {
               azure_CalculateCost();
-            } else {
+            } else if (!isp_templ) {
               _calculateCost(context);
             }
           });
@@ -894,22 +865,29 @@ define(function (require) {
               $('select[wizard_field="DRIVE"]').change(function () {
                 azure_CalculateCost();
               });
-            } else {
+            } else if (!isp_templ) {
               $('select[wizard_field="DRIVE"]').change(function () {
                 _calculateCost();
               });
             }
           }
 
+          if (template_json.VMTEMPLATE.TEMPLATE.HYPERVISOR == "vcenter") {
+            $(".memory_input .mb_input input", context).attr(
+              "pattern",
+              "^([048]|\\d*[13579][26]|\\d*[24680][048])$"
+            );
+            $(".template_user_inputs" + template_json.VMTEMPLATE.ID).append('<div class="switch" style="border: 2px solid #9a9a9a;padding: 10px 0;border-radius: 10px;text-align: center;margin-top: 20px;">' +
+              '<div style="color: black;font-weight: 400;">Экономьте до 70% с оплатой по мере использования</div>' +
+              '<input class="switch-input" id="input_bil_per_vcentre" checked type="checkbox"><label for="input_bil_per_vcentre" class="switch-paddle"></label></div>');
+          } else {
+            $(".memory_input .mb_input input", context).removeAttr("pattern");
+          }
+
           if (default_user_view) {
             $('label:contains("Password")').append(
               'Repeat password<br><input type="password" value="" class="repeat_pas" required="">'
             );
-          }
-
-          if (template_id == 560) {
-            $('#capacityContext').after($('#right_colum .template_user_inputs560'));
-            $('.template_user_inputs560 legend').css('width', '100%');
           }
 
           if (azure_template == true) {
@@ -974,14 +952,20 @@ define(function (require) {
               $(this).css("height", "50px");
               $(this)
                 .children()
-                .css({ float: "right", width: "60%" });
+                .css({
+                  float: "right",
+                  width: "60%"
+                });
               if (
                 $(this)[0] == $('label select[wizard_field="SIZE"]').parent()[0]
               ) {
                 $(this).html($('label select[wizard_field="SIZE"]'));
                 $(this)
                   .children()
-                  .css({ float: "", width: "30%" });
+                  .css({
+                    float: "",
+                    width: "30%"
+                  });
                 $(this).append(
                   '<input class="inp_ram" type="number" disabled value="0" style="width: 20%;float: right;">'
                 );
@@ -1001,20 +985,29 @@ define(function (require) {
               $(this).css("height", "50px");
               $(this)
                 .children()
-                .css({ float: "right", width: "65%" });
+                .css({
+                  float: "right",
+                  width: "65%"
+                });
             });
 
             var AZURE_IMAGES = JSON.parse(settings.AZURE_IMAGES);
             for (var i in AZURE_IMAGES) {
               $('select[wizard_field="OS_IMAGE"]').append(
-                $("<option></option>", { value: i, text: i })
+                $("<option></option>", {
+                  value: i,
+                  text: i
+                })
               );
             }
 
             var AZURE_SKUS = JSON.parse(settings.AZURE_SKUS);
             for (var i in AZURE_SKUS) {
               $('select[wizard_field="SIZE"]').append(
-                $("<option></option>", { value: i, text: i })
+                $("<option></option>", {
+                  value: i,
+                  text: i
+                })
               );
             }
             $('select[wizard_field="SIZE"] option')
@@ -1033,15 +1026,57 @@ define(function (require) {
               }
               azure_CalculateCost();
             });
+
+            $('input[wizard_field="OS_DISK_SIZE"]').change(function () {
+              azure_CalculateCost();
+            });
+            $(".uinput-slider").on("change", function () {
+              azure_CalculateCost();
+            });
+          } else if (isp_templ) {
+            // ЦЕННИКИ
+            $('.total_cost_div .cost_value').text(isp_templ_user["PRICE"]);
+            $('#capacityContext fieldset div').hide();
+            for (let key in isp_templ_user.InputsVal) {
+              if (isp_templ_user.InputsVal[key].hasOwnProperty('tmpl_key')) {
+                $('[wizard_field="' + key + '"]').parent().parent().parent().appendTo('#capacityContext fieldset');
+              }
+              if (key != 'ostempl' && key != 'addon_16') {
+                $('[wizard_field="' + key + '"]').parent().parent().find('input').on('change', function () {
+                  iso_calcul();
+                });
+              } else {
+                $('[wizard_field="' + key + '"]').on('change', function () {
+                  iso_calcul();
+                });
+              }
+
+            }
+            for (let key in isp_templ_user.Dependens) {
+              let input = '<div class="row"><div class="large-12 large-centered columns"><select wizard_field="' + key + '" style="display:none" required=""></select></div></div>';
+              $('[wizard_field="' + isp_templ_user.Dependens[key].dep_input + '"]').parent().parent().parent().after(input);
+
+              $('[wizard_field="' + isp_templ_user.Dependens[key].dep_input + '"]').on('change', function () {
+                let options = '';
+                let val = $(this).val();
+                isp_templ_user.Dependens[key].values.forEach(element => {
+                  if (element.depend == val) {
+                    options += '<option value="' + element.isp_key + '">' + element.value + '</option>';
+                  }
+                });
+                if (options == '') {
+                  $('[wizard_field="' + key + '"]').hide();
+                } else {
+                  $('[wizard_field="' + key + '"]').show();
+                  $('[wizard_field="' + key + '"]').html(options);
+                }
+              });
+              $('[wizard_field="' + isp_templ_user.Dependens[key].dep_input + '"]').change();
+            }
+
+            $('#capacityContext').after($('#right_colum .template_user_inputs560'));
+            $('.template_user_inputs560 legend').css('width', '100%');
           }
-
-          $('input[wizard_field="OS_DISK_SIZE"]').change(function () {
-            azure_CalculateCost();
-          });
-          $(".uinput-slider").on("change", function () {
-            azure_CalculateCost();
-          });
-
           $("#right_colum .cost_label").text(
             settings.CURRENCY_MAIN + " / " + Locale.tr("HOUR")
           );
@@ -1102,5 +1137,112 @@ define(function (require) {
 
     $("#SCHED_REQUIREMENTS" + id, context).val(req_string.join(" | "));
     $("#SCHED_DS_REQUIREMENTS" + id, context).val(req_ds_string.join(" | "));
+  }
+
+
+
+
+  function _calculateCost() {
+    var memory_val =
+      parseFloat($(".capacity_cost_div .cost_value").attr("value")) / 1024;
+    var cpu_val = parseFloat($(".vcpu_input_wrapper .vcpu_input input").val());
+    var disk_val = parseFloat(
+      $(".provision_create_template_disk_cost_div .cost_value").attr("value")
+    );
+    var publicip_val = 1 * $("#amt_public_ip").val();
+
+    if (Number.isNaN(memory_val)) {
+      memory_val = 0;
+    }
+    if (Number.isNaN(cpu_val)) {
+      cpu_val = 0;
+    }
+    if (Number.isNaN(disk_val)) {
+      disk_val = 0;
+    }
+
+    if ($("#publicip_cost_div").css("display") != "none") {
+      var publicip_cost = settings.PUBLIC_IP_COST * publicip_val;
+    } else {
+      var publicip_cost = 0;
+    }
+    var settings_disks_costs = JSON.parse(settings.DISK_COSTS);
+
+    var capasity_cost = JSON.parse(settings.CAPACITY_COST);
+    var memory_cost = memory_val * capasity_cost.MEMORY_COST;
+    var cpu_cost = cpu_val * capasity_cost.CPU_COST;
+    var disk_cost =
+      settings_disks_costs[$('[wizard_field="DRIVE"]').val()] * disk_val;
+
+    if (Number.isNaN(disk_cost)) {
+      disk_cost = 0;
+    }
+
+    var time_val = $("#CostVaribl").val() * 1;
+
+    var capacity_text = ((memory_cost * 1 + cpu_cost * 1) * time_val).toFixed(
+      3
+    );
+    var disk_text = ((time_val * disk_cost) / 1024).toFixed(3);
+    var publicip_text = (publicip_cost * time_val).toFixed(3);
+
+    $(".capacity_cost_div span.cost_value").text(capacity_text);
+    $(".provision_create_template_disk_cost_div span.cost_value").text(
+      disk_text
+    );
+    $(".publicip_cost_div .cost_value").text(publicip_text);
+
+    var total = capacity_text * 1 + disk_text * 1 + publicip_text * 1;
+
+    if (Config.isFeatureEnabled("showback")) {
+      $(".total_cost_div .cost_value").text(total.toFixed(2));
+    }
+  }
+
+  function iso_calcul() {
+    let all = isp_templ_user["PRICE"] * 1;
+    for (let key in isp_templ_user.InputsVal) {
+      if (key == "ostempl") {
+        continue
+      } else if (key == "addon_16") {
+        if ($('[wizard_field="addon_16"]').val() == 'Лицензия на панель управления ISPmanager Lite 4-5') {
+          all += 4;
+        }
+      } else if ($('[wizard_field="' + key + '"]').attr('min') < $('[wizard_field="' + key + '"]').val()) {
+        all += isp_templ_user.InputsVal[key].price;
+      }
+    }
+    $('.total_cost_div:nth-child(1) .cost_value').html('&emsp;' + all.toFixed(2));
+  }
+
+  function azure_CalculateCost() {
+    var standart = $('select[wizard_field="SIZE"]').val();
+    var drive_type = $('select[wizard_field="DRIVE"]').val();
+    var disk_val = $('input[wizard_field="OS_DISK_SIZE"]').val();
+    var time_val = $("#CostVaribl").val() * 1;
+
+    var standart_cost = 0;
+    if (standart != "Select Instance Size") {
+      var azure_skus = JSON.parse(settings.AZURE_SKUS);
+      var stand = JSON.parse(azure_skus[standart]);
+      standart_cost = stand.PRICE;
+    }
+    var pub_ip_cost = parseFloat(
+      settings.AZURE_PUBLIC_IP_COST.replace(",", ".").replace(" ", "")
+    );
+
+    var setting_drive_costs = JSON.parse(settings.AZURE_DISK_COSTS);
+    var disk_cost = setting_drive_costs[drive_type] * disk_val;
+
+    var total_cost = (standart_cost * 1 + disk_cost + pub_ip_cost) * time_val;
+
+    $(".capacity_cost_div span.cost_value").text(
+      (standart_cost * time_val).toFixed(3)
+    );
+    $(".provision_create_template_disk_cost_div span.cost_value").text(
+      (disk_cost * time_val).toFixed(3)
+    );
+    $(".publicip_cost_div .cost_value").text(pub_ip_cost.toFixed(3));
+    $(".total_cost_div .cost_value").text(total_cost.toFixed(2));
   }
 });

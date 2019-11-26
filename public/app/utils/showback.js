@@ -45,6 +45,7 @@ define(function (require) {
     return html;
   }
 
+
   // context is a jQuery selector
   // The following options can be set:
   //   fixed_user     fix an owner user ID. Use "" to fix to "any user"
@@ -66,8 +67,7 @@ define(function (require) {
         context: $("#showback_user_select", context),
         resourceName: "User",
         initValue: -1,
-        extraOptions:
-          '<option value="-1">' + Locale.tr("<< me >>") + "</option>"
+        extraOptions: '<option value="-1">' + Locale.tr("<< me >>") + "</option>"
       });
     }
 
@@ -86,14 +86,24 @@ define(function (require) {
       bDeferRender: true,
       iDisplayLength: 6,
       sDom: "t<'row collapse'<'small-12 columns'p>>",
-      aoColumnDefs: [
-        { bVisible: false, aTargets: [0, 1, 2] },
-        { sType: "num", aTargets: [4] },
-        { aDataSort: [2], aTargets: [3] }
+      aoColumnDefs: [{
+        bVisible: false,
+        aTargets: [0, 1, 2]
+      },
+      {
+        sType: "num",
+        aTargets: [4]
+      },
+      {
+        aDataSort: [2],
+        aTargets: [3]
+      }
       ]
     });
 
-    showback_dataTable.fnSort([[3, "desc"]]);
+    showback_dataTable.fnSort([
+      [3, "desc"]
+    ]);
 
     showback_dataTable.on("click", "tbody tr", function () {
       var cells = showback_dataTable.fnGetData(this);
@@ -102,8 +112,10 @@ define(function (require) {
 
       var vms = update_table_template(month);
       if (lists_month[month].total.cost > 0) {
-        create_diagram(getDataset(month));
+        create_diagram(getDataset(month), month);
         $("#test_table_graph").show();
+        $('#show_all_vms').show();
+        $('#test_table_graph_legend p[data-percent="0.00"]').hide();
         $("#test_table_graph_legend").show();
       }
 
@@ -111,7 +123,20 @@ define(function (require) {
         scrollX: true,
         scrollCollapse: true,
         bInfo: false,
-        bPaginate: false
+        bPaginate: false,
+        "bSort": false,
+        aoColumnDefs: [{
+          bVisible: false,
+          aTargets: [0]
+        }],
+      });
+
+      test_dataTable2 = $("#test_datatable2", context).dataTable({
+        scrollX: true,
+        scrollCollapse: true,
+        bInfo: false,
+        bPaginate: false,
+        "bSort": false
       });
 
       $("#table_test_title").off("click", ".showback_div_label");
@@ -129,6 +154,8 @@ define(function (require) {
           if (getSelectLabel(this)) {
             test_dataTable.fnClearTable();
             test_dataTable.fnAddData(getShowback(month, vms));
+            test_dataTable2.fnClearTable();
+            test_dataTable2.fnAddData(getShowback(month, vms));
             ////////
             var total = 0;
             var num = 1;
@@ -151,7 +178,35 @@ define(function (require) {
               .eq(num)
               .text(total.toFixed(2));
             ////////
+
+            $('#test_datatable tbody tr').hover(function () {
+              let indx = $('#test_datatable tbody tr').index($(this));
+              let second_row = $('#test_datatable2 tbody tr').eq(indx);
+              $(second_row).css('background-color', '#f4f4f4');
+              $(this).css('background-color', '#f4f4f4');
+            }, function () {
+              let indx = $('#test_datatable tbody tr').index($(this));
+              let second_row = $('#test_datatable2 tbody tr').eq(indx);
+              $(second_row).css('background-color', 'white');
+              $(this).css('background-color', 'white');
+            }
+            );
+
+            $('#test_datatable2 tbody tr').hover(function () {
+              let indx = $('#test_datatable2 tbody tr').index($(this));
+              let second_row = $('#test_datatable tbody tr').eq(indx);
+              $(second_row).css('background-color', '#f4f4f4');
+              $(this).css('background-color', '#f4f4f4');
+            }, function () {
+              let indx = $('#test_datatable2 tbody tr').index($(this));
+              let second_row = $('#test_datatable tbody tr').eq(indx);
+              $(second_row).css('background-color', 'white');
+              $(this).css('background-color', 'white');
+            }
+            );
+
             test_dataTable.$("tr").css("border-top", "1px solid lightgray");
+            test_dataTable2.$("tr").css("border-top", "1px solid lightgray");
           }
         }
       );
@@ -162,25 +217,44 @@ define(function (require) {
         function () {
           var cells = test_dataTable.fnGetData(this);
           var day = cells[0];
+          let indx = $('#test_datatable tbody tr').index($(this));
+          let second_row = $('#test_datatable2 tbody tr').eq(indx);
           if ($(this).hasClass("Shown")) {
-            $(this)
-              .next("tr")
-              .remove();
-            $(this)
-              .find("td")
-              .eq(0)
-              .text(day);
-            $(this).removeClass("Shown");
+            $(this).removeClass("Shown").next("tr").remove();
+
+            $(second_row).removeClass('Shown').next('tr').remove();
+            $(second_row).find("td").eq(0).text(day);
           } else {
-            $(this)
-              .find("td")
-              .eq(0)
-              .text(day + " " + getWeekDay(new Date(2019, month - 1, day)));
-            $(this).after(more_info(month, day, vms));
-            $(this)
-              .next("tr")
-              .show(500);
-            $(this).addClass("Shown");
+            $(this).addClass("Shown").after(more_info(month, day, vms));
+            $(this).next("tr").show(500);
+
+            $(second_row).addClass("Shown").find("td").eq(0).text(day + " " + getWeekDay(new Date(2019, month - 1, day)));
+            $(second_row).after("<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>");
+            $(second_row).next("tr").show(500)
+          }
+        }
+      );
+
+      $("#test_datatable2", context).on(
+        "click",
+        'tbody [role="row"]',
+        function () {
+          var cells = test_dataTable.fnGetData(this);
+          var day = cells[0];
+          let indx = $('#test_datatable2 tbody tr').index($(this));
+          let second_row = $('#test_datatable tbody tr').eq(indx);
+          if ($(this).hasClass("Shown")) {
+            $(this).removeClass("Shown").next("tr").remove();
+            $(this).find("td").eq(0).text(day);
+
+            $(second_row).removeClass("Shown").next("tr").remove();
+          } else {
+            $(this).addClass("Shown").find("td").eq(0).text(day + " " + getWeekDay(new Date(2019, month - 1, day)));
+            $(this).after("<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>");
+            $(this).next("tr").show(500);
+
+            $(second_row).addClass("Shown").after(more_info(month, day, vms));
+            $(second_row).next("tr").show(500);
           }
         }
       );
@@ -191,7 +265,44 @@ define(function (require) {
 
       test_dataTable.$("tr").css("border-top", "1px solid lightgray");
 
-      test_dataTable.fnSort([[0, "desc"]]);
+      test_dataTable.fnSort([
+        [0, "desc"]
+      ]);
+
+      test_dataTable2.fnClearTable();
+      test_dataTable2.fnAddData(getShowback(month, vms));
+
+      $('#test_datatable tbody tr').hover(function () {
+        let indx = $('#test_datatable tbody tr').index($(this));
+        let second_row = $('#test_datatable2 tbody tr').eq(indx);
+        $(second_row).css('background-color', '#f4f4f4');
+        $(this).css('background-color', '#f4f4f4');
+      }, function () {
+        let indx = $('#test_datatable tbody tr').index($(this));
+        let second_row = $('#test_datatable2 tbody tr').eq(indx);
+        $(second_row).css('background-color', 'white');
+        $(this).css('background-color', 'white');
+      }
+      );
+
+      $('#test_datatable2 tbody tr').hover(function () {
+        let indx = $('#test_datatable2 tbody tr').index($(this));
+        let second_row = $('#test_datatable tbody tr').eq(indx);
+        $(second_row).css('background-color', '#f4f4f4');
+        $(this).css('background-color', '#f4f4f4');
+      }, function () {
+        let indx = $('#test_datatable2 tbody tr').index($(this));
+        let second_row = $('#test_datatable tbody tr').eq(indx);
+        $(second_row).css('background-color', 'white');
+        $(this).css('background-color', 'white');
+      }
+      );
+
+      test_dataTable2.$("tr").css("border-top", "1px solid lightgray");
+      $('#div_test_datatable2 tr[role="row"]').eq(0).css('height', $('#div_test_datatable tr[role="row"]').eq(0).css('height'));
+      test_dataTable2.fnSort([
+        [0, "desc"]
+      ]);
       $("#test_title", context).text(
         Locale.months[month - 1] + " " + year + " " + Locale.tr("VMs")
       );
@@ -214,6 +325,7 @@ define(function (require) {
       success: function (req, res) {
         lists = req.response;
         lists_month = create_list_months(lists);
+        //console.log(666, req.response);
         _fillShowback(context);
       }
     };
@@ -435,16 +547,21 @@ define(function (require) {
       // }
     }
 
-    //console.log(list_months);
+    //console.log(111, list_months);
     return list_months;
   }
 
   function update_table_template(month) {
     $(".test_table").hide();
     $("#test_datatable_wrapper").remove();
+    $("#test_datatable2_wrapper").remove();
     $("#test_datatable").remove();
+    $("#test_datatabl2").remove();
     $("#div_test_datatable").append(
       '<table id="test_datatable" class="hover"><thead><tr></tr></thead><tbody></tbody><tfoot><tr id="tr_total"></tr></tfoot></table>'
+    );
+    $("#div_test_datatable2").append(
+      '<table id="test_datatable2" class="hover"><thead><tr><th>DAY</th></tr></thead><tbody></tbody><tfoot></tfoot></table>'
     );
     var months_days = days_month(2019, month);
     var vms = {};
@@ -481,8 +598,8 @@ define(function (require) {
   }
 
   function more_info(month, day, vms) {
-    var more_tr =
-      "<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>";
+    var more_tr = '<tr hidden>';
+    // "<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>";
     for (var i in vms) {
       if (lists_month[month][day][i] != undefined) {
         more_tr +=
@@ -643,32 +760,45 @@ define(function (require) {
 
   function getDataset(month) {
     var total = lists_month[month].total.cost;
+    var legend_arr = [];
     var dataset = [];
-    $("#test_table_graph_legend").text("");
     var kk = 0;
-    for (var i in lists_month[month].vms) {
+    $("#test_table_graph_legend").text("");
+    for (let i in lists_month[month].vms) {
       var percent = (100 / (total / lists_month[month].vms[i].cost)).toFixed(2);
-      dataset.push({ value: percent, color: Colors.names[kk] });
+      legend_arr.push({
+        val_percent: percent,
+        vmsId: i,
+        label: i + " - " + lists_month[month].vms[i].name
+      });
+    }
+    legend_arr.sort(function (a, b) {
+      return a.val_percent == b.val_percent ? 0 : +(a.val_percent * 1 < b.val_percent * 1) || -1;
+    });
+    legend_arr.forEach(element => {
       $("#test_table_graph_legend").append(
-        '<p><i class="fa fa-square" aria-hidden="true" style="color:' +
-        Colors.names[kk] +
-        '"></i>  ' +
-        i +
-        " - " +
-        lists_month[month].vms[i].name +
-        "</p>"
+        '<p data-percent="' + element.val_percent + '" data-vmsId="' + element.vmsId +
+        '" style="float: left;width: 50%;"><i class="fa fa-square" aria-hidden="true" style="color:' +
+        Colors.names[kk] + '"></i>  ' + element.label + "</p>"
       );
+      if (element.val_percent > 0) {
+        dataset.push({
+          value: element.val_percent,
+          color: Colors.names[kk],
+          vmsId: element.vmsId
+        });
+      }
       if (kk != 6) {
         kk++;
       } else {
         kk = 0;
       }
-    }
+    });
 
     return dataset;
   }
 
-  function create_diagram(dataset) {
+  function create_diagram(dataset, month) {
     var maxValue = 25;
     $("#test_table_graph").text("");
     var container = $("#test_table_graph");
@@ -686,6 +816,9 @@ define(function (require) {
       }).css({
         background: data.color,
         transform: "rotate(" + rotateDeg + "deg) skewY(" + skewDeg + "deg)"
+      }).attr({
+        "data-percent": data.value,
+        "data-vmsId": data.vmsId
       });
       container.append(sector);
 
@@ -698,31 +831,76 @@ define(function (require) {
           return addSector(data, angle, false);
         }
 
-        return addPart(
-          {
-            value: data.value - maxValue,
+        return addPart({
+          value: data.value - maxValue,
+          vmsId: data.vmsId,
+          color: data.color
+        },
+          addSector({
+            value: maxValue,
+            vmsId: data.vmsId,
             color: data.color
           },
-          addSector(
-            {
-              value: maxValue,
-              color: data.color
-            },
             angle,
             true
           )
         );
       })(curr, prev);
     }, 0);
+
+
+    $('#test_table_graph .sector').hover(function () {
+      let vmsid = $(this).attr('data-vmsid');
+      $('#test_table_graph .sector:not([data-vmsid="' + vmsid + '"])').css('opacity', '0.3');
+      let percent = $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').attr('data-percent');
+      $('#test_table_graph').attr('data-percent', percent + '%');
+      $('#test_table_graph_legend p:not([data-vmsid="' + vmsid + '"])').hide();
+      let legend_vm = $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').css('width', '100%').html();
+      let info_field_name = { 'Total': 'cost', 'CPU': 'cpu', 'Memory': 'memory', 'Disk': 'disk', 'Public IP': 'pub_ip', 'Work time': 'work_time' };
+      let full_info_vm = '<span>';
+      for (let i in info_field_name) {
+        if (!isNaN(lists_month[month].vms[vmsid][info_field_name[i]])) {
+          full_info_vm += '<br>' + i + ': ' + lists_month[month].vms[vmsid][info_field_name[i]].toFixed(2);
+        }
+      }
+      full_info_vm += '</span>';
+      $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').html(legend_vm + full_info_vm);
+    }, function () {
+      let vmsid = $(this).attr('data-vmsid');
+      $('#test_table_graph .sector:not([data-vmsid="' + vmsid + '"])').css('opacity', '1');
+      $('#test_table_graph').attr('data-percent', '100%');
+      $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').css('width', '50%').find('span').remove();
+      $('#test_table_graph_legend p').show();
+      if (!$('#show_all_vms input').prop('checked')) {
+        $('#test_table_graph_legend p[data-percent="0.00"]').hide();
+      }
+    }
+    );
+
+    $('#test_table_graph_legend p').hover(function () {
+      $('#test_table_graph .sector:not([data-vmsid="' + $(this).attr('data-vmsid') + '"])').css('opacity', '0.3');
+      $('#test_table_graph').attr('data-percent', $(this).attr('data-percent') + '%');
+    }, function () {
+      $('#test_table_graph .sector:not([data-vmsid="' + $(this).attr('data-vmsid') + '"])').css('opacity', '1');
+      $('#test_table_graph').attr('data-percent', '100%');
+    });
+
+    $('#show_all_vms input').change(function () {
+      if ($(this).prop('checked')) {
+        $('#test_table_graph_legend p').show();
+      } else {
+        $('#test_table_graph_legend p[data-percent="0.00"]').hide();
+      }
+    });
   }
 
   function constrColors() {
     Colors.names = [
       "#add8e6",
-      "#e0ffff",
+      "#00ccff",
       "#90ee90",
       "#ffb6c1",
-      "#ffffe0",
+      "#ffcc66",
       "lightsalmon",
       "lightseagreen"
     ];

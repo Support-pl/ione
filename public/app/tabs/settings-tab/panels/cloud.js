@@ -105,10 +105,22 @@ define(function (require) {
                     for (var key in datastores) {
                         if (datastores[key].DATASTORE.TEMPLATE.TYPE == 'SYSTEM_DS') {
                             if (datastores[key].DATASTORE.TEMPLATE.DEPLOY == "TRUE") {
-                                datastores_hbs.push({ ID: datastores[key].DATASTORE.ID, NAME: datastores[key].DATASTORE.NAME, DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR, DEPLOY: true });
+                                datastores_hbs.push({
+                                    ID: datastores[key].DATASTORE.ID,
+                                    NAME: datastores[key].DATASTORE.NAME,
+                                    DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,
+                                    HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,
+                                    DEPLOY: true
+                                });
                                 check = 'checked ';
                             } else {
-                                datastores_hbs.push({ ID: datastores[key].DATASTORE.ID, NAME: datastores[key].DATASTORE.NAME, DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE, HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR, DEPLOY: false });
+                                datastores_hbs.push({
+                                    ID: datastores[key].DATASTORE.ID,
+                                    NAME: datastores[key].DATASTORE.NAME,
+                                    DISK_TYPE: datastores[key].DATASTORE.TEMPLATE.DRIVE_TYPE,
+                                    HYPERVISOR: datastores[key].DATASTORE.TEMPLATE.HYPERVISOR,
+                                    DEPLOY: false
+                                });
                                 check = '';
                             }
                             $('#datastores_body').append('<tr role="row"><td>' + datastores[key].DATASTORE.ID + '</td><td>' + datastores[key].DATASTORE.NAME + '</td>' +
@@ -121,19 +133,25 @@ define(function (require) {
 
                     // datastore_dataTable.fnClearTable();
                     // datastore_dataTable.fnAddData();
-                    console.log(datastores, datastores_hbs);
+                    //console.log(datastores, datastores_hbs);
                     settings_hbs = {};
                     for (var i in settings) {
                         if (settings[i] != null) {
                             if (settings[i].indexOf('{') == 0) {
                                 var tree = JSON.parse(settings[i]);
-                                settings_hbs[i] = { bool_tree: true, value: tree };
+                                settings_hbs[i] = {
+                                    bool_tree: true,
+                                    value: tree
+                                };
                             } else {
-                                settings_hbs[i] = { bool_tree: false, value: settings[i] };
+                                settings_hbs[i] = {
+                                    bool_tree: false,
+                                    value: settings[i]
+                                };
                             }
                         }
                     }
-                    console.log(settings_hbs);
+                    //console.log(settings_hbs);
                     var flag_circle;
                     for (var i in settings_hbs) {
 
@@ -206,7 +224,9 @@ define(function (require) {
                             for (var j in settings_hbs[i].value) {
                                 pre_name.push(j);
                                 kol++
-                                if (kol == 2) { break; }
+                                if (kol == 2) {
+                                    break;
+                                }
                             }
                             if (pre_name.length > 1) {
                                 if (Object.keys(settings_hbs[i].value).length > 2) {
@@ -370,12 +390,17 @@ define(function (require) {
 
 
         $('#datastores_but_submit').click(function () {
-            console.log(datastores_hbs, datastores);
+            //console.log(datastores_hbs, datastores);
             var datastores = $('#datastores_body .datastores_select_disk_type');
             var len = datastores.length - 1;
             for (var i = 0; i < len; i++) {
                 if (datastores_hbs[i].DISK_TYPE != $(datastores[i]).val()) {
-                    OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DRIVE_TYPE = ' + $(datastores[i]).val() } });
+                    OpenNebula.Datastore.append({
+                        data: {
+                            id: datastores_hbs[i].ID,
+                            extra_param: 'DRIVE_TYPE = ' + $(datastores[i]).val()
+                        }
+                    });
                     datastores_hbs[i].DISK_TYPE = $(datastores[i]).val();
                     Notifier.notifyMessage(Locale.tr('Changed disk type'));
                 }
@@ -383,9 +408,19 @@ define(function (require) {
                 if (datastores_hbs[i].DEPLOY != dep) {
                     if ($(datastores[i]).val() != null) {
                         if (dep == true) {
-                            OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DEPLOY = TRUE' } });
+                            OpenNebula.Datastore.append({
+                                data: {
+                                    id: datastores_hbs[i].ID,
+                                    extra_param: 'DEPLOY = TRUE'
+                                }
+                            });
                         } else {
-                            OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'DEPLOY = FALSE' } });
+                            OpenNebula.Datastore.append({
+                                data: {
+                                    id: datastores_hbs[i].ID,
+                                    extra_param: 'DEPLOY = FALSE'
+                                }
+                            });
                         }
                         datastores_hbs[i].DEPLOY = dep;
                         Notifier.notifyMessage(Locale.tr('Changed deploy'));
@@ -396,7 +431,12 @@ define(function (require) {
                 }
                 var hyper_value = $('#datastore_huper' + datastores_hbs[i].ID + ' input').val();
                 if (datastores_hbs[i].HYPERVISOR != hyper_value && hyper_value != 'undefined') {
-                    OpenNebula.Datastore.append({ data: { id: datastores_hbs[i].ID, extra_param: 'HYPERVISOR = ' + hyper_value } });
+                    OpenNebula.Datastore.append({
+                        data: {
+                            id: datastores_hbs[i].ID,
+                            extra_param: 'HYPERVISOR = ' + hyper_value
+                        }
+                    });
                     datastores_hbs[i].HYPERVISOR = hyper_value;
                     Notifier.notifyMessage(Locale.tr('Changed hypervisor'));
                 }
@@ -513,7 +553,10 @@ define(function (require) {
                             '<a id="div_minus_' + new_key + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                             '</span></td></tr>'
                         );
-                        settings_hbs[new_key] = { bool_tree: false, value: new_val };
+                        settings_hbs[new_key] = {
+                            bool_tree: false,
+                            value: new_val
+                        };
                         set_events();
                     } else {
                         $('tbody#settings_body').append('<tr class="tr_setting_' + new_key + '">' +
@@ -532,7 +575,10 @@ define(function (require) {
                             '<a id="div_minus_' + new_key1 + '" class="remove_x" href="#"> <i class="fa fa-trash-o right"></i></a>' +
                             '</span></td></tr>'
                         );
-                        settings_hbs[new_key] = { bool_tree: true, value: {} };
+                        settings_hbs[new_key] = {
+                            bool_tree: true,
+                            value: {}
+                        };
                         settings_hbs[new_key].value[new_key1] = new_val;
                         set_events();
                     }
@@ -546,7 +592,11 @@ define(function (require) {
                     if (settings_hbs[i].bool_tree == true) {
                         if (JSON.stringify(settings_hbs[i].value) != settings[i]) {
 
-                            var keys = { 'added': [], 'changed': [], 'deleted': [] };
+                            var keys = {
+                                'added': [],
+                                'changed': [],
+                                'deleted': []
+                            };
                             var obj_sett = JSON.parse(settings[i]);
                             for (var j in settings_hbs[i].value) {
                                 if (obj_sett[j] == undefined) {

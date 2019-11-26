@@ -84,9 +84,13 @@
     </div>
   </div>
   <div class="medium-6 columns">
-    <div class="container" id="test_table_graph" hidden></div>
+    <div class="container" id="test_table_graph" data-percent="100%" style="border: 1px solid #e8e6e6;" hidden></div>
   </div>
   <div class="medium-6 columns">
+    <div id="show_all_vms" hidden>
+      <input type="checkbox" style="float: left;margin: 10px;">
+      <label for="test" style="float: left;margin: 5px;">Show all list Vms</label>
+    </div>
     <div id="test_table_graph_legend" style="margin-top: 50px;font-size: 15px;" hidden>
     </div>
   </div>
@@ -117,7 +121,19 @@
         style="margin-right: 25px;cursor: pointer;padding: 0px 10px 0px 10px;float: right;text-align: center;border: 2px solid #4dbbd3;border-radius: 100px !important;margin-top: 40px;">
         {{ tr "Total"}}</div>
     </div>
-    <div id="div_test_datatable" class="large-12 columns" style="overflow:auto">
+    <div id="div_test_datatable2" class="large-2 columns" style="padding:0;border-right: 1px solid lightgray;">
+      <table id="test_datatable2" class="hover">
+        <thead>
+          <tr>
+            <th>DAY</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+    <div id="div_test_datatable" class="large-10 columns" style="overflow:auto;padding-left: 0;">
       <table id="test_datatable" class="hover">
         <thead>
           <tr>
