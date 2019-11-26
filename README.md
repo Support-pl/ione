@@ -2,8 +2,7 @@
 
 ### Contacts
 [Homepage](https://ione-cloud.net)
-<a href="https://docs.ione-cloud.net"><img href="https://img.shields.io/static/v1?label=docs&message=IONe&color=blue"/></a>
-[Docs](https://docs.ione-cloud.net)
+<a href="https://docs.ione-cloud.net" title="IONe Docs Page" rel="nofollow"><img src="https://img.shields.io/static/v1?label=docs&message=IONe&color=blue&style=flat" alt="IONe Docs Page"/></a>
 [GitHub](https://github.com/ione-cloud)
 Creators:
 [Support.pl](https://support.pl)
