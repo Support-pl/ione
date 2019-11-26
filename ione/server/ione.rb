@@ -198,15 +198,22 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
             end
             post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
                 body = JSON.parse(@request_body)
+
+                u = User.new_with_id(-1, Client.new(args['auth']))
+                rc = u.info!
+                if OpenNebula.is_error?(rc)
+                    raise "False Credentials given"
+                end
+
                 JSON.pretty_generate(r:
-                    onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method << excl, *body['args'])
+                    onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
                 )
             end
         end
 
         RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
         begin
-            run IONeAPIServer.run!
+            IONeAPIServer.run!
         rescue StandardError => e
             RPC_LOGGER.debug e.message
         end
