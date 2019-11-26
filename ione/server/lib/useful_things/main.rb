@@ -343,7 +343,8 @@ class IONe
                     name: vm.name,
                     ip: GetIP(vm),
                     state: vm.state_str,
-                    lcm_state: vm.lcm_state_str
+                    lcm_state: vm.lcm_state_str,
+                    host: get_vm_host(vm)
                 }
             end
         else
@@ -353,7 +354,8 @@ class IONe
                     name: vm.name,
                     ip: GetIP(vm),
                     state: vm.state_str,
-                    lcm_state: vm.lcm_state_str
+                    lcm_state: vm.lcm_state_str,
+                    host: get_vm_host(vm)
                 }
             end
         end
