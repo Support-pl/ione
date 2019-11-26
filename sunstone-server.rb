@@ -360,7 +360,7 @@ before do
     @request_body = request.body.read
     request.body.rewind
 
-    unless %w(/ /login /vnc /spice /version).include?(request.path)
+    unless %w(/ /login /vnc /spice /version).include?(request.path) || request.path.include?('/ione/')
         halt [401, "csrftoken"] unless authorized? && valid_csrftoken?
     end
 
