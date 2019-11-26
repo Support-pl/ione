@@ -1,7 +1,7 @@
 # OpenNebula Sunstone with IONe integration
 
 ### Contacts
-<p align="center">
+<p align="left">
     <a href="https://ione-cloud.net" title="Project Homepage" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=Project&message=HomePage&color=blue&style=flat" alt="Project Homepage"/>
     </a>
