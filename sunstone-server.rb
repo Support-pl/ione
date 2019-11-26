@@ -360,7 +360,7 @@ before do
     @request_body = request.body.read
     request.body.rewind
 
-    unless %w(/ /login /vnc /spice /version).include?(request.path)
+    unless %w(/ /login /vnc /spice /version).include?(request.path) || request.path.include?('/ione/')
         halt [401, "csrftoken"] unless authorized? && valid_csrftoken?
     end
 
@@ -894,10 +894,12 @@ end
 require 'ione/server/ione.rb'
 post '/ione/:method' do
     begin
+        RPC_LOGGER.debug "IONeAPI calls proxy method #{params['method']}(#{JSON.parse(@request_body)['params'].collect {|p| p.inspect}.join(", ")}) | from #{session[:ip]}"
         r = IONe.new($cloud_auth.client(session[:user], session[:active_zone_endpoint]), $db).send(params['method'], *JSON.parse(@request_body)['params'])
     rescue => e
         r = e.message
     end
+    RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
     JSON.pretty_generate response: r
 end
 

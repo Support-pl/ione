@@ -14,8 +14,8 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
-//  require('foundation.alert');
+define(function (require) {
+  //  require('foundation.alert');
   var Sunstone = require('sunstone');
   var OpenNebula = require('opennebula');
   var OpenNebulaVM = require('opennebula/vm');
@@ -41,7 +41,7 @@ define(function(require) {
   var TAB_ID = require('../tabId');
   var _accordionId = 0;
 
-  var VNC_DIALOG_ID   = require('tabs/vms-tab/dialogs/vnc/dialogId');
+  var VNC_DIALOG_ID = require('tabs/vms-tab/dialogs/vnc/dialogId');
   var SPICE_DIALOG_ID = require('tabs/vms-tab/dialogs/spice/dialogId');
   var REINSTALL_DIALOG_ID = require('tabs/vms-tab/dialogs/reinstall/dialogId');
 
@@ -64,7 +64,7 @@ define(function(require) {
     context.html(html(opts));
 
     Foundation.reflow(context, 'accordion');
-    
+
     if (opts.data) {
       $(".provision_vms_table", context).data("opennebula", opts.data)
     }
@@ -75,14 +75,17 @@ define(function(require) {
 
   function html(opts_arg) {
     opts = $.extend({
-        title: Locale.tr("Virtual Machines"),
-        refresh: true,
-        create: true,
-        filter: true
-      }, opts_arg)
+      title: Locale.tr("Virtual Machines"),
+      refresh: true,
+      create: true,
+      filter: true
+    }, opts_arg)
 
     _accordionId += 1;
-    return TemplateVmsList({'accordionId': _accordionId, 'opts': opts});
+    return TemplateVmsList({
+      'accordionId': _accordionId,
+      'opts': opts
+    });
   }
 
   function fill_provision_vms_datatable(datatable, item_list) {
@@ -90,13 +93,13 @@ define(function(require) {
     if (item_list.length == 0) {
       datatable.html('<div class="text-center">' +
         '<span class="fa-stack fa-5x">' +
-          '<i class="fa fa-cloud fa-stack-2x"></i>' +
-          '<i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>' +
+        '<i class="fa fa-cloud fa-stack-2x"></i>' +
+        '<i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>' +
         '</span>' +
         '<br>' +
         '<br>' +
         '<span>' +
-          Locale.tr("There are no Virtual Machines") +
+        Locale.tr("There are no Virtual Machines") +
         '</span>' +
         '<br>' +
         '<br>' +
@@ -109,8 +112,8 @@ define(function(require) {
   function update_provision_vms_datatable(datatable, timeout) {
     datatable.html('<div class="text-center">' +
       '<span class="fa-stack fa-5x">' +
-        '<i class="fa fa-cloud fa-stack-2x"></i>' +
-        '<i class="fa  fa-spinner fa-spin fa-stack-1x fa-inverse"></i>' +
+      '<i class="fa fa-cloud fa-stack-2x"></i>' +
+      '<i class="fa  fa-spinner fa-spin fa-stack-1x fa-inverse"></i>' +
       '</span>' +
       '<br>' +
       '<br>' +
@@ -122,15 +125,15 @@ define(function(require) {
     if (data) {
       fill_provision_vms_datatable(datatable, data)
     } else {
-      setTimeout(function() {
-          OpenNebula.VM.list({
-            timeout: true,
-            success: function (request, item_list) {
-              fill_provision_vms_datatable(datatable, item_list)
-            },
-            error: Notifier.onError
-          })
-        }, timeout);
+      setTimeout(function () {
+        OpenNebula.VM.list({
+          timeout: true,
+          success: function (request, item_list) {
+            fill_provision_vms_datatable(datatable, item_list)
+          },
+          error: Notifier.onError
+        })
+      }, timeout);
     }
   }
 
@@ -138,31 +141,48 @@ define(function(require) {
     var provision_vms_datatable = $('.provision_vms_table', context).dataTable({
       "iDisplayLength": 6,
       "bAutoWidth": false,
-      "sDom" : '<"H">t<"F"lp>',
-      "aLengthMenu": [[6, 12, 36, 72], [6, 12, 36, 72]],
-      "aaSorting"  : [[0, "desc"]],
-      "aoColumnDefs": [
-          { "bVisible": false, "aTargets": ["all"]},
-          { "sType": "num", "aTargets": [0]}
+      "sDom": '<"H">t<"F"lp>',
+      "aLengthMenu": [
+        [6, 12, 36, 72],
+        [6, 12, 36, 72]
       ],
-      "aoColumns": [
-          { "mDataProp": "VM.ID" },
-          { "mDataProp": "VM.NAME" },
-          { "mDataProp": "VM.UID" }
+      "aaSorting": [
+        [0, "desc"]
+      ],
+      "aoColumnDefs": [{
+          "bVisible": false,
+          "aTargets": ["all"]
+        },
+        {
+          "sType": "num",
+          "aTargets": [0]
+        }
+      ],
+      "aoColumns": [{
+          "mDataProp": "VM.ID"
+        },
+        {
+          "mDataProp": "VM.NAME"
+        },
+        {
+          "mDataProp": "VM.UID"
+        }
       ],
       "fnPreDrawCallback": function (oSettings) {
         // create a thumbs container if it doesn't exist. put it in the dataTables_scrollbody div
-        if (this.$('tr', {"filter": "applied"} ).length == 0) {
-          this.html('<div class="text-center">'+
-            '<span class="fa-stack fa-5x">'+
-              '<i class="fa fa-cloud fa-stack-2x"></i>'+
-              '<i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>'+
-            '</span>'+
-            '<br>'+
-            '<br>'+
-            '<span>'+
-              Locale.tr("There are no Virtual Machines")+
-            '</span>'+
+        if (this.$('tr', {
+            "filter": "applied"
+          }).length == 0) {
+          this.html('<div class="text-center">' +
+            '<span class="fa-stack fa-5x">' +
+            '<i class="fa fa-cloud fa-stack-2x"></i>' +
+            '<i class="fa fa-info-circle fa-stack-1x fa-inverse"></i>' +
+            '</span>' +
+            '<br>' +
+            '<br>' +
+            '<span>' +
+            Locale.tr("There are no Virtual Machines") +
+            '</span>' +
             '</div>');
         } else {
           $(".provision_vms_table", context).html('<div class="provision_vms_ul large-up-3 medium-up-3 small-up-1"></div>');
@@ -170,71 +190,71 @@ define(function(require) {
 
         return true;
       },
-      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+      "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         var data = aData.VM;
 
-        if(data == undefined){
+        if (data == undefined) {
           return nRow;
         }
 
         var state = get_provision_vm_state(data);
 
         var monitoring = "";
-        if(data.MONITORING.GUEST_IP){
+        if (data.MONITORING.GUEST_IP) {
           monitoring = '<li class="provision-bullet-item"><span class=""><i class="fa fa-fw fa-lg fa-server"/>' + data.MONITORING.GUEST_IP + '</span></li>';
         }
 
-        $(".provision_vms_ul", context).append('<div class="column">'+
-            '<ul class="provision-pricing-table menu vertical" opennebula_id="'+data.ID+'" datatable_index="'+iDisplayIndexFull+'">'+
-              '<li class="provision-title">'+
-                '<a class="provision_info_vm_button">'+
-                '<span class="'+ state.color +'-color right" title="'+state.str+'">'+
-                  '<i class="fa fa-square"/>'+
-                '</span>'+
-                data.NAME + '</a>'+
-              '</li>'+
-              '<li class="provision-bullet-item" >'+
-                '<i class="fa fa-fw fa-lg fa-laptop"/> '+
-                'x'+data.TEMPLATE.CPU+' - '+
-                ((data.TEMPLATE.MEMORY > 1000) ?
-                  (Math.floor(data.TEMPLATE.MEMORY/1024)+'GB') :
-                  (TemplateUtils.htmlEncode(data.TEMPLATE.MEMORY)+'MB'))+
-                ' - '+
-                get_provision_disk_image(data) +
-              '</li>'+
-              '<li class="provision-bullet-item" >'+
-                '<span class="">'+
-                  get_provision_ips(data) +
-                '</span>'+
-              '</li>'+ monitoring +
-              '<li class="provision-bullet-item-last" >'+
-                '<span class="">'+
-                  '<i class="fa fa-fw fa-lg fa-user"/> '+
-                  data.UNAME+
-                '</span>'+
-                '<span class="right">'+
-                  Humanize.prettyTimeAgo(data.STIME)+
-                '</span>'+
-              '</li>'+
-            '</ul>'+
+        $(".provision_vms_ul", context).append('<div class="column">' +
+          '<ul class="provision-pricing-table menu vertical" opennebula_id="' + data.ID + '" datatable_index="' + iDisplayIndexFull + '">' +
+          '<li class="provision-title">' +
+          '<a class="provision_info_vm_button">' +
+          '<span class="' + state.color + '-color right" title="' + state.str + '">' +
+          '<i class="fa fa-square"/>' +
+          '</span>' +
+          data.NAME + '</a>' +
+          '</li>' +
+          '<li class="provision-bullet-item" >' +
+          '<i class="fa fa-fw fa-lg fa-laptop"/> ' +
+          'x' + data.TEMPLATE.CPU + ' - ' +
+          ((data.TEMPLATE.MEMORY > 1000) ?
+            (Math.floor(data.TEMPLATE.MEMORY / 1024) + 'GB') :
+            (TemplateUtils.htmlEncode(data.TEMPLATE.MEMORY) + 'MB')) +
+          ' - ' +
+          get_provision_disk_image(data) +
+          '</li>' +
+          '<li class="provision-bullet-item" >' +
+          '<span class="">' +
+          get_provision_ips(data) +
+          '</span>' +
+          '</li>' + monitoring +
+          '<li class="provision-bullet-item-last" >' +
+          '<span class="">' +
+          '<i class="fa fa-fw fa-lg fa-user"/> ' +
+          data.UNAME +
+          '</span>' +
+          '<span class="right">' +
+          Humanize.prettyTimeAgo(data.STIME) +
+          '</span>' +
+          '</li>' +
+          '</ul>' +
           '</div>');
 
         return nRow;
       }
     });
 
-    $('.provision_list_vms_search', context).on('input',function(){
-      provision_vms_datatable.fnFilter( $(this).val() );
+    $('.provision_list_vms_search', context).on('input', function () {
+      provision_vms_datatable.fnFilter($(this).val());
     })
 
-    context.on("click", ".provision_vms_list_refresh_button", function(){
+    context.on("click", ".provision_vms_list_refresh_button", function () {
       OpenNebula.Action.clear_cache("VM");
       update_provision_vms_datatable(provision_vms_datatable, 0);
       return false;
     });
 
-    $(".provision_list_vms_filter", context).on("change", ".resource_list_select", function(){
-      if ($(this).val() != "-2"){
+    $(".provision_list_vms_filter", context).on("change", ".resource_list_select", function () {
+      if ($(this).val() != "-2") {
         provision_vms_datatable.fnFilter("^" + $(this).val() + "$", 2, true, false);
       } else {
         provision_vms_datatable.fnFilter("", 2);
@@ -242,15 +262,15 @@ define(function(require) {
     })
 
     ResourceSelect.insert({
-        context: $('.provision_list_vms_filter', context),
-        resourceName: 'User',
-        initValue: (opts.filter_expression ? opts.filter_expression : "-2"),
-        extraOptions: '<option value="-2">' + Locale.tr("ALL") + '</option>',
-        triggerChange: true,
-        onlyName: true
-      });
+      context: $('.provision_list_vms_filter', context),
+      resourceName: 'User',
+      initValue: (opts.filter_expression ? opts.filter_expression : "-2"),
+      extraOptions: '<option value="-2">' + Locale.tr("ALL") + '</option>',
+      triggerChange: true,
+      onlyName: true
+    });
 
-    context.on("click", ".provision_vms_list_filter_button", function(){
+    context.on("click", ".provision_vms_list_filter_button", function () {
       $(".provision_list_vms_filter", context).fadeIn();
       return false;
     });
@@ -263,20 +283,22 @@ define(function(require) {
 
   function setup_info_vm(context) {
 
-      function refresh(){
-          // location.reload();
-          // OpenNebula.Action.clear_cache("VM");
-          // ProvisionVmsList.show(0);
-      }
+    let proc_vm = false;
 
-      function parse_result(response){
-          if(response.error != undefined){
-              Notifier.notifyError('ReinstallError: ' + response.error);
-          } else {
-              Notifier.notifyError('ReinstallError: ' + response);
-              refresh();
-          }
+    function refresh() {
+      // location.reload();
+      // OpenNebula.Action.clear_cache("VM");
+      // ProvisionVmsList.show(0);
+    }
+
+    function parse_result(response) {
+      if (response.error != undefined) {
+        Notifier.notifyError('ReinstallError: ' + response.error);
+      } else {
+        Notifier.notifyError('ReinstallError: ' + response);
+        refresh();
       }
+    }
 
     function update_provision_vm_info(vm_id, context) {
       //var tempScrollTop = $(window).scrollTop();
@@ -285,104 +307,83 @@ define(function(require) {
       $(".provision_info_vm", context).css('visibility', 'hidden');
 
       OpenNebula.VM.show({
-        data : {
+        data: {
           id: vm_id
         },
         error: Notifier.onError,
-        success: function(request, response){
+        success: function (request, response) {
           Sunstone.insertPanels(TAB_ID, response, TAB_ID, $(".provision-sunstone-info", context));
 
-          var data = response.VM
+          var data = response.VM;
           var state = get_provision_vm_state(data);
 
           // helper, cleaner code
-          function enabled(action){
-              if (Config.isTabActionEnabled("provision-tab", action) == undefined){
-                  return StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
-              }else{
-                  return Config.isTabActionEnabled("provision-tab", action) &&
-                  StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
-              }
+          function enabled(action) {
+            if (proc_vm) {
+              return false;
+            }
+            if (Config.isTabActionEnabled("provision-tab", action) == undefined) {
+              return StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
+            } else {
+              return Config.isTabActionEnabled("provision-tab", action) &&
+                StateActions.enabledStateAction(action, data.STATE, data.LCM_STATE);
+            }
           }
 
-          var resultvm = 0;
-          OpenNebula.VM.show({data:{'id':vm_id},success: function(a,b){resultvm=b;
-                if(resultvm.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')){
-                    $(".provision_reinstall_confirm_button", context).show();
-                } else {
-                    $(".provision_reinstall_confirm_button", context).hide();
-                }
-          }});
-
-          if (enabled("VM.recover") == true){
+          if (response.VM.TEMPLATE.IMPORTED != 'YES' && enabled('VM.reinstall')) {
+            $(".provision_reinstall_confirm_button", context).show();
+          } else {
+            $(".provision_reinstall_confirm_button", context).hide();
+          }
+          if (enabled("VM.recover") == true) {
             $(".provision_backup_confirm_button", context).show();
           } else {
             $(".provision_backup_confirm_button", context).hide();
           }
-          if (enabled("VM.reboot")){
+          if (enabled("VM.reboot")) {
             $(".provision_reboot_confirm_button", context).show();
           } else {
             $(".provision_reboot_confirm_button", context).hide();
           }
-          if (enabled("VM.poweroff") || enabled("VM.poweroff_hard")){
+          if (enabled("VM.poweroff") || enabled("VM.poweroff_hard")) {
             $(".provision_poweroff_confirm_button", context).show();
           } else {
             $(".provision_poweroff_confirm_button", context).hide();
           }
-          if (enabled("VM.undeploy") || enabled("VM.undeploy_hard")){
+          if (enabled("VM.undeploy") || enabled("VM.undeploy_hard")) {
             $(".provision_undeploy_confirm_button", context).show();
           } else {
             $(".provision_undeploy_confirm_button", context).hide();
           }
-          if (enabled("VM.resume")){
+          if (enabled("VM.resume")) {
             $(".provision_resume_button", context).show();
           } else {
             $(".provision_resume_button", context).hide();
           }
-          if (enabled("VM.terminate") || enabled("VM.terminate_hard")){
+          if (enabled("VM.terminate") || enabled("VM.terminate_hard")) {
             $(".provision_terminate_confirm_button", context).show();
           } else {
             $(".provision_terminate_confirm_button", context).hide();
           }
-
-          if (data.STATE == 8) {
-            OpenNebula.AnsibleProcess.list({success: function(a,res){
-                for(var i in res){
-                    if (res[i].ANSIBLE_PROCESS.status == 'RUNNING'){
-                        if (vm_id == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]){
-                            $(".provision_reinstall_confirm_button", context).hide();
-                            $(".provision_backup_confirm_button", context).hide();
-                            $(".provision_reboot_confirm_button", context).hide();
-                            $(".provision_poweroff_confirm_button", context).hide();
-                            $(".provision_undeploy_confirm_button", context).hide();
-                            $(".provision_resume_button", context).hide();
-                            $(".provision_terminate_confirm_button", context).hide();
-                            return false;
-                        }
-                    }
-                }
-            }});
-          }
-
-          if(Config.isTabActionEnabled("provision-tab", "VM.save_as_template")){
-            if (enabled("VM.save_as_template")){
+          if (Config.isTabActionEnabled("provision-tab", "VM.save_as_template")) {
+            if (enabled("VM.save_as_template")) {
               $(".provision_save_as_template_confirm_button", context).show();
               $(".provision_save_as_template_confirm_button_disabled", context).hide();
             } else {
               $(".provision_save_as_template_confirm_button", context).hide();
               $(".provision_save_as_template_confirm_button_disabled", context).show();
             }
-          }else{
+          } else {
             $(".provision_save_as_template_confirm_button", context).hide();
             $(".provision_save_as_template_confirm_button_disabled", context).hide();
           }
 
           if (OpenNebula.VM.isVNCSupported(data) ||
-             OpenNebula.VM.isSPICESupported(data)) {
+            OpenNebula.VM.isSPICESupported(data)) {
 
             $(".provision_vnc_button", context).show();
             $(".provision_vnc_button_disabled", context).hide();
-          }else{
+          } else {
             $(".provision_vnc_button", context).hide();
             $(".provision_vnc_button_disabled", context).show();
           }
@@ -394,26 +395,26 @@ define(function(require) {
 
           if (Config.isTabActionEnabled("provision-tab", 'VM.rename')) {
             context.off("click", ".provision_info_vm_rename a");
-            context.on("click", ".provision_info_vm_rename a", function() {
+            context.on("click", ".provision_info_vm_rename a", function () {
               var valueStr = $(".provision_info_vm_name", context).text();
               $(".provision_info_vm_name", context).html('<input class="input_edit_value_rename" type="text" value="' + valueStr + '"/>');
             });
 
             context.off("change", ".input_edit_value_rename");
-            context.on("change", ".input_edit_value_rename", function() {
+            context.on("change", ".input_edit_value_rename", function () {
               var valueStr = $(".input_edit_value_rename", context).val();
               if (valueStr != "") {
                 OpenNebula.VM.rename({
-                  data : {
+                  data: {
                     id: vm_id,
                     extra_param: {
-                      "name" : valueStr
+                      "name": valueStr
                     }
                   },
-                  success: function(request, response){
+                  success: function (request, response) {
                     update_provision_vm_info(vm_id, context);
                   },
-                  error: function(request, response){
+                  error: function (request, response) {
                     Notifier.onError(request, response);
                   }
                 });
@@ -422,54 +423,54 @@ define(function(require) {
           }
 
           $(".provision-pricing-table_vm_info", context).html(
-              '<li class="provision-title">'+
-                '<span class="without-link '+ state.color +'-color">'+
-                  '<span class="'+ state.color +'-color right" title="'+state.str+'">'+
-                    '<i class="fa fa-square"/>'+
-                  '</span>'+
-                  state.str+
-                '</span>'+
-              '</li>'+
-              '<li class="provision-bullet-item" >'+
-                '<span>'+
-                  '<i class="fa fa-fw fa-lg fa-laptop"/> '+
-                  'x'+TemplateUtils.htmlEncode(data.TEMPLATE.CPU)+' - '+
-                  ((data.TEMPLATE.MEMORY > 1000) ?
-                    (Math.floor(data.TEMPLATE.MEMORY/1024)+'GB') :
-                    (TemplateUtils.htmlEncode(data.TEMPLATE.MEMORY)+'MB'))+
-                '</span>'+
-                ' - '+
-                '<span>'+
-                  get_provision_disk_image(data) +
-                '</span>'+
-              '</li>'+
-              '<li class="provision-bullet-item" >'+
-                '<span>'+
-                  get_provision_ips(data) +
-                '</span>'+
-              '</li>'+
-              '<li class="provision-bullet-item-last text-right">'+
-                '<span class="left">'+
-                  '<i class="fa fa-fw fa-lg fa-user"/> '+
-                  data.UNAME+
-                '</span>'+
-                '<span>'+
-                  '<i class="fa fa-fw fa-lg fa-clock-o"/> '+
-              Humanize.prettyTimeAgo(data.STIME)+
-                  ' - '+
-                  'ID: '+
-                  data.ID+
-                '</span>'+
-              '</li>');
+            '<li class="provision-title">' +
+            '<span class="without-link ' + state.color + '-color">' +
+            '<span class="' + state.color + '-color right" title="' + state.str + '">' +
+            '<i class="fa fa-square"/>' +
+            '</span>' +
+            state.str +
+            '</span>' +
+            '</li>' +
+            '<li class="provision-bullet-item" >' +
+            '<span>' +
+            '<i class="fa fa-fw fa-lg fa-laptop"/> ' +
+            'x' + TemplateUtils.htmlEncode(data.TEMPLATE.CPU) + ' - ' +
+            ((data.TEMPLATE.MEMORY > 1000) ?
+              (Math.floor(data.TEMPLATE.MEMORY / 1024) + 'GB') :
+              (TemplateUtils.htmlEncode(data.TEMPLATE.MEMORY) + 'MB')) +
+            '</span>' +
+            ' - ' +
+            '<span>' +
+            get_provision_disk_image(data) +
+            '</span>' +
+            '</li>' +
+            '<li class="provision-bullet-item" >' +
+            '<span>' +
+            get_provision_ips(data) +
+            '</span>' +
+            '</li>' +
+            '<li class="provision-bullet-item-last text-right">' +
+            '<span class="left">' +
+            '<i class="fa fa-fw fa-lg fa-user"/> ' +
+            data.UNAME +
+            '</span>' +
+            '<span>' +
+            '<i class="fa fa-fw fa-lg fa-clock-o"/> ' +
+            Humanize.prettyTimeAgo(data.STIME) +
+            ' - ' +
+            'ID: ' +
+            data.ID +
+            '</span>' +
+            '</li>');
           var AdminView = !(~config.user_config.default_view.indexOf('user') || ~config.user_config.default_view.indexOf('cloud'))
-          if(AdminView){
+          if (AdminView) {
             var vcenter_info = "";
-            if(data.MONITORING.VCENTER_GUEST_STATE){
+            if (data.MONITORING.VCENTER_GUEST_STATE) {
               vcenter_info = "<thead><tr><th>" + Locale.tr("vCenter information") + "</th></tr></thead><tbody>" +
-              "<tr><td>" + Locale.tr("GUEST STATE") + "</td><td>" + data.MONITORING.VCENTER_GUEST_STATE + "</td>" +
-               "<td>" + Locale.tr("VMWARETOOLS RUNNING STATUS") + "</td><td>" +
-               data.MONITORING.VCENTER_VMWARETOOLS_RUNNING_STATUS + "</td></tr>" +
-               "<tr><td>" + Locale.tr("VMWARETOOLS VERSION") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION + "</td><td>" + Locale.tr("VMWARETOOLS VERSION STATUS") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION_STATUS + "</td></tr></tbody>";
+                "<tr><td>" + Locale.tr("GUEST STATE") + "</td><td>" + data.MONITORING.VCENTER_GUEST_STATE + "</td>" +
+                "<td>" + Locale.tr("VMWARETOOLS RUNNING STATUS") + "</td><td>" +
+                data.MONITORING.VCENTER_VMWARETOOLS_RUNNING_STATUS + "</td></tr>" +
+                "<tr><td>" + Locale.tr("VMWARETOOLS VERSION") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION + "</td><td>" + Locale.tr("VMWARETOOLS VERSION STATUS") + "</td><td>" + data.MONITORING.VCENTER_VMWARETOOLS_VERSION_STATUS + "</td></tr></tbody>";
             }
           }
 
@@ -480,68 +481,104 @@ define(function(require) {
           $(".provision_info_vm_loading", context).hide();
 
           //$(window).scrollTop(tempScrollTop);
+          if (proc_vm) {
+            OpenNebula.AnsibleProcess.show({
+              data: {
+                id: proc_vm
+              },
+              success: function (a, res) {
+                if (res.ANSIBLE_PROCESS.STATUS != "RUNNING") {
+                  proc_vm = false;
+                }
+              }
+            });
+          } else {
+            OpenNebula.AnsibleProcess.list({
+              success: function (a, res) {
+                console.log('Check Process');
+                let list_len = res.length;
+                for (let i = list_len - 1; i >= 0; i--) {
+                  if (res[i].ANSIBLE_PROCESS.status == 'RUNNING') {
+                    if (vm_id == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]) {
+                      proc_vm = res[i].ANSIBLE_PROCESS.ID;
+                      console.log('Идет процесс восстановления');
+                      $(".provision_reinstall_confirm_button", context).hide();
+                      $(".provision_backup_confirm_button", context).hide();
+                      $(".provision_reboot_confirm_button", context).hide();
+                      $(".provision_poweroff_confirm_button", context).hide();
+                      $(".provision_undeploy_confirm_button", context).hide();
+                      $(".provision_resume_button", context).hide();
+                      $(".provision_terminate_confirm_button", context).hide();
+                      return false;
+                    }
+                  }
+                }
+              }
+            });
+          }
+
+
 
           OpenNebula.VM.monitor({
-            data : {
+            data: {
               timeout: true,
               id: data.ID,
               monitor: {
-                monitor_resources : "MONITORING/CPU,MONITORING/MEMORY,MONITORING/NETTX,MONITORING/NETRX"
+                monitor_resources: "MONITORING/CPU,MONITORING/MEMORY,MONITORING/NETTX,MONITORING/NETRX"
               }
             },
-            success: function(request, response){
-              var vm_graphs = [
-                  {
-                      monitor_resources : "MONITORING/CPU",
-                      labels : "Real CPU",
-                      humanize_figures : false,
-                      div_graph : $(".vm_cpu_provision_graph", context)
-                  },
-                  {
-                      monitor_resources : "MONITORING/MEMORY",
-                      labels : "Real MEM",
-                      humanize_figures : true,
-                      div_graph : $(".vm_memory_provision_graph", context)
-                  },
-                  {
-                      labels : "Network reception",
-                      monitor_resources : "MONITORING/NETRX",
-                      humanize_figures : true,
-                      convert_from_bytes : true,
-                      div_graph : $(".vm_net_rx_provision_graph", context)
-                  },
-                  {
-                      labels : "Network transmission",
-                      monitor_resources : "MONITORING/NETTX",
-                      humanize_figures : true,
-                      convert_from_bytes : true,
-                      div_graph : $(".vm_net_tx_provision_graph", context)
-                  },
-                  {
-                      labels : "Network reception speed",
-                      monitor_resources : "MONITORING/NETRX",
-                      humanize_figures : true,
-                      convert_from_bytes : true,
-                      y_sufix : "B/s",
-                      derivative : true,
-                      div_graph : $(".vm_net_rx_speed_provision_graph", context)
-                  },
-                  {
-                      labels : "Network transmission speed",
-                      monitor_resources : "MONITORING/NETTX",
-                      humanize_figures : true,
-                      convert_from_bytes : true,
-                      y_sufix : "B/s",
-                      derivative : true,
-                      div_graph : $(".vm_net_tx_speed_provision_graph", context)
-                  }
+            success: function (request, response) {
+              var vm_graphs = [{
+                  monitor_resources: "MONITORING/CPU",
+                  labels: "Real CPU",
+                  humanize_figures: false,
+                  div_graph: $(".vm_cpu_provision_graph", context)
+                },
+                {
+                  monitor_resources: "MONITORING/MEMORY",
+                  labels: "Real MEM",
+                  humanize_figures: true,
+                  div_graph: $(".vm_memory_provision_graph", context)
+                },
+                {
+                  labels: "Network reception",
+                  monitor_resources: "MONITORING/NETRX",
+                  humanize_figures: true,
+                  convert_from_bytes: true,
+                  div_graph: $(".vm_net_rx_provision_graph", context)
+                },
+                {
+                  labels: "Network transmission",
+                  monitor_resources: "MONITORING/NETTX",
+                  humanize_figures: true,
+                  convert_from_bytes: true,
+                  div_graph: $(".vm_net_tx_provision_graph", context)
+                },
+                {
+                  labels: "Network reception speed",
+                  monitor_resources: "MONITORING/NETRX",
+                  humanize_figures: true,
+                  convert_from_bytes: true,
+                  y_sufix: "B/s",
+                  derivative: true,
+                  div_graph: $(".vm_net_rx_speed_provision_graph", context)
+                },
+                {
+                  labels: "Network transmission speed",
+                  monitor_resources: "MONITORING/NETTX",
+                  humanize_figures: true,
+                  convert_from_bytes: true,
+                  y_sufix: "B/s",
+                  derivative: true,
+                  div_graph: $(".vm_net_tx_speed_provision_graph", context)
+                }
               ];
 
-              for(var i=0; i<vm_graphs.length; i++) {
-                  Graphs.plot(
-                      response,
-                      vm_graphs[i]
-                  );
+              for (var i = 0; i < vm_graphs.length; i++) {
+                Graphs.plot(
+                  response,
+                  vm_graphs[i]
+                );
               }
             }
           })
@@ -550,12 +587,12 @@ define(function(require) {
     }
 
     if (Config.isTabActionEnabled("provision-tab", "VM.save_as_template")) {
-      context.on("click", ".provision_save_as_template_confirm_button", function(){
+      context.on("click", ".provision_save_as_template_confirm_button", function () {
         $(".provision_confirm_action:first", context).html(
           TemplateConfirmSaveAsTemplate());
       });
 
-      context.on("click", ".provision_save_as_template_button", function(){
+      context.on("click", ".provision_save_as_template_button", function () {
         var button = $(this);
         button.attr("disabled", "disabled");
         var context = $(".provision_info_vm[vm_id]");
@@ -567,28 +604,28 @@ define(function(require) {
           ($('input[name=provision_snapshot_radio]:checked').val() == "persistent");
 
         OpenNebula.VM.save_as_template({
-          data : {
+          data: {
             id: vm_id,
             extra_param: {
-              name : template_name,
+              name: template_name,
               description: template_description,
-              persistent : persistent
+              persistent: persistent
             }
           },
           timeout: false,
-          success: function(request, response){
+          success: function (request, response) {
             OpenNebula.Action.clear_cache("VMTEMPLATE");
-            Notifier.notifyMessage(Locale.tr("VM Template") + ' ' + request.request.data[1].name + ' ' + Locale.tr("saved successfully"))
+            Notifier.notifyMessage(Locale.tr("VM Template") + ' ' + request.request.data[1].name + ' ' + Locale.tr("saved successfully"));
             update_provision_vm_info(vm_id, context);
             button.removeAttr("disabled");
           },
-          error: function(request, response){
-            if(response.error.http_status == 0){   // Failed due to cloning template taking too long
-                OpenNebula.Action.clear_cache("VMTEMPLATE");
-                update_provision_vm_info(vm_id, context);
-                Notifier.notifyMessage(Locale.tr("VM cloning in the background. The Template will appear as soon as it is ready, and the VM unlocked."));
+          error: function (request, response) {
+            if (response.error.http_status == 0) { // Failed due to cloning template taking too long
+              OpenNebula.Action.clear_cache("VMTEMPLATE");
+              update_provision_vm_info(vm_id, context);
+              Notifier.notifyMessage(Locale.tr("VM cloning in the background. The Template will appear as soon as it is ready, and the VM unlocked."));
             } else {
-                Notifier.onError(request, response);
+              Notifier.onError(request, response);
             }
             button.removeAttr("disabled");
           }
@@ -598,129 +635,141 @@ define(function(require) {
       });
     }
 
-    context.on("click", ".provision_terminate_confirm_button", function(){
+    context.on("click", ".provision_terminate_confirm_button", function () {
       var data = $(".provision_info_vm", context).data("vm");
 
       var hard = Config.isTabActionEnabled("provision-tab", "VM.terminate_hard") &&
-             StateActions.enabledStateAction("VM.terminate_hard", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.terminate_hard", data.STATE, data.LCM_STATE);
 
       var soft = Config.isTabActionEnabled("provision-tab", "VM.terminate") &&
-             StateActions.enabledStateAction("VM.terminate", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.terminate", data.STATE, data.LCM_STATE);
 
       var opts = {};
 
-      if(hard && soft){
+      if (hard && soft) {
         opts.both = true;
-      } else if(hard){
+      } else if (hard) {
         opts.hard = true;
       }
 
-      $(".provision_confirm_action:first", context).html(TemplateConfirmTerminate({opts: opts}));
+      $(".provision_confirm_action:first", context).html(TemplateConfirmTerminate({
+        opts: opts
+      }));
     });
 
-    context.on("click", ".provision_poweroff_confirm_button", function(){
+    context.on("click", ".provision_poweroff_confirm_button", function () {
       var data = $(".provision_info_vm", context).data("vm");
 
       var hard = Config.isTabActionEnabled("provision-tab", "VM.poweroff_hard") &&
-             StateActions.enabledStateAction("VM.poweroff_hard", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.poweroff_hard", data.STATE, data.LCM_STATE);
 
       var soft = Config.isTabActionEnabled("provision-tab", "VM.poweroff") &&
-             StateActions.enabledStateAction("VM.poweroff", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.poweroff", data.STATE, data.LCM_STATE);
 
       var opts = {};
 
-      if(hard && soft){
+      if (hard && soft) {
         opts.both = true;
-      } else if(hard){
+      } else if (hard) {
         opts.hard = true;
       }
 
-      $(".provision_confirm_action:first", context).html(TemplateConfirmPoweroff({opts: opts}));
+      $(".provision_confirm_action:first", context).html(TemplateConfirmPoweroff({
+        opts: opts
+      }));
     });
 
-    context.on("click", ".provision_undeploy_confirm_button", function(){
+    context.on("click", ".provision_undeploy_confirm_button", function () {
       var data = $(".provision_info_vm", context).data("vm");
 
       var hard = Config.isTabActionEnabled("provision-tab", "VM.undeploy_hard") &&
-             StateActions.enabledStateAction("VM.undeploy_hard", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.undeploy_hard", data.STATE, data.LCM_STATE);
 
       var soft = Config.isTabActionEnabled("provision-tab", "VM.undeploy") &&
-             StateActions.enabledStateAction("VM.undeploy", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.undeploy", data.STATE, data.LCM_STATE);
 
       var opts = {};
 
-      if(hard && soft){
+      if (hard && soft) {
         opts.both = true;
-      } else if(hard){
+      } else if (hard) {
         opts.hard = true;
       }
 
-      $(".provision_confirm_action:first", context).html(TemplateConfirmUndeploy({opts: opts}));
+      $(".provision_confirm_action:first", context).html(TemplateConfirmUndeploy({
+        opts: opts
+      }));
     });
 
-    context.on("click", ".provision_reboot_confirm_button", function(){
+    context.on("click", ".provision_reboot_confirm_button", function () {
       var data = $(".provision_info_vm", context).data("vm");
 
       var hard = Config.isTabActionEnabled("provision-tab", "VM.reboot_hard") &&
-             StateActions.enabledStateAction("VM.reboot_hard", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.reboot_hard", data.STATE, data.LCM_STATE);
 
       var soft = Config.isTabActionEnabled("provision-tab", "VM.reboot") &&
-             StateActions.enabledStateAction("VM.reboot", data.STATE, data.LCM_STATE);
+        StateActions.enabledStateAction("VM.reboot", data.STATE, data.LCM_STATE);
 
       var opts = {};
 
-      if(hard && soft){
+      if (hard && soft) {
         opts.both = true;
-      } else if(hard){
+      } else if (hard) {
         opts.hard = true;
       }
 
-      $(".provision_confirm_action:first", context).html(TemplateConfirmReboot({opts: opts}));
+      $(".provision_confirm_action:first", context).html(TemplateConfirmReboot({
+        opts: opts
+      }));
     });
 
-      context.on("click", ".provision_backup_confirm_button", function(){
-          var vm_id = $(".provision_info_vm", context).attr("vm_id");
-          var data = $(".provision_info_vm", context).data("vm");
-          var name = $('.provision_info_vm_name').text();;
+    context.on("click", ".provision_backup_confirm_button", function () {
+      var vm_id = $(".provision_info_vm", context).attr("vm_id");
+      var data = $(".provision_info_vm", context).data("vm");
+      var name = $('.provision_info_vm_name').text();;
 
-          // var today = OpenNebula.VM.revert_zfs_snapshot({
-          //     data: {
-          //         id:vm_id, previous:false
-          //     },
-          //     success: function(r, response){ parse_result(response) },
-          //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
-          // });
-          //
-          // var tomorrow = OpenNebula.VM.revert_zfs_snapshot({
-          //     data: {
-          //         id:vm_id, previous:true
-          //     },
-          //     success: function(r, response){ parse_result(response) },
-          //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
-          // });
+      // var today = OpenNebula.VM.revert_zfs_snapshot({
+      //     data: {
+      //         id:vm_id, previous:false
+      //     },
+      //     success: function(r, response){ parse_result(response) },
+      //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+      // });
+      //
+      // var tomorrow = OpenNebula.VM.revert_zfs_snapshot({
+      //     data: {
+      //         id:vm_id, previous:true
+      //     },
+      //     success: function(r, response){ parse_result(response) },
+      //     error: function(r, response){ Notifier.notifyError('ReinstallError: ' + response.error); }
+      // });
 
-          var opts = {};
+      var opts = {};
 
-          opts.backup = true;
-          $(".provision_confirm_action:first", context).html(TemplateConfirmBackup({opts: opts,id:vm_id,name:name}));
-      });
+      opts.backup = true;
+      $(".provision_confirm_action:first", context).html(TemplateConfirmBackup({
+        opts: opts,
+        id: vm_id,
+        name: name
+      }));
+    });
 
 
-    context.on("click", ".provision_terminate_button", function(){
+    context.on("click", ".provision_terminate_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
       var terminate_action = $('input[name=provision_terminate_radio]:checked').val()
 
       OpenNebula.VM[terminate_action]({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           update_provision_vm_info(vm_id, context);
           button.removeAttr("disabled");
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -729,21 +778,21 @@ define(function(require) {
       return false;
     });
 
-    context.on("click", ".provision_poweroff_button", function(){
+    context.on("click", ".provision_poweroff_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
       var poweroff_action = $('input[name=provision_poweroff_radio]:checked').val()
 
       OpenNebula.VM[poweroff_action]({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           update_provision_vm_info(vm_id, context);
           button.removeAttr("disabled");
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -752,21 +801,21 @@ define(function(require) {
       return false;
     });
 
-    context.on("click", ".provision_undeploy_button", function(){
+    context.on("click", ".provision_undeploy_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
       var undeploy_action = $('input[name=provision_undeploy_radio]:checked').val()
 
       OpenNebula.VM[undeploy_action]({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           update_provision_vm_info(vm_id, context);
           button.removeAttr("disabled");
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -775,7 +824,7 @@ define(function(require) {
       return false;
     });
 
-    context.on("click", ".provision_reboot_button", function(){
+    context.on("click", ".provision_reboot_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
 
@@ -783,14 +832,14 @@ define(function(require) {
       var reboot_action = $('input[name=provision_reboot_radio]:checked').val()
 
       OpenNebula.VM[reboot_action]({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           update_provision_vm_info(vm_id, context);
           button.removeAttr("disabled");
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -799,129 +848,151 @@ define(function(require) {
       return false;
     });
 
-      context.on("click", ".provision_backup_button", function(){
+    context.on("click", ".provision_backup_button", function () {
 
 
-          var button = $(this);
-          button.attr("disabled", "disabled");
+      var button = $(this);
+      button.attr("disabled", "disabled");
 
-          var vm_id = $(".provision_info_vm", context).attr("vm_id");
-          if ($('input[name=provision_backup_radio]:checked').val() == 'backup_today'){
-              var backup_action = false;
-          }else{
-              var backup_action = true;
+      var vm_id = $(".provision_info_vm", context).attr("vm_id");
+      if ($('input[name=provision_backup_radio]:checked').val() == 'backup_today') {
+        var backup_action = false;
+      } else {
+        var backup_action = true;
+      }
+
+      $('ul .provision_action_icons button').hide();
+      $('.provision_confirm_action').hide();
+      Notifier.notifyMessage('Процесс восстановления запущен. Пожалуйста ожидайте.');
+      OpenNebula.VM.revert_zfs_snapshot({
+        data: {
+          id: vm_id,
+          previous: backup_action
+        },
+        success: function (r, response) {
+          if (response.error != undefined) {
+            Notifier.notifyError(Locale.tr(response.error));
+          } else {
+            Notifier.notifySubmit(Locale.tr(response.response));
           }
-          Notifier.notifyMessage('Процесс восстановления запущен. Пожалуйста ожидайте.');
-          OpenNebula.VM.revert_zfs_snapshot({
-              data: {
-                  id:vm_id, previous:backup_action
-              },
-              success: function(r, response){
-                if(response.error != undefined){
-                  Notifier.notifyError(Locale.tr(response.error));
-                }else{
-                  Notifier.notifySubmit(Locale.tr(response.response));
-                }
 
-                update_provision_vm_info(vm_id, context);
-              },
-              error: function(r, response){ Notifier.notifyError(Locale.tr('Error occurred, contact technical support'))}
+          OpenNebula.AnsibleProcess.show({
+            data: {
+              id: response.id
+            },
+            success: function (a, res) {
+              if (res.ANSIBLE_PROCESS.STATUS == "RUNNING") {
+                proc_vm = res.ANSIBLE_PROCESS.ID;
+              } else {
+                proc_vm = false;
+              }
+              update_provision_vm_info(vm_id, context);
+            }
           });
-
-          return false;
+        },
+        error: function (r, response) {
+          Notifier.notifyError(Locale.tr('Error occurred, contact technical support'))
+        }
       });
-      
+
+      return false;
+    });
 
 
-      context.on("click", ".provision_reinstall_confirm_button", function(){
-          var button = $(this);
-          var vm_id = $(".provision_info_vm", context).attr("vm_id");
 
-          var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
-          dialog.setElement(that.element);
-          dialog.show();
-          $('.listos').html('');
-          var template;
-          OpenNebula.Template.list({data:{},success: function(a,b){template=b;
-                  for (key in template){
-                      if(template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE'){
-                          var html = '<div class="column"> ' +
-                              '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="'+template[key].VMTEMPLATE.ID+'"> ' +
-                              '<li class="provision-title" title="' + template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION + '"><span style="color:#2E9CB9">'+template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION+'</span></li> ' +
-                              '<li class="provision-bullet-item"><span class="provision-logo"><img src="'+template[key].VMTEMPLATE.TEMPLATE.LOGO+'"></span></li> ' +
-                              '<li class="provision-bullet-item-last text-left"></li> ' +
-                              '</ul> ' +
-                              '</div>';
-                          $('.listos').append(html);
-                      }
-                  };
-          }});
+    context.on("click", ".provision_reinstall_confirm_button", function () {
+      var button = $(this);
+      var vm_id = $(".provision_info_vm", context).attr("vm_id");
 
-          if(config.user_id == '197'){
-              var html = '<tr>' +
-                  '<td></td>' +
-                  '<td>Name</td>' +
-                  '<td style="width: 250px;">Description</td>' +
-                  '<td style="width: 180px;">OS</td>' +
-                  '<td>Vars</td>' +
-                  '</tr>';
-              var vars = '';
-              $('.playbooks').html('');
+      var dialog = Sunstone.getDialog(REINSTALL_DIALOG_ID);
+      dialog.setElement(that.element);
+      dialog.show();
+      $('.listos').html('');
+      var template;
+      OpenNebula.Template.list({
+        data: {},
+        success: function (a, b) {
+          template = b;
+          for (key in template) {
+            if (template[key].VMTEMPLATE.TEMPLATE.PAAS_ACCESSIBLE == 'TRUE') {
+              var html = '<div class="column"> ' +
+                '<ul class="provision-pricing-table only-one curs hoverable menu vertical text-center" opennebula_id="' + template[key].VMTEMPLATE.ID + '"> ' +
+                '<li class="provision-title" title="' + template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION + '"><span style="color:#2E9CB9">' + template[key].VMTEMPLATE.TEMPLATE.DESCRIPTION + '</span></li> ' +
+                '<li class="provision-bullet-item"><span class="provision-logo"><img src="' + template[key].VMTEMPLATE.TEMPLATE.LOGO + '"></span></li> ' +
+                '<li class="provision-bullet-item-last text-left"></li> ' +
+                '</ul> ' +
+                '</div>';
+              $('.listos').append(html);
+            }
+          };
+        }
+      });
+
+      if (config.user_id == '197') {
+        var html = '<tr>' +
+          '<td></td>' +
+          '<td>Name</td>' +
+          '<td style="width: 250px;">Description</td>' +
+          '<td style="width: 180px;">OS</td>' +
+          '<td>Vars</td>' +
+          '</tr>';
+        var vars = '';
+        $('.playbooks').html('');
+        $('.playbooks').append(html);
+        $('.playbooks_table').removeClass('hidden');
+        OpenNebula.Ansible.list({
+          success: function (r, res) {
+            for (key in res) {
+              if (Object.keys(res[key].ANSIBLE.VARS).length != 0) {
+                for (kkey in res[key].ANSIBLE.VARS) {
+                  vars += kkey + ': <input type="text" class="vars' + res[key].ANSIBLE.id + ' vars ' + kkey + '' + res[key].ANSIBLE.id + ' " ><br>'
+                }
+              } else {
+                vars = '-';
+              }
+
+              html = '<tr style="border-top: 1px solid grey;border-bottom: 1px solid grey;"><td><input type="checkbox" name="checkansible" id="check' + res[key].ANSIBLE.id + '" class="checkbox_playbooks" value="' + res[key].ANSIBLE.id + '"></td>' +
+                '<td><span class="playbooks-text">' + res[key].ANSIBLE.name + '</span></td>' +
+                '<td><span class="playbooks-text">' + res[key].ANSIBLE.description + '</span></td>' +
+                '<td><span class="playbooks-text">' + res[key].ANSIBLE.extra_data.SUPPORTED_OS + '</span> </td>' +
+                '<td><span class="playbooks-text">' + vars + '</span></td>' +
+                '</tr>'
               $('.playbooks').append(html);
-              $('.playbooks_table').removeClass('hidden');
-              OpenNebula.Ansible.list({
-                  success: function (r, res) {
-                      for (key in res){
-                          if(Object.keys(res[key].ANSIBLE.VARS).length != 0){
-                              for (kkey in res[key].ANSIBLE.VARS){
-                                  vars += kkey +': <input type="text" class="vars'+res[key].ANSIBLE.id+' vars '+kkey+''+res[key].ANSIBLE.id+' " ><br>'
-                              }
-                          }else{
-                              vars = '-';
-                          }
-
-                          html = '<tr style="border-top: 1px solid grey;border-bottom: 1px solid grey;"><td><input type="checkbox" name="checkansible" id="check'+res[key].ANSIBLE.id+'" class="checkbox_playbooks" value="' + res[key].ANSIBLE.id + '"></td>' +
-                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.name +'</span></td>' +
-                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.description +'</span></td>' +
-                              '<td><span class="playbooks-text">'+ res[key].ANSIBLE.extra_data.SUPPORTED_OS +'</span> </td>' +
-                              '<td><span class="playbooks-text">'+ vars +'</span></td>' +
-                              '</tr>'
-                          $('.playbooks').append(html);
-                          if(Object.keys(res[key].ANSIBLE.VARS).length != 0){
-                              for (kkey in res[key].ANSIBLE.VARS){
-                                  if (typeof(res[key].ANSIBLE.VARS[kkey]) == 'string') {
-                                      $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey].replace(/[\\]+/g, ''));
-                                  }else{
-                                      $('.'+kkey+res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey]);
-                                  }
-                              }
-                          }
-                          vars = '';
-                      }
-
+              if (Object.keys(res[key].ANSIBLE.VARS).length != 0) {
+                for (kkey in res[key].ANSIBLE.VARS) {
+                  if (typeof (res[key].ANSIBLE.VARS[kkey]) == 'string') {
+                    $('.' + kkey + res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey].replace(/[\\]+/g, ''));
+                  } else {
+                    $('.' + kkey + res[key].ANSIBLE.id).val(res[key].ANSIBLE.VARS[kkey]);
                   }
-              });
+                }
+              }
+              vars = '';
+            }
+
           }
+        });
+      }
 
-          return false;
-      });
+      return false;
+    });
 
 
 
-    context.on("click", ".provision_resume_button", function(){
+    context.on("click", ".provision_resume_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
 
       OpenNebula.VM.resume({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           update_provision_vm_info(vm_id, context);
           button.removeAttr("disabled");
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -930,17 +1001,17 @@ define(function(require) {
       return false;
     });
 
-    context.on("click", ".provision_vnc_button", function(){
+    context.on("click", ".provision_vnc_button", function () {
       var button = $(this);
       button.attr("disabled", "disabled");
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
       var vm_data = $(".provision_info_vm", context).data("vm");
 
       OpenNebula.VM.vnc({
-        data : {
+        data: {
           id: vm_id
         },
-        success: function(request, response){
+        success: function (request, response) {
           if (OpenNebula.VM.isVNCSupported(vm_data)) {
 
             var dialog = Sunstone.getDialog(VNC_DIALOG_ID);
@@ -958,7 +1029,7 @@ define(function(require) {
             Notifier.notifyError("The remote console is not enabled for this VM")
           }
         },
-        error: function(request, response){
+        error: function (request, response) {
           Notifier.onError(request, response);
           button.removeAttr("disabled");
         }
@@ -967,8 +1038,9 @@ define(function(require) {
       return false;
     });
 
-    context.on("click", ".provision_refresh_info", function(){
+    context.on("click", ".provision_refresh_info", function () {
       var vm_id = $(".provision_info_vm", context).attr("vm_id");
+      OpenNebula.Action.clear_cache("VM");
       update_provision_vm_info(vm_id, context);
       return false;
     });
@@ -977,7 +1049,7 @@ define(function(require) {
     // Info VM
     //
 
-    $(".provision_list_vms", context).on("click", ".provision_info_vm_button", function(){
+    $(".provision_list_vms", context).on("click", ".provision_info_vm_button", function () {
       $("a.provision_show_vm_accordion", context).trigger("click");
       // TODO loading
 
@@ -1146,9 +1218,9 @@ define(function(require) {
   function get_provision_disk_image(data) {
     var disks = []
     if ($.isArray(data.TEMPLATE.DISK))
-        disks = data.TEMPLATE.DISK
+      disks = data.TEMPLATE.DISK
     else if (!$.isEmptyObject(data.TEMPLATE.DISK))
-        disks = [data.TEMPLATE.DISK]
+      disks = [data.TEMPLATE.DISK]
 
     if (disks.length > 0) {
       return disks[0].IMAGE != undefined ? disks[0].IMAGE : '';

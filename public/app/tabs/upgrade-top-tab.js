@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Locale = require('utils/locale');
   var TAB_ID = 'upgrade-top-tab';
 
@@ -28,42 +28,43 @@ define(function(require) {
   return Tab;
 
   function _setup() {
-    $('#li_upgrade-top-tab > a').on("click", function(e){
-      var redirect_port = config['upgrade']['redirect_port'];
-      var upgrade_url = config['upgrade']['url'];
+    $('#li_upgrade-top-tab > a').hide();
+    // $('#li_upgrade-top-tab > a').on("click", function(e){
+    //   var redirect_port = config['upgrade']['redirect_port'];
+    //   var upgrade_url = config['upgrade']['url'];
 
-      if (redirect_port) {
-        window.location = document.URL.replace(/(https?:\/\/)([^:\/]+).*$/,"http://$2:"+redirect_port)
-      } else {
-        window.location = upgrade_url
-      }
+    //   if (redirect_port) {
+    //     window.location = document.URL.replace(/(https?:\/\/)([^:\/]+).*$/,"http://$2:"+redirect_port)
+    //   } else {
+    //     window.location = upgrade_url
+    //   }
 
-      return false;
-    });
+    //   return false;
+    // });
 
-    $.ajax({
-      url: '/version',
-      type: "GET",
-      dataType: "json",
-      success: function(response) {
-        var version = response["version"];
+    // $.ajax({
+    //   url: '/version',
+    //   type: "GET",
+    //   dataType: "json",
+    //   success: function (response) {
+    //     var version = response["version"];
 
-        // remote_version could be null if the server cannot reach the url
-        var remote_version = response["remote_version"];
+    //     // remote_version could be null if the server cannot reach the url
+    //     var remote_version = response["remote_version"];
 
-        var tab_title;
+    //     var tab_title;
 
-        if (remote_version && (version < remote_version)) {
-          tab_title = config['upgrade']['upgrade'];
-        } else {
-          tab_title = config['upgrade']['no_upgrade'];
-        }
+    //     if (remote_version && (version < remote_version)) {
+    //       tab_title = config['upgrade']['upgrade'];
+    //     } else {
+    //       tab_title = config['upgrade']['no_upgrade'];
+    //     }
 
-        $("li[id$='upgrade-top-tab'] > a").html(tab_title);
-      },
-      error: function(response) {
-        return null;
-      }
-    });
+    //     $("li[id$='upgrade-top-tab'] > a").html(tab_title);
+    //   },
+    //   error: function (response) {
+    //     return null;
+    //   }
+    // });
   }
 });

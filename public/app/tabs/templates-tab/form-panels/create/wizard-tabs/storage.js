@@ -14,12 +14,12 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
 
-//  require('foundation.tab');
+  //  require('foundation.tab');
   var Config = require('sunstone-config');
   var Locale = require('utils/locale');
   var Tips = require('utils/tips');
@@ -55,7 +55,7 @@ define(function(require) {
     this.title = Locale.tr("Storage");
     this.classes = "hypervisor only_kvm only_vcenter"
 
-    if(opts.listener != undefined){
+    if (opts.listener != undefined) {
       this.listener = opts.listener;
     }
   }
@@ -83,7 +83,7 @@ define(function(require) {
   }
 
   function _onShow(context, panelForm) {
-    $.each(this.diskTabObjects, function(id, tab) {
+    $.each(this.diskTabObjects, function (id, tab) {
       tab.onShow();
     })
   }
@@ -96,15 +96,15 @@ define(function(require) {
 
     Foundation.reflow(context, 'tabs');
 
-    context.on("click", "#tf_btn_disks", function() {
+    context.on("click", "#tf_btn_disks", function () {
       that.addDiskTab(context);
       return false;
     });
 
     that.addDiskTab(context);
 
-    if(that.listener != undefined){
-      $(context).on("change", "input", function(){
+    if (that.listener != undefined) {
+      $(context).on("change", "input", function () {
         that.listener.notify();
       });
     }
@@ -114,9 +114,11 @@ define(function(require) {
     var templateJSON = {};
     var disksJSON = [];
     var diskJSON;
-    $.each(this.diskTabObjects, function(id, diskTab) {
+    $.each(this.diskTabObjects, function (id, diskTab) {
       diskJSON = diskTab.retrieve($("#" + diskTab.diskTabId, context));
-      if (!$.isEmptyObject(diskJSON)) { disksJSON.push(diskJSON); };
+      if (!$.isEmptyObject(diskJSON)) {
+        disksJSON.push(diskJSON);
+      };
     });
 
     if (disksJSON.length > 0) {
@@ -132,7 +134,7 @@ define(function(require) {
     var that = this;
     var disks = templateJSON.DISK
     if (disks instanceof Array) {
-      $.each(disks, function(diskId, diskJSON) {
+      $.each(disks, function (diskId, diskJSON) {
         if (diskId > 0) {
           that.addDiskTab(context);
         }
@@ -158,11 +160,11 @@ define(function(require) {
     var diskTab = new DiskTab(that.numberOfDisks);
 
     var content = $('<div id="' + diskTab.diskTabId + '" class="disk wizard_internal_tab tabs-panel">' +
-        diskTab.html() +
+      diskTab.html() +
       '</div>').appendTo($("#" + CONTENTS_CONTAINER_ID, context));
 
     var a = $("<li class='tabs-title'>" +
-       "<a href='#" + diskTab.diskTabId + "'>" + Locale.tr("DISK") + "</a>" +
+      "<a href='#" + diskTab.diskTabId + "'>" + Locale.tr("DISK") + "</a>" +
       "</li>").appendTo($("#" + LINKS_CONTAINER_ID, context));
 
     Foundation.reInit($("#" + LINKS_CONTAINER_ID, context));
@@ -176,7 +178,7 @@ define(function(require) {
     that.diskTabObjects[that.numberOfDisks] = diskTab;
 
     // close icon: removing the tab on click
-    a.on("click", "i.remove-tab", function() {
+    a.on("click", "i.remove-tab", function () {
       var target = $(this).parent().attr("href");
       var li = $(this).closest('li');
       var ul = $(this).closest('ul');
@@ -197,11 +199,11 @@ define(function(require) {
   }
 
   function _renameTabLinks(context) {
-    $("#" + LINKS_CONTAINER_ID + " li", context).each(function(index) {
+    $("#" + LINKS_CONTAINER_ID + " li", context).each(function (index) {
       $("a", this).html(Locale.tr("Disk") + ' ' + index + " <i class='fa fa-times-circle remove-tab'></i>");
     })
 
-    if(this.listener != undefined){
+    if (this.listener != undefined) {
       this.listener.notify();
     }
   }

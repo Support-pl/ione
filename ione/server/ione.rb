@@ -1,4 +1,3 @@
-require 'zmqjsonrpc'
 require 'yaml'
 require 'ipaddr'
 require 'sequel'
@@ -136,13 +135,11 @@ begin
     $ione_conf['Scripts'].each do | script |
         puts "\tIncluding #{script}"
         begin
-            Thread.new do
-                require "#{ROOT}/scripts/#{script}/main.rb"
-            end
-                LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
-            rescue => e
-                LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
-                puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
+            Thread.new { require "#{ROOT}/scripts/#{script}/main.rb" }
+            LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
+        rescue => e
+            LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
+            puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
         end
     end if $ione_conf['Scripts'].class == Array
 rescue => e
@@ -161,18 +158,68 @@ $methods = IONe.instance_methods(false).map { | method | method.to_s }
 
 rpc_log_file = "#{LOG_ROOT}/rpc.log"
 `touch #{rpc_log_file}` unless File.exist? rpc_log_file
-
-LOG "Initializing JSON-RPC Server..."
-puts 'Initializing JSON_RPC server and logic handler'
-server = ZmqJsonRpc::Server.new(IONe.new($client, $db), "tcp://*:#{$ione_conf['Server']['listen-port']}", Logger.new(rpc_log_file))
-LOG_COLOR "Server initialized", 'none', 'green'
+# Logger instance for rpc calls
+RPC_LOGGER = Logger.new(rpc_log_file)
 
 puts 'Pre-init job ended, starting up server'
-Thread.new do
-    begin
-        server.server_loop # Server start
-    rescue => e
-        LOG_ERROR "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
-        puts "Server isn't started: #{e.message}\nBacktrace:#{e.backtrace}"
+if !defined?(DEBUG_LIB) && MAIN_IONE then
+
+    # Public API bindings
+    IONeAPIServerThread = Thread.new do
+        require 'pry-remote'
+        class IONeAPIServer < Sinatra::Base
+            set :bind, '0.0.0.0'
+            set :port, 8009
+
+            before do
+                @request_body = request.body.read
+            end
+
+            get '/' do
+                'Hello, World! via IONe Web API'
+            end
+            post '/ione/:method' do | method |
+                begin
+                    args = JSON.parse(@request_body)
+                    u = User.new_with_id(-1, Client.new(args['auth']))
+                    rc = u.info!
+                    if OpenNebula.is_error?(rc)
+                        raise "False Credentials given"
+                    end
+                    RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
+                    r = IONe.new(Client.new(params['auth']), $db).send(method, *args['params'])
+                rescue => e
+                    r = e.message
+                    backtrace = e.backtrace
+                end
+                RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+                RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+                JSON.pretty_generate response: r
+            end
+            post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
+                body = JSON.parse(@request_body)
+
+                u = User.new_with_id(-1, Client.new(args['auth']))
+                rc = u.info!
+                if OpenNebula.is_error?(rc)
+                    raise "False Credentials given"
+                end
+
+                JSON.pretty_generate(r:
+                    onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
+                )
+            end
+        end
+
+        RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
+        begin
+            IONeAPIServer.run!
+        rescue StandardError => e
+            RPC_LOGGER.debug e.message
+        end
     end
-end if !defined?(DEBUG_LIB) && MAIN_IONE
+
+    at_exit do
+        IONeAPIServerThread.kill
+    end
+end

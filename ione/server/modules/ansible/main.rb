@@ -192,9 +192,14 @@ class IONe
         AnsiblePlaybookProcess.new(proc_id:id).to_hash
     end
     # Returns all AnsiblePlaybook Processes as Array of Hashes
+    # @param [Integer] chunks - number of chunks per page
+    # @param [Integer] page - page number(shift)
     # @return [Array<AnsiblePlaybookProcess>]
-    def ListAnsiblePlaybookProcesses
-        AnsiblePlaybookProcess.list
+    def ListAnsiblePlaybookProcesses chunks = nil, page = 0
+        apps = AnsiblePlaybookProcess.list
+        return apps if chunks.nil?
+
+        apps.each_slice(chunks).to_a[page]
     end
 
 

@@ -31,8 +31,20 @@ end
 $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
-require 'zmqjsonrpc'
-IONe = ZmqJsonRpc::Client.new('tcp://localhost:8008', -1)
+
+def suppress_output
+    original_stderr = $stderr.clone
+    original_stdout = $stdout.clone
+    $stderr.reopen(File.new('/dev/null', 'w'))
+    $stdout.reopen(File.new('/dev/null', 'w'))
+    yield
+ensure
+    $stdout.reopen(original_stdout)
+    $stderr.reopen(original_stderr)
+end
+
+suppress_output{ require '/usr/lib/one/sunstone/debug_lib.rb' }
+$ione = IONe.new($client, $db)
 
 id = ARGV.first.to_i
 vm = VirtualMachine.new_with_id(id, Client.new)
@@ -43,15 +55,15 @@ if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
     exit 0
 end
 
-host = Host.new_with_id IONe.get_vm_host(id, true).last.to_i, Client.new
+host = Host.new_with_id $ione.get_vm_host(id, true).last.to_i, Client.new
 
-IONe.SetVMResourcesLimits(
+$ione.SetVMResourcesLimits(
     id,
     host,
     {
         'cpu' => vm['/VM/TEMPLATE/CPU'].to_i,
         'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-        'iops' => IONe.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+        'iops' => $ione.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
     }
 ) if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter'
 

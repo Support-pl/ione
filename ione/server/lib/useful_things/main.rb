@@ -28,7 +28,7 @@ class IONe
         vmp = VirtualMachinePool.new(@client)
         vmp.info_all!
         vmp.each do | vm |
-            return vm.id.to_i if vm.uid(false, true) == uid
+            return vm.id.to_i if vm.uid(false) == uid
         end
         'none'
     end
@@ -77,7 +77,11 @@ class IONe
         defer { LOG_CALL(id, false, 'get_vm_by_uname') }
         userid = get_uid_by_name(name)
         vmid = get_vm_by_uid(userid)
-        { :vmid => vmid, :userid => userid, :ip => GetIP(vmid) }
+        unless vmid.nil? then
+            { :vmid => vmid, :userid => userid, :ip => GetIP(vmid) }
+        else
+            nil
+        end
     end
     # Returns host name, where VM has been deployed
     # @param [Integer] vm - VM ID
@@ -91,7 +95,7 @@ class IONe
           history = vm.to_hash!['VM']["HISTORY_RECORDS"]['HISTORY'] # Searching hostname at VM allocation history
           history = history.last if history.class == Array # If history consists of 2 or more lines - returns last
           return hid ? [history['HOSTNAME'], history['HID']] : history['HOSTNAME']
-        rescue
+    rescue
           return nil # Returns NilClass if did not found anything - possible if vm is at HOLD or PENDING state
     end
     # Returns datastore name, where VM has been deployed
@@ -141,7 +145,7 @@ class IONe
             vm_pool.each do |vm| # Creating VM list from VirtualMachine Pool Object
                 begin
                 info << {
-                    :vmid => vm.id, :userid => vm.uid(false, true), :host => get_vm_host(vm.id),
+                    :vmid => vm.id, :userid => vm.uid(false), :host => get_vm_host(vm.id),
                     :login => vm.uname(false, true), :ip => GetIP(vm), :state => (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
                 }
                 rescue
@@ -192,7 +196,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'GetUserInfo') }
-        onblock(User, userid) do |user|
+        onblock(:u, userid) do |user|
             user.info!
             user.to_xml
         end
@@ -314,6 +318,7 @@ class IONe
             vm.terminate true
         end
         u.delete
+        true
     rescue => e
         LOG_DEBUG e.message
     end
@@ -321,5 +326,38 @@ class IONe
     # Returns current IOps conf from `/etc/one/ione.conf`
     def GetvCenterIOpsConf
         $ione_conf['vCenter']['drives-iops']
+    end
+
+    # Returns all vms available with given credentials
+    # @param [Integer] chunks - number of chunks per page
+    # @param [Integer] page - page number(shift)
+    # @return [Array<Integer>]
+    def get_available_vms chunks = nil, page = 0
+        vmp = VirtualMachinePool.new(@client)
+        vmp.info_all!
+    
+        if chunks.nil? then
+            vmp.inject([]) do |r, vm|
+                r << {
+                    id: vm.id,
+                    name: vm.name,
+                    ip: GetIP(vm),
+                    state: vm.state_str,
+                    lcm_state: vm.lcm_state_str,
+                    host: get_vm_host(vm)
+                }
+            end
+        else
+            vmp.inject([]){ |r, vm| r << vm }.each_slice(chunks).to_a[page].map do | vm |
+                {
+                    id: vm.id,
+                    name: vm.name,
+                    ip: GetIP(vm),
+                    state: vm.state_str,
+                    lcm_state: vm.lcm_state_str,
+                    host: get_vm_host(vm)
+                }
+            end
+        end
     end
 end

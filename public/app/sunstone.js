@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   require("jquery");
   //require('foundation.reveal');
   //require('foundation.tab');
@@ -35,16 +35,16 @@ define(function(require) {
   var DASHBOARD_TAB_ID = require("tabs/dashboard-tab/tabId");
 
   var SunstoneCfg = {
-    "actions" : {},
-    "dialogs" : {},
-    "dialogInstances" : {},
-    "tabs" : {}
+    "actions": {},
+    "dialogs": {},
+    "dialogInstances": {},
+    "tabs": {}
   };
 
-  var _addMainTabs = function() {
+  var _addMainTabs = function () {
     _addActions();
 
-    $.each(Config.enabledTabs, function(i, tabName){
+    $.each(Config.enabledTabs, function (i, tabName) {
       var name = "./tabs/" + tabName;
       var tabObj = require(name);
       var _tabId = tabObj.tabId;
@@ -77,49 +77,53 @@ define(function(require) {
     });
   };
 
-  var _addActions = function() {
-    $.each(Config.allTabs(), function(i, tabName){
+  var _addActions = function () {
+    $.each(Config.allTabs(), function (i, tabName) {
       var name = "./tabs/" + tabName;
+
       var tabObj = require(name);
 
-      var actions = tabObj.actions;
-      if (actions) {
-        $.each(actions, function(actionName, action) {
-          SunstoneCfg["actions"][actionName] = action;
-        });
+      if (tabObj) {
+        var actions = tabObj.actions;
+        if (actions) {
+          $.each(actions, function (actionName, action) {
+            SunstoneCfg["actions"][actionName] = action;
+          });
+        }
       }
+
     });
   };
 
-  var _addDialogs = function(dialogs) {
-    $.each(dialogs, function(index, dialog) {
+  var _addDialogs = function (dialogs) {
+    $.each(dialogs, function (index, dialog) {
       SunstoneCfg["dialogs"][dialog.DIALOG_ID] = dialog;
     });
     return false;
   };
 
-  var _addPanelsHooks = function(tabId, hooks) {
+  var _addPanelsHooks = function (tabId, hooks) {
     SunstoneCfg["tabs"][tabId]["panelsHooks"] = hooks;
     return false;
   };
 
-  var _addInitHooks = function(tabId, hooks) {
+  var _addInitHooks = function (tabId, hooks) {
     SunstoneCfg["tabs"][tabId]["initHooks"] = hooks;
     return false;
   };
 
-  var _addPanels = function(tabId, panels) {
+  var _addPanels = function (tabId, panels) {
     var indexedPanels = {};
-    $.each(panels, function(index, panel) {
+    $.each(panels, function (index, panel) {
       indexedPanels[panel.PANEL_ID] = panel;
     });
     SunstoneCfg["tabs"][tabId]["panels"] = indexedPanels;
     return false;
   };
 
-  var _addFormPanels = function(tabId, formPanels) {
+  var _addFormPanels = function (tabId, formPanels) {
     var indexedFormPanels = {};
-    $.each(formPanels, function(index, formPanel) {
+    $.each(formPanels, function (index, formPanel) {
       indexedFormPanels[formPanel.FORM_PANEL_ID] = formPanel;
     });
     SunstoneCfg["tabs"][tabId]["formPanels"] = indexedFormPanels;
@@ -128,7 +132,7 @@ define(function(require) {
   };
 
   //Inserts all main tabs in the DOM
-  var _insertTabs = function() {
+  var _insertTabs = function () {
     for (var tabName in SunstoneCfg["tabs"]) {
       _insertTab(tabName);
       _insertButtonsInTab(tabName);
@@ -137,7 +141,7 @@ define(function(require) {
       var hooks = SunstoneCfg["tabs"][tabName].initHooks;
 
       if (hooks) {
-        $.each(hooks, function(i, hook){
+        $.each(hooks, function (i, hook) {
           hook.init();
         });
       }
@@ -157,7 +161,7 @@ define(function(require) {
     _setupTabs();
   };
 
-  var _setupDataTable = function(tabName) {
+  var _setupDataTable = function (tabName) {
     var dataTable = SunstoneCfg["tabs"][tabName].dataTable;
     if (dataTable) {
       dataTable.initialize();
@@ -167,14 +171,14 @@ define(function(require) {
   //Inserts a main tab in the DOM. This is done by
   //adding the content to the proper div and by adding a list item
   //link to the navigation menu
-  var _insertTab = function(tabName) {
+  var _insertTab = function (tabName) {
     var tabInfo = SunstoneCfg["tabs"][tabName];
     var condition = tabInfo["condition"];
     var tabClass = tabInfo["tabClass"] ? tabInfo["tabClass"] : "topTab";
     var parent = tabInfo["parentTab"] ? tabInfo["parentTab"] : "";
 
     //skip this tab if we do not meet the condition
-    if (condition && !condition()) {return;}
+    if (condition && !condition()) { return; }
 
     if (tabInfo.no_content === true) {
       tabClass += " tab_with_no_content is-accordion-submenu-parent";
@@ -190,27 +194,27 @@ define(function(require) {
       title += "<i class=\"fa fa-lg fa-fw " + tabInfo.icon + "\"></i> ";
     }
     title += tabInfo.title;
-    if (tabInfo.beta){
+    if (tabInfo.beta) {
       title += "<sup>βeta</sup> ";
     }
 
     if (parent !== "") {
       liItem = "<li id=\"li_" + tabName + "\" class=\"" + tabClass + "\">" +
-              "<a href=\"#\">" + title + "</a>" +
-            "</li>";
+        "<a href=\"#\">" + title + "</a>" +
+        "</li>";
 
       if ($("#menu ul#navigation #li_" + parent + " .menu").length > 0) {
         $("#menu ul#navigation #li_" + parent + " .menu").append(liItem);
       } else {
         $("#menu ul#navigation #li_" + parent).append(
-            "<ul class=\"menu vertical nested\" data-submenu>" +
-              liItem +
-            "</ul>");
+          "<ul class=\"menu vertical nested\" data-submenu>" +
+          liItem +
+          "</ul>");
       }
     } else {
       liItem = "<li id=\"li_" + tabName + "\" class=\"" + tabClass + "\">" +
-              "<a href=\"#\">" + title + "</a>" +
-            "</li>";
+        "<a href=\"#\">" + title + "</a>" +
+        "</li>";
 
       $("div#menu ul#navigation").append(liItem);
     }
@@ -226,7 +230,7 @@ define(function(require) {
     //};
 
     if (tabInfo.forms) {
-      $.each(tabInfo.forms, function(key, value) {
+      $.each(tabInfo.forms, function (key, value) {
         Sunstone.addFormPanel(tabName, key, value);
       });
     }
@@ -240,7 +244,7 @@ define(function(require) {
 
   //If we have defined a block of action buttons in a tab,
   //this function takes care of inserting them in the DOM.
-  var _insertButtonsInTab = function(tabName, panelName, panelButtons, customContext) {
+  var _insertButtonsInTab = function (tabName, panelName, panelButtons, customContext) {
     var buttons = panelButtons ? panelButtons : SunstoneCfg["tabs"][tabName]["buttons"];
     var buttonCode = "";
     var condition = null;
@@ -259,7 +263,7 @@ define(function(require) {
     if (actionBlock.length) {
 
       var ButtonsTemplate = require("hbs!./sunstone/buttons");
-      var buttonsRow = $(ButtonsTemplate({customId: customId, customContext: customContext}));
+      var buttonsRow = $(ButtonsTemplate({ customId: customId, customContext: customContext }));
 
       //for every button defined for this tab...
       for (buttonName in buttons) {
@@ -274,17 +278,17 @@ define(function(require) {
         var type = button.type + "_button";
         var strClass = [type];
         switch (button.type) {
-        case "select":
-          break;
-        case "image":
-          strClass.push("action_button");
-          break;
-        case "create_dialog":
-          strClass.push("action_button");
-          strClass.push("top_button");
-          break;
-        default:
-          strClass.push("top_button");
+          case "select":
+            break;
+          case "image":
+            strClass.push("action_button");
+            break;
+          case "create_dialog":
+            strClass.push("action_button");
+            strClass.push("top_button");
+            break;
+          default:
+            strClass.push("top_button");
         }
 
         if (button.alwaysActive) {
@@ -298,94 +302,94 @@ define(function(require) {
         var buttonContext;
         var text;
         switch (button.layout) {
-        case "create":
-          buttonContext = $("#" + customId + "create_buttons", buttonsRow);
-          icon = button.icon ? button.icon : "<i class=\"fa fa-plus\"/>";
-          text = button.text ? icon + " " + button.text : icon;
-          strClass.push("success", "button");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
-          break;
-        case "refresh":
-          buttonContext = $("#" + customId + "refresh_buttons", buttonsRow);
-          icon = button.icon ? button.icon : "<i class=\"fa fa-refresh\"/>";
-          text = button.text ? icon + " " + button.text : icon;
-          strClass.push("refresh", "button",  "secondary");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
-          break;
-        case "top":
-          buttonContext = $("#" + customId + "refresh_buttons", buttonsRow);
-          text = "<span class=\"fa-stack\">" +
+          case "create":
+            buttonContext = $("#" + customId + "create_buttons", buttonsRow);
+            icon = button.icon ? button.icon : "<i class=\"fa fa-plus\"/>";
+            text = button.text ? icon + " " + button.text : icon;
+            strClass.push("success", "button");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+            break;
+          case "refresh":
+            buttonContext = $("#" + customId + "refresh_buttons", buttonsRow);
+            icon = button.icon ? button.icon : "<i class=\"fa fa-refresh\"/>";
+            text = button.text ? icon + " " + button.text : icon;
+            strClass.push("refresh", "button", "secondary");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+            break;
+          case "top":
+            buttonContext = $("#" + customId + "refresh_buttons", buttonsRow);
+            text = "<span class=\"fa-stack\">" +
               "<i class=\"fa fa-refresh fa-stack-2x\" style=\"color: #dfdfdf\"></i>" +
               "<i class=\"fa fa-play fa-stack-1x\"></i>" +
-            "</span>";
-          strClass.push("toggle_top_button", "only-sunstone-list", "button",  "hollow");
-          buttonCode = "<a class=\"" + strClass.join(" ") + "\" style=\"padding-left:0px; margin-right: 20px\">" + text + "</a>";
-          break;
-        case "main":
-          buttonContext = $("#" + customId + "main_buttons", buttonsRow);
-          text = button.text;
-          strClass.push("button");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
-          break;
-        case "vmsplay_buttons":
-          buttonContext = $("#" + customId + "vmsplay_buttons", buttonsRow);
-          text = button.text;
-          strClass.push("button");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
-          break;
-        case "vmspause_buttons":
-          buttonContext = $("#" + customId + "vmspause_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "vmsstop_buttons":
-          buttonContext = $("#" + customId + "vmsstop_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "vmsrepeat_buttons":
-          buttonContext = $("#" + customId + "vmsrepeat_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "vmsdelete_buttons":
-          buttonContext = $("#" + customId + "vmsdelete_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "vmsplanification_buttons":
-          buttonContext = $("#" + customId + "vmsplanification_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "more_select":
-          buttonContext = $("#" + customId + "more_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "user_select":
-          buttonContext = $("#" + customId + "user_buttons", buttonsRow);
-          text = button.text;
-          buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
-          break;
-        case "del":
-          buttonContext = $("#" + customId + "delete_buttons", buttonsRow);
-          text = "<i class=\" fa fa-trash-o\"/> ";
-          strClass.push("alert", "button");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
-          break;
-        case "labels":
-          buttonContext = $("#" + customId + "labels_buttons", buttonsRow);
-          text = "<i class=\"fa fa-tags\"/>";
-          strClass.push("only-sunstone-info", "only-sunstone-list", "top_button", "secondary", "button", "dropdown");
-          buttonCode = "<button type=\"button\" data-toggle=\"" + customId + "LabelsDropdown\" class=\"" + strClass.join(" ") + "\">" +
-            text+"</button>";
-          break;
-        default:
-          buttonContext = $("#" + customId + "main_buttons", buttonsRow);
-          text = button.text;
-          strClass.push("button");
-          buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+              "</span>";
+            strClass.push("toggle_top_button", "only-sunstone-list", "button", "hollow");
+            buttonCode = "<a class=\"" + strClass.join(" ") + "\" style=\"padding-left:0px; margin-right: 20px\">" + text + "</a>";
+            break;
+          case "main":
+            buttonContext = $("#" + customId + "main_buttons", buttonsRow);
+            text = button.text;
+            strClass.push("button");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+            break;
+          case "vmsplay_buttons":
+            buttonContext = $("#" + customId + "vmsplay_buttons", buttonsRow);
+            text = button.text;
+            strClass.push("button");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+            break;
+          case "vmspause_buttons":
+            buttonContext = $("#" + customId + "vmspause_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "vmsstop_buttons":
+            buttonContext = $("#" + customId + "vmsstop_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "vmsrepeat_buttons":
+            buttonContext = $("#" + customId + "vmsrepeat_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "vmsdelete_buttons":
+            buttonContext = $("#" + customId + "vmsdelete_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "vmsplanification_buttons":
+            buttonContext = $("#" + customId + "vmsplanification_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "more_select":
+            buttonContext = $("#" + customId + "more_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "user_select":
+            buttonContext = $("#" + customId + "user_buttons", buttonsRow);
+            text = button.text;
+            buttonCode = "<li><a class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</a></li>";
+            break;
+          case "del":
+            buttonContext = $("#" + customId + "delete_buttons", buttonsRow);
+            text = "<i class=\" fa fa-trash-o\"/> ";
+            strClass.push("alert", "button");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
+            break;
+          case "labels":
+            buttonContext = $("#" + customId + "labels_buttons", buttonsRow);
+            text = "<i class=\"fa fa-tags\"/>";
+            strClass.push("only-sunstone-info", "only-sunstone-list", "top_button", "secondary", "button", "dropdown");
+            buttonCode = "<button type=\"button\" data-toggle=\"" + customId + "LabelsDropdown\" class=\"" + strClass.join(" ") + "\">" +
+              text + "</button>";
+            break;
+          default:
+            buttonContext = $("#" + customId + "main_buttons", buttonsRow);
+            text = button.text;
+            strClass.push("button");
+            buttonCode = "<button class=\"" + strClass.join(" ") + "\" href=\"" + buttonName + "\">" + text + "</button>";
         }
 
         buttonContext.append(buttonCode);
@@ -443,23 +447,23 @@ define(function(require) {
       $(".create_dialog_button", actionBlock).prop("disabled", false).removeAttr("disabled");
       $(".alwaysActive", actionBlock).prop("disabled", false).removeAttr("disabled");
 
-      $("#" + customId + "reset_button", actionBlock).on("click", function() {
+      $("#" + customId + "reset_button", actionBlock).on("click", function () {
         _resetFormPanel(tabName);
         return false;
       });
 
-      $(".submit_button", actionBlock).on("click", function() {
+      $(".submit_button", actionBlock).on("click", function () {
         _submitFormPanel(tabName);
         return false;
       });
     }//if tab exists
   };
 
-  var _setupButtons = function() {
+  var _setupButtons = function () {
     //Listen for .action_buttons
     //An action buttons runs a predefined action. If it has type
     //"multiple" it runs that action on the elements of a datatable.
-    $(document).on("click", ".action_button", function() {
+    $(document).on("click", ".action_button", function () {
       var error = 0;
       var value = $(this).val();
       if ($.isEmptyObject(value)) {
@@ -473,14 +477,14 @@ define(function(require) {
         Notifier.notifyError("Action " + value + " not defined.");
         return false;
       };
-      switch (action.type){
-      case "multiple": //find the datatable
-        var context = $(this).parents(".tab");
-        var nodes = action.elements();
-        error = _runAction(value, nodes);
-        break;
-      default:
-        error = _runAction(value);
+      switch (action.type) {
+        case "multiple": //find the datatable
+          var context = $(this).parents(".tab");
+          var nodes = action.elements();
+          error = _runAction(value, nodes);
+          break;
+        default:
+          error = _runAction(value);
       }
 
       return false;
@@ -488,7 +492,7 @@ define(function(require) {
 
     //Listen .confirm_buttons. These buttons show a confirmation dialog
     //before running the action.
-    $(document).on("click", ".confirm_button", function() {
+    $(document).on("click", ".confirm_button", function () {
       var dialogInstance = _getDialogInstance(CONFIRM_DIALOG_ID);
       dialogInstance.reset();
       $("#" + CONFIRM_DIALOG_ID).data("buttonAction", $(this).attr("href"));
@@ -499,12 +503,12 @@ define(function(require) {
 
     //Listen .confirm_buttons. These buttons show a confirmation dialog
     //with a select box before running the action.
-    $(document).on("click", ".confirm_with_select_button", function() {
+    $(document).on("click", ".confirm_with_select_button", function () {
       var dialogInstance = _getDialogInstance(CONFIRM_WITH_SELECT_DIALOG_ID);
 
       dialogInstance.setParams({
-        "buttonAction" : $(this).attr("href"),
-        "buttonTab" : $(this).parents(".tab").attr("id")
+        "buttonAction": $(this).attr("href"),
+        "buttonTab": $(this).parents(".tab").attr("id")
       });
 
       dialogInstance.reset();
@@ -516,19 +520,19 @@ define(function(require) {
     //$(document).foundation('dropdown', 'reflow');
 
     // Button to return to the list view from the detailed view
-    $(document).on("click", "button[href='back']", function(e) {
+    $(document).on("click", "button[href='back']", function (e) {
       window.history.back();
       e.preventDefault();
     });
   };
 
-  var _setupTabs = function() {
+  var _setupTabs = function () {
     Foundation.reflow($("#menu"), "accordion-menu");
     Foundation.reflow($("div.sunstone-content"), "sticky");
     var topTabs = $(".sunstone-menu-content ul li.topTab");
     var subTabs = $(".sunstone-menu-content ul li.subTab > a");
 
-    subTabs.on("click", function() {
+    subTabs.on("click", function () {
       if ($(this).closest("li").hasClass("topTab")) {
         return false;
       } else {
@@ -538,7 +542,7 @@ define(function(require) {
       }
     });
 
-    topTabs.on("click", function(e) {
+    topTabs.on("click", function (e) {
       var tabName = $(this).attr("id").substring(3);
 
       if ($(this).hasClass("tab_with_no_content")) {
@@ -555,7 +559,7 @@ define(function(require) {
     _setupButtons();
   };
 
-  var _showRighList = function(tabName) {
+  var _showRighList = function (tabName) {
     var tab = $("#" + tabName);
     $(".tab").hide();
     tab.show();
@@ -569,7 +573,7 @@ define(function(require) {
     $(".action_blocks", tab).removeClass("large-12").addClass("large-9");
   };
 
-  var _showRighInfo = function(tabName) {
+  var _showRighInfo = function (tabName) {
     var tab = $("#" + tabName);
     $(".tab").hide();
     tab.show();
@@ -583,19 +587,19 @@ define(function(require) {
     $(".action_blocks", tab).removeClass("large-9").addClass("large-12");
   };
 
-  var _showTab = function(tabName) {
-    if (_getTab() == tabName && _rightListVisible()){
+  var _showTab = function (tabName) {
+    if (_getTab() == tabName && _rightListVisible()) {
       _routerShowTab(tabName);
     } else {
-      if (router != undefined){
+      if (router != undefined) {
         router.navigate(tabName);
-      }else{
+      } else {
         _routerShowTab(tabName);
       }
     }
   };
 
-  var _routerShowTab = function(tabName) {
+  var _routerShowTab = function (tabName) {
     $(".labels-tree", "#navigation").remove();
 
     if (!SunstoneCfg["tabs"][tabName]) {
@@ -628,7 +632,7 @@ define(function(require) {
     var hashRes = ["Dashboard", "Settings", "NetworkTopology"];
     var res = SunstoneCfg["tabs"][tabName]["resource"];
     if (res) {
-      if (!hashRes.includes(res)){
+      if (!hashRes.includes(res)) {
         Sunstone.runAction(res + ".list");
       } else {
         Sunstone.runAction(res + ".refresh");
@@ -636,26 +640,26 @@ define(function(require) {
     }
   };
 
-  var _getTab = function() {
+  var _getTab = function () {
     return $(".tab:visible").attr("id");
   };
 
-  var _showElement = function(tabName, elementId) {
-    if(!Config.isTabEnabled(tabName)){
+  var _showElement = function (tabName, elementId) {
+    if (!Config.isTabEnabled(tabName)) {
       return;
     }
 
-    if (router != undefined){
+    if (router != undefined) {
       router.navigate(tabName + "/" + elementId);
-    }else{
+    } else {
       _routerShowElement(tabName, elementId);
     }
   };
 
-  var _routerShowElement = function(tabName, elementId) {
+  var _routerShowElement = function (tabName, elementId) {
     var resource = SunstoneCfg["tabs"][tabName].resource;
 
-    if (resource == undefined){
+    if (resource == undefined) {
       return;
     }
 
@@ -678,12 +682,12 @@ define(function(require) {
   };
 
   // Returns the element that is currently shown in the right info
-  var _getElementRightInfo = function(tabName, context) {
+  var _getElementRightInfo = function (tabName, context) {
     var context = context || $(".sunstone-info", $("#" + tabName));
     return context.data("element");
   };
 
-  var _insertPanels = function(tabName, info, contextTabId, context) {
+  var _insertPanels = function (tabName, info, contextTabId, context) {
     var context = context || $(".sunstone-info", $("#" + tabName));
 
     context.data("element", info[Object.keys(info)[0]]);
@@ -698,9 +702,9 @@ define(function(require) {
     var prevPanelInstances = SunstoneCfg["tabs"][tabName]["panelInstances"];
     var prevPanelStates = {};
 
-    if(isRefresh && prevPanelInstances != undefined){
-      $.each(prevPanelInstances, function(panelName, panel) {
-        if(panel.getState){
+    if (isRefresh && prevPanelInstances != undefined) {
+      $.each(prevPanelInstances, function (panelName, panel) {
+        if (panel.getState) {
           prevPanelStates[panelName] = panel.getState(context);
         }
       });
@@ -709,8 +713,8 @@ define(function(require) {
     var hooks = SunstoneCfg["tabs"][tabName].panelsHooks;
 
     if (hooks) {
-      $.each(hooks, function(i, hook){
-        hook.pre(info, (contextTabId||tabName));
+      $.each(hooks, function (i, hook) {
+        hook.pre(info, (contextTabId || tabName));
       });
     }
 
@@ -719,8 +723,8 @@ define(function(require) {
     var templatePanelsParams = [];
     SunstoneCfg["tabs"][tabName]["panelInstances"] = {};
 
-    $.each(panels, function(panelName, Panel) {
-      if (Config.isTabPanelEnabled((contextTabId||tabName), panelName)) {
+    $.each(panels, function (panelName, Panel) {
+      if (Config.isTabPanelEnabled((contextTabId || tabName), panelName)) {
         if (activaTabHref) {
           if (activaTabHref == "#" + panelName) {
             active = true;
@@ -755,15 +759,15 @@ define(function(require) {
     });
 
     context.html(html);
-    $.each(SunstoneCfg["tabs"][tabName]["panelInstances"], function(panelName, panel) {
+    $.each(SunstoneCfg["tabs"][tabName]["panelInstances"], function (panelName, panel) {
       panel.setup(context);
 
-      if(isRefresh && prevPanelStates[panelName] && panel.setState){
-        panel.setState( prevPanelStates[panelName], context );
+      if (isRefresh && prevPanelStates[panelName] && panel.setState) {
+        panel.setState(prevPanelStates[panelName], context);
       }
     });
 
-    $("#" + containerId + "Tabs", context).on("change.zf.tabs", function(target) {
+    $("#" + containerId + "Tabs", context).on("change.zf.tabs", function (target) {
       var elemIdWithHash = $(".is-active > a")[0];
       var tabIdWithHash = elemIdWithHash.hash;
 
@@ -775,14 +779,14 @@ define(function(require) {
 
     Foundation.reflow(context, "tabs");
 
-    if(activaTabHref != undefined){
+    if (activaTabHref != undefined) {
       $("[href=\"" + activaTabHref + "\"]", context).trigger("click");
       $("#" + containerId + "Tabs", context).trigger("change.zf.tabs");
     }
 
     if (hooks) {
-      $.each(hooks, function(i, hook){
-        hook.post(info, (contextTabId||tabName));
+      $.each(hooks, function (i, hook) {
+        hook.post(info, (contextTabId || tabName));
       });
     }
   };
@@ -791,7 +795,7 @@ define(function(require) {
   //can be use to run action depending on conditions and notify them
   //if desired. Returns 1 if some problem has been detected: i.e
   //the condition to run the action is not met, the action is not found
-  var _runAction = function(action, dataArg, extraParam) {
+  var _runAction = function (action, dataArg, extraParam) {
     var actions = SunstoneCfg["actions"];
     if (!actions[action]) {
       Notifier.notifyError("Action " + action + " not defined");
@@ -816,68 +820,72 @@ define(function(require) {
     var callback = actionCfg["callback"];
     var err = actionCfg["error"];
 
-    switch (actionCfg.type){
-    case "create":
-    case "register":
-      call({data:dataArg, success: callback, error:err});
-      break;
-    case "single":
-      if (extraParam) {
-        call({
-          data:{
-            id:dataArg,
-            extra_param: extraParam
-          },
-          success: callback, error:err
-        });
-      } else {
-        call({data:{id:dataArg}, success: callback, error:err});
-      };
-      break;
-    case "list":
-      call({success: callback, error:err, options:dataArg});
-      break;
-    case "monitor_global":
-      call({
-          timeout: true,
-          success: callback,
-          error:err,
-          data: {monitor: dataArg}});
-      break;
-    case "monitor":
-    case "monitor_single":
-      call({
-          timeout: true,
-          success: callback,
-          error:err,
-          data: {id:dataArg, monitor: extraParam}});
-      break;
-    case "multiple":
-      $.each(dataArg, function() {
+    switch (actionCfg.type) {
+      case "create":
+      case "register":
+        call({ data: dataArg, success: callback, error: err });
+        break;
+      case "single":
         if (extraParam) {
           call({
-                        data:{
-                          id:this,
-                          extra_param:extraParam
-                        },
-                        success: callback,
-                        error: err});
+            data: {
+              id: dataArg,
+              extra_param: extraParam
+            },
+            success: callback, error: err
+          });
         } else {
-          call({
-              data:{id:this},
+          call({ data: { id: dataArg }, success: callback, error: err });
+        };
+        break;
+      case "list":
+        call({ success: callback, error: err, options: dataArg });
+        break;
+      case "monitor_global":
+        call({
+          timeout: true,
+          success: callback,
+          error: err,
+          data: { monitor: dataArg }
+        });
+        break;
+      case "monitor":
+      case "monitor_single":
+        call({
+          timeout: true,
+          success: callback,
+          error: err,
+          data: { id: dataArg, monitor: extraParam }
+        });
+        break;
+      case "multiple":
+        $.each(dataArg, function () {
+          if (extraParam) {
+            call({
+              data: {
+                id: this,
+                extra_param: extraParam
+              },
               success: callback,
-              error:err});
+              error: err
+            });
+          } else {
+            call({
+              data: { id: this },
+              success: callback,
+              error: err
+            });
+          }
+        });
+        break;
+      default:
+        if (dataArg && extraParam) {
+          call(dataArg, extraParam);
+        } else if (dataArg) {
+          call(dataArg);
+        } else {
+          call();
         }
-      });
-      break;
-    default:
-      if (dataArg && extraParam) {
-        call(dataArg, extraParam);
-      } else if (dataArg) {
-        call(dataArg);
-      } else {
-        call();
-      }
     }
 
     if (notify) {
@@ -892,20 +900,20 @@ define(function(require) {
     _popFormPanelLoading(tabId);
     _showFormPanelSubmit(tabId);
 
-    setTimeout(function() {
+    setTimeout(function () {
       var tab = SunstoneCfg["tabs"][tabId];
       var formPanelInstance = tab["formPanelInstances"][formPanelId];
 
-      var formContext = $("#" + tabId+" div[form-panel-id="+formPanelId+"]");
+      var formContext = $("#" + tabId + " div[form-panel-id=" + formPanelId + "]");
 
       if (!formPanelInstance) {
         formContext =
-        $("<div class=\"tabs-content tabs-contentForm\" " +
-                "data-tabs-content=\"" + tab.tabName + "FormTabs\" " +
-                "form-panel-id=\""+formPanelId+"\">\
-          <div class=\"wizardForms tabs-panel is-active\" id=\""+tab.tabName+"-wizardForms\"></div>\
-          <div class=\"advancedForms tabs-panel\" id=\""+tab.tabName+"-advancedForms\"></div>\
-        </div>").appendTo( $(".contentForm", context) );
+          $("<div class=\"tabs-content tabs-contentForm\" " +
+            "data-tabs-content=\"" + tab.tabName + "FormTabs\" " +
+            "form-panel-id=\"" + formPanelId + "\">\
+          <div class=\"wizardForms tabs-panel is-active\" id=\""+ tab.tabName + "-wizardForms\"></div>\
+          <div class=\"advancedForms tabs-panel\" id=\""+ tab.tabName + "-advancedForms\"></div>\
+        </div>").appendTo($(".contentForm", context));
 
         // Create panelInstance, insert in the DOM and setup
         var formPanel = tab["formPanels"][formPanelId];
@@ -919,14 +927,14 @@ define(function(require) {
         formPanelInstance = new formPanel();
         tab["formPanelInstances"][formPanelId] = formPanelInstance;
 
-        if (action != undefined){
+        if (action != undefined) {
           formPanelInstance.setAction(formContext, action);
         }
 
         formPanelInstance.insert(formContext);
       }
 
-      if (action != undefined){
+      if (action != undefined) {
         formPanelInstance.setAction(formContext, action);
       }
 
@@ -937,7 +945,7 @@ define(function(require) {
         $(".wizard_tabs", context).show();
       } else {
         $(".wizard_tabs", context).hide();
-        $("a[href=\"#"+tab.tabName+"-wizardForms\"]", context).click();
+        $("a[href=\"#" + tab.tabName + "-wizardForms\"]", context).click();
       }
 
       // Hide reset button if not defined
@@ -956,7 +964,7 @@ define(function(require) {
     }, 13);
   }
 
-  var _submitFormPanel = function(tabId) {
+  var _submitFormPanel = function (tabId) {
     var context = $("#" + tabId);
     //_popFormPanelLoading(tabId);
     // Workaround until Foundation.abide support hidden forms
@@ -967,7 +975,7 @@ define(function(require) {
 
     _disableFormPanelSubmit(tabId);
 
-    setTimeout(function() {
+    setTimeout(function () {
       var formPanelInstance = SunstoneCfg["tabs"][tabId].activeFormPanel;
 
       if ($(".wizardForms", context).is(":visible")) {
@@ -987,14 +995,14 @@ define(function(require) {
    * @param  {String} formPanelId TAB_ID. Optional, if it is not provided the
    *                        visible form panel will be used
    */
-  var _resetFormPanel = function(tabId, formPanelId) {
-    if (tabId == undefined){
+  var _resetFormPanel = function (tabId, formPanelId) {
+    if (tabId == undefined) {
       tabId = _getTab();
     }
 
     _popFormPanelLoading(tabId);
 
-    setTimeout(function() {
+    setTimeout(function () {
       var formPanelInstance;
       if (formPanelId != undefined) {
         formPanelInstance = SunstoneCfg["tabs"][tabId]["formPanelInstances"][formPanelId];
@@ -1003,14 +1011,14 @@ define(function(require) {
       }
 
       if (formPanelInstance) {
-        var context = $("#" + tabId+" div[form-panel-id="+formPanelInstance.formPanelId+"]");
+        var context = $("#" + tabId + " div[form-panel-id=" + formPanelInstance.formPanelId + "]");
 
         formPanelId = formPanelInstance.formPanelId;
 
         formPanelInstance.reset(context);
       }
 
-      if (_formPanelVisible($("#"+tabId))){
+      if (_formPanelVisible($("#" + tabId))) {
         _showFormPanel(tabId, formPanelId);
       }
     }, 13);
@@ -1024,7 +1032,7 @@ define(function(require) {
    *                        tab will be used
    */
   function _hideFormPanelLoading(tabId) {
-    if (tabId == undefined){
+    if (tabId == undefined) {
       tabId = _getTab();
     }
 
@@ -1040,35 +1048,35 @@ define(function(require) {
       $(".sunstone-form-title", context).text(formPanelInstance.title());
       $(".submit_button", context).text(formPanelInstance.buttonText());
 
-      $("div[form-panel-id="+formPanelInstance.formPanelId+"]", context).fadeIn();
+      $("div[form-panel-id=" + formPanelInstance.formPanelId + "]", context).fadeIn();
     }
 
     _enableFormPanelSubmit(tabId);
   }
 
   function _hideFormPanel(tabId) {
-    if (tabId == undefined){
+    if (tabId == undefined) {
       tabId = _getTab();
     }
 
     var context = $("#" + tabId);
 
-    if (_formPanelVisible(context)){
+    if (_formPanelVisible(context)) {
       $("[href=\"back\"]", context).trigger("click");
     }
   }
 
   function _popFormPanelLoading(tabId) {
-    if (tabId == undefined){
+    if (tabId == undefined) {
       tabId = _getTab();
     }
 
-    if(_getTab() != tabId){
+    if (_getTab() != tabId) {
       _routerShowTab(tabId);
     }
 
-    if (!_formPanelVisible($("#"+tabId)) && router != undefined){
-      router.navigate(tabId+"/form");
+    if (!_formPanelVisible($("#" + tabId)) && router != undefined) {
+      router.navigate(tabId + "/form");
     }
 
     var context = $("#" + tabId);
@@ -1095,19 +1103,19 @@ define(function(require) {
   function _disableFormPanelSubmit(tabId) {
     var context = $("#" + tabId);
     $(".submit_button", context).
-        attr("disabled", "disabled").
-        on("click.disable", function(e) { return false; });
+      attr("disabled", "disabled").
+      on("click.disable", function (e) { return false; });
   }
 
   function _enableFormPanelSubmit(tabId) {
-    if (tabId == undefined){
+    if (tabId == undefined) {
       tabId = _getTab();
     }
 
     var context = $("#" + tabId);
     $(".submit_button", context).
-        removeAttr("disabled").
-        off("click.disable");
+      removeAttr("disabled").
+      off("click.disable");
   }
 
   function _hideFormPanelSubmit(tabId) {
@@ -1120,7 +1128,7 @@ define(function(require) {
     $(".submit_button", context).show();
   }
 
-  var _getButton = function(tadId, buttonName) {
+  var _getButton = function (tadId, buttonName) {
     var button = null;
     var buttons = SunstoneCfg["tabs"][tadId]["buttons"];
     button = buttons[buttonName];
@@ -1131,39 +1139,39 @@ define(function(require) {
     return button;
   };
 
-  var _rightInfoVisible = function(context) {
+  var _rightInfoVisible = function (context) {
     return $(".sunstone-info", context).is(":visible");
   };
 
-  var _rightListVisible = function(context) {
+  var _rightListVisible = function (context) {
     return $(".sunstone-list", context).is(":visible");
   };
 
-  var _formPanelVisible = function(context) {
+  var _formPanelVisible = function (context) {
     return $(".sunstone-form", context).is(":visible");
   };
 
-  var _rightInfoResourceId = function(context) {
+  var _rightInfoResourceId = function (context) {
     return $(".resource-id", context).text();
   };
 
-  var _getAction = function(actionId) {
+  var _getAction = function (actionId) {
     return SunstoneCfg["actions"][actionId];
   };
 
-  var _getDataTable = function(tabName) {
+  var _getDataTable = function (tabName) {
     if (SunstoneCfg["tabs"][tabName]) {
       return SunstoneCfg["tabs"][tabName].dataTable;
     }
   };
 
-  var _getResource = function(tabName) {
+  var _getResource = function (tabName) {
     if (SunstoneCfg["tabs"][tabName]) {
       return SunstoneCfg["tabs"][tabName].resource;
     }
   };
 
-  var _getDialogInstance = function(dialogId) {
+  var _getDialogInstance = function (dialogId) {
     var dialogInstance = SunstoneCfg["dialogInstances"][dialogId];
     if (dialogInstance == undefined) {
       var Dialog = SunstoneCfg["dialogs"][dialogId];
@@ -1175,33 +1183,33 @@ define(function(require) {
     return dialogInstance;
   };
 
-  var _setupNavigoRoutes = function() {
-    router =  new Navigo(null, true);
+  var _setupNavigoRoutes = function () {
+    router = new Navigo(null, true);
 
     for (var tabName in SunstoneCfg["tabs"]) {
-      router.on(new RegExp("(?:#|/)"+tabName+"/form"), function(){
-        if(_getTab() == undefined){
+      router.on(new RegExp("(?:#|/)" + tabName + "/form"), function () {
+        if (_getTab() == undefined) {
           // This will happen if the user opens sunstone directly in a /form url
           _showTab(this);
         }
       }.bind(tabName));
 
-      router.on(new RegExp("(?:#|/)"+tabName+"/(\\d+)"), function(id){
+      router.on(new RegExp("(?:#|/)" + tabName + "/(\\d+)"), function (id) {
         _routerShowElement(this, id);
       }.bind(tabName));
 
-      router.on(new RegExp("(?:#|/)"+tabName), function(){
+      router.on(new RegExp("(?:#|/)" + tabName), function () {
         _routerShowTab(this);
       }.bind(tabName));
     }
 
-    router.on(function(){
+    router.on(function () {
       _routerShowTab(DASHBOARD_TAB_ID);
     });
 
-    $(document).on("click", "a", function(e){
+    $(document).on("click", "a", function (e) {
       if ($(this).attr("href") != undefined &&
-          $(this).attr("href")[0] === "#"){
+        $(this).attr("href")[0] === "#") {
         e.preventDefault();
       }
     });
@@ -1218,7 +1226,7 @@ define(function(require) {
     "getElementRightInfo": _getElementRightInfo,
 
     "showTab": _showTab,
-    "showElement" : _showElement,
+    "showElement": _showElement,
     "getTab": _getTab,
 
     "showFormPanel": _showFormPanel,
@@ -1235,7 +1243,7 @@ define(function(require) {
     "rightListVisible": _rightListVisible,
     "rightInfoResourceId": _rightInfoResourceId,
 
-    "runAction" : _runAction,
+    "runAction": _runAction,
     "getAction": _getAction,
     "getButton": _getButton,
     "getDataTable": _getDataTable,

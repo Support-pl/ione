@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
   var OpenNebulaSupport = require('opennebula/support');
@@ -26,67 +26,69 @@ define(function(require) {
   var UPLOAD_DIALOG_ID = require('./dialogs/upload/dialogId');
 
   var _actions = {
-    "Support.list" : {
+    "Support.list": {
       type: "list",
       call: OpenNebulaSupport.list,
-      callback: function(req, list, res){
+      callback: function (req, list, res) {
         SupportUtils.showSupportList();
         $(".support_open_value").text(res.open_requests);
         $(".support_pending_value").text(res.pending_requests);
 
         var elements = [];
-        if(res.REQUEST_POOL.REQUEST){
+        if (res.REQUEST_POOL.REQUEST) {
           elements = res.REQUEST_POOL.REQUEST;
         }
 
         Sunstone.getDataTable(TAB_ID).updateView(req, elements);
       },
-      error: function(request, error_json) {
-        if (error_json.error.http_status=="401") {
+      error: function (request, error_json) {
+        if (error_json.error.http_status == "401") {
           SupportUtils.stopIntervalRefresh();
         }
 
         SupportUtils.showSupportConnect();
       }
     },
-    "Support.refresh" : {
+    "Support.refresh": {
       type: "custom",
-      call: function() {
+      call: function () {
         var tab = $('#' + TAB_ID);
         if (Sunstone.rightInfoVisible(tab)) {
-          Sunstone.runAction(RESOURCE+".show", Sunstone.rightInfoResourceId(tab));
+          Sunstone.runAction(RESOURCE + ".show", Sunstone.rightInfoResourceId(tab));
         } else {
           Sunstone.getDataTable(TAB_ID).waitingNodes();
-          Sunstone.runAction(RESOURCE+".list", {force: true});
+          Sunstone.runAction(RESOURCE + ".list", {
+            force: true
+          });
         }
       },
-      error: function(request, error_json) {
+      error: function (request, error_json) {
         SupportUtils.showSupportConnect();
       }
     },
-    "Support.show" : {
+    "Support.show": {
       type: "single",
       call: OpenNebulaSupport.show,
-      callback: function(request, response) {
+      callback: function (request, response) {
         //Sunstone.getDataTable(TAB_ID).updateElement(request, response);
-        if (Sunstone.rightInfoVisible($('#'+TAB_ID))) {
+        if (Sunstone.rightInfoVisible($('#' + TAB_ID))) {
           Sunstone.insertPanels(TAB_ID, response);
         }
       },
-      error: function(request, error_json) {
+      error: function (request, error_json) {
         SupportUtils.showSupportConnect();
       }
     },
-    "Support.create" : {
+    "Support.create": {
       type: "create",
       call: OpenNebulaSupport.create,
-      callback: function(request, response){
+      callback: function (request, response) {
         Sunstone.resetFormPanel(TAB_ID, CREATE_DIALOG_ID);
         Sunstone.hideFormPanel(TAB_ID);
         Sunstone.runAction("Support.refresh");
       },
-      error: function(request, error_json){
-        if (error_json.error.http_status=="403") {
+      error: function (request, error_json) {
+        if (error_json.error.http_status == "403") {
           Sunstone.hideFormPanelLoading(TAB_ID);
           Notifier.notifyError(error_json.error.message);
         } else {
@@ -95,38 +97,38 @@ define(function(require) {
         }
       }
     },
-    "Support.create_dialog" : {
+    "Support.create_dialog": {
       type: "custom",
-      call: function(){
+      call: function () {
         Sunstone.showFormPanel(TAB_ID, CREATE_DIALOG_ID, "create");
       }
     },
-    "Support.update" : {
+    "Support.update": {
       type: "single",
       call: OpenNebulaSupport.update,
-      callback: function(request, response){
+      callback: function (request, response) {
         Sunstone.runAction("Support.refresh");
         Notifier.notifyMessage("Comment added correctly");
       },
-      error: function(request, response){
+      error: function (request, response) {
         Sunstone.runAction("Support.refresh");
         //Notifier.onError(request, response);
         Notifier.notifyError("Comment failed to be added");
       }
     },
-    "Support.signout" : {
+    "Support.signout": {
       type: "single",
-      call: function() {
+      call: function () {
         $.ajax({
           url: 'support/credentials',
           type: "DELETE",
           dataType: "text",
-          success: function(){
+          success: function () {
             SupportUtils.showSupportConnect();
             Sunstone.runAction("Support.refresh");
           },
-          error: function(response){
-            if (response.status=="401") {
+          error: function (response) {
+            if (response.status == "401") {
               Notifier.notifyError("Support credentials are incorrect");
             } else {
               Notifier.notifyError(response.responseText);
@@ -135,13 +137,15 @@ define(function(require) {
         });
       }
     },
-    "Support.upload" : {
+    "Support.upload": {
       type: "single",
-      call: function() {
+      call: function () {
         var selected_nodes = Sunstone.getDataTable(TAB_ID).elements();
         var resource_id = "" + selected_nodes[0];
 
-        Sunstone.getDialog(UPLOAD_DIALOG_ID).setParams({requestId: resource_id});
+        Sunstone.getDialog(UPLOAD_DIALOG_ID).setParams({
+          requestId: resource_id
+        });
         Sunstone.getDialog(UPLOAD_DIALOG_ID).reset();
         Sunstone.getDialog(UPLOAD_DIALOG_ID).show();
       }

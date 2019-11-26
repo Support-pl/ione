@@ -1,6 +1,6 @@
 begin
     $db.create_table :records do 
-        Integer    :id,    null: false
+        Integer     :id,    null: false
         Integer     :time,  null: false
         String      :state, size: 10,   null: false
     end
@@ -14,18 +14,23 @@ class IONe
     # @param [Integer] stime - Point from which calculation starts(timestamp)
     # @param [Integer] etime - Point at which calculation stops(timestamp)
     # @param [Boolean] group_by_day - Groups showbacks by days
-    def CalculateShowback uid, stime, etime = Time.now.to_i, group_by_day = false
+    def CalculateShowback uid, stime, etime = Time.now.to_i, group_by_day = false, stream_data = nil
         vm_pool = @db[:vm_pool].select(:oid).where(:uid => uid).to_a.map! {| vm | vm[:oid]}
 
         showback = {}
+        stream = !stream_data.nil?
+
         vm_pool.each do | vm |
             vm = onblock :vm, vm, @client
             vm.info!
 
             next if vm['/VM/ETIME'].to_i < stime && vm['/VM/ETIME'].to_i != 0
             begin
-                showback[vm.id] = vm.calculate_showback(stime, etime, group_by_day).without('time_period_requested', 'time_period_corrected')
-                showback[vm.id]['name'] = vm.name
+                r = vm.calculate_showback(stime, etime, group_by_day).without('time_period_requested', 'time_period_corrected')
+                showback[vm.id] = r
+                if stream then
+                    stream_data << "\"#{vm.id}\": " << JSON.generate(r) << ","
+                end
             rescue OpenNebula::VirtualMachine::ShowbackError => e
                 if e.message.include? "VM didn't exist in given time-period" then
                     next
@@ -37,8 +42,12 @@ class IONe
 
         showback['TOTAL'] = showback.values.inject(0){| result, record | result += record['TOTAL'].to_f }
         showback['time_period_requested'] = etime - stime
+        if stream then
+            stream_data << '"TOTAL": ' << showback['TOTAL'] << ','
+            stream_data << '"time_period_requested": ' << showback['time_period_requested']
+        end
 
-        showback
+        showback unless stream
     end
     
     # Does very complicated things, don't think about it)))))

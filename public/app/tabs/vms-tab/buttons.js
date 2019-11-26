@@ -170,7 +170,7 @@ define(function (require) {
                     <option value="0">' + Locale.tr("failure") + '</option>\
                     <option value="3">' + Locale.tr("delete") + '</option>\
                     <option value="4">' + Locale.tr("delete-recreate") + '</option>\
-                  </select>'              ,
+                  </select>',
       tip: Locale.tr("Recovers a stuck VM that is waiting for a driver operation. \
                     The recovery may be done by failing, succeeding or retrying the current operation. \
                     YOU NEED TO MANUALLY CHECK THE VM STATUS ON THE HOST, to decide if the operation \
@@ -215,7 +215,9 @@ define(function (require) {
       custom_classes: "state-dependent"
     },
   }
-
+  if (config.user_config.default_view == "user") {
+    Buttons["VM.create_dialog"]["text"] = Locale.tr("Create") + " " + Locale.tr("VMs");
+  }
   if (Config.isTabActionEnabled("vms-tab", "VM.place_on_node") != true) {
     delete Buttons["VM.place_on_node"];
   }

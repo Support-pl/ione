@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var OpenNebulaAction = require('./action');
 
   var RESOURCE = "REQUEST";
@@ -23,18 +23,18 @@ define(function(require) {
 
   var Support = {
     "resource": RESOURCE,
-    "create": function(params) {
+    "create": function (params) {
       OpenNebulaAction.create(params, RESOURCE, PATH);
     },
-    "update": function(params) {
+    "update": function (params) {
       OpenNebulaAction.simple_action(params, RESOURCE, "update", params.data.extra_param, PATH);
     },
-    "list" : function(params) {
+    "list": function (params) {
       params.cache_name = CACHE_NAME;
       OpenNebulaAction.clear_cache(params.cache_name);
       OpenNebulaAction.list(params, RESOURCE, PATH)
     },
-    "show" : function(params) {
+    "show": function (params) {
       OpenNebulaAction.show(params, RESOURCE, false, PATH)
     }
   }

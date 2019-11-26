@@ -1,5 +1,3 @@
-require 'zmqjsonrpc'
-
 def r **result
    JSON.pretty_generate result
 end
@@ -22,10 +20,16 @@ post '/vm/:id/reinstall' do | id |
       vm = IONe.new($client, $db).get_vm_data(id.to_i)
 
       template = OpenNebula::Template.new_with_id(data['template_id'], @one_client)
-      template.info!
+      res = template.info!
+      if OpenNebula.is_error? res then
+         raise "Access Error, contact support."
+      end
       image = OpenNebula::Image.new_with_id(template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID'], @one_client)
-      image.info!
-      
+      res = image.info!
+      if OpenNebula.is_error? res then
+         raise "Access Error, contact support."
+      end
+
       if !(@one_user.id == vm['OWNERID'].to_i || @one_user.groups.include?(0)) then
          r error: "User is not OWNER for given VM"
       elsif vm['DRIVE'].to_i < image['/IMAGE/SIZE'].to_i then
@@ -54,7 +58,6 @@ post '/vm/:id/reinstall' do | id |
       end
    rescue => e
       msg = e.message
-      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
       r error: e.message, backtrace: e.backtrace
    end
 end
@@ -72,13 +75,15 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       elsif data['previous'].nil? then
          r error: 'Snapshot not given'
       else
-         IONe.new($client, $db).RevertZFSSnapshot(id, data['previous']) == true ?
-            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted") :
+         result = IONe.new($client, $db).RevertZFSSnapshot(id, data['previous'])
+         if result.first then
+            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted", id: result.last)
+         else
             r(response: "Contact Technical Support to make sure revert process started")
+         end
       end
    rescue => e
       msg = e.message
-      msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
       r error: e.message, backtrace: e.backtrace
    end
 end

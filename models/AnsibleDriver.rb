@@ -1,5 +1,3 @@
-require 'zmqjsonrpc'
-
 def r **result # Generates response
     JSON.pretty_generate result
 end
@@ -47,7 +45,7 @@ end
 
 class AnsiblePlaybookModel
 
-    attr_reader     :method, :id
+    attr_reader    :method, :id
     attr_accessor  :body
 
     # Each number is corresponds to position at ACTIONS
@@ -55,10 +53,10 @@ class AnsiblePlaybookModel
         'chown'          => 2,
         'chgrp'          => 2,
         'chmod'          => 2,
-        'run'             => 0,
+        'run'            => 0,
         'update'         => 1,
         'delete'         => 2,
-        'vars'            => 0,
+        'vars'           => 0,
         'clone'          => 0,
         'rename'         => 1  }
 
@@ -71,10 +69,10 @@ class AnsiblePlaybookModel
             @params = data
             begin
                 # Check if mandatory params are not nil
-                check =  @params['name'].nil?                             ||
-                            @params['body'].nil?                             ||
-                            @params['extra_data'].nil?                     ||
-                            @params['extra_data']['PERMISSIONS'].nil?
+                check = @params['name'].nil?                       ||
+                        @params['body'].nil?                       ||
+                        @params['extra_data'].nil?                 ||
+                        @params['extra_data']['PERMISSIONS'].nil?
             rescue
                 raise ParamsError.new @params # Custom error if extra_data is nil
             end
@@ -199,7 +197,6 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
         })
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -212,7 +209,6 @@ post '/ansible' do # Allocates new playbook
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         @one_user.info!
         r error: e.message, backtrace: e.backtrace, data:data
     end
@@ -228,7 +224,6 @@ delete '/ansible/:id' do |id| # Deletes given playbook
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -245,7 +240,6 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
         r ANSIBLE: pb.body
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -256,7 +250,6 @@ get '/ansible/:id/vars' do | id | # I think it's not needed here, rly
         r vars: pb.call
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -271,7 +264,6 @@ post '/ansible/:id/action' do | id | # Performs action
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -289,7 +281,6 @@ post '/ansible/:action' do | action | # Performs actions, which are defined as d
         r error: "Broken data received, unable to parse."
     rescue => e
         msg = e.message
-        msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -350,7 +341,7 @@ class AnsiblePlaybookProcessModel
      class NoAccessError < StandardError # Custom error for no access exceptions. Returns string contain which action is blocked
          def initialize action
              super()
-             @action = AnsiblePlaybook::ACTIONS[action]
+             @action = AnsiblePlaybookModel::ACTIONS[action]
          end
          def message
              "Not enough rights to perform action: #{@action}!"
@@ -396,8 +387,7 @@ end
          })
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -409,8 +399,7 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         @one_user.info!
+          @one_user.info!
          r error: e.message, backtrace: e.backtrace, data:data
      end
  end
@@ -426,8 +415,7 @@ end
          r ANSIBLE_PROCESS: apc.body
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -441,8 +429,7 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end
  
@@ -456,7 +443,6 @@ end
          r error: "Broken data received, unable to parse."
      rescue => e
          msg = e.message
-         msg.crop_zmq_error! if msg.is_zmq_error? # Crops ZmqJsonRpc backtrace from exception message
-         r error: e.message, backtrace: e.backtrace
+          r error: e.message, backtrace: e.backtrace
      end
  end

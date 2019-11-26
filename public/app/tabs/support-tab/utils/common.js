@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     Common functions for the support tab
    */
@@ -26,29 +26,30 @@ define(function(require) {
   var support_interval_function;
 
   function _show_support_connect() {
-    $(".support_info").hide();
-    $("#"+Sunstone.getDataTable(TAB_ID).dataTableId+"Container", "#"+TAB_ID).hide();
-    $(".support_connect").show();
-    $(".actions_row", "#"+TAB_ID).hide();
+    $('#li_support-tab').hide();
+    // $(".support_info").hide();
+    // $("#"+Sunstone.getDataTable(TAB_ID).dataTableId+"Container", "#"+TAB_ID).hide();
+    // $(".support_connect").show();
+    // $(".actions_row", "#"+TAB_ID).hide();
   }
 
   function _show_support_list() {
-    $(".support_info").show();
-    $(".support_connect").hide();
-    $(".actions_row", "#"+TAB_ID).show();
-    $("#"+Sunstone.getDataTable(TAB_ID).dataTableId+"Container", "#"+TAB_ID).show();
+    // $(".support_info").show();
+    // $(".support_connect").hide();
+    // $(".actions_row", "#" + TAB_ID).show();
+    // $("#" + Sunstone.getDataTable(TAB_ID).dataTableId + "Container", "#" + TAB_ID).show();
   }
 
   function _startIntervalRefresh() {
-    Sunstone.runAction('Support.list');
+    // Sunstone.runAction('Support.list');
 
-    support_interval_function = setInterval(function(){
-      Sunstone.runAction('Support.list');
-    }, Sunstone.TOP_INTERVAL);
+    // support_interval_function = setInterval(function(){
+    //   Sunstone.runAction('Support.list');
+    // }, Sunstone.TOP_INTERVAL);
   }
 
   function _stopIntervalRefresh() {
-    clearInterval(support_interval_function);
+    // clearInterval(support_interval_function);
   }
 
   return {

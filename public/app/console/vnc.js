@@ -154,7 +154,7 @@ define(function(require) {
                    'onUpdateState':  updateState,
                    'onXvpInit':    xvpInit,
                    'onPasswordRequired':  passwordRequired});
-
+    console.log(host, port, password, path, token);
     if (password) {
       rfb.connect(host, port, password, path + "?token=" + token);
     } else {
