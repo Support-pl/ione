@@ -167,6 +167,9 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
     # Public API bindings
     IONeAPIServerThread = Thread.new do
         require 'pry-remote'
+        #
+        # IONe API based on http
+        #
         class IONeAPIServer < Sinatra::Base
             set :bind, '0.0.0.0'
             set :port, 8009
@@ -187,7 +190,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
                         raise "False Credentials given"
                     end
                     RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
-                    r = IONe.new(Client.new(params['auth']), $db).send(method, *args['params'])
+                    r = IONe.new(Client.new(args['auth']), $db).send(method, *args['params'])
                 rescue => e
                     r = e.message
                     backtrace = e.backtrace
@@ -199,7 +202,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
             post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
                 body = JSON.parse(@request_body)
 
-                u = User.new_with_id(-1, Client.new(args['auth']))
+                u = User.new_with_id(-1, Client.new(body['auth']))
                 rc = u.info!
                 if OpenNebula.is_error?(rc)
                     raise "False Credentials given"
