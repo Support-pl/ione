@@ -97,3 +97,12 @@ begin
 rescue => e
     puts e.message, e.backtrace
 end
+
+ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers.each do | driver |
+    begin
+        require driver
+    rescue LoadError => e
+        puts "Driver #{driver} was not included: #{e.message}"
+    end
+end
