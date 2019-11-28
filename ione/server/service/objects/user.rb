@@ -59,7 +59,7 @@ class OpenNebula::User
         info! || self['//LANG']
     end
     # Sets User sunstone language
-    # @param [String] lang - lang code, like en_US/ru_RU/etc
+    # @param [String] l - lang code, like en_US/ru_RU/etc
     def lang= l
         sunstone = to_hash!['USER']['TEMPLATE']['SUNSTONE']
         sunstone['LANG'] = l
