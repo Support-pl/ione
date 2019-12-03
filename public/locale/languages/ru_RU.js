@@ -1553,7 +1553,7 @@ locale = {
     "Virtual machine will be rebooted during the recovering!": "Во время восстановления, машина будет выключена!",
     "Important notice!": "Важно!",
     "Backups are creating every day at 4:00 AM.": "Резервные копии создаются в 4 утра каждый день.",
-    "Recovery": "Восстановить",
+    "Recover": "Восстановить",
     "Choose the backup for use:": "Выберите копию для восстановления",
     "Yesterday": "Вчера",
     "Today": "Сегодня",
@@ -1566,10 +1566,9 @@ locale = {
     "Enter new root-password": "Введите новый пароль для root",
     "Are you sure, that you want to reinstall the system?": "Вы уверены, что хотите переустановить систему?",
     "Contact Technical Support to make sure revert process started": "Обратитесь в техническую поддержку, чтобы убедится, что процесс восстановления был запущен успешно",
-    "It's ok, yesterdays snapshot will be reverted": "Успешно, ВМ будет восстановлена из вчерашней копии",
-    "It's ok, todays snapshot will be reverted": "Успешно, ВМ будет восстановлена из сегодняшней копии",
+    "Snapshot revertion process prechecks are initialized": "Предварительные проверки запущены",
     "Error while recovering VM, contact technical support": "Ошибка при восстановлении ВМ, обратитесь в техническую поддержку",
-    "50GB Disk Recovery taxes approximately 1 hour.": "Восстановление диска 50 гб занимает около  1 часа.",
+    "50GB Disk Recovery takes approximately 1 hour.": "Восстановление диска 50 гб занимает около  1 часа.",
     "DAY": "День",
     "WEEK": "Неделя",
     "MONTH": "Месяц",
@@ -1608,4 +1607,8 @@ locale = {
     "Work time": "Время работы",
     "Memory": "Память",
     "Are you sure?": "Вы уверены в этом?",
+    "Snapshots must be deleted first": "Снимки должны быть удалены перед восстановлением",
+    "System backup has snapshot inside, automatic recovery is not possible, contact technical support":"Резервная копия содержит снимок, автоматическое восстановление невозможно. Обратитесь в техническую поддержку.",
+    "Recovery process has begun":"Процесс восстановления запущен. Пожалуйста ожидайте."
+
 }
