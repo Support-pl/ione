@@ -863,7 +863,7 @@ define(function (require) {
 
       $('ul .provision_action_icons button').hide();
       $('.provision_confirm_action').hide();
-      Notifier.notifyMessage('Процесс восстановления запущен. Пожалуйста ожидайте.');
+      Notifier.notifyMessage(Locale.tr('Recovery process has begun'));
       OpenNebula.VM.revert_zfs_snapshot({
         data: {
           id: vm_id,
@@ -875,20 +875,33 @@ define(function (require) {
           } else {
             Notifier.notifySubmit(Locale.tr(response.response));
           }
-
-          OpenNebula.AnsibleProcess.show({
-            data: {
-              id: response.id
-            },
-            success: function (a, res) {
-              if (res.ANSIBLE_PROCESS.STATUS == "RUNNING") {
-                proc_vm = res.ANSIBLE_PROCESS.ID;
+          
+          var es = new EventSource('/zfs_snapshot_revert_status/' + response.id + '?csrftoken=' + csrftoken);
+          es.onmessage = function(e) {
+              msg = e.data
+              if(msg == "running"){
+                  proc_vm = response.id
+              } else if(msg == "recovered") {
+                  Notifier.notifySubmit(Locale.tr('Recovery succeed'))
+                  proc_vm = false
+                  update_provision_vm_info(vm_id, context);
+                  es.close();
               } else {
-                proc_vm = false;
+                  code = msg.split(' ')
+
+                  if(code[1] == "vc"){
+                      Notifier.notifyError(Locale.tr('Snapshots must be deleted first'))
+                  } else if(code[1] == "zfs"){
+                      Notifier.notifyError(Locale.tr('System backup has snapshot inside, automatic recovery is not possible, contact technical support'))
+                  } else {
+                      Notifier.notifyError(Locale.tr('Error while recovering VM, contact technical support'))
+                  }
+
+                  proc_vm = false
+                  update_provision_vm_info(vm_id, context);
+                  es.close();
               }
-              update_provision_vm_info(vm_id, context);
-            }
-          });
+          };
         },
         error: function (r, response) {
           Notifier.notifyError(Locale.tr('Error occurred, contact technical support'))

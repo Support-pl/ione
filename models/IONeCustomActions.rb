@@ -77,7 +77,7 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       else
          result = IONe.new($client, $db).RevertZFSSnapshot(id, data['previous'])
          if result.first then
-            r(response: "It's ok, #{data['previous'] ? 'yesterdays' : 'todays'} snapshot will be reverted", id: result.last)
+            r(response: "Snapshot revertion process prechecks are initialized", id: result.last)
          else
             r(response: "Contact Technical Support to make sure revert process started")
          end
@@ -86,6 +86,41 @@ post '/vm/:id/revert_zfs_snapshot' do | id |
       msg = e.message
       r error: e.message, backtrace: e.backtrace
    end
+end
+
+get '/zfs_snapshot_revert_status/:id' do | id |
+begin
+   content_type 'text/event-stream'
+   headers['Cache-Control']       = "no-transform"
+   process = onblock(:app, id)
+   if process.status == "FAILED" then
+      begin
+          msg = "failed "
+          log = process.to_hash['log'].split("\n").reverse
+          i = log.index do | line |
+              line.include? 'TASK [fail]'
+          end - 1
+          err = JSON.parse(log[i].slice(/{.+}/))
+
+          if err['msg'].include? "VM has VC snap" then
+              msg += "vc"
+          elsif err['msg'].include? "zfs snap has VC snap" then
+              msg += "zfs"
+          end
+      rescue
+      end
+   elsif process.status == "RUNNING"
+      msg = "running"
+   elsif process.status == "SUCCESS"
+      msg = "recovered"
+   end
+   logger.debug("data: #{msg}\n\n")
+   stream do | out |
+      out << "data: #{msg}\n\n"
+   end
+rescue => e
+   e.message
+end
 end
 
 get '/ione_conf' do
