@@ -216,6 +216,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
 
         RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
         begin
+            sleep(5)
             IONeAPIServer.run!
         rescue StandardError => e
             RPC_LOGGER.debug e.message
