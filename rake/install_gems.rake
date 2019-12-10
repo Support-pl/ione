@@ -26,7 +26,23 @@ task :install_gems => :before do
     puts
 
     puts "4. Installing required system libs and tools"
-    sh %{sudo yum install -y #{@sys_packages.join(' ')}}
+    begin
+        sh %{sudo yum install -y #{@sys_packages.join(' ')}}
+    rescue
+        puts <<-EOF
+        It seems to be, that you aren't using CentOS or yum doesn't work properly, follow next steps:
+    
+        1. Install this packages manually:
+            
+            #{@sys_packages.join(' ')}
+        
+        2. If wanted to install our Sunstone version too, run
+            
+            rake install_ui
+    
+        Thanks, for installation and choosing us!
+        EOF
+    end
     puts
 
     puts "Done.\n"

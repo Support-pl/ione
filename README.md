@@ -35,59 +35,37 @@ Creators:
    </thead>
    <tbody>
       <tr>
-         <td align="left">CentOS</td>
-         <td align="center">6/7</td>
-         <td align="center"></td>
+         <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td>
-         <td align="center">5.4+</td>
-         <td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.4+</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Sunstone</td>
-         <td align="center">^^^^</td>
-         <td align="center"></td>
+         <td align="left">Sunstone</td><td align="center">^^^^</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">MySQL MariaDB Server</td>
-         <td align="center">~5.5</td>
-         <td align="center"></td>
+         <td align="left">MySQL MariaDB Server</td><td align="center">~5.5</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Ruby</td>
-         <td align="center">2.0.0</td>
-         <td align="center"></td>
+         <td align="left">Ruby</td><td align="center">2.0.0</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Ansible</td>
-         <td align="center">2.x.x</td>
-         <td align="center">yes</td>
+         <td align="left">Ansible</td><td align="center">2.x.x</td><td align="center">yes</td>
       </tr>
       <tr>
-         <td align="left">vCenter</td>
-         <td align="center">6.0/6.5/6.7</td>
-         <td align="center">yes</td>
+         <td align="left">vCenter</td><td align="center">6.0/6.5/6.7</td><td align="center">yes</td>
       </tr>
       <tr>
-         <td align="left">KVM-QEMU</td>
-         <td align="center">latest</td>
-         <td align="center">yes</td>
+         <td align="left">KVM-QEMU</td><td align="center">latest</td><td align="center">yes</td>
       </tr>
       <tr>
-         <td align="left">Azure (ASM)</td>
-         <td align="center">—</td>
-         <td align="center">yes</td>
+         <td align="left">Azure (ASM)</td><td align="center">—</td><td align="center">yes</td>
       </tr>
       <tr>
-         <td align="left">Azure (ARM)</td>
-         <td align="center">—</td>
-         <td align="center">yes</td>
+         <td align="left">Azure (ARM)</td><td align="center">—</td><td align="center">yes</td>
       </tr>
       <tr>
-         <td align="left">Amazon EC2</td>
-         <td align="center">—</td>
-         <td align="center">yes</td>
+         <td align="left">Amazon EC2</td><td align="center">—</td><td align="center">yes</td>
       </tr>
    </tbody>
 </table>

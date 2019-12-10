@@ -15,13 +15,5 @@ load "rake/install_ione.rake"
 
 desc "Full IONe Installation"
 task :install => [:before, :install_ione, :install_ui] do
-end
-
-task :test do
-    puts <<-EOF
-    > If you have one with httpd installed, restart httpd:
-
-        sudo systemctl restart httpd
-        
-    EOF
+    puts "  Thanks, for installation and choosing us!   "
 end
