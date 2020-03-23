@@ -10,7 +10,7 @@ class IONe
     # @param [Boolean] log - logs process if true
     # @param [Array<String>] trace
     # @return [NilClass | Array] Returns message and trace if Exception
-    def Suspend(params, log = true, trace = ["Suspend method called:#{__LINE__}"])
+    def Suspend params, log = true, trace = ["Suspend method called:#{__LINE__}"]
         trace << "Generating sys objects:#{__LINE__ + 1}"
         LOG_STAT()
         id = id_gen()

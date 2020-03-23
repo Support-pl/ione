@@ -3,7 +3,7 @@
 )
 
 desc "IONe Sunstone Skin Installation"
-task :install_ui => :before do
+task :install_ui => [:before, :install_gems] do
     puts "Installing bower and grunt..."
     sh %{sudo npm install -g bower grunt grunt-cli}
     puts
@@ -20,6 +20,7 @@ task :install_ui => :before do
     puts
 
     puts "Building UI..."
+    chmod "+x", "build.sh"
     sh %{sudo ./build.sh}
     cp "./dist/main-dist.js", "./dist/main.js"
 

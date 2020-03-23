@@ -1,8 +1,11 @@
 begin
     $db.create_table :records do 
+        primary_key :key 
         Integer     :id,    null: false
         Integer     :time,  null: false
         String      :state, size: 10,   null: false
+        String      :type,  size: 2,    null: false,    default: 'vm'
+        String      :meta,  text: true, null: true,     default: '{}'
     end
 rescue
     puts "Table :records already exists, skipping"

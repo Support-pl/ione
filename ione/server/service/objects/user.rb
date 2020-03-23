@@ -50,6 +50,9 @@ class OpenNebula::User
     rescue
         nil
     end
+    def vns db
+        db[:network_pool].where(uid: @pe_id).select(:oid).to_a.map { |row| onblock(:vn, row[:oid]){|vn| vn.info! || vn} }
+    end
     # Checks if user exists
     def exists?
         info! == nil

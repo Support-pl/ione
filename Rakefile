@@ -14,6 +14,6 @@ load "rake/install_gems.rake"
 load "rake/install_ione.rake"
 
 desc "Full IONe Installation"
-task :install => [:before, :install_ione, :install_ui] do
+task :install => [:before, :install_gems, :install_ione, :install_ui] do
     puts "  Thanks, for installation and choosing us!   "
 end

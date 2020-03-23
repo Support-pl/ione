@@ -1,4 +1,4 @@
-@sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel zeromq zeromq-devel)
+@sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel)
 
 desc "Install Gems"
 task :install_gems => :before do
@@ -38,7 +38,11 @@ task :install_gems => :before do
         
         2. If wanted to install our Sunstone version too, run
             
-            rake install_ui
+            rake install
+        
+        3. If you want to install IONe only, run
+
+            rake install_ione
     
         Thanks, for installation and choosing us!
         EOF
