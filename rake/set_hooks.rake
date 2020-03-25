@@ -96,6 +96,19 @@ USER_HOOK = [
     command = "remove_ar.rb",
     arguments = "$TEMPLATE" ]
 
+VNET_HOOK = [
+    name        = "vn_record"
+    on          = "CREATE"
+    command     = "vn_record.rb"
+    arguments   = "$ID"
+]
+VNET_HOOK = [
+    name        = "vn_record"
+    on          = "REMOVE"
+    command     = "vn_record.rb"
+    arguments   = "$ID"
+]
+
 EOF
 
 task :hooks do

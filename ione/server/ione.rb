@@ -51,6 +51,8 @@ $db = Sequel.connect({
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
 
+class Settings < Sequel::Model(:settings); end
+
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
 include ONeHelper

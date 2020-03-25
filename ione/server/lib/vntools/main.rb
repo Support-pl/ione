@@ -1,37 +1,73 @@
 class IONe
-   def reserve_public_ip params = {}, trace = ["Reserve_Public_IP method called:#{__LINE__}"]
-    params = {
-        n: 1,
-        u: 721
-    }
 
-    conf = @db[:settings].as_hash(:name, :body)
-    vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'])
-    vnet.info!
+    #
+    # Reserves Public IP or IPs to user private netpool
+    #
+    # @param [Hash] params
+    # @option params [Integer] n - number of addresses to reserve
+    # @option params [Integer] u - user id
+    #
+    # @return [Integer]
+    #
+    def reserve_public_ip params
 
-    u = onblock(:u, params[:u])
-    u.info!
+        params.to_sym!
 
-    if (uvnet = u.vns(@db).select{|v| v.type == 'PUBLIC'}.first) then
-        uvnet = uvnet.id
+        conf = @db[:settings].as_hash(:name, :body)
+        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'])
+        vnet.info!
+
+        u = onblock(:u, params[:u])
+        u.info!
+
+        if (uvnet = u.vns(@db).select{|v| v.type == 'PUBLIC'}.first) then
+            uvnet = uvnet.id
+        end
+
+        params[:n].times do
+            uvnet = vnet.reserve(
+                uvnet ? nil : "user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet
+            )
+        end
+        vn = onblock(:vn, uvnet)
+        vn.chown(u.id, u.groups.first)
+        ar = vn.ar_pool.sort_by{|o| o['AR_ID']}.last
+
+        AR.create do | r |
+            r.vnid  = vn.id
+            r.arid  = ar['AR_ID']
+            r.time  = Time.now.to_i
+            r.state = 'crt'
+            r.owner = params[:u]
+        end
+
+        return vn.id
     end
+    #
+    # Releases Public IP back to supernet-pool. Repeats OpenNebula::VirtualNetwork#rm_ar method, but with creating Record in :records storage
+    #
+    # @param [Hash] params
+    # @option params [Integer] vn - Virtual Network ID
+    # @option params [Integer] ar - Address Range ID
+    #
+    # @return [TrueClass]
+    #
+    def release_public_ip params
 
-    uvnet = vnet.reserve(
-        uvnet ? nil : "user-#{params[:u]}-pub-vnet", params[:n], nil, nil, uvnet
-    )
-    onblock(:vn, uvnet).chown(u.id, u.groups.first)
+        vn = onblock(:vn, params[:vn])
+        vn.info!
 
-    r = Record.create do | r |
-        r.id    = uvnet
-        r.state = 'res'
-        r.time  = Time.now.to_i
-        r.type  = 'vn'
-        r.meta  = JSON.generate(AR_ID: 0)
+        if vn.rm_ar(params[:ar]).nil? then
+            AR.create do | r |
+                r.vnid  = params[:vn]
+                r.arid  = params[:ar]
+                r.time  = Time.now.to_i
+                r.state = 'del'
+                r.owner = vn['//UID']
+            end
+            true
+        else
+            false
+        end
     end
-
-    return true
-   end
 end
-
-IONe.new($client, $db).reserve_public_ip()
-Record.where(type:'vn').to_a
