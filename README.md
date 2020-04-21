@@ -38,7 +38,7 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.4+</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.8+</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">Sunstone</td><td align="center">^^^^</td><td align="center"></td>

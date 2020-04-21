@@ -27,16 +27,12 @@ class IONe
                 begin
                     trace << "Suspending VM:#{__LINE__ + 1}"
                     vm.suspend
+                    trace << "Locking VM:#{__LINE__ + 1}"
+                    vm.lock 2
                 rescue
                     trace << "Some exception raised while suspending VM:#{__LINE__ - 2}"
                     LOG_AUTO "VM wasn't suspended, but rights will be changed" if log
                 end
-                trace << "Changing user rights:#{__LINE__ + 1}"
-                vm.chmod(
-                    -1,  0, -1,
-                    -1, -1, -1,
-                    -1, -1, -1
-                    )
             end
             trace << "Killing proccess:#{__LINE__ + 1}"
             0
@@ -70,11 +66,9 @@ class IONe
             next if vms.include? vm.id
             begin
                 LOG "Suspending VM##{vm.id}", "Suspend"
-                vm.chmod(
-                    -1,  0, -1,
-                    -1, -1, -1,
-                    -1, -1, -1  )
                 vm.suspend
+                LOG "Locking VM##{vm.id}", "Suspend"
+                vm.lock 2
             rescue => e
                 LOG "Error occured while suspending VM##{vm.id}\nCheck Debug log for error-codes and backtrace", "Suspend"
                 LOG_DEBUG e.message
@@ -104,19 +98,15 @@ class IONe
                 onblock(:vm, params['vmid'].to_i) do | vm |
                     r = vm.info!
                     raise r if OpenNebula.is_error? r
+                    trace << "Unlocking VM:#{__LINE__ + 1}"         
+                    vm.unlock       
                     trace << "Resuming VM:#{__LINE__ + 1}"                
                     vm.resume
-                    trace << "Changing user rights:#{__LINE__ + 1}"                
-                    vm.chmod(
-                        -1,  1, -1,
-                        -1, -1, -1,
-                        -1, -1, -1
-                    )
                 end
                 trace << "Killing proccess:#{__LINE__ + 1}"            
                 0
             rescue => e
-                return e.message, trace
+                [e.message, trace]
             end
         result
     end
@@ -136,10 +126,9 @@ class IONe
             next if vms.include? vm.id
             begin
                 LOG "Unsuspending VM##{vm.id}", "Unsuspend"
-                vm.chmod(
-                    1,  1, 1,
-                    -1, -1, -1,
-                    -1, -1, -1  )
+                trace << "Unlocking VM:#{__LINE__ + 1}"         
+                vm.unlock 
+                trace << "Resuming VM:#{__LINE__ + 1}"                
                 vm.resume
             rescue => e
                 LOG "Error occured while unsuspending VM##{vm.id}\nCheck Debug log for error-codes and backtrace", "Unsuspend"
@@ -161,7 +150,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'Reboot') }
-                  
+        
         return "VMID cannot be nil!" if vmid.nil?     
         LOG "Rebooting VM#{vmid}", "Reboot"
         LOG "Params: vmid = #{vmid}, hard = #{hard}", "DEBUG" #if DEBUG
@@ -181,7 +170,7 @@ class IONe
         id = id_gen()
         LOG_CALL(id, true, __method__)
         defer { LOG_CALL(id, false, 'Terminate') }
-                  
+        
         LOG "Terminate query call params: {\"userid\" => #{userid}, \"vmid\" => #{vmid}}", "Terminate"
         # If userid will be nil oneadmin account can be broken
         if userid == nil || vmid == nil then
@@ -332,6 +321,7 @@ class IONe
     end
 
     # temp
+    # UPD: not really :)
     def SetVMResourcesLimits vmid, host, params
         PostDeployActivities.new(@client).LimitsController(params, vmid, host)
     end
