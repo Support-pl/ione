@@ -882,9 +882,11 @@ end
 # Perform an action on a Resource
 ##############################################################################
 post '/:resource/:id/action' do
-    @SunstoneServer.perform_action(params[:resource],
-                                   params[:id],
-                                   @request_body)
+    @SunstoneServer.perform_action(
+        params[:resource],
+        params[:id],
+        @request_body
+    )
 end
 
 ##############################################################################
@@ -900,6 +902,7 @@ post '/ione/:method' do
         r = e.message
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+    response.headers["Access-Control-Allow-Origin"] = "*"
     JSON.pretty_generate response: r
 end
 
