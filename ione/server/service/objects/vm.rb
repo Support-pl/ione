@@ -409,7 +409,7 @@ class OpenNebula::VirtualMachine
                 diff = (Time.at(etime).to_date - Time.at(first).to_date).to_i + 1
                 diff.times do | day |
                     showback << {
-                        'date' => Time.at(first + day * 86400).to_a[3..4].join('/'),
+                        'date' => Time.at(first + day * 86400).to_a[3..5].join('/'),
                         'TOTAL' => (
                             day % self['//BILLING_PERIOD'].to_i == 0 ? self['//PRICE'].to_f : 0.0 )
                     }
@@ -487,17 +487,17 @@ class OpenNebula::VirtualMachine
                     border[0..2] = 59, 59, 23
                     border = Time.local(*border).to_i
 
-                    result << { 'stime' => r['stime'], 'etime' => border, 'state' => r['state'], 'date' => Time.at(r['stime']).to_a[3..4].join('/') }
+                    result << { 'stime' => r['stime'], 'etime' => border, 'state' => r['state'], 'date' => Time.at(r['stime']).to_a[3..5].join('/') }
 
                     (diff).times do | day |
-                        result << { 'stime' => border += 1, 'date' => Time.at(border).to_a[3..4].join('/'), 'etime' => border += 86399, 'state' => r['state'] }
+                        result << { 'stime' => border += 1, 'date' => Time.at(border).to_a[3..5].join('/'), 'etime' => border += 86399, 'state' => r['state'] }
                     end
 
                     result[diff]['etime'] = r['etime']
                     
                     timeline[i] = result
                 else
-                    timeline[i]['date'] = Time.at(r['stime']).to_a[3..4].join('/')
+                    timeline[i]['date'] = Time.at(r['stime']).to_a[3..5].join('/')
                 end
             end
             timeline.flatten!
