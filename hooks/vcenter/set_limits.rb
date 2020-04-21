@@ -61,7 +61,7 @@ $ione.SetVMResourcesLimits(
     id,
     host,
     {
-        'cpu' => vm['/VM/TEMPLATE/CPU'].to_i,
+        'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
         'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
         'iops' => $ione.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
     }
