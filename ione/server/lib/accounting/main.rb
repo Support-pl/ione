@@ -23,6 +23,7 @@ class IONe
             stream_data << '"computing": {'
         end
 
+        index = 0
         vm_pool.each do | vm |
             vm = onblock :vm, vm, @client
             vm.info!
@@ -32,7 +33,8 @@ class IONe
                 r = vm.calculate_showback(stime, etime, group_by_day).without('time_period_requested', 'time_period_corrected')
                 showback['computing'][vm.id] = r
                 if stream then
-                    stream_data << "\"#{vm.id}\": " << JSON.generate(r) << ","
+                    stream_data << (index != 0 ? ',' : '') << ' ' << "\"#{vm.id}\": " << JSON.generate(r)
+                    index += 1
                 end
             rescue OpenNebula::VirtualMachine::ShowbackError => e
                 if e.message.include? "VM didn't exist in given time-period" then
@@ -44,20 +46,20 @@ class IONe
         end
 
         if stream then
-            stream_data << '},{"networking":'
+            stream_data << '}, "networking":'
         end
 
         networking = onblock(:u, uid).calculate_networking_showback(stime, etime)
         showback['networking'] = networking
         if stream then
-            stream_data << JSON.generate(networking) << '}'
+            stream_data << JSON.generate(networking) << ', '
         end
         
         showback['TOTAL'] =     showback.values.inject(0){| result, record | result += record['TOTAL'].to_f }
         showback['TOTAL'] +=    networking['TOTAL']
         showback['time_period_requested'] = etime - stime
         if stream then
-            stream_data << '"TOTAL": ' << showback['TOTAL'] << ','
+            stream_data << '"TOTAL": ' << showback['TOTAL'] << ', '
             stream_data << '"time_period_requested": ' << showback['time_period_requested']
         end
 
