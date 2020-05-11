@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # -------------------------------------------------------------------------- #
 # Copyright 2018, IONe Cloud Project, Support.by                             #
 #                                                                            #
@@ -16,8 +15,6 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-# ROOT = ENV['IONEROOT'] # IONe root path
-# require "#{ROOT}/debug_lib.rb"
 ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
 
 if !ONE_LOCATION
@@ -29,43 +26,24 @@ else
 end
 
 $: << RUBY_LIB_LOCATION
+require 'yaml'
+require 'json'
+require 'sequel'
 require 'opennebula'
 include OpenNebula
 
-def suppress_output
-    original_stderr = $stderr.clone
-    original_stdout = $stdout.clone
-    $stderr.reopen(File.new('/dev/null', 'w'))
-    $stdout.reopen(File.new('/dev/null', 'w'))
-    yield
-ensure
-    $stdout.reopen(original_stdout)
-    $stderr.reopen(original_stderr)
+$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+require $ione_conf['DataBase']['adapter']
+$db = Sequel.connect({
+        adapter: $ione_conf['DataBase']['adapter'].to_sym,
+        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
+        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host']  })
+
+class AR < Sequel::Model(:ars); end
+
+AR.create do | r |
+    r.vnid  = ARGV.first
+    r.arid  = ARGV.last == 'crt' ? 0 : -1
+    r.time  = Time.now.to_i
+    r.state = ARGV.last
 end
-
-suppress_output{ require '/usr/lib/one/sunstone/debug_lib.rb' }
-$ione = IONe.new($client, $db)
-
-id = ARGV.first.to_i
-vm = VirtualMachine.new_with_id(id, Client.new)
-vm.info!
-puts "States are: [#{ARGV[1]}, #{ARGV[2]}] -> [#{vm.state} -- #{vm.state_str}, #{vm.lcm_state} -- #{vm.lcm_state_str}]"
-if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
-    puts "VM started not from PENDING state, skipping..."
-    exit 0
-end
-
-host = Host.new_with_id $ione.get_vm_host(id, true).last.to_i, Client.new
-
-$ione.SetVMResourcesLimits(
-    id,
-    host,
-    {
-        'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
-        'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-        'iops' => $ione.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
-    }
-) if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter'
-
-puts 'Successful set Limits up'
-exit 0

@@ -50,6 +50,51 @@ class OpenNebula::User
     rescue
         nil
     end
+    def vns db
+        db[:network_pool].where(uid: @pe_id).select(:oid).to_a.map { |row| onblock(:vn, row[:oid]){|vn| vn.info! || vn} }
+    end
+    def billable_vns
+        AR.where(owner:id, state:"crt").all
+    end
+    # Calculates VNs Showback
+    # @param [Integer] stime_req - Point from which calculation starts(timestamp)
+    # @param [Integer] etime_req - Point at which calculation stops(timestamp)
+    # @return [Hash]
+    def calculate_networking_showback stime_req, etime_req
+        raise ShowbackError, ["Wrong Time-period given", stime_req, etime_req] if stime_req >= etime_req
+        
+        info!
+
+        vnp = billable_vns
+        vnp.inject({'TOTAL' => 0}) do | showback, rec |
+            first = rec.time
+
+            stime = stime_req
+
+            stime = rec.time if rec.time > stime
+            if (etime = AR.where(rec.values.without(:key, :time, :state)).where(state: 'del').all.first).nil? then
+                etime = etime_req
+            end
+
+            stime = Time.at(stime).to_datetime
+            first = Time.at(first).to_datetime
+            etime = Time.at(etime).to_datetime
+            current, periods = stime > first ? stime : first, 0
+
+            while current <= etime do
+                periods += 1
+                current = current >> 1
+            end
+
+            r = onblock(:vn, rec.vnid).ar_record(rec.arid, periods)
+            
+            showback['TOTAL'] += r.values[0]
+            showback.merge(
+                r
+            )
+        end
+    end
+
     # Checks if user exists
     def exists?
         info! == nil
@@ -59,7 +104,7 @@ class OpenNebula::User
         info! || self['//LANG']
     end
     # Sets User sunstone language
-    # @param [String] lang - lang code, like en_US/ru_RU/etc
+    # @param [String] l - lang code, like en_US/ru_RU/etc
     def lang= l
         sunstone = to_hash!['USER']['TEMPLATE']['SUNSTONE']
         sunstone['LANG'] = l

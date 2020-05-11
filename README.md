@@ -1,6 +1,6 @@
 # OpenNebula Sunstone with IONe integration
 
-### Contacts
+## Contacts
 <p align="left">
     <a href="https://ione-cloud.net" title="Project Homepage" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=Project&message=HomePage&color=blue&style=flat" alt="Project Homepage"/>
@@ -11,7 +11,7 @@
     <a href="https://github.com/ione-cloud" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.0&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.1&color=success&style=flat" alt="version"/>
 </p>
 
 Creators:
@@ -25,22 +25,55 @@ Creators:
  * Modified user interface for VDC
 
 ## System requirements
-|   Package/Service/App     |   Version         |   Optional?   |
-|:--------------------------|:-----------------:|:-------------:|
-|   CentOS	                |   6/7             |               |
-|   OpenNebula	            |   5.4+            |               |
-|   Sunstone	            |   ^^^^            |               |
-|   MySQL MariaDB Server	|   ~5.5            |               |
-|   Ruby	                |   2.0.0           |               |
-|   Ansible             	|   2.x.x           |   yes         |
-|   vCenter             	|   6.0/6.5/6.7     |   yes         |
-|   KVM-QEMU            	|   latest          |   yes         |
-|   Azure (ASM)             |	—               |   yes         |
-|   Azure (ARM)             |	—               |   yes         |
-|   Amazon EC2              |	—               |   yes         |
+<table>
+   <thead>
+      <tr>
+         <th align="left">Package/Service/App</th>
+         <th align="center">Version</th>
+         <th align="center">Optional?</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
+      </tr>
+      <tr>
+         <td align="left">OpenNebula</td><td align="center">5.8+</td><td align="center"></td>
+      </tr>
+      <tr>
+         <td align="left">Sunstone</td><td align="center">^^^^</td><td align="center"></td>
+      </tr>
+      <tr>
+         <td align="left">MySQL MariaDB Server</td><td align="center">~5.5</td><td align="center"></td>
+      </tr>
+      <tr>
+         <td align="left">Ruby</td><td align="center">2.0.0</td><td align="center"></td>
+      </tr>
+      <tr>
+         <td align="left">Ansible</td><td align="center">2.x.x</td><td align="center">yes</td>
+      </tr>
+      <tr>
+         <td align="left">vCenter</td><td align="center">6.0/6.5/6.7</td><td align="center">yes</td>
+      </tr>
+      <tr>
+         <td align="left">KVM-QEMU</td><td align="center">latest</td><td align="center">yes</td>
+      </tr>
+      <tr>
+         <td align="left">Azure (ASM)</td><td align="center">—</td><td align="center">yes</td>
+      </tr>
+      <tr>
+         <td align="left">Azure (ARM)</td><td align="center">—</td><td align="center">yes</td>
+      </tr>
+      <tr>
+         <td align="left">Amazon EC2</td><td align="center">—</td><td align="center">yes</td>
+      </tr>
+   </tbody>
+</table>
 
 
 ## Install
+
+>If you are using a RedHat based distribution install redhat-lsb
 
 1. Download this repo using:
 
@@ -66,20 +99,77 @@ Creators:
 
 7. Fill all settings using UI. Panel "Cloud" at Settings tab._(Accessible only as oneadmin)_:
 
-| Key                           | Subkey                    | Value                                     |
-|:------------------------------|:--------------------------|------------------------------------------:|
-| __CAPACITY_COST__             | CPU_COST                  | `CPU cost per hour`                       |
-|                               | MEMORY_COST               | `RAM cost per hour`                       |
-| __DISK_COSTS__                | DISKTYPE_0(e.g. SSD)      | `cost per hour`                           |
-|                               | DISKTYPE_1(e.g. HDD)      | `cost per hour`                           |
-| __DISK_TYPES__                |                           | `comma separated list of types: SSD,HDD`  |
-| __PUBLIC_IP_COST__            |                           | `cost per hour`                           |
-| __IAAS_GROUP_ID__             |                           | `ID of group for IaaS Users`              |
-| __PUBLIC_NETWORK_DEFAULTS__   | NETWORK_ID                | `Public IPs pool network ID`              |
-| __PRIVATE_NETWORK_DEFAULTS__  | NETWORK_ID                | `Private Networks pool network ID`        |
-| __NODES_DEFAULT__             | HYPERIVSOR_0(e.g. VCENTER)| `OpenNebula host id`                      |
-|                               | HYPERIVSOR_0(e.g. KVM)    | `OpenNebula host id`                      |
-| __CURRENCY_MAIN__             |                           | `$/€/etc... this will be shown to user`   |
+<table>
+   <thead>
+      <tr>
+         <th align="left">Key</th>
+         <th align="left">Subkey</th>
+         <th align="right">Value</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td align="left">__CAPACITY_COST__</td>
+         <td align="left">CPU_COST</td>
+         <td align="right"><code>CPU cost per hour</code></td>
+      </tr>
+      <tr>
+         <td align="left"></td>
+         <td align="left">MEMORY_COST</td>
+         <td align="right"><code>RAM cost per hour</code></td>
+      </tr>
+      <tr>
+         <td align="left">__DISK_COSTS__</td>
+         <td align="left">DISKTYPE_0(e.g. SSD)</td>
+         <td align="right"><code>cost per hour</code></td>
+      </tr>
+      <tr>
+         <td align="left"></td>
+         <td align="left">DISKTYPE_1(e.g. HDD)</td>
+         <td align="right"><code>cost per hour</code></td>
+      </tr>
+      <tr>
+         <td align="left">__DISK_TYPES__</td>
+         <td align="left"></td>
+         <td align="right"><code>comma separated list of types: SSD,HDD</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong>PUBLIC_IP_COST</strong></td>
+         <td align="left"></td>
+         <td align="right"><code>cost per hour</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong>IAAS_GROUP_ID</strong></td>
+         <td align="left"></td>
+         <td align="right"><code>ID of group for IaaS Users</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong>PUBLIC_NETWORK_DEFAULTS</strong></td>
+         <td align="left">NETWORK_ID</td>
+         <td align="right"><code>Public IPs pool network ID</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong>PRIVATE_NETWORK_DEFAULTS</strong></td>
+         <td align="left">NETWORK_ID</td>
+         <td align="right"><code>Private Networks pool network ID</code></td>
+      </tr>
+      <tr>
+         <td align="left">__NODES_DEFAULT__</td>
+         <td align="left">HYPERIVSOR_0(e.g. VCENTER)</td>
+         <td align="right"><code>OpenNebula host id</code></td>
+      </tr>
+      <tr>
+         <td align="left"></td>
+         <td align="left">HYPERIVSOR_0(e.g. KVM)</td>
+         <td align="right"><code>OpenNebula host id</code></td>
+      </tr>
+      <tr>
+         <td align="left">__CURRENCY_MAIN__</td>
+         <td align="left"></td>
+         <td align="right"><code>$/€/etc... this will be shown to user</code></td>
+      </tr>
+   </tbody>
+</table>
 ---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`

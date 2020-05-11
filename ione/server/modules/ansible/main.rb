@@ -133,10 +133,21 @@ class IONe
     def GetAnsiblePlaybook_ControllerRunnable id, vars = {}
         AnsiblePlaybook.new(id:id).runnable vars
     end
-    # Returns all playbooks from DB
+    #
+    # Returns Playbooks from DB
+    #
+    # @param [Fixnum] chunks - number of playbooks per page(chunk)
+    # @param [Fixnum] page - page number(shift)
+    #
     # @return [Array<Hash>]
-    def ListAnsiblePlaybooks
-        AnsiblePlaybook.list
+    #
+    def ListAnsiblePlaybooks chunks = nil, page = 0
+        pool = AnsiblePlaybook.list
+        pool.delete_if {|pb| !ansible_check_permissions(pb, @client.user, 0) } # Deletes playbooks, which aren't under user access
+        
+        return pool if chunks.nil?
+        
+        pool.each_slice(chunks).to_a[page]
     end
     # Checks AnsiblePlaybook Syntax
     # @see AnsiblePlaybook.check_syntax Check this method source to learn syntax special rules
@@ -192,14 +203,16 @@ class IONe
         AnsiblePlaybookProcess.new(proc_id:id).to_hash
     end
     # Returns all AnsiblePlaybook Processes as Array of Hashes
-    # @param [Integer] chunks - number of chunks per page
+    # @param [Integer] chunks - number of processes per page(chunk)
     # @param [Integer] page - page number(shift)
-    # @return [Array<AnsiblePlaybookProcess>]
+    # @return [Array<Hash>]
     def ListAnsiblePlaybookProcesses chunks = nil, page = 0
-        apps = AnsiblePlaybookProcess.list
-        return apps if chunks.nil?
+        pool = AnsiblePlaybookProcess.list
+        pool.delete_if {|apc| !@client.user!.groups.include?(0) && apc['uid'] != @client.user_id }
+        
+        return pool if chunks.nil?
 
-        apps.each_slice(chunks).to_a[page]
+        pool.each_slice(chunks).to_a[page]
     end
 
 

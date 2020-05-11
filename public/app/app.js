@@ -52,7 +52,6 @@ define(function (require) {
   //$(window).load(function() {
   //   $('#loading').hide();
   //});
-
   $(document).ready(function () {
     Sunstone.addDialogs(_commonDialogs);
     Sunstone.addMainTabs();

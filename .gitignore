@@ -6,3 +6,5 @@ ione/server/.yardopts
 tests/zfs_snap_acc.rb
 .DS_Store
 tests/*
+ione/server/modules/zfs-snapshots/
+*.code-workspace

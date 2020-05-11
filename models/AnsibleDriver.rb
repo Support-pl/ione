@@ -196,7 +196,6 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
             }
         })
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -208,7 +207,6 @@ post '/ansible' do # Allocates new playbook
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
-        msg = e.message
         @one_user.info!
         r error: e.message, backtrace: e.backtrace, data:data
     end
@@ -223,7 +221,6 @@ delete '/ansible/:id' do |id| # Deletes given playbook
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -239,7 +236,6 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
         pb.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
         r ANSIBLE: pb.body
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -249,7 +245,6 @@ get '/ansible/:id/vars' do | id | # I think it's not needed here, rly
         pb = AnsiblePlaybookModel.new(id:id, data:{'action' => {'perform' => 'vars'}}, user:@one_user)
         r vars: pb.call
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -263,7 +258,6 @@ post '/ansible/:id/action' do | id | # Performs action
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -280,7 +274,6 @@ post '/ansible/:action' do | action | # Performs actions, which are defined as d
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
-        msg = e.message
         r error: e.message, backtrace: e.backtrace
     end
 end
@@ -370,9 +363,7 @@ end
  get '/ansible_process' do
      begin
          pool = IONe.new($client, $db).ListAnsiblePlaybookProcesses
-         IONe.new($client, $db).Test(pool.size, 'DEBUG')
          pool.delete_if {|apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
-         IONe.new($client, $db).Test(pool.size, 'DEBUG')
          pool.map! do | apc | # Adds user name to every object
              user =  OpenNebula::User.new_with_id( apc['uid'], @one_client)
              user.info!
@@ -386,22 +377,20 @@ end
              }
          })
      rescue => e
-         msg = e.message
           r error: e.message, backtrace: e.backtrace
      end
  end
  
  post '/ansible_process' do
-     begin
-         data = JSON.parse(@request_body)
-         r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }}
-     rescue JSON::ParserError # If JSON.parse fails
-         r error: "Broken data received, unable to parse."
-     rescue => e
-         msg = e.message
-          @one_user.info!
-         r error: e.message, backtrace: e.backtrace, data:data
-     end
+    begin
+        data = JSON.parse(@request_body)
+        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }}
+    rescue JSON::ParserError # If JSON.parse fails
+        r error: "Broken data received, unable to parse."
+    rescue => e
+        @one_user.info!
+        r error: e.message, backtrace: e.backtrace, data:data
+    end
  end
  
  get '/ansible_process/:id' do |id|
@@ -414,7 +403,6 @@ end
          apc.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
          r ANSIBLE_PROCESS: apc.body
      rescue => e
-         msg = e.message
           r error: e.message, backtrace: e.backtrace
      end
  end
@@ -428,7 +416,6 @@ end
      rescue JSON::ParserError # If JSON.parse fails
          r error: "Broken data received, unable to parse."
      rescue => e
-         msg = e.message
           r error: e.message, backtrace: e.backtrace
      end
  end
@@ -442,7 +429,6 @@ end
      rescue JSON::ParserError # If JSON.parse fails
          r error: "Broken data received, unable to parse."
      rescue => e
-         msg = e.message
           r error: e.message, backtrace: e.backtrace
      end
  end

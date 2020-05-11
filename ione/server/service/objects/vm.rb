@@ -358,21 +358,6 @@ class OpenNebula::VirtualMachine
         etime = self['/VM/ETIME'].to_i if self['/VM/ETIME'].to_i < etime && self['/VM/ETIME'].to_i != 0
 
         requested_time = (etime - stime) / 3600.0
-
-        public_ip = 0
-        nic = to_hash['VM']['TEMPLATE']['NIC']
-        if nic.class == Array then
-            nic.each do | el |
-                vnet = VirtualNetwork.new_with_id el['NETWORK_ID'], @client
-                vnet.info!
-                public_ip += vnet['/VNET/TEMPLATE/TYPE'] == 'PUBLIC' ? 1 : 0
-            end
-        elsif nic.class == Hash 
-            vnet = VirtualNetwork.new_with_id nic['NETWORK_ID'], @client
-            vnet.info!
-            public_ip += vnet['/VNET/TEMPLATE/TYPE'] == 'PUBLIC' ? 1 : 0
-        end
-        public_ip_cost = public_ip * requested_time * self['/VM/USER_TEMPLATE/PUBLIC_IP_COST'].to_f
         
         ### Quick response for HOLD and PENDING vms ###
         return {
@@ -385,9 +370,8 @@ class OpenNebula::VirtualMachine
             "MEMORY" => 0,
             "DISK" => 0,
             "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
-            "PUBLIC_IP" => public_ip_cost,
             "EXCEPTION" => "State #{state == 0 ? "HOLD" : "PENDING"}",
-            "TOTAL" => public_ip_cost
+            "TOTAL" => 0
         } if state == 0 || state == 1
 
         records = OpenNebula::Records.new(id).records
@@ -425,7 +409,7 @@ class OpenNebula::VirtualMachine
                 diff = (Time.at(etime).to_date - Time.at(first).to_date).to_i + 1
                 diff.times do | day |
                     showback << {
-                        'date' => Time.at(first + day * 86400).to_a[3..4].join('/'),
+                        'date' => Time.at(first + day * 86400).to_a[3..5].join('/'),
                         'TOTAL' => (
                             day % self['//BILLING_PERIOD'].to_i == 0 ? self['//PRICE'].to_f : 0.0 )
                     }
@@ -466,7 +450,6 @@ class OpenNebula::VirtualMachine
         cpu_cost        = cpu       * self['/VM/TEMPLATE/CPU_COST'].to_f
         memory_cost     = memory    * self['/VM/TEMPLATE/MEMORY_COST'].to_f
         disk_cost       = disk      * self['/VM/TEMPLATE/DISK_COST'].to_f
-        public_ip_cost  = public_ip * self['/VM/USER_TEMPLATE/PUBLIC_IP_COST'].to_f
 
         unless group_by_day then
             ### Calculating Work Time ###
@@ -483,7 +466,6 @@ class OpenNebula::VirtualMachine
             cpu_cost        *= work_time     
             memory_cost     *= work_time     
             disk_cost       *= requested_time
-            public_ip_cost  *= requested_time
 
             return {
                 "id" => id,
@@ -495,8 +477,7 @@ class OpenNebula::VirtualMachine
                 "MEMORY" => memory_cost,
                 "DISK" => disk_cost,
                 "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
-                "PUBLIC_IP" => public_ip_cost,
-                "TOTAL" => cpu_cost + memory_cost + disk_cost + public_ip_cost
+                "TOTAL" => cpu_cost + memory_cost + disk_cost
             }
         else
             timeline.clone.each_with_index do | r, i |
@@ -506,17 +487,17 @@ class OpenNebula::VirtualMachine
                     border[0..2] = 59, 59, 23
                     border = Time.local(*border).to_i
 
-                    result << { 'stime' => r['stime'], 'etime' => border, 'state' => r['state'], 'date' => Time.at(r['stime']).to_a[3..4].join('/') }
+                    result << { 'stime' => r['stime'], 'etime' => border, 'state' => r['state'], 'date' => Time.at(r['stime']).to_a[3..5].join('/') }
 
                     (diff).times do | day |
-                        result << { 'stime' => border += 1, 'date' => Time.at(border).to_a[3..4].join('/'), 'etime' => border += 86399, 'state' => r['state'] }
+                        result << { 'stime' => border += 1, 'date' => Time.at(border).to_a[3..5].join('/'), 'etime' => border += 86399, 'state' => r['state'] }
                     end
 
                     result[diff]['etime'] = r['etime']
                     
                     timeline[i] = result
                 else
-                    timeline[i]['date'] = Time.at(r['stime']).to_a[3..4].join('/')
+                    timeline[i]['date'] = Time.at(r['stime']).to_a[3..5].join('/')
                 end
             end
             timeline.flatten!
@@ -537,7 +518,6 @@ class OpenNebula::VirtualMachine
                     'CPU' => 0,
                     'MEMORY' => 0,
                     'DISK' => 0,
-                    'PUBLIC_IP' => 0,
                     'TOTAL' => 0
                 }) do | showback, record |
                     requested_time = record['requested_time'] / 3600.0
@@ -547,12 +527,11 @@ class OpenNebula::VirtualMachine
                     showback['CPU'] += cpu_cost * work_time
                     showback['MEMORY'] += memory_cost * work_time
                     showback['DISK'] +=  disk_cost * requested_time if record['state'] != 'pnd'
-                    showback['PUBLIC_IP'] += public_ip_cost * requested_time
                     
                     showback
                 end
 
-                result['TOTAL'] += (result['CPU'] + result['MEMORY'] + result['DISK'] + result['PUBLIC_IP'])
+                result['TOTAL'] += (result['CPU'] + result['MEMORY'] + result['DISK'])
                 result
             end
 
@@ -579,7 +558,6 @@ class OpenNebula::VirtualMachine
             "MEMORY" => 0,
             "DISK" => 0,
             "DISK_TYPE" => 'no_type',
-            "PUBLIC_IP" => 0,
             "EXCEPTION" => "No Records",
             "TOTAL" => 0
         }

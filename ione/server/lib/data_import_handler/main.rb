@@ -19,7 +19,7 @@ class IONe
             end
             params['vmid'] = GetVMIDbyIP(params['ip']) if params['vmid'].nil?
             return { params['serviceid'].to_s => [userid, nil] } if params['vmid'].nil?
-            vm = get_pool_element(VirtualMachine, params['vmid'], @client)
+            vm = VirtualMachine.new_with_id params['vmid'], @client
             vm.chown(userid, USERS_GROUP)
             user = User.new(User.build_xml(userid), @client)
             used = vm.to_hash!['VM']['TEMPLATE']

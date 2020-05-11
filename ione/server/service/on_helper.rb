@@ -114,19 +114,6 @@ module ONeHelper
         :p   => Pool
     }
 
-    # Generates any 'Pool' element object
-    # @param [Class] type - object class to create
-    # @param [Integer] id - element id at its Pool
-    # @param [OpenNebula::Client] client - auth provider object
-    # @return [OpenNebula::PoolElement]
-    # @example Getting VirtualMachine object
-    #   vm = ONeHelper::get_pool_element(VirtualMachine, 777, Client.new('oneadmin:secret', 'http://localhost:2633/RPC2'))
-    #   p vm.class
-    #       => #<OpenNebula::VirtualMachine:0x00000004c4ead8>
-    def get_pool_element(type, id, client)
-        type.new(type.build_xml(id), client)
-    end
-
     # Generates any 'Pool' element object or yields it
     # @param [Class | Symbol] object - object class to create or symbol linked to target class
     # @param [Integer] id - element id at its Pool
@@ -151,9 +138,9 @@ module ONeHelper
             return 'Error: Unknown instance name given' if object.nil?
         end
         if block_given?
-            yield get_pool_element(object, id.to_i, client)
+            yield object.new_with_id id.to_i, client
         else
-            get_pool_element(object, id.to_i, client)
+            object.new_with_id id.to_i, client
         end
     end
     # Returns random Datastore ID filtered by disk type

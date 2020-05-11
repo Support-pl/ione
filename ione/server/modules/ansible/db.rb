@@ -58,6 +58,17 @@ class AnsiblePlaybook
         end
         raise "Unhandlable, id is nil" if @id.nil?
     end
+    #
+    # OpenNebula::PoolElement-like initializer
+    #
+    # @param [Fixnum] id - Playbook ID
+    # @param [OpenNebula::Client] client - not required
+    #
+    # @return [AnsiblePlaybook]
+    #
+    def self.new_with_id id, client = nil
+        self.new(id: id)
+    end
     # Synchronizes object from DB
     def sync
         get_me.each do |var, value|
@@ -199,6 +210,9 @@ class AnsiblePlaybook
     end
 end
 
+# Adding AnsiblePlaybook alias to onblock
+ON_INSTANCES[:ap] = AnsiblePlaybook
+
 # Ansible Playbook run process implementation
 class AnsiblePlaybookProcess
     
@@ -294,6 +308,17 @@ class AnsiblePlaybookProcess
         @status = 'done'
     ensure
         allocate if @id.nil?
+    end
+    #
+    # OpenNebula::PoolElement-like initializer
+    #
+    # @param [Fixnum] proc_id - Process ID
+    # @param [OpenNebula::Client] client - not required
+    #
+    # @return [AnsiblePlaybookProcess]
+    #
+    def self.new_with_id proc_id, client = nil
+        self.new(proc_id: proc_id)
     end
     
     # Start Process
@@ -505,3 +530,6 @@ class AnsiblePlaybookProcess
         me
     end
 end
+
+# Adding AnsiblePlaybookProcess alias to onblock
+ON_INSTANCES[:app] = AnsiblePlaybookProcess
