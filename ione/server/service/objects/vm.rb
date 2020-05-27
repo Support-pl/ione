@@ -438,7 +438,7 @@ class OpenNebula::VirtualMachine
         timeline.delete_if { |r| (r['etime'] < stime) || (r['stime'] > etime)   }
         raise OpenNebula::Records::NoRecordsError if timeline.empty?
         timeline[0]['stime'] = stime if timeline[0]['stime'] < stime
-        timeline[timeline.size - 1]['etime'] = etime if timeline.last['etime'] > etime
+        timeline[-1]['etime'] = etime if timeline.last['etime'] > etime
 
 
         ### Calculating Capacity ###
@@ -581,7 +581,7 @@ class OpenNebula::VirtualMachine
         attr_reader :params
 
         def initialize params = []
-            @params = params[1..(params.length - 1)]
+            @params = params[1...params.length]
             super "#{params[0]}\nParams:#{@params.inspect}"
         end
     end
