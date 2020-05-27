@@ -85,9 +85,12 @@ Creators:
 
 3. Run install script as root:
 
-    `sudo ruby install.rb`
+    `rake install`
 > Note:
 > Works only with CentOS for now.
+
+> Note:
+> Additionaly installer isn't tested much times, so it's quite "buggy".
 
 4. Wait for complection.
 
