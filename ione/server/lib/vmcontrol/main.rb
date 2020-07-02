@@ -319,6 +319,35 @@ class IONe
     rescue => e
         return e.message
     end
+        
+    def Unlock vmid, log = true
+        LOG_STAT()
+        id = id_gen()
+        LOG_CALL(id, true, __method__)
+        defer { LOG_CALL(id, false, 'RevSnapshot') }
+        
+        LOG "VM Unlock query accepted" if log
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.unlock
+    rescue => e
+        return e.message
+    end
+    def Lock vmid, log = true
+        LOG_STAT()
+        id = id_gen()
+        LOG_CALL(id, true, __method__)
+        defer { LOG_CALL(id, false, 'RevSnapshot') }
+        
+        LOG "VM Lock query accepted" if log
+        vm = onblock :vm, vmid
+        r = vm.info!
+        raise r if OpenNebula.is_error? r
+        vm.lock
+    rescue => e
+        return e.message
+    end
 
     # temp
     # UPD: not really :)
