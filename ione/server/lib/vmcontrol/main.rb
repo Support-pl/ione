@@ -324,7 +324,7 @@ class IONe
         LOG_STAT()
         id = id_gen()
         LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'RevSnapshot') }
+        defer { LOG_CALL(id, false, 'Unlock') }
         
         LOG "VM Unlock query accepted" if log
         vm = onblock :vm, vmid
@@ -338,7 +338,7 @@ class IONe
         LOG_STAT()
         id = id_gen()
         LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'RevSnapshot') }
+        defer { LOG_CALL(id, false, 'Lock') }
         
         LOG "VM Lock query accepted" if log
         vm = onblock :vm, vmid
