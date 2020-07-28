@@ -170,7 +170,6 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
 
     # Public API bindings
     IONeAPIServerThread = Thread.new do
-        require 'pry-remote'
         #
         # IONe API based on http
         #
