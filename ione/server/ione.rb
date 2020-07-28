@@ -164,6 +164,8 @@ rpc_log_file = "#{LOG_ROOT}/rpc.log"
 RPC_LOGGER = Logger.new(rpc_log_file)
 
 puts 'Pre-init job ended, starting up server'
+RPC_LOGGER.debug "Preparing to start up server"
+RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && MAIN_IONE(#{MAIN_IONE}) => #{!defined?(DEBUG_LIB) && MAIN_IONE}"
 if !defined?(DEBUG_LIB) && MAIN_IONE then
 
     # Public API bindings
@@ -232,4 +234,6 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
     at_exit do
         IONeAPIServerThread.kill
     end
+else
+    RPC_LOGGER.debug "Condition is false, skipping server"
 end
