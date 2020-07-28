@@ -150,6 +150,7 @@ module ONeHelper
     def ChooseDS(ds_type = nil, hypervisor = nil)
         dss = IONe.new($client, $db).DatastoresMonitoring('sys').sort! { | ds | 100 * ds['used'].to_f / ds['full_size'].to_f }
         dss.delete_if { |ds| ds['type'] != ds_type || ds['deploy'] != 'TRUE' || (!hypervisor.nil? && ds['hypervisor'] != hypervisor.upcase) } unless ds_type.nil?
+        raise "No suitable DataStores were found" if dss.size == 0
         ds = dss[rand(dss.size)]
         LOG_DEBUG "Deploying to #{ds['name']}"
         ds['id']
