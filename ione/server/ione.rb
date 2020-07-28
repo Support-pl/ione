@@ -207,7 +207,9 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
                 u = User.new_with_id(-1, Client.new(body['auth']))
                 rc = u.info!
                 if OpenNebula.is_error?(rc)
-                    raise "False Credentials given"
+                    status 401
+                    body "False Credentials given"
+                    return
                 end
 
                 JSON.pretty_generate(r:
