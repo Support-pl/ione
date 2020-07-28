@@ -189,7 +189,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
                     args = JSON.parse(@request_body)
                     u = User.new_with_id(-1, Client.new(args['auth']))
                     rc = u.info!
-                    if OpenNebula.is_error?(rc)
+                    if OpenNebula.is_error?(rc) or args['auth'].empty?
                         status 401
                         body "False Credentials given"
                         return
@@ -209,7 +209,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
 
                 u = User.new_with_id(-1, Client.new(body['auth']))
                 rc = u.info!
-                if OpenNebula.is_error?(rc)
+                if OpenNebula.is_error?(rc) or body['auth'].empty?
                     status 401
                     body "False Credentials given"
                     return
