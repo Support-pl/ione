@@ -232,6 +232,7 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
     end
 
     at_exit do
+        RPC_LOGGER.debug "IONeAPIServer is being stopped due to at_exit directive"
         IONeAPIServerThread.kill
     end
 else
