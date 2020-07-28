@@ -189,7 +189,9 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
                     u = User.new_with_id(-1, Client.new(args['auth']))
                     rc = u.info!
                     if OpenNebula.is_error?(rc)
-                        raise "False Credentials given"
+                        status 401
+                        body "False Credentials given"
+                        return
                     end
                     RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
                     r = IONe.new(Client.new(args['auth']), $db).send(method, *args['params'])
