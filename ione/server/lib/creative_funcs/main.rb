@@ -574,7 +574,7 @@ class IONe
             defer { LOG_CALL(id, false, 'LimitsController') }
             onblock(:vm, vmid) do | vm |
                 lim_res = vm.setResourcesAllocationLimits(
-                    cpu: params['cpu'] * $ione_conf['vCenter']['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
+                    cpu: params['cpu'] * $ione_conf['vCenter'][host.nil? ? 'default' : host.name!]['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
                 )
                 unless lim_res.nil? then
                     err, back = lim_res.split("<|>")
