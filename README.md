@@ -92,6 +92,9 @@ Creators:
 > Note:
 > Additionaly installer isn't tested much times, so it's quite "buggy".
 
+> Note:
+> Make sure you are able to restart OpenNebula via systemd, otherwise script will fail on this step.
+
 4. Wait for complection.
 
 5. Fill `/etc/one/ione.conf` for proper work of IONe
