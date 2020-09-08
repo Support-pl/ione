@@ -13,7 +13,7 @@ class IONe
             res << {
                 id: tp.id,
                 name: tp.name,
-                description: tp.to_hash['VMTEMPLATE']['TEMPLATE']['DESCRIPTION']
+                description: tp.to_hash['VMTEMPLATE']['TEMPLATE']['DESCRIPTION'],
                 logo: tp.to_hash['VMTEMPLATE']['TEMPLATE']['LOGO'],
                 uid: tp.to_hash['VMTEMPLATE']['UID'],
                 gid: tp.to_hash['VMTEMPLATE']['GID'],
