@@ -15,7 +15,7 @@ task :install_ione => [:before, :install_gems] do
         touch "/var/log/one/#{file}.log"
     end
     chown_R "oneadmin", "oneadmin", "/var/log/one/"
-    chmod_R 700, "/var/log/one/"
+    chmod_R 750, "/var/log/one/"
 
     puts 'Copying IONe'
     @ione.each do | files |
