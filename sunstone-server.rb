@@ -239,7 +239,7 @@ helpers do
             rescue
             end
         end
-        (session[:csrftoken] && session[:csrftoken] == csrftoken) || $ione_conf['APIAccessList'].include?(request.ip)
+        (session[:csrftoken] && session[:csrftoken] == csrftoken) || ($ione_conf['APIAccessList'] and $ione_conf['APIAccessList'].include?(request.ip))
     end
 
     def authorized?
