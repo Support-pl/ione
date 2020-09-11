@@ -56,7 +56,7 @@ define(function(require) {
   function _fillVCenterClusters(opts) {
     this.opts = opts;
 
-    var path = '/vcenter';
+    var path = '/vcenter/hosts';
 
     var context = $(".vcenter_import", opts.container);
     context.html( TemplateHTML({}) );
