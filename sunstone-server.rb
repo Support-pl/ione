@@ -202,25 +202,6 @@ end
 DEFAULT_TABLE_ORDER = "desc"
 DEFAULT_PAGE_LENGTH = 10
 
-SUPPORT = {
-    :zendesk_url => "https://opennebula.zendesk.com/api/v2",
-    :custom_field_version => 391130,
-    :custom_field_severity => 391197,
-    :author_id => 21231023,
-    :author_name => "OpenNebula Support Team",
-    :support_subscription => "http://opennebula.systems/support/",
-    :account => "http://opennebula.systems/buy/",
-    :docs => "http://docs.opennebula.org/5.4/",
-    :community => "http://opennebula.org/support/community/",
-    :project => "OpenNebula"
-}
-
-UPGRADE = {
-    :upgrade => "<span style='color: #0098c3'>Upgrade Available</span>&nbsp;<span style='color:#DC7D24'><i class='fa fa-exclamation-circle'></i></span>",
-    :no_upgrade => "",
-    :url => "http://opennebula.org/software/"
-}
-
 ##############################################################################
 # Helpers
 ##############################################################################
@@ -512,9 +493,7 @@ get '/' do
 
     erb :index, :locals => {
         :logos_conf => logos_conf,
-        :oned_conf  => oned_conf,
-        :support    => SUPPORT,
-        :upgrade    => UPGRADE
+        :oned_conf  => oned_conf
     }
 end
 
