@@ -50,9 +50,12 @@ class OpenNebula::User
     rescue
         nil
     end
+    # Returns users VNets objects array
+    # @return [Array<OpenNebula::VirtualNetwork>]
     def vns db
         db[:network_pool].where(uid: @pe_id).select(:oid).to_a.map { |row| onblock(:vn, row[:oid]){|vn| vn.info! || vn} }
     end
+    # Returns users VNets being billed
     def billable_vns
         AR.where(owner:id, state:"crt").all
     end
