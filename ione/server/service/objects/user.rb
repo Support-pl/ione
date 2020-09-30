@@ -57,7 +57,7 @@ class OpenNebula::User
     end
     # Returns users VNets being billed
     def billable_vns
-        AR.where(owner:id, state:"crt").all
+        AR.where(owner:@pe_id, state:"crt").all
     end
     # Calculates VNs Showback
     # @param [Integer] stime_req - Point from which calculation starts(timestamp)
