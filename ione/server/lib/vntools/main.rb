@@ -72,4 +72,8 @@ class IONe
             false
         end
     end
+
+    def get_user_vnets uid
+        onblock(:u, uid).vns(@db)
+    end
 end
