@@ -54,19 +54,19 @@ module OpenNebulaJSON
             end
         end
 
-        def passwd(params=Hash.new)
+        def passwd params = Hash.new
             super(params['password'])
         end
 
-        def chgrp(params=Hash.new)
+        def chgrp params = Hash.new
             super(params['group_id'].to_i)
         end
 
-        def chauth(params=Hash.new)
+        def chauth params = Hash.new
             super(params['auth_driver'])
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -74,21 +74,21 @@ module OpenNebulaJSON
             end
         end
 
-        def set_quota(params=Hash.new)
+        def set_quota params = Hash.new
             quota_json = params['quotas']
             quota_template = template_to_str(quota_json)
             super(quota_template)
         end
 
-        def addgroup(params=Hash.new)
+        def addgroup params = Hash.new
             super(params['group_id'].to_i)
         end
 
-        def delgroup(params=Hash.new)
+        def delgroup params = Hash.new
             super(params['group_id'].to_i)
         end
 
-        def login(params=Hash.new)
+        def login params = Hash.new
             username = params['username'].nil? ? "" : params['username']
             token   = params['token'].nil? ? "" : params['token']
             expire  = params['expire'].nil? ? 36000 : params['expire'].to_i

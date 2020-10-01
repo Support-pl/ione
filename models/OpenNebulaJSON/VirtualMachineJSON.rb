@@ -84,23 +84,23 @@ module OpenNebulaJSON
             end
         end
 
-        def deploy(params=Hash.new)
+        def deploy params = Hash.new
             super(params['host_id'], params['enforce'], params['ds_id'])
         end
 
-        def undeploy(params=Hash.new)
+        def undeploy params = Hash.new
             super(params['hard'])
         end
 
-        def terminate(params=Hash.new)
+        def terminate params = Hash.new
             super(params['hard'])
         end
 
-        def reboot(params=Hash.new)
+        def reboot params = Hash.new
             super(params['hard'])
         end
 
-        def poweroff(params=Hash.new)
+        def poweroff params = Hash.new
             super(params['hard'])
         end
 
@@ -108,74 +108,74 @@ module OpenNebulaJSON
             super(params['host_id'], live, params['enforce'], params['ds_id'])
         end
 
-        def disk_saveas(params=Hash.new)
+        def disk_saveas params = Hash.new
             super(params['disk_id'].to_i, params['image_name'],
                 params['type'], params['snapshot_id'].to_i)
         end
 
-        def disk_resize(params=Hash.new)
+        def disk_resize params = Hash.new
             super(params['disk_id'].to_i, params['new_size'])
         end
 
-        def snapshot_create(params=Hash.new)
+        def snapshot_create params = Hash.new
             super(params['snapshot_name'])
         end
 
-        def snapshot_revert(params=Hash.new)
+        def snapshot_revert params = Hash.new
             super(params['snapshot_id'].to_i)
         end
 
-        def snapshot_delete(params=Hash.new)
+        def snapshot_delete params = Hash.new
             super(params['snapshot_id'].to_i)
         end
 
-        def disk_snapshot_create(params=Hash.new)
+        def disk_snapshot_create params = Hash.new
             super(params['disk_id'].to_i, params['snapshot_name'])
         end
 
-        def disk_snapshot_revert(params=Hash.new)
+        def disk_snapshot_revert params = Hash.new
             super(params['disk_id'].to_i, params['snapshot_id'].to_i)
         end
 
-        def disk_snapshot_delete(params=Hash.new)
+        def disk_snapshot_delete params = Hash.new
             super(params['disk_id'].to_i, params['snapshot_id'].to_i)
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i,params['group_id'].to_i)
         end
 
-        def chmod_octet(params=Hash.new)
+        def chmod_octet params = Hash.new
             super(params['octet'])
         end
 
-        def resize(params=Hash.new)
+        def resize params = Hash.new
             template_json = params['vm_template']
             template = template_to_str(template_json)
             super(template, params['enforce'])
         end
 
-        def disk_attach(params=Hash.new)
+        def disk_attach params = Hash.new
             template_json = params['disk_template']
             template = template_to_str(template_json)
             super(template)
         end
 
-        def disk_detach(params=Hash.new)
+        def disk_detach params = Hash.new
             super(params['disk_id'].to_i)
         end
 
-        def nic_attach(params=Hash.new)
+        def nic_attach params = Hash.new
             template_json = params['nic_template']
             template = template_to_str(template_json)
             super(template)
         end
 
-        def nic_detach(params=Hash.new)
+        def nic_detach params = Hash.new
             super(params['nic_id'].to_i)
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -183,19 +183,19 @@ module OpenNebulaJSON
             end
         end
 
-        def updateconf(params=Hash.new)
+        def updateconf params = Hash.new
             super(params['template_raw'])
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def recover(params=Hash.new)
+        def recover params = Hash.new
             super(params['result'].to_i)
         end
 
-        def save_as_template(params=Hash.new)
+        def save_as_template params = Hash.new
             vm_new = VirtualMachine.new(VirtualMachine.build_xml(@pe_id),
                                         @client)
             vm_new.save_as_template(params['name'],params['description'], params['persistent'])

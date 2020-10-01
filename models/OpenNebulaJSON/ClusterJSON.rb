@@ -52,31 +52,31 @@ module OpenNebulaJSON
             end
         end
 
-        def addhost(params=Hash.new)
+        def addhost params = Hash.new
             super(params['host_id'].to_i)
         end
 
-        def delhost(params=Hash.new)
+        def delhost params = Hash.new
             super(params['host_id'].to_i)
         end
 
-        def adddatastore(params=Hash.new)
+        def adddatastore params = Hash.new
             super(params['ds_id'].to_i)
         end
 
-        def deldatastore(params=Hash.new)
+        def deldatastore params = Hash.new
             super(params['ds_id'].to_i)
         end
 
-        def addvnet(params=Hash.new)
+        def addvnet params = Hash.new
             super(params['vnet_id'].to_i)
         end
 
-        def delvnet(params=Hash.new)
+        def delvnet params = Hash.new
             super(params['vnet_id'].to_i)
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -84,7 +84,7 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
     end

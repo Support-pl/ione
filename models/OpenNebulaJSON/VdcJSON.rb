@@ -63,47 +63,47 @@ module OpenNebulaJSON
             end
         end
 
-        def add_group(params=Hash.new)
+        def add_group params = Hash.new
             super(params['group_id'].to_i)
         end
 
-        def del_group(params=Hash.new)
+        def del_group params = Hash.new
             super(params['group_id'].to_i)
         end
 
-        def add_cluster(params=Hash.new)
+        def add_cluster params = Hash.new
             super(params['zone_id'].to_i, params['cluster_id'].to_i)
         end
 
-        def del_cluster(params=Hash.new)
+        def del_cluster params = Hash.new
             super(params['zone_id'].to_i, params['cluster_id'].to_i)
         end
 
-        def add_host(params=Hash.new)
+        def add_host params = Hash.new
             super(params['zone_id'].to_i, params['host_id'].to_i)
         end
 
-        def del_host(params=Hash.new)
+        def del_host params = Hash.new
             super(params['zone_id'].to_i, params['host_id'].to_i)
         end
 
-        def add_datastore(params=Hash.new)
+        def add_datastore params = Hash.new
             super(params['zone_id'].to_i, params['ds_id'].to_i)
         end
 
-        def del_datastore(params=Hash.new)
+        def del_datastore params = Hash.new
             super(params['zone_id'].to_i, params['ds_id'].to_i)
         end
 
-        def add_vnet(params=Hash.new)
+        def add_vnet params = Hash.new
             super(params['zone_id'].to_i, params['vnet_id'].to_i)
         end
 
-        def del_vnet(params=Hash.new)
+        def del_vnet params = Hash.new
             super(params['zone_id'].to_i, params['vnet_id'].to_i)
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -111,7 +111,7 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
     end

@@ -70,7 +70,7 @@ module OpenNebulaJSON
             end
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -78,15 +78,15 @@ module OpenNebulaJSON
             end
         end
 
-        def remove_attr(params=Hash.new)
+        def remove_attr params = Hash.new
             super(params['name'])
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i,params['group_id'].to_i)
         end
 
-        def chmod_json(params=Hash.new)
+        def chmod_json params = Hash.new
             if params['octet']
                 self.chmod_octet(params['octet'])
             else
@@ -102,11 +102,11 @@ module OpenNebulaJSON
             end
         end
 
-        def chtype(params=Hash.new)
+        def chtype params = Hash.new
             super(params['type'])
         end
 
-        def clone(params=Hash.new)
+        def clone params = Hash.new
             if params['target_ds']
                 rc = super(params['name'], params['target_ds'].to_i)
             else
@@ -120,19 +120,19 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def snapshot_flatten(params=Hash.new)
+        def snapshot_flatten params = Hash.new
             super(params['snapshot_id'].to_i)
         end
 
-        def snapshot_revert(params=Hash.new)
+        def snapshot_revert params = Hash.new
             super(params['snapshot_id'].to_i)
         end
 
-        def snapshot_delete(params=Hash.new)
+        def snapshot_delete params = Hash.new
             super(params['snapshot_id'].to_i)
         end
     end

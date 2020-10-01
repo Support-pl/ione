@@ -57,7 +57,7 @@ module OpenNebulaJSON
             end
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -65,11 +65,11 @@ module OpenNebulaJSON
             end
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i,params['group_id'].to_i)
         end
 
-        def chmod_json(params=Hash.new)
+        def chmod_json params = Hash.new
             if params['octet']
                 self.chmod_octet(params['octet'])
             else
@@ -85,15 +85,15 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def clone(params=Hash.new)
+        def clone params = Hash.new
             super(params['name'])
         end
 
-        def commit(params=Hash.new)
+        def commit params = Hash.new
             super(params['recover'] == true)
         end
     end
