@@ -11,7 +11,11 @@ rescue
     puts "Table :ars already exists, skipping"
 end
 
-class AR < Sequel::Model(:ars); end
+class AR < Sequel::Model(:ars)
+    def to_json opts = {}
+        to_hash.to_json opts
+    end
+end
 
 class OpenNebula::VirtualNetwork
     #
