@@ -346,7 +346,7 @@ before do
     @request_body = request.body.read
     request.body.rewind
 
-    if CSRF_BYPASS_PATTERNS.inject(false){|r, el| puts r || (el =~ request.path)} then
+    if CSRF_BYPASS_PATTERNS.inject(false){|r, el| r || (el =~ request.path)} then
         begin
             body = JSON.parse(@request_body)
             u = User.new_with_id(-1, Client.new(body['auth']))
