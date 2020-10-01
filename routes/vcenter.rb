@@ -184,7 +184,6 @@ post '/vcenter/templates' do
 end
 
 get '/vcenter/networks' do
-    p params
     begin
         new_vcenter_importer("networks")
 
