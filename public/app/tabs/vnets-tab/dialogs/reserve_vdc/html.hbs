@@ -14,25 +14,29 @@
 {{! limitations under the License.                                             }}
 {{! -------------------------------------------------------------------------- }}
 
-
-<div class="row uinput-slider-container">
-  {{#if label}}
-  <div class="small-12 columns">
-    <label for="input-{{sliderId}}">{{label}}</label>
-  </div>
-  {{/if}}
-  <div class="small-6 columns">
-    <input id="input-{{sliderId}}" type="range" class="uinput-slider" min="{{min}}" max="{{max}}" step="{{step}}"
-      value="{{initial}}" list="uinput-list-{{sliderId}}" {{#if disabled}}disabled="true" {{/if}} />
-    <datalist id="uinput-list-{{sliderId}}">
-      {{#each ticks}}
-      <option>{{this}}</option>
-      {{/each}}
-    </datalist>
-  </div>
-  <div class="small-6 columns">
-    <input type="number" class="uinput-slider-val" min="{{min}}" max="{{max_value}}" step="{{step}}" value="{{initial}}"
-      {{#unless wizard_field_disabled}}wizard_field="{{name}}" {{/unless}} {{#if disabled}}disabled="true" {{/if}}
-      required />
-  </div>
+<div id="{{dialogId}}" class="reveal small" data-reveal>
+	<div class="reveal-body">
+		<div class="row">
+			<h3 class="subheader">
+				{{tr "Reservation from Virtual Network"}}
+			</h3>
+		</div>
+		<div id="{{dialogId}}Form" style="text-align: center">
+			<h4 id="current">1</h4>
+			<div class="form_buttons reveal-footer">
+				<div class="form_buttons" style="display: flex;">
+					<span style="margin: 0 15px;">1</span>
+					<input id="countAdress" type="range" class="uinput-slider" min="1" max="10" step="1" value="1">
+					<span style="margin: 0 15px;">10</span>
+				</div>
+				<div style="display: flex;justify-content: space-around;">
+					<button data-close class="button radius center success" id="reserve">{{tr "Reserve Public IP"}}</button>
+					<button data-close class="button radius center success" id="release">{{tr "Release Public IP"}}</button>
+				</div>
+			</div>
+			<button class="close-button" data-close aria-label="{{tr "Close modal"}}" type="button">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	</div>
 </div>

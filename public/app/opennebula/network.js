@@ -14,82 +14,110 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var OpenNebulaAction = require('./action');
 
   var RESOURCE = "VNET";
 
-  var Network =  {
+  var Network = {
     "resource": RESOURCE,
-    "create": function(params) {
+    "create": function (params) {
       OpenNebulaAction.create(params, RESOURCE);
     },
-    "del": function(params) {
+    "del": function (params) {
       OpenNebulaAction.del(params, RESOURCE);
     },
-    "list": function(params) {
+    "list": function (params) {
       OpenNebulaAction.list(params, RESOURCE);
     },
-    "list_in_zone" : function(params) {
+    "list_in_zone": function (params) {
       OpenNebulaAction.list_in_zone(params, RESOURCE);
     },
-    "show": function(params) {
+    "show": function (params) {
       OpenNebulaAction.show(params, RESOURCE);
     },
-    "chown" : function(params) {
+    "chown": function (params) {
       OpenNebulaAction.chown(params, RESOURCE);
     },
-    "chgrp" : function(params) {
+    "chgrp": function (params) {
       OpenNebulaAction.chgrp(params, RESOURCE);
     },
-    "chmod" : function(params) {
+    "chmod": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "chmod", action_obj);
     },
-    "publish": function(params) {
+    "publish": function (params) {
       OpenNebulaAction.simple_action(params, RESOURCE, "publish");
     },
-    "unpublish": function(params) {
+    "unpublish": function (params) {
       OpenNebulaAction.simple_action(params, RESOURCE, "unpublish");
     },
-    "hold" : function(params) {
+    "hold": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "hold", action_obj);
     },
-    "release" : function(params) {
+    "release": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "release", action_obj);
     },
-    "add_ar" : function(params) {
-      var action_obj = {"ar_template" : params.data.extra_param};
+    "add_ar": function (params) {
+      var action_obj = { "ar_template": params.data.extra_param };
       OpenNebulaAction.simple_action(params, RESOURCE, "add_ar", action_obj);
     },
-    "rm_ar" : function(params) {
+    "rm_ar": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "rm_ar", action_obj);
     },
-    "update_ar": function(params) {
-      var action_obj = {"ar_template" : params.data.extra_param};
+    "update_ar": function (params) {
+      var action_obj = { "ar_template": params.data.extra_param };
       OpenNebulaAction.simple_action(params, RESOURCE, "update_ar", action_obj);
     },
-    "reserve": function(params) {
+    "reserve": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "reserve", action_obj);
     },
-    "update": function(params) {
-      var action_obj = {"template_raw" : params.data.extra_param};
+    "update": function (params) {
+      var action_obj = { "template_raw": params.data.extra_param };
       OpenNebulaAction.simple_action(params, RESOURCE, "update", action_obj);
     },
-    "append": function(params) {
-      var action_obj = {"template_raw" : params.data.extra_param, append : true};
+    "append": function (params) {
+      var action_obj = { "template_raw": params.data.extra_param, append: true };
       OpenNebulaAction.simple_action(params, RESOURCE, "update", action_obj);
     },
-    "rename" : function(params) {
+    "rename": function (params) {
       var action_obj = params.data.extra_param;
       OpenNebulaAction.simple_action(params, RESOURCE, "rename", action_obj);
     },
-    "getName": function(id){
+    "getName": function (id) {
       return OpenNebulaAction.getName(id, RESOURCE);
+    },
+    "reserve_public_ip": function ({ n: amount, u: user_id }, callback) {
+      $.ajax({
+        url: '/ione/reserve_public_ip',
+        type: 'POST',
+        data: JSON.stringify({ "params": [{ "n": amount * 1, "u": user_id * 1 }] }),
+        success: function (req, res) {
+          console.log('SUCCESS -> ', { req, res })
+          return callback ? callback(req, res) : null;
+        },
+        error: function (req, res) {
+          console.log('ERROR ->', { req, res });
+        }
+      });
+    },
+    "release_public_ip": function ({ vn, ar }, callback) {
+      $.ajax({
+        url: '/ione/release_public_ip',
+        type: 'POST',
+        data: JSON.stringify({ "params": [{ "vn": vn * 1, "ar": ar * 1 }] }),
+        success: function (req, res) {
+          console.log('SUCCESS -> ', { req, res })
+          return callback ? callback(req, res) : null;
+        },
+        error: function (req, res) {
+          console.log('ERROR ->', { req, res });
+        }
+      });
     }
   }
 

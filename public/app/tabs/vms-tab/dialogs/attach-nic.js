@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -69,11 +69,11 @@ define(function(require) {
 
   function _setup(context) {
     var that = this;
-    that.nicTab.setup(context, {hide_pci: true});
+    that.nicTab.setup(context, { hide_pci: true });
 
     Tips.setup(context);
 
-    $('#' + DIALOG_ID + 'Form', context).submit(function() {
+    $('#' + DIALOG_ID + 'Form', context).submit(function () {
       var templateJSON = that.nicTab.retrieve(context);
       var obj = {
         "NIC": templateJSON
@@ -90,7 +90,7 @@ define(function(require) {
   }
 
   function _onShow(context) {
-    this.setNames( {tabId: TAB_ID} );
+    this.setNames({ tabId: TAB_ID });
 
     this.nicTab.onShow(context);
 

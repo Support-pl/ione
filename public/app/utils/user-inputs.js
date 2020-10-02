@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Locale = require('utils/locale');
   var TemplateUtils = require('utils/template-utils');
   var VNetsTable = require('tabs/vnets-tab/datatable');
@@ -50,78 +50,78 @@ define(function(require) {
     'retrieveOrder': _retrieveOrder
   };
 
-  function _html(){
+  function _html() {
     return TemplateHTML();
   }
 
-  function _setup(context){
-    context.on("click", ".add_user_input_attr", function() {
-      $(".user_input_attrs tbody", context).append(RowTemplateHTML({'idInput': UniqueId.id()}));
+  function _setup(context) {
+    context.on("click", ".add_user_input_attr", function () {
+      $(".user_input_attrs tbody", context).append(RowTemplateHTML({ 'idInput': UniqueId.id() }));
       $('tbody label').css('cursor', 'pointer');
       $("select.user_input_type", context).change();
     });
 
     $('tbody', context).sortable();
 
-    context.on("change", "select.user_input_type", function() {
+    context.on("change", "select.user_input_type", function () {
       var row = $(this).closest("tr");
 
       $(".user_input_type_right", row).hide();
-      $(".user_input_type_right."+this.value, row).show();
+      $(".user_input_type_right." + this.value, row).show();
     });
 
-    context.on("click", ".user_input_attrs i.remove-tab", function() {
+    context.on("click", ".user_input_attrs i.remove-tab", function () {
       $(this).closest('tr').remove();
     });
   }
 
-  function _retrieveOrder(){
-    if (this.order){
+  function _retrieveOrder() {
+    if (this.order) {
       return this.order;
     }
     return "";
   }
 
-  function _retrieve(context){
+  function _retrieve(context) {
     var userInputsJSON = {};
     var order_inputs = "";
 
-    $('.user_input_attrs tbody tr').each(function(key, value){
+    $('.user_input_attrs tbody tr').each(function (key, value) {
       order_inputs += $(".user_input_name", $(this)).val().toUpperCase() + ",";
     });
 
-    this.order = order_inputs.slice(0,-1);
+    this.order = order_inputs.slice(0, -1);
 
-    $(".user_input_attrs tbody tr", context).each(function() {
-      
+    $(".user_input_attrs tbody tr", context).each(function () {
+
       if ($(".user_input_name", $(this)).val()) {
         var attr = {};
         attr.name = $(".user_input_name", $(this)).val();
-        if($('.user_input_mandatory', $(this)).prop('checked')){
+        if ($('.user_input_mandatory', $(this)).prop('checked')) {
           attr.mandatory = true;
         } else {
           attr.mandatory = false;
         }
-        
+
         attr.type = $(".user_input_type", $(this)).val();
         attr.description = $(".user_input_description", $(this)).val();
 
-        switch(attr.type){
+        switch (attr.type) {
           case "number":
           case "number-float":
           case "fixed":
-            attr.initial = $("."+attr.type+" input.user_input_initial", $(this)).val();
+            attr.initial = $("." + attr.type + " input.user_input_initial", $(this)).val();
             break;
           case "range":
           case "range-float":
-            var min = $("."+attr.type+" input.user_input_params_min", $(this)).val();
-            var max = $("."+attr.type+" input.user_input_params_max", $(this)).val();
-            attr.params  = min + ".." + max;
-            attr.initial = $("."+attr.type+" input.user_input_initial", $(this)).val();
+            var min = $("." + attr.type + " input.user_input_params_min", $(this)).val();
+            var max = $("." + attr.type + " input.user_input_params_max", $(this)).val();
+            attr.params = min + ".." + max;
+            attr.initial = $("." + attr.type + " input.user_input_initial", $(this)).val();
             break;
           case "list":
-            attr.params  = $("."+attr.type+" input.user_input_params", $(this)).val();
-            attr.initial = $("."+attr.type+" input.user_input_initial", $(this)).val();
+            attr.params = $("." + attr.type + " input.user_input_params", $(this)).val();
+            attr.initial = $("." + attr.type + " input.user_input_initial", $(this)).val();
             break;
           case "boolean":
             attr.initial = $('.user_input_initial:checked', $(this)).val();
@@ -130,30 +130,30 @@ define(function(require) {
 
         userInputsJSON[attr.name] = _marshall(attr);
       }
-      
+
     });
 
     return userInputsJSON;
   }
 
-  function _fill(context, templateJSON){
+  function _fill(context, templateJSON) {
     var userInputsJSON = templateJSON['USER_INPUTS'];
-    if(!templateJSON['INPUTS_ORDER']){
+    if (!templateJSON['INPUTS_ORDER']) {
       var inputsOrderString = "";
-      $.each(userInputsJSON, function(key, value){
+      $.each(userInputsJSON, function (key, value) {
         inputsOrderString += key + ',';
       });
-      templateJSON['INPUTS_ORDER'] = inputsOrderString.slice(0,-1);
+      templateJSON['INPUTS_ORDER'] = inputsOrderString.slice(0, -1);
     }
 
     var order = templateJSON['INPUTS_ORDER'];
     var orderJSON = order.split(",");
 
-    if(userInputsJSON){
-      $.each(orderJSON, function(key, value){
+    if (userInputsJSON) {
+      $.each(orderJSON, function (key, value) {
         var nameOrder = value;
-        $.each(userInputsJSON, function(key, value) {
-          if(nameOrder == key){
+        $.each(userInputsJSON, function (key, value) {
+          if (nameOrder == key) {
             $(".add_user_input_attr", context).trigger("click");
 
             var trcontext = $(".user_input_attrs tbody tr", context).last();
@@ -162,26 +162,26 @@ define(function(require) {
 
             var attr = _unmarshall(value);
 
-            if (templateJSON[key] != undefined){
+            if (templateJSON[key] != undefined) {
               attr.initial = templateJSON[key];
             }
             $(".user_input_type", trcontext).val(attr.type).change();
             $(".user_input_description", trcontext).val(attr.description);
 
-            if (attr.mandatory){
+            if (attr.mandatory) {
               $('.user_input_mandatory', trcontext).attr("checked", "checked");
             } else {
               $('.user_input_mandatory', trcontext).removeAttr("checked");
             }
 
-            switch(attr.type){
+            switch (attr.type) {
               case "number":
               case "number-float":
               case "fixed":
-                $("."+attr.type+" input.user_input_initial", trcontext).val(attr.initial);
+                $("." + attr.type + " input.user_input_initial", trcontext).val(attr.initial);
                 break;
               case "boolean":
-                if(attr.initial == "YES"){
+                if (attr.initial == "YES") {
                   $('input#radio_yes', trcontext).attr("checked", "checked");
                   $('input#radio_no', trcontext).removeAttr('checked');
                 }
@@ -194,20 +194,20 @@ define(function(require) {
               case "range-float":
                 var values = attr.params.split("..");  // "2..8"
 
-                if (values.length == 2){
-                  $("."+attr.type+" input.user_input_params_min", trcontext).val(values[0]);
-                  $("."+attr.type+" input.user_input_params_max", trcontext).val(values[1]);
+                if (values.length == 2) {
+                  $("." + attr.type + " input.user_input_params_min", trcontext).val(values[0]);
+                  $("." + attr.type + " input.user_input_params_max", trcontext).val(values[1]);
                 } else {
-                  console.error('Wrong user input parameters for "'+key+'". Expected "MIN..MAX", received "'+attr.params+'"');
+                  console.error('Wrong user input parameters for "' + key + '". Expected "MIN..MAX", received "' + attr.params + '"');
                 }
 
-                $("."+attr.type+" input.user_input_initial", trcontext).val(attr.initial);
+                $("." + attr.type + " input.user_input_initial", trcontext).val(attr.initial);
 
                 break;
 
               case "list":
-                $("."+attr.type+" input.user_input_params", trcontext).val(attr.params);
-                $("."+attr.type+" input.user_input_initial", trcontext).val(attr.initial);
+                $("." + attr.type + " input.user_input_params", trcontext).val(attr.params);
+                $("." + attr.type + " input.user_input_initial", trcontext).val(attr.initial);
                 break;
             }
           }
@@ -240,7 +240,7 @@ define(function(require) {
   // opts.network_header: header text for the network inputs
   // returns true if at least one input was inserted
   function _generateServiceTemplateUserInputs(div, template_json, opts) {
-    if(opts == undefined){
+    if (opts == undefined) {
       opts = {};
     }
 
@@ -262,7 +262,7 @@ define(function(require) {
     var user_inputs = opts.user_inputs;
 
     var defaults = opts.defaults;
-    if (defaults == undefined){
+    if (defaults == undefined) {
       defaults = {};
     }
 
@@ -289,14 +289,14 @@ define(function(require) {
     var network_attrs = [];
     var input_attrs = [];
 
-    $.each(user_inputs, function(key, value) {
+    $.each(user_inputs, function (key, value) {
       var attrs = _parse(key, value);
 
-      if (defaults[key] != undefined){
+      if (defaults[key] != undefined) {
         attrs.initial = opts.defaults[key];
       }
 
-      if (attrs.type == "vnet_id"){
+      if (attrs.type == "vnet_id") {
         network_attrs.push(attrs);
       } else {
         input_attrs.push(attrs);
@@ -307,13 +307,13 @@ define(function(require) {
       html += '<fieldset>';
       if (opts.network_header.length > 0) {
         html += '<legend>' +
-            opts.network_header +
+          opts.network_header +
           '</legend>' +
           '</div>';
       }
 
       html += '<div class="instantiate_user_inputs">' +
-          '</div>' +
+        '</div>' +
         '</fieldset>';
 
       div.append(html);
@@ -321,19 +321,19 @@ define(function(require) {
       var separator = "";
 
       var vnetsTable;
-      $.each(network_attrs, function(index, vnet_attr) {
+      $.each(network_attrs, function (index, vnet_attr) {
         var unique_id = "vnet_user_input_" + UniqueId.id();
-        vnetsTable = new VNetsTable(unique_id, {'select': true});
+        vnetsTable = new VNetsTable(unique_id, { 'select': true });
 
         $(".instantiate_user_inputs", div).append(
           '<div class="row">' +
-            '<div class="large-12 large-centered columns">' +
-              separator +
-              '<h5>' +
-                TemplateUtils.htmlEncode(vnet_attr.description) +
-              '</h5>' +
-              vnetsTable.dataTableHTML +
-            '</div>' +
+          '<div class="large-12 large-centered columns">' +
+          separator +
+          '<h5>' +
+          TemplateUtils.htmlEncode(vnet_attr.description) +
+          '</h5>' +
+          vnetsTable.dataTableHTML +
+          '</div>' +
           '</div>');
 
         separator = "<hr/>";
@@ -350,46 +350,46 @@ define(function(require) {
       html += '<fieldset>';
       if (opts.text_header.length > 0) {
         html += '<legend>' +
-            opts.text_header +
+          opts.text_header +
           '</legend>' +
           '</div>';
       }
 
       html += '<div class="instantiate_user_inputs">' +
-          '</div>' +
+        '</div>' +
         '</fieldset>';
 
       div.append(html);
 
-      if(opts.defaults.INPUTS_ORDER){
+      if (opts.defaults.INPUTS_ORDER) {
         var order = opts.defaults.INPUTS_ORDER;
         var orderJSON = order.split(",");
-        $.each(orderJSON, function(key, value){
+        $.each(orderJSON, function (key, value) {
           var orderValue = value;
-          $.each(input_attrs, function(index, custom_attr) {
-            if(custom_attr.name == orderValue){
+          $.each(input_attrs, function (index, custom_attr) {
+            if (custom_attr.name == orderValue) {
               $(".instantiate_user_inputs", div).append(
                 '<div class="row">' +
-                  '<div class="large-12 large-centered columns">' +
-                    '<label>' +
-                      TemplateUtils.htmlEncode(custom_attr.description) +
-                      _attributeInput(custom_attr) +
-                    '</label>' +
-                  '</div>' +
+                '<div class="large-12 large-centered columns">' +
+                '<label>' +
+                TemplateUtils.htmlEncode(Locale.tr(custom_attr.description)) +
+                _attributeInput(custom_attr) +
+                '</label>' +
+                '</div>' +
                 '</div>');
             }
           });
         });
       } else {
-        $.each(input_attrs, function(index, custom_attr) {
+        $.each(input_attrs, function (index, custom_attr) {
           $(".instantiate_user_inputs", div).append(
             '<div class="row">' +
-              '<div class="large-12 large-centered columns">' +
-                '<label>' +
-                  TemplateUtils.htmlEncode(custom_attr.description) +
-                  _attributeInput(custom_attr) +
-                '</label>' +
-              '</div>' +
+            '<div class="large-12 large-centered columns">' +
+            '<label>' +
+            TemplateUtils.htmlEncode(Locale.tr(custom_attr.description)) +
+            _attributeInput(custom_attr) +
+            '</label>' +
+            '</div>' +
             '</div>');
         });
       }
@@ -413,22 +413,22 @@ define(function(require) {
     var st = "";
 
     st += (attr.mandatory ? "M" : "O") + "|" +
-          (attr.type != undefined ? attr.type : "text") + "|" +
-          (attr.description != undefined ? attr.description : "");
+      (attr.type != undefined ? attr.type : "text") + "|" +
+      (attr.description != undefined ? attr.description : "");
 
     switch (attr.type) {
       case "number":
       case "number-float":
       case "boolean":
       case "fixed":
-        st += ("| |" + (attr.initial != undefined ? attr.initial : "") );
+        st += ("| |" + (attr.initial != undefined ? attr.initial : ""));
 
         break;
       case "range":
       case "range-float":
       case "list":
         st += ("|" + (attr.params != undefined ? attr.params : "") +
-               "|" + (attr.initial != undefined ? attr.initial : "") );
+          "|" + (attr.initial != undefined ? attr.initial : ""));
 
         break;
     }
@@ -457,11 +457,11 @@ define(function(require) {
       "initial": ""
     };
 
-    if (parts[3] != undefined){
+    if (parts[3] != undefined) {
       attr.params = parts[3];
     }
 
-    if (parts[4] != undefined){
+    if (parts[4] != undefined) {
       attr.initial = parts[4];
     }
 
@@ -506,12 +506,12 @@ define(function(require) {
       case "range":
         var params = attr.params.split("..");  // "2..8"
 
-        attr.min = parseInt( params[0] );
-        attr.max = parseInt( params[1] );
+        attr.min = parseInt(params[0]);
+        attr.max = parseInt(params[1]);
         attr.step = "1";
 
         attr.tick_size = 1;
-        while ((attr.max - attr.min) / attr.tick_size > 10 ){
+        while ((attr.max - attr.min) / attr.tick_size > 10) {
           attr.tick_size *= 10;
         }
 
@@ -520,12 +520,12 @@ define(function(require) {
       case "range-float":
         var params = attr.params.split("..");  // "2.4..8.75"
 
-        attr.min = parseFloat( params[0] );
-        attr.max = parseFloat( params[1] );
+        attr.min = parseFloat(params[0]);
+        attr.max = parseFloat(params[1]);
         attr.step = "any";
 
         attr.tick_size = 1;
-        while ((attr.max - attr.min) / attr.tick_size > 10 ){
+        while ((attr.max - attr.min) / attr.tick_size > 10) {
           attr.tick_size *= 10;
         }
 
@@ -550,7 +550,7 @@ define(function(require) {
     // Modified input for GB
     var attr_gb = $.extend({}, attr);
 
-    if (attr.type == "range"){
+    if (attr.type == "range") {
       attr.tick_size = 1024;
     }
 
@@ -558,37 +558,37 @@ define(function(require) {
 
     attr_gb.wizard_field_disabled = true;
 
-    if (attr_gb.type == "range"){
+    if (attr_gb.type == "range") {
       attr_gb.type = "range-float";
       attr_gb.min = Math.ceil((attr_gb.min / 1024));
       attr_gb.max = Math.floor((attr_gb.max / 1024));
       attr_gb.step = "1";
       attr_gb.tick_size = 1;
 
-    } else if (attr_gb.type == "list"){
-      attr_gb.options = attr_gb.options.map(function(e){
-                          return e / 1024;
-                        });
+    } else if (attr_gb.type == "list") {
+      attr_gb.options = attr_gb.options.map(function (e) {
+        return e / 1024;
+      });
 
-    } else if (attr_gb.type == "number"){
+    } else if (attr_gb.type == "number") {
       attr_gb.type = "number-float";
       attr_gb.step = "0.1";
     }
 
     div.html(
-      '<div class="input-group mb_input_wrapper">'+
-        '<div class="mb_input input-group-field">' +
-          _attributeInput(attr) +
-        '</div>' +
-        '<div class="gb_input input-group-field">' +
-          _attributeInput(attr_gb) +
-        '</div>' +
-        '<div class="input-group-button">'+
-          '<select class="mb_input_unit">' +
-            '<option value="MB">'+Locale.tr("MB")+'</option>' +
-            '<option value="GB" selected>'+Locale.tr("GB")+'</option>' +
-          '</select>' +
-        '</div>'+
+      '<div class="input-group mb_input_wrapper">' +
+      '<div class="mb_input input-group-field">' +
+      _attributeInput(attr) +
+      '</div>' +
+      '<div class="gb_input input-group-field">' +
+      _attributeInput(attr_gb) +
+      '</div>' +
+      '<div class="input-group-button">' +
+      '<select class="mb_input_unit">' +
+      '<option value="MB">' + Locale.tr("MB") + '</option>' +
+      '<option value="GB" selected>' + Locale.tr("GB") + '</option>' +
+      '</select>' +
+      '</div>' +
       '</div>');
 
     _setupAttributeInputMB(div);
@@ -597,7 +597,7 @@ define(function(require) {
     $("input, select", $("div.mb_input", div)).trigger("input");
 
     var input_val = $("input, select", $("div.mb_input", div)).val();
-    if (input_val == "" || (input_val >= 1024 && (input_val % 1024 == 0))){
+    if (input_val == "" || (input_val >= 1024 && (input_val % 1024 == 0))) {
       $(".mb_input_unit", div).val("GB").change();
     } else {
       $(".mb_input_unit", div).val("MB").change();
@@ -606,7 +606,7 @@ define(function(require) {
 
   function _setupAttributeInputMB(context) {
     // MB to GB
-    $("div.mb_input", context).on("change", "input, select", function(){
+    $("div.mb_input", context).on("change", "input, select", function () {
       var val = "";
 
       if (this.value && this.value >= 0) {
@@ -617,7 +617,7 @@ define(function(require) {
     });
 
     // GB to MB
-    $("div.gb_input", context).on("change", "input, select", function(){
+    $("div.gb_input", context).on("change", "input, select", function () {
       var val = "";
 
       if (this.value && this.value >= 0) {
@@ -630,14 +630,14 @@ define(function(require) {
     var gb_inputs = $("div.gb_input", context).children().detach();
 
     // Unit select
-    $(".mb_input_unit", context).on('change', function() {
+    $(".mb_input_unit", context).on('change', function () {
       var mb_input_unit_val = $('.mb_input_unit :selected', context).val();
 
       if (mb_input_unit_val == 'GB') {
         $("div.mb_input", context).hide();
         gb_inputs.appendTo($("div.gb_input", context));
 
-        $("input, select", $("div.mb_input",context)).trigger("change");
+        $("input, select", $("div.mb_input", context)).trigger("change");
       } else {
         $("div.mb_input", context).show();
         gb_inputs = $("div.gb_input", context).children().detach();
@@ -658,37 +658,37 @@ define(function(require) {
 
     var wizard_field = 'wizard_field="' + TemplateUtils.htmlEncode(attr.name) + '"';
 
-    if (attr.wizard_field_disabled == true){
+    if (attr.wizard_field_disabled == true) {
       wizard_field = "";
     }
 
     var value = "";
 
-    if (attr.initial != undefined){
+    if (attr.initial != undefined) {
       value = TemplateUtils.htmlEncode(attr.initial);
     }
 
     switch (attr.type) {
       case "text":
-        input = '<textarea type="text" rows="1" '+wizard_field+' '+required+'>'+TemplateUtils.htmlEncode(value)+'</textarea>';
+        input = '<textarea type="text" rows="1" ' + wizard_field + ' ' + required + '>' + TemplateUtils.htmlEncode(value) + '</textarea>';
         break;
       case "text64":
         try {
-          input = '<textarea type="text" rows="1" wizard_field_64="true" '+wizard_field+' '+required+'>'+TemplateUtils.htmlEncode(atob(value))+'</textarea>';
-        } catch(e){
+          input = '<textarea type="text" rows="1" wizard_field_64="true" ' + wizard_field + ' ' + required + '>' + TemplateUtils.htmlEncode(atob(value)) + '</textarea>';
+        } catch (e) {
           console.error(e.message);
-          input = "<p>"+e.message+"</p>";
+          input = "<p>" + e.message + "</p>";
         }
         break;
       case "password":
-        input = '<br><input type="password" value="'+value+'" '+wizard_field+' '+required+'/>';
+        input = '<br><input type="password" value="' + value + '" ' + wizard_field + ' ' + required + '/>';
         break;
       case "boolean":
         var id = UniqueId.id();
-        if(value == "YES"){
-          input = '<br>' + Locale.tr("YES ") + '<input style="margin-right: 20px" checked type="radio" name="bool_' +id + '" value="YES"' + wizard_field + ' ' + required + '/>';
+        if (value == "YES") {
+          input = '<br>' + Locale.tr("YES ") + '<input style="margin-right: 20px" checked type="radio" name="bool_' + id + '" value="YES"' + wizard_field + ' ' + required + '/>';
           input += Locale.tr("NO ") + '<input type="radio" name="bool_' + id + '" value="NO"' + wizard_field + ' ' + required + '/>';
-        } else if(value == "NO"){
+        } else if (value == "NO") {
           input = '<br>' + Locale.tr("YES ") + '<input style="margin-right: 20px" type="radio" name="bool_' + id + '" value="YES"' + wizard_field + ' ' + required + '/>';
           input += Locale.tr("NO ") + '<input checked type="radio" name="bool_' + id + '" value="NO"' + wizard_field + ' ' + required + '/>'
         } else {
@@ -698,58 +698,61 @@ define(function(require) {
         break;
       case "number":
       case "number-float":
-        var min = attr.min != undefined ? 'min="'+attr.min+'"' : "";
-        var max = attr.max != undefined ? 'max="'+attr.max+'"' : "";
+        var min = attr.min != undefined ? 'min="' + attr.min + '"' : "";
+        var max = attr.max != undefined ? 'max="' + attr.max + '"' : "";
 
-        input = '<input type="number" step="'+attr.step+'" '+min+' '+max+' value="'+value+'" '+wizard_field+' '+required+'/>';
+        input = '<input type="number" step="' + attr.step + '" ' + min + ' ' + max + ' value="' + value + '" ' + wizard_field + ' ' + required + '/>';
         break;
       case "range":
       case "range-float":
-        if(attr.max_value != ""){
+        if (attr.max_value != "") {
           attr.max_value = attr.max;
         }
         input = RangeSlider.html(attr);
 
         break;
       case "list":
-        input = '<select '+wizard_field+' '+required+'>';
+        input = '<select ' + wizard_field + ' ' + required + '>';
 
-        $.each(attr.options, function(){
+        $.each(attr.options, function () {
           var selected = (attr.initial == this);
 
-          input +=  '<option value="'+this+'" '+
-                    (selected? 'selected' : '')+'>'+
-                      this+
-                    '</option>';
+          input += '<option value="' + this + '" ' +
+            (selected ? 'selected' : '') + '>' +
+            this +
+            '</option>';
         });
 
         input += '</select>';
 
         break;
       case "fixed":
-        input = '<input type="text" value="'+value+'" '+wizard_field+' '+required+' disabled/>';
+        input = '<input type="text" value="' + value + '" ' + wizard_field + ' ' + required + ' disabled/>';
         break;
       case "superlist":
-        input = '<input type="button" class="button radius" value="'+attr.params+'" '+wizard_field+' '+required+'/>';
-        $('#left_colum').on("click", '[wizard_field="'+attr.name+'"]', function(){
-          Settings.cloud({success:function(r, res) {
-              if (r.error != undefined){
+        input = '<input type="button" class="button radius" value="' + attr.params + '" ' + wizard_field + ' ' + required + '/>';
+        $('#left_colum').on("click", '[wizard_field="' + attr.name + '"]', function () {
+          Settings.cloud({
+            success: function (r, res) {
+              if (r.error != undefined) {
                 Notifier.notifyError(Locale.tr("No settings"));
                 return false;
               }
               settings = r.response;
-              if (settings[attr.initial] != undefined){
+              if (settings[attr.initial] != undefined) {
                 Sunstone.getDialog('superlistTemplateDialog').setParams(
-                    { tabId : 'templates-tab',
-                      resource : 'Template',
-                      dialog:{label:attr.params,name: attr.name,field_name:attr.initial, field_data:settings[attr.initial]}
-                    });
+                  {
+                    tabId: 'templates-tab',
+                    resource: 'Template',
+                    dialog: { label: attr.params, name: attr.name, field_name: attr.initial, field_data: settings[attr.initial] }
+                  });
                 Sunstone.getDialog('superlistTemplateDialog').reset();
                 Sunstone.getDialog('superlistTemplateDialog').show();
-              }else{
-                Notifier.notifyError(Locale.tr("No settings field")+' '+attr.initial);
+              } else {
+                Notifier.notifyError(Locale.tr("No settings field") + ' ' + attr.initial);
               }
-            }});
+            }
+          });
         });
         break;
     }

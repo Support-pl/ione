@@ -14,34 +14,34 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   require('jquery');
 
   // Clone the local config object in a private var
   var _config = $.extend(true, {}, config);
 
   var Config = {
-    'isTabEnabled': function(tabName) {
+    'isTabEnabled': function (tabName) {
       var enabled = _config['view']['enabled_tabs'].indexOf(tabName) != -1;
       return enabled;
     },
 
-    "changeFilter": function(bool) {
+    "changeFilter": function (bool) {
       _config['pool_filter'] = bool;
     },
 
-    "isChangedFilter": function(){
+    "isChangedFilter": function () {
       return _config['pool_filter'];
     },
 
-    "isTabActionEnabled": function(tabName, actionName, panelName) {
+    "isTabActionEnabled": function (tabName, actionName, panelName) {
       var enabled = false;
       var configTab = _config['view']['tabs'][tabName];
 
       if (configTab != undefined) {
         if (panelName) {
           enabled = configTab['panel_tabs_actions'][panelName][actionName];
-        } else {
+        } else if (configTab['actions']) {
           enabled = configTab['actions'][actionName];
         }
       }
@@ -49,7 +49,7 @@ define(function(require) {
       return enabled;
     },
 
-    "isTabPanelEnabled": function(tabName, panelTabName) {
+    "isTabPanelEnabled": function (tabName, panelTabName) {
       if (_config['view']['tabs'][tabName]) {
         var enabled = _config['view']['tabs'][tabName]['panel_tabs'][panelTabName];
         return enabled;
@@ -58,7 +58,7 @@ define(function(require) {
       }
     },
 
-    "isProvisionTabEnabled": function(tabName, panelTabName) {
+    "isProvisionTabEnabled": function (tabName, panelTabName) {
       if (_config['view']['tabs'][tabName]) {
         if (_config['view']['tabs'][tabName]['provision_tabs']) {
           return _config['view']['tabs'][tabName]['provision_tabs'][panelTabName];
@@ -72,7 +72,7 @@ define(function(require) {
       }
     },
 
-    "isFeatureEnabled": function(featureName) {
+    "isFeatureEnabled": function (featureName) {
       if (_config['view']['features'] && _config['view']['features'][featureName]) {
         return true;
       } else {
@@ -80,7 +80,7 @@ define(function(require) {
       }
     },
 
-    "tabTableColumns": function(tabName) {
+    "tabTableColumns": function (tabName) {
       if (!_config['view']['tabs'][tabName]) {
         return [];
       }
@@ -94,7 +94,7 @@ define(function(require) {
       }
     },
 
-    "isTemplateCreationTabEnabled": function(tabName, wizardTabName) {
+    "isTemplateCreationTabEnabled": function (tabName, wizardTabName) {
       var enabled = false;
 
       if (_config['view']['tabs'][tabName] && _config['view']['tabs'][tabName]['template_creation_tabs']) {
@@ -104,7 +104,7 @@ define(function(require) {
       return (enabled == true);
     },
 
-    "dashboardWidgets": function(perRow) {
+    "dashboardWidgets": function (perRow) {
       if (!_config['view']['tabs']['dashboard-tab']) {
         return []
       }
@@ -118,13 +118,13 @@ define(function(require) {
       }
     },
 
-    "tableOrder": function() {
+    "tableOrder": function () {
       return _config['user_config']["table_order"];
     },
 
     "provision": {
       "dashboard": {
-        "isEnabled": function(widget) {
+        "isEnabled": function (widget) {
           if (_config['view']['tabs']['provision-tab']) {
             var enabled = _config['view']['tabs']['provision-tab']['dashboard'][widget];
             return enabled;
@@ -134,7 +134,7 @@ define(function(require) {
         }
       },
       "create_vm": {
-        "isEnabled": function(widget) {
+        "isEnabled": function (widget) {
           if (_config['view']['tabs']['provision-tab'] && _config['view']['tabs']['provision-tab']["create_vm"]) {
             return _config['view']['tabs']['provision-tab']['create_vm'][widget];
           } else {
@@ -159,7 +159,7 @@ define(function(require) {
     'scaleFactor': _config['view']['features']['instantiate_cpu_factor'],
     'filterView': _config['view']['filter_view'],
 
-    "allTabs": function() {
+    "allTabs": function () {
       return Object.keys(_config['view']['tabs']);
     }
   }

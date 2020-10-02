@@ -150,29 +150,29 @@ define(function (require) {
         [0, "desc"]
       ],
       "aoColumnDefs": [{
-          "bVisible": false,
-          "aTargets": ["all"]
-        },
-        {
-          "sType": "num",
-          "aTargets": [0]
-        }
+        "bVisible": false,
+        "aTargets": ["all"]
+      },
+      {
+        "sType": "num",
+        "aTargets": [0]
+      }
       ],
       "aoColumns": [{
-          "mDataProp": "VM.ID"
-        },
-        {
-          "mDataProp": "VM.NAME"
-        },
-        {
-          "mDataProp": "VM.UID"
-        }
+        "mDataProp": "VM.ID"
+      },
+      {
+        "mDataProp": "VM.NAME"
+      },
+      {
+        "mDataProp": "VM.UID"
+      }
       ],
       "fnPreDrawCallback": function (oSettings) {
         // create a thumbs container if it doesn't exist. put it in the dataTables_scrollbody div
         if (this.$('tr', {
-            "filter": "applied"
-          }).length == 0) {
+          "filter": "applied"
+        }).length == 0) {
           this.html('<div class="text-center">' +
             '<span class="fa-stack fa-5x">' +
             '<i class="fa fa-cloud fa-stack-2x"></i>' +
@@ -286,9 +286,9 @@ define(function (require) {
     let proc_vm = false;
 
     function refresh() {
-      // location.reload();
-      // OpenNebula.Action.clear_cache("VM");
-      // ProvisionVmsList.show(0);
+      location.reload();
+      OpenNebula.Action.clear_cache("VM");
+      ProvisionVmsList.show(0);
     }
 
     function parse_result(response) {
@@ -313,7 +313,7 @@ define(function (require) {
         error: Notifier.onError,
         success: function (request, response) {
           Sunstone.insertPanels(TAB_ID, response, TAB_ID, $(".provision-sunstone-info", context));
-
+          // console.log(11212, response);
           var data = response.VM;
           var state = get_provision_vm_state(data);
 
@@ -481,41 +481,41 @@ define(function (require) {
           $(".provision_info_vm_loading", context).hide();
 
           //$(window).scrollTop(tempScrollTop);
-          if (proc_vm) {
-            OpenNebula.AnsibleProcess.show({
-              data: {
-                id: proc_vm
-              },
-              success: function (a, res) {
-                if (res.ANSIBLE_PROCESS.STATUS != "RUNNING") {
-                  proc_vm = false;
-                }
-              }
-            });
-          } else {
-            OpenNebula.AnsibleProcess.list({
-              success: function (a, res) {
-                console.log('Check Process');
-                let list_len = res.length;
-                for (let i = list_len - 1; i >= 0; i--) {
-                  if (res[i].ANSIBLE_PROCESS.status == 'RUNNING') {
-                    if (vm_id == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]) {
-                      proc_vm = res[i].ANSIBLE_PROCESS.ID;
-                      console.log('Идет процесс восстановления');
-                      $(".provision_reinstall_confirm_button", context).hide();
-                      $(".provision_backup_confirm_button", context).hide();
-                      $(".provision_reboot_confirm_button", context).hide();
-                      $(".provision_poweroff_confirm_button", context).hide();
-                      $(".provision_undeploy_confirm_button", context).hide();
-                      $(".provision_resume_button", context).hide();
-                      $(".provision_terminate_confirm_button", context).hide();
-                      return false;
-                    }
-                  }
-                }
-              }
-            });
-          }
+          // if (proc_vm) {
+          //   OpenNebula.AnsibleProcess.show({
+          //     data: {
+          //       id: proc_vm
+          //     },
+          //     success: function (a, res) {
+          //       if (res.ANSIBLE_PROCESS.STATUS != "RUNNING") {
+          //         proc_vm = false;
+          //       }
+          //     }
+          //   });
+          // } else {
+          //   OpenNebula.AnsibleProcess.list({
+          //     success: function (a, res) {
+          //       console.log('Check Process');
+          //       let list_len = res.length;
+          //       for (let i = list_len - 1; i >= 0; i--) {
+          //         if (res[i].ANSIBLE_PROCESS.status == 'RUNNING') {
+          //           if (vm_id == Object.keys(JSON.parse(res[i].ANSIBLE_PROCESS.HOSTS))[0]) {
+          //             proc_vm = res[i].ANSIBLE_PROCESS.ID;
+          //             console.log('Идет процесс восстановления');
+          //             $(".provision_reinstall_confirm_button", context).hide();
+          //             $(".provision_backup_confirm_button", context).hide();
+          //             $(".provision_reboot_confirm_button", context).hide();
+          //             $(".provision_poweroff_confirm_button", context).hide();
+          //             $(".provision_undeploy_confirm_button", context).hide();
+          //             $(".provision_resume_button", context).hide();
+          //             $(".provision_terminate_confirm_button", context).hide();
+          //             return false;
+          //           }
+          //         }
+          //       }
+          //     }
+          //   });
+          // }
 
 
 
@@ -529,49 +529,49 @@ define(function (require) {
             },
             success: function (request, response) {
               var vm_graphs = [{
-                  monitor_resources: "MONITORING/CPU",
-                  labels: "Real CPU",
-                  humanize_figures: false,
-                  div_graph: $(".vm_cpu_provision_graph", context)
-                },
-                {
-                  monitor_resources: "MONITORING/MEMORY",
-                  labels: "Real MEM",
-                  humanize_figures: true,
-                  div_graph: $(".vm_memory_provision_graph", context)
-                },
-                {
-                  labels: "Network reception",
-                  monitor_resources: "MONITORING/NETRX",
-                  humanize_figures: true,
-                  convert_from_bytes: true,
-                  div_graph: $(".vm_net_rx_provision_graph", context)
-                },
-                {
-                  labels: "Network transmission",
-                  monitor_resources: "MONITORING/NETTX",
-                  humanize_figures: true,
-                  convert_from_bytes: true,
-                  div_graph: $(".vm_net_tx_provision_graph", context)
-                },
-                {
-                  labels: "Network reception speed",
-                  monitor_resources: "MONITORING/NETRX",
-                  humanize_figures: true,
-                  convert_from_bytes: true,
-                  y_sufix: "B/s",
-                  derivative: true,
-                  div_graph: $(".vm_net_rx_speed_provision_graph", context)
-                },
-                {
-                  labels: "Network transmission speed",
-                  monitor_resources: "MONITORING/NETTX",
-                  humanize_figures: true,
-                  convert_from_bytes: true,
-                  y_sufix: "B/s",
-                  derivative: true,
-                  div_graph: $(".vm_net_tx_speed_provision_graph", context)
-                }
+                monitor_resources: "MONITORING/CPU",
+                labels: "Real CPU",
+                humanize_figures: false,
+                div_graph: $(".vm_cpu_provision_graph", context)
+              },
+              {
+                monitor_resources: "MONITORING/MEMORY",
+                labels: "Real MEM",
+                humanize_figures: true,
+                div_graph: $(".vm_memory_provision_graph", context)
+              },
+              {
+                labels: "Network reception",
+                monitor_resources: "MONITORING/NETRX",
+                humanize_figures: true,
+                convert_from_bytes: true,
+                div_graph: $(".vm_net_rx_provision_graph", context)
+              },
+              {
+                labels: "Network transmission",
+                monitor_resources: "MONITORING/NETTX",
+                humanize_figures: true,
+                convert_from_bytes: true,
+                div_graph: $(".vm_net_tx_provision_graph", context)
+              },
+              {
+                labels: "Network reception speed",
+                monitor_resources: "MONITORING/NETRX",
+                humanize_figures: true,
+                convert_from_bytes: true,
+                y_sufix: "B/s",
+                derivative: true,
+                div_graph: $(".vm_net_rx_speed_provision_graph", context)
+              },
+              {
+                labels: "Network transmission speed",
+                monitor_resources: "MONITORING/NETTX",
+                humanize_figures: true,
+                convert_from_bytes: true,
+                y_sufix: "B/s",
+                derivative: true,
+                div_graph: $(".vm_net_tx_speed_provision_graph", context)
+              }
               ];
 
               for (var i = 0; i < vm_graphs.length; i++) {
@@ -849,8 +849,6 @@ define(function (require) {
     });
 
     context.on("click", ".provision_backup_button", function () {
-
-
       var button = $(this);
       button.attr("disabled", "disabled");
 
@@ -869,38 +867,47 @@ define(function (require) {
           id: vm_id,
           previous: backup_action
         },
-        success: function (r, response) {
+        success: (r, response) => {
+          console.log('Success', r, response)
           if (response.error != undefined) {
             Notifier.notifyError(Locale.tr(response.error));
           } else {
             Notifier.notifySubmit(Locale.tr(response.response));
           }
-          
+
           var es = new EventSource('/zfs_snapshot_revert_status/' + response.id + '?csrftoken=' + csrftoken);
-          es.onmessage = function(e) {
-              msg = e.data
-              if(msg == "running"){
-                  proc_vm = response.id
-              } else if(msg == "recovered") {
-                  Notifier.notifySubmit(Locale.tr('Recovery succeed'))
-                  proc_vm = false
-                  update_provision_vm_info(vm_id, context);
-                  es.close();
+          es.onmessage = function (e) {
+            msg = e.data
+            if (msg == "running") {
+              proc_vm = response.id
+            } else if (msg == "recovered") {
+              proc_vm = false
+              setTimeout(() => {
+                Notifier.notifySubmit(Locale.tr('Recovery succeed'))
+                OpenNebula.Action.clear_cache("VM");
+                update_provision_vm_info(vm_id, context);
+              }, 5000)
+              es.close();
+              // refresh();
+            } else {
+              code = msg.split(' ')
+              var errorStr = '';
+              if (code[1] == "vc") {
+                errorStr = Locale.tr('Snapshots must be deleted first');
+              } else if (code[1] == "zfs") {
+                errorStr = Locale.tr('System backup has snapshot inside, automatic recovery is not possible, contact technical support');
               } else {
-                  code = msg.split(' ')
-
-                  if(code[1] == "vc"){
-                      Notifier.notifyError(Locale.tr('Snapshots must be deleted first'))
-                  } else if(code[1] == "zfs"){
-                      Notifier.notifyError(Locale.tr('System backup has snapshot inside, automatic recovery is not possible, contact technical support'))
-                  } else {
-                      Notifier.notifyError(Locale.tr('Error while recovering VM, contact technical support'))
-                  }
-
-                  proc_vm = false
-                  update_provision_vm_info(vm_id, context);
-                  es.close();
+                errorStr = Locale.tr('Error while recovering VM, contact technical support');
               }
+
+              proc_vm = false
+              setTimeout(() => {
+                Notifier.notifyError(errorStr);
+                OpenNebula.Action.clear_cache("VM");
+                update_provision_vm_info(vm_id, context);
+              }, 5000)
+              es.close();
+            }
           };
         },
         error: function (r, response) {

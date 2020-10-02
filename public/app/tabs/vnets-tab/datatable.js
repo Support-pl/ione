@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -53,14 +53,14 @@ define(function(require) {
 
     this.dataTableOptions = {
       "bAutoWidth": false,
-      "bSortClasses" : false,
+      "bSortClasses": false,
       "bDeferRender": true,
       "aoColumnDefs": [
-          {"bSortable": false, "aTargets": ["check"]},
-          {"sWidth": "35px", "aTargets": [0]},
-          {"bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(TAB_NAME)},
-          {"bVisible": false, "aTargets": ['_all']},
-          {"sType": "num", "aTargets": [1, 6]}
+        { "bSortable": false, "aTargets": ["check"] },
+        { "sWidth": "35px", "aTargets": [0] },
+        { "bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(TAB_NAME) },
+        { "bVisible": false, "aTargets": ['_all'] },
+        { "sType": "num", "aTargets": [1, 6] }
       ]
     }
 
@@ -91,7 +91,7 @@ define(function(require) {
     this.usedLeases = 0;
     this.totalVNets = 0;
 
-    this.conf.searchDropdownHTML = SearchDropdown({tableId: this.dataTableId});
+    this.conf.searchDropdownHTML = SearchDropdown({ tableId: this.dataTableId });
     this.searchColumn = SEARCH_COLUMN;
 
     TabDataTable.call(this);
@@ -111,6 +111,9 @@ define(function(require) {
 
   function _elementArray(element_json) {
     var element = element_json[XML_ROOT];
+    if (config.user_config.default_view == "user" && element.UID != config.user_id) {
+      return;
+    }
 
     this.usedLeases = this.usedLeases + parseInt(element.USED_LEASES);
     this.totalVNets++;
@@ -118,34 +121,32 @@ define(function(require) {
     var total_size = 0;
 
     var arList = Utils.getARList(element);
-
-    $.each(arList, function(){
+    $.each(arList, function () {
       total_size += parseInt(this.SIZE);
     });
 
     var clusters = '-';
-    if (element.CLUSTERS.ID != undefined){
+    if (element.CLUSTERS.ID != undefined) {
       clusters = $.isArray(element.CLUSTERS.ID) ? element.CLUSTERS.ID.join(",") : element.CLUSTERS.ID;
     }
 
     var parent_net = "";
 
-    if(element.PARENT_NETWORK_ID.length > 0){
+    if (element.PARENT_NETWORK_ID.length > 0) {
       parent_net = OpenNebulaNetwork.getName(element.PARENT_NETWORK_ID);
     }
 
     var search = {
-      NAME:     element.NAME,
-      UNAME:    element.UNAME,
-      GNAME:    element.GNAME,
+      NAME: element.NAME,
+      UNAME: element.UNAME,
+      GNAME: element.GNAME,
       VLAN_ID: (element.VLAN_ID.length ? element.VLAN_ID : ""),
       PARENT_NETWORK: parent_net
     }
-
     return [
       '<input class="check_item" type="checkbox" id="' + RESOURCE.toLowerCase() + '_' +
-                           element.ID + '" name="selected_items" value="' +
-                           element.ID + '"/>',
+      element.ID + '" name="selected_items" value="' +
+      element.ID + '"/>',
       element.ID,
       element.NAME,
       element.UNAME,
@@ -155,7 +156,7 @@ define(function(require) {
       element.BRIDGE,
       ProgressBar.html(element.USED_LEASES, total_size),
       element.VLAN_ID.length ? element.VLAN_ID : "-",
-      (LabelsUtils.labelsStr(element[TEMPLATE_ATTR])||''),
+      (LabelsUtils.labelsStr(element[TEMPLATE_ATTR]) || ''),
       btoa(unescape(encodeURIComponent(JSON.stringify(search))))
     ];
   }

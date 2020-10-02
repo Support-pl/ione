@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -42,10 +42,11 @@ define(function(require) {
     CONSTRUCTOR
    */
 
+  var defaultUser = config.user_config["default_view"] == "user" ? true : false;
+
   function NicTab(nicTabId) {
     this.nicTabId = 'nicTab' + nicTabId + UniqueId.id();
-
-    this.vnetsTable = new VNetsTable(this.nicTabId + 'Table', {'select': true});
+    this.vnetsTable = new VNetsTable(this.nicTabId + 'Table', { 'select': true });
 
     var secgroupSelectOptions = {
       'select': true,
@@ -72,6 +73,7 @@ define(function(require) {
   function _html() {
     return TemplateHTML({
       'nicTabId': this.nicTabId,
+      'defaultUser': defaultUser,
       'vnetsTableSelectHTML': this.vnetsTable.dataTableHTML,
       'secgroupsTableSelectHTML': this.secgroupsTable.dataTableHTML
     });
@@ -89,19 +91,26 @@ define(function(require) {
   function _setup(context, options) {
     var that = this;
 
-    if (options != undefined && options.hide_pci == true){
+    if (options != undefined && options.hide_pci == true) {
       $("input.pci-type-nic", context).attr('disabled', 'disabled');
     }
 
     that.vnetsTable.initialize({
       'selectOptions': {
-        'select_callback': function(aData, options) {
+        'select_callback': function (aData, options) {
           // If the net is selected by Id, avoid overwriting it with name+uname
           if ($('#NETWORK_ID', context).val() != aData[options.id_index]) {
             $('#NETWORK_ID', context).val("");
             $('#NETWORK', context).val(aData[options.name_index]);
             $('#NETWORK_UNAME', context).val(aData[options.uname_index]);
             $('#NETWORK_UID', context).val("");
+          }
+          // console.log(aData, options);
+          // console.log('config', defaultUser);
+          if (defaultUser && aData[options.id_index] == "0") {
+            $('.accordion_advanced').hide();
+          } else {
+            $('.accordion_advanced').show();
           }
         }
       }
@@ -111,17 +120,17 @@ define(function(require) {
     that.secgroupsTable.initialize();
     that.secgroupsTable.refreshResourceTableSelect();
 
-    $("input.pci-type-nic", context).on("change", function(){
+    $("input.pci-type-nic", context).on("change", function () {
       var tbody = $(".pci-row tbody", context);
 
-      if ($(this).prop('checked')){
+      if ($(this).prop('checked')) {
         $("input[wizard_field=MODEL]", context).prop("disabled", true).prop('wizard_field_disabled', true);
         $(".nic-model-row", context).hide();
         $(".pci-row", context).show();
 
-        tbody.html( CreateUtils.pciRowHTML() );
+        tbody.html(CreateUtils.pciRowHTML());
 
-        CreateUtils.fillPCIRow({tr: $('tr', tbody), remove: false});
+        CreateUtils.fillPCIRow({ tr: $('tr', tbody), remove: false });
       } else {
         $("input[wizard_field=MODEL]", context).removeAttr('disabled').prop('wizard_field_disabled', false);
         $(".nic-model-row", context).show();
@@ -158,7 +167,7 @@ define(function(require) {
       nicJSON["SECURITY_GROUPS"] = secgroups.join(",");
     }
 
-    if ($("input.pci-type-nic", context).prop("checked")){
+    if ($("input.pci-type-nic", context).prop("checked")) {
       nicJSON["NIC_PCI"] = true;
     }
 
@@ -168,17 +177,17 @@ define(function(require) {
   function _fill(context, templateJSON) {
     if (templateJSON.NETWORK_ID != undefined) {
       var selectedResources = {
-          ids : templateJSON.NETWORK_ID
-        }
+        ids: templateJSON.NETWORK_ID
+      }
 
       this.vnetsTable.selectResourceTableSelect(selectedResources);
     } else if (templateJSON.NETWORK != undefined && templateJSON.NETWORK_UNAME != undefined) {
       var selectedResources = {
-          names : {
-            name: templateJSON.NETWORK,
-            uname: templateJSON.NETWORK_UNAME
-          }
+        names: {
+          name: templateJSON.NETWORK,
+          uname: templateJSON.NETWORK_UNAME
         }
+      }
 
       this.vnetsTable.selectResourceTableSelect(selectedResources);
     }
@@ -213,15 +222,15 @@ define(function(require) {
     }
 
     if (templateJSON["SECURITY_GROUPS"] != undefined &&
-        templateJSON["SECURITY_GROUPS"].length != 0) {
+      templateJSON["SECURITY_GROUPS"].length != 0) {
 
-      var selectedResources = {ids: templateJSON["SECURITY_GROUPS"].split(",")};
+      var selectedResources = { ids: templateJSON["SECURITY_GROUPS"].split(",") };
       this.secgroupsTable.selectResourceTableSelect(selectedResources);
     } else {
       this.secgroupsTable.refreshResourceTableSelect();
     }
 
-    if (templateJSON["TYPE"] == "NIC"){
+    if (templateJSON["TYPE"] == "NIC") {
       $("input.pci-type-nic", context).click();
     }
 

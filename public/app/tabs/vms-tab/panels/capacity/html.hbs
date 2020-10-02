@@ -36,16 +36,20 @@
           <td id="memory_info">{{humanizeSize "MB" element.TEMPLATE.MEMORY}}</td>
           {{#isFeatureEnabled "showback"}}
           <td id="cpu_cost_info">{{cpuCost}}</td>
-          <td id="memory_cost_info" >{{memoryCost}}</td>
+          <td id="memory_cost_info">{{memoryCost}}</td>
           {{/isFeatureEnabled}}
           <td>
-          {{#isTabActionEnabled "vms-tab" "VM.resize"}}
-          {{#if resizeStateEnabled}}
-            <button id="resize_capacity" class="button small success right radius" >{{tr "Resize"}}</button>
-          {{else}}
-            <button id="resize_capacity" class="button small success right radius" disabled="disabled">{{tr "Resize"}}</button>
-          {{/if}}
-          {{/isTabActionEnabled}}
+            {{#defUser}}
+            {{#isTabActionEnabled "vms-tab" "VM.resize"}}
+
+            {{#if resizeStateEnabled}}
+            <button id="resize_capacity" class="button small success right radius">{{tr "Resize"}}</button>
+            {{else}}
+            <button id="resize_capacity" class="button small success right radius"
+              disabled="disabled">{{tr "Resize"}}</button>
+            {{/if}}
+            {{/isTabActionEnabled}}
+            {{/defUser}}
           </td>
         </tr>
       </tbody>
@@ -62,7 +66,7 @@
     <div class="row">
       <div class="large-12 columns">
         <div class="large-12 columns centered graph vm_cpu_graph" style="height: 100px;">
-          <span  id="provision_dashboard_total" style="font-size:80px">
+          <span id="provision_dashboard_total" style="font-size:80px">
             <i class="fa fa-spinner fa-spin"></i>
           </span>
         </div>
@@ -80,7 +84,7 @@
     </div>
     <div class="row">
       <div class="large-12 columns centered graph vm_memory_graph" style="height: 100px;">
-        <span  id="provision_dashboard_total" style="font-size:80px">
+        <span id="provision_dashboard_total" style="font-size:80px">
           <i class="fa fa-spinner fa-spin"></i>
         </span>
       </div>

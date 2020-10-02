@@ -356,6 +356,9 @@ locale = {
     "Context": "",
     "Save as in progress": "",
     "attach/detach in progress": "",
+    "Reserve an IP address": "",
+    "Release Public IP": "",
+    "Reserve Public IP": "",
     "YES": "",
     "NO": "",
     "This will detach the disk immediately": "",
@@ -763,7 +766,7 @@ locale = {
     "DAY": "",
     "WEEK": "",
     "MONTH": "",
-    "COST / TIME indicator": "",
+    "Cost for the period": "",
     "Total cost": "",
     "Public IP": "",
     "Private IP": "",
@@ -797,5 +800,7 @@ locale = {
     "Your server will be located in the data center, after which your funds will be debited!": "",
     "Work time": "",
     "Memory": "",
-    "Are you sure?": ""
+    "Are you sure?": "",
+    "Place on node": "",
+    "When paying per month - save up to 70%": ""
 }

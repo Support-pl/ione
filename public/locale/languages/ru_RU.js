@@ -357,6 +357,9 @@ locale = {
     "Disk read IOPS": "IOPS(чтение)",
     "Disk write IOPS": "IOPS(запись)",
     "Context": "Контекст",
+    "Reserve an IP address": "Зарезервировать IP адрес",
+    "Release Public IP": "Освободить публичные IP",
+    "Reserve Public IP": "Зарезервировать публичные IP",
     "Save as in progress": "Выполняется сохранение",
     "attach/detach in progress": "выполняется присоединение/отсоединение",
     "YES": "Да",
@@ -1572,7 +1575,7 @@ locale = {
     "DAY": "День",
     "WEEK": "Неделя",
     "MONTH": "Месяц",
-    "COST / TIME indicator": "Индикатор стоимость / время",
+    "Cost for the period": "Стоимость за период",
     "Total cost": "Общая стоимость",
     "Public IP": "Публичная сеть",
     "Private IP": "Локальная сеть",
@@ -1608,7 +1611,13 @@ locale = {
     "Memory": "Память",
     "Are you sure?": "Вы уверены в этом?",
     "Snapshots must be deleted first": "Снимки должны быть удалены перед восстановлением",
-    "System backup has snapshot inside, automatic recovery is not possible, contact technical support":"Резервная копия содержит снимок, автоматическое восстановление невозможно. Обратитесь в техническую поддержку.",
-    "Recovery process has begun":"Процесс восстановления запущен. Пожалуйста ожидайте."
+    "System backup has snapshot inside, automatic recovery is not possible, contact technical support": "Резервная копия содержит снимок, автоматическое восстановление невозможно. Обратитесь в техническую поддержку.",
+    "Recovery process has begun": "Процесс восстановления запущен. Пожалуйста ожидайте.",
+    "Place on node": "Разместить на узле",
+    "When paying per month - save up to 70%": "При оплате за месяц - экономия до 70%",
+    "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0": "По умолчанию «имя шаблона - <vmid>», когда пусто. При создании нескольких виртуальных машин подстановочный знак %i будет заменен числом, начинающимся с 0",
+    "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually.": "Устанавливает состояние новой виртуальной машины вместо ожидающей. Планировщик не будет развертывать виртуальные машины в этом состоянии. Это может быть выпущено позже, или развернуто вручную.",
+    "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.": "Логическое выражение, которое исключает записи из пула хранилищ данных, подходящих для запуска этой виртуальной машины.",
+    "Number of virtual cpus. This value is optional, the default hypervisor behavior is used, usually one virtual CPU.": "Количество виртуальных процессоров. Это значение не является обязательным, используется поведение гипервизора по умолчанию, обычно это один виртуальный процессор."
 
 }

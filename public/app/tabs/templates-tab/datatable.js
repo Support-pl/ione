@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -53,7 +53,7 @@ define(function(require) {
     var element = element_json[this.xmlRoot];
 
     if (element.TEMPLATE.VROUTER != undefined &&
-        element.TEMPLATE.VROUTER.toUpperCase() == "YES"){
+      element.TEMPLATE.VROUTER.toUpperCase() == "YES") {
 
       return false;
     }
@@ -68,6 +68,11 @@ define(function(require) {
   }
 
   function _postUpdateView() {
+    if (config.user_config["default_view"] == "user") {
+      $('#vm_create tr td:nth-child(1)').hide();
+      $('#vm_create tr td:nth-child(3)').hide();
+      $('#vm_create tr td:nth-child(4)').hide();
+    }
     $(".total_templates").text(this.totalTemplates);
   }
 });
