@@ -159,7 +159,7 @@ define(function (require) {
                             flag_circle = '<td class="td_key_setting" style="font-weight: bold;"><span id="setting_tree_circle"><a href="#"><i class="fa fa-arrow-circle-right"/></a></span>' +
                                 '<span id="setting_tree_key_span" style="cursor: pointer;">' + i + '</span></td>';
                             for (var j in settings_hbs[i].value) {
-                                flag_circle += '<tr class="tr_setting_' + j + '" style="display: none">' +
+                                flag_circle += '<tr class="tr_setting_' + j + '" data-parent-key="' + i + '" style="display: none">' +
                                     '<td class="td_key_setting" style="text-align: center;">' + j + '</td>' +
                                     '<td class="td_value_setting">' + settings_hbs[i].value[j] + '</td>' +
                                     '<td style="width: 60px;">' +
@@ -587,6 +587,8 @@ define(function (require) {
         });
 
         $('#settings_but_submit').click(function () {
+            console.log('Settings --> ', settings);
+            console.log('FORM settings --> ', settings_hbs);
             for (var i in settings_hbs) {
                 if (settings[i] != undefined) {
                     if (settings_hbs[i].bool_tree == true) {
@@ -610,6 +612,7 @@ define(function (require) {
                                     keys.deleted.push(j);
                                 }
                             }
+                            console.log(111, i, settings_hbs[i].value);
                             $.ajax({
                                 url: '/settings/' + i,
                                 type: 'POST',
@@ -627,6 +630,7 @@ define(function (require) {
                         }
                     } else {
                         if (settings_hbs[i].value != settings[i]) {
+                            console.log(222, i, settings_hbs[i].value);
                             $.ajax({
                                 url: '/settings/' + i,
                                 type: 'POST',
@@ -641,6 +645,7 @@ define(function (require) {
                     }
                 } else {
                     if (settings_hbs[i].bool_tree == true) {
+                        console.log(333, i, settings_hbs[i].value);
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
@@ -652,6 +657,7 @@ define(function (require) {
                         Notifier.notifySubmit('Field have been added', Object.keys(settings_hbs[i].value), i);
                         settings[i] = JSON.stringify(settings_hbs[i].value);
                     } else {
+                        console.log(444, i, settings_hbs[i].value);
                         $.ajax({
                             url: '/settings',
                             type: 'POST',
@@ -668,6 +674,7 @@ define(function (require) {
             var del_key = [];
             for (var i in settings) {
                 if (settings_hbs[i] == undefined) {
+                    console.log(555, i, settings_hbs[i].value);
                     $.ajax({
                         url: '/settings/' + i,
                         type: 'DELETE',

@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Sunstone = require('sunstone');
   var Notifier = require('utils/notifier');
   var Locale = require('utils/locale');
@@ -33,75 +33,76 @@ define(function(require) {
   var RESERVE_DIALOG_ID = require('./dialogs/reserve/dialogId');
   var IMPORT_DIALOG_ID = require('./form-panels/import/formPanelId');
   var CLUSTERS_DIALOG_ID = require('utils/dialogs/clusters/dialogId');
+  var RESERVE_VDC_DIALOG_ID = require('./dialogs/reserve_vdc/dialogId');
 
   var _commonActions = new CommonActions(OpenNebulaResource, RESOURCE, TAB_ID,
     XML_ROOT, Locale.tr("Virtual Network created"));
 
   var _actions = {
-    "Network.create" : _commonActions.create(CREATE_DIALOG_ID),
-    "Network.create_dialog" : _commonActions.showCreate(CREATE_DIALOG_ID),
-    "Network.list" : _commonActions.list(),
-    "Network.show" : _commonActions.show(),
-    "Network.refresh" : _commonActions.refresh(),
-    "Network.delete" : _commonActions.del(),
+    "Network.create": _commonActions.create(CREATE_DIALOG_ID),
+    "Network.create_dialog": _commonActions.showCreate(CREATE_DIALOG_ID),
+    "Network.list": _commonActions.list(),
+    "Network.show": _commonActions.show(),
+    "Network.refresh": _commonActions.refresh(),
+    "Network.delete": _commonActions.del(),
     "Network.hold": _commonActions.singleAction('hold'),
     "Network.release": _commonActions.singleAction('release'),
     "Network.chown": _commonActions.multipleAction('chown'),
     "Network.chgrp": _commonActions.multipleAction('chgrp'),
     "Network.chmod": _commonActions.singleAction('chmod'),
     "Network.rename": _commonActions.singleAction('rename'),
-    "Network.update" : _commonActions.update(),
-    "Network.update_template" : _commonActions.updateTemplate(),
-    "Network.append_template" : _commonActions.appendTemplate(),
-    "Network.update_dialog" : _commonActions.checkAndShowUpdate(),
-    "Network.show_to_update" : _commonActions.showUpdate(CREATE_DIALOG_ID),
+    "Network.update": _commonActions.update(),
+    "Network.update_template": _commonActions.updateTemplate(),
+    "Network.append_template": _commonActions.appendTemplate(),
+    "Network.update_dialog": _commonActions.checkAndShowUpdate(),
+    "Network.show_to_update": _commonActions.showUpdate(CREATE_DIALOG_ID),
 
-    "Network.import_dialog" : {
+    "Network.import_dialog": {
       type: "custom",
-      call: function() {
+      call: function () {
         Sunstone.showFormPanel(TAB_ID, IMPORT_DIALOG_ID, "import");
       }
     },
 
-    "Network.add_ar" : {
+    "Network.add_ar": {
       type: "single",
       call: OpenNebulaResource.add_ar,
-      callback: function(req) {
+      callback: function (req) {
         // Reset the wizard
         Sunstone.getDialog(ADD_AR_DIALOG_ID).hide();
         Sunstone.getDialog(ADD_AR_DIALOG_ID).reset();
 
-        Sunstone.runAction("Network.show",req.request.data[0]);
+        Sunstone.runAction("Network.show", req.request.data[0]);
       },
       error: Notifier.onError
     },
 
-    "Network.rm_ar" : {
+    "Network.rm_ar": {
       type: "single",
       call: OpenNebulaResource.rm_ar,
-      callback: function(req) {
+      callback: function (req) {
         OpenNebulaAction.clear_cache("VNET");
-        Sunstone.runAction("Network.show",req.request.data[0]);
+        Sunstone.runAction("Network.show", req.request.data[0]);
       },
       error: Notifier.onError
     },
 
-    "Network.update_ar" : {
+    "Network.update_ar": {
       type: "single",
       call: OpenNebulaResource.update_ar,
-      callback: function(req) {
+      callback: function (req) {
         // Reset the wizard
         Sunstone.getDialog(UPDATE_AR_DIALOG_ID).hide();
         Sunstone.getDialog(UPDATE_AR_DIALOG_ID).reset();
 
-        Sunstone.runAction("Network.show",req.request.data[0]);
+        Sunstone.runAction("Network.show", req.request.data[0]);
       },
       error: Notifier.onError
     },
 
-    "Network.reserve_dialog" : {
+    "Network.reserve_dialog": {
       type: "custom",
-      call: function() {
+      call: function () {
         var selected_nodes = Sunstone.getDataTable(TAB_ID).elements();
         if (selected_nodes.length != 1) {
           Notifier.notifyMessage("Please select one (and just one) Virtual Network.");
@@ -110,35 +111,43 @@ define(function(require) {
 
         var resource_id = "" + selected_nodes[0];
 
-        Sunstone.getDialog(RESERVE_DIALOG_ID).setParams({vnetId: resource_id});
+        Sunstone.getDialog(RESERVE_DIALOG_ID).setParams({ vnetId: resource_id });
         Sunstone.getDialog(RESERVE_DIALOG_ID).reset();
         Sunstone.getDialog(RESERVE_DIALOG_ID).show();
       }
     },
 
-    "Network.reserve" : {
+    "Network.reserve_vdc_dialog": {
+      type: "custom",
+      call: function () {
+        Sunstone.getDialog(RESERVE_VDC_DIALOG_ID).reset();
+        Sunstone.getDialog(RESERVE_VDC_DIALOG_ID).show();
+      }
+    },
+
+    "Network.reserve": {
       type: "single",
       call: OpenNebulaResource.reserve,
-      callback: function(req) {
+      callback: function (req) {
         // Reset the wizard
         Sunstone.getDialog(RESERVE_DIALOG_ID).hide();
         Sunstone.getDialog(RESERVE_DIALOG_ID).reset();
 
         OpenNebulaAction.clear_cache("VNET");
-        Sunstone.runAction("Network.show",req.request.data[0]);
+        Sunstone.runAction("Network.show", req.request.data[0]);
       },
       error: Notifier.onError
     },
 
-    "Network.addtocluster" : _commonActions.checkAndShow("clusters"),
+    "Network.addtocluster": _commonActions.checkAndShow("clusters"),
 
-    "Network.clusters" : {
+    "Network.clusters": {
       type: "single",
       call: OpenNebulaResource.show,
-      callback: function(request, response) {
+      callback: function (request, response) {
         Sunstone.getDialog(CLUSTERS_DIALOG_ID).setParams({
           element: response[XML_ROOT],
-          resource:"vnet"
+          resource: "vnet"
         });
 
         Sunstone.getDialog(CLUSTERS_DIALOG_ID).reset();

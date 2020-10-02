@@ -14,43 +14,50 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Locale = require('utils/locale');
+  var Config = require('sunstone-config');
 
   var VNetButtons = {
-    "Network.refresh" : {
+    "Network.refresh": {
       type: "action",
       layout: "refresh",
       alwaysActive: true
     },
-    "Network.create_dialog" : {
+    "Network.create_dialog": {
       type: "create_dialog",
       layout: "create"
     },
-    "Network.import_dialog" : {
+    "Network.import_dialog": {
       type: "create_dialog",
       layout: "create",
-      text:  Locale.tr("Import"),
+      text: Locale.tr("Import"),
       icon: '<i class="fa fa-download"/>',
       alwaysActive: true
     },
-    "Network.update_dialog" : {
+    "Network.update_dialog": {
       type: "action",
       layout: "main",
       text: Locale.tr("Update")
     },
-    "Network.reserve_dialog" : {
+    "Network.reserve_dialog": {
       type: "action",
       layout: "main",
       text: Locale.tr("Reserve"),
       custom_classes: "only-sunstone-info reserve-sunstone-info",
     },
-    "Network.addtocluster" : {
-      type : "action",
-      layout: "main",
-      text : Locale.tr("Select cluster")
+    "Network.reserve_vdc_dialog": {
+      type: "action",
+      text: Locale.tr("Reserve an IP address"),
+      custom_classes: "warning",
+      alwaysActive: true
     },
-    "Network.chown" : {
+    "Network.addtocluster": {
+      type: "action",
+      layout: "main",
+      text: Locale.tr("Select cluster")
+    },
+    "Network.chown": {
       type: "confirm_with_select",
       text: Locale.tr("Change owner"),
       layout: "user_select",
@@ -58,7 +65,7 @@ define(function(require) {
       tip: Locale.tr("Select the new owner")
     },
 
-    "Network.chgrp" : {
+    "Network.chgrp": {
       type: "confirm_with_select",
       text: Locale.tr("Change group"),
       layout: "user_select",
@@ -66,15 +73,17 @@ define(function(require) {
       tip: Locale.tr("Select the new group")
     },
 
-    "Network.delete" : {
+    "Network.delete": {
       type: "confirm",
       layout: "del",
       text: Locale.tr("Delete")
     },
-    "Network.edit_labels" : {
+    "Network.edit_labels": {
       layout: "labels",
     }
   };
-
+  if (config.user_config.default_view != 'cloud' && Config.isTabActionEnabled("vnets-tab", "Network.reserve_vdc_dialog") != true) {
+    delete VNetButtons["Network.reserve_vdc_dialog"];
+  }
   return VNetButtons;
 })

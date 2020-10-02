@@ -15,11 +15,11 @@
 {{! -------------------------------------------------------------------------- }}
 
 <ul class="dropdown menu divfrombalance" data-dropdown-menu data-alignment="right">
-{{#if BALANCE}}
-<li>
-<span class='balance' style='display: none;' ></span>
-</li>
-{{/if}}
+  {{#if BALANCE}}
+  <li>
+    <span class='balance' style='display: none;'></span>
+  </li>
+  {{/if}}
   {{#if filterView}}
   <li>
     <a class="thin-font" href="#" id="filter-view">
@@ -60,7 +60,7 @@
           {{#each availableViews}}
           <li>
             <a href="#" class="quickconf_view" view="{{this}}">
-              <i class="fa fa-fw"></i> 
+              <i class="fa fa-fw"></i>
               {{this}}
             </a>
           </li>
@@ -68,13 +68,15 @@
         </ul>
       </li>
       {{/if}}
+      {{#if isUser}}
       <li>
         <a href="#">
           <i class="fa fa-fw fa-users"></i>
           {{tr "Groups"}}
         </a>
-        <ul class="menu groups-menu"></ul>      
+        <ul class="menu groups-menu"></ul>
       </li>
+      {{/if}}
     </ul>
   </li>
   <li>

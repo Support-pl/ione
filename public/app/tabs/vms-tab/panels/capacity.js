@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -70,22 +70,27 @@ define(function(require) {
 
   function _html() {
     var resizeStateEnabled = StateActions.enabledStateAction("VM.resize",
-                                    this.element.STATE, this.element.LCM_STATE);
+      this.element.STATE, this.element.LCM_STATE);
 
-    var cpuCost    = this.element.TEMPLATE.CPU_COST;
+    var cpuCost = this.element.TEMPLATE.CPU_COST;
     var memoryCost = this.element.TEMPLATE.MEMORY_COST;
-
-    if (cpuCost == undefined){
+    var defUser = true;
+    if (cpuCost == undefined) {
       cpuCost = Config.onedConf.DEFAULT_COST.CPU_COST;
     }
 
-    if (memoryCost == undefined){
+    if (memoryCost == undefined) {
       memoryCost = Config.onedConf.DEFAULT_COST.MEMORY_COST;
+    }
+
+    if (config.user_config["default_view"] == "user") {
+      defUser = false;
     }
 
     return TemplateInfo({
       'element': this.element,
       'resizeStateEnabled': resizeStateEnabled,
+      'defUser': defUser,
       'cpuCost': cpuCost,
       'memoryCost': memoryCost
     });
@@ -96,7 +101,7 @@ define(function(require) {
     that.onshow = _onShow(context, that);
     if (Config.isTabActionEnabled("vms-tab", "VM.resize")) {
       context.off('click', '#resize_capacity');
-      context.on('click', '#resize_capacity', function() {
+      context.on('click', '#resize_capacity', function () {
         var dialog = Sunstone.getDialog(RESIZE_DIALOG_ID);
         dialog.setElement(that.element);
         dialog.show();
@@ -106,40 +111,40 @@ define(function(require) {
   }
 
   function _onShow(context, that) {
-   // var that = this;
+    // var that = this;
     OpenNebulaVM.monitor({
       data: {
         id: that.element.ID,
         monitor: {
-          monitor_resources : "MONITORING/CPU,TEMPLATE/CPU,MONITORING/MEMORY,TEMPLATE/MEMORY"
+          monitor_resources: "MONITORING/CPU,TEMPLATE/CPU,MONITORING/MEMORY,TEMPLATE/MEMORY"
         }
       },
-      success: function(req, response) {
+      success: function (req, response) {
         var vmGraphs = [
           {
-            monitor_resources : "TEMPLATE/CPU,MONITORING/CPU",
-            labels : Locale.tr("Allocated") + "," + Locale.tr("Real"),
-            humanize_figures : false,
-            div_graph : $(".vm_cpu_graph", context),
-            div_legend : $(".vm_cpu_legend", context)
+            monitor_resources: "TEMPLATE/CPU,MONITORING/CPU",
+            labels: Locale.tr("Allocated") + "," + Locale.tr("Real"),
+            humanize_figures: false,
+            div_graph: $(".vm_cpu_graph", context),
+            div_legend: $(".vm_cpu_legend", context)
           },
           {
-            monitor_resources : "TEMPLATE/MEMORY,MONITORING/MEMORY",
-            labels : Locale.tr("Allocated") + "," + Locale.tr("Real"),
-            humanize_figures : true,
-            div_graph : $(".vm_memory_graph", context),
-            div_legend : $(".vm_memory_legend", context)
+            monitor_resources: "TEMPLATE/MEMORY,MONITORING/MEMORY",
+            labels: Locale.tr("Allocated") + "," + Locale.tr("Real"),
+            humanize_figures: true,
+            div_graph: $(".vm_memory_graph", context),
+            div_legend: $(".vm_memory_legend", context)
           }
         ];
 
-        if(response.monitoring["TEMPLATE/CPU"] != undefined){
-          response.monitoring["TEMPLATE/CPU"].map(function(e){
+        if (response.monitoring["TEMPLATE/CPU"] != undefined) {
+          response.monitoring["TEMPLATE/CPU"].map(function (e) {
             e[1] = e[1] * 100;
           });
         }
 
-        if(response.monitoring["TEMPLATE/MEMORY"] != undefined){
-          response.monitoring["TEMPLATE/MEMORY"].map(function(e){
+        if (response.monitoring["TEMPLATE/MEMORY"] != undefined) {
+          response.monitoring["TEMPLATE/MEMORY"].map(function (e) {
             e[1] = e[1] * 1024;
           });
         }

@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
@@ -52,27 +52,35 @@ define(function(require) {
 
     this.dataTableOptions = {
       "bAutoWidth": false,
-      "bSortClasses" : false,
+      "bSortClasses": false,
       "bDeferRender": true,
       "aoColumnDefs": [
-          {"bSortable": false, "aTargets": ["check"]},
-          {"sWidth": "35px", "aTargets": [0]},
-          {"bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(tabId)},
-          {"bVisible": false, "aTargets": ['_all']},
-          {"sType": "date-euro", "aTargets": [ 5 ]},
-          {"sType": "num", "aTargets": [1]}
+        { "bSortable": false, "aTargets": ["check"] },
+        { "sWidth": "35px", "aTargets": [0] },
+        { "bVisible": true, "aTargets": SunstoneConfig.tabTableColumns(tabId) },
+        { "bVisible": false, "aTargets": ['_all'] },
+        { "sType": "date-euro", "aTargets": [5] },
+        { "sType": "num", "aTargets": [1] }
       ]
     }
 
-    this.columns = [
-      Locale.tr("ID"),
-      Locale.tr("Name"),
-      Locale.tr("Owner"),
-      Locale.tr("Group"),
-      Locale.tr("Registration time"),
-      Locale.tr("Labels"),
-      "search_data"
-    ];
+    if (config.user_config["default_view"] == "user") {
+      this.columns = [
+        Locale.tr("Name"),
+        Locale.tr("Labels"),
+      ];
+    } else {
+      this.columns = [
+        Locale.tr("ID"),
+        Locale.tr("Name"),
+        Locale.tr("Owner"),
+        Locale.tr("Group"),
+        Locale.tr("Registration time"),
+        Locale.tr("Labels"),
+        "search_data"
+      ];
+    }
+
 
     this.selectOptions = {
       "id_index": 1,
@@ -83,7 +91,7 @@ define(function(require) {
       "you_selected_multiple": Locale.tr("You selected the following Templates:"),
     };
 
-    this.conf.searchDropdownHTML = SearchDropdown({tableId: this.dataTableId});
+    this.conf.searchDropdownHTML = SearchDropdown({ tableId: this.dataTableId });
     this.searchColumn = SEARCH_COLUMN;
 
     TabDataTable.call(this);
@@ -105,25 +113,39 @@ define(function(require) {
     var element = element_json[XML_ROOT];
 
     var search = {
-      NAME:           element.NAME,
-      UNAME:          element.UNAME,
-      GNAME:          element.GNAME,
-      REGTIME_AFTER:  element.REGTIME,
+      NAME: element.NAME,
+      UNAME: element.UNAME,
+      GNAME: element.GNAME,
+      REGTIME_AFTER: element.REGTIME,
       REGTIME_BEFORE: element.REGTIME
     }
 
-    return [
+    if (config.user_config["default_view"] == "user") {
+      return [
         '<input class="check_item" type="checkbox" id="' + this.resource.toLowerCase() + '_' +
-                             element.ID + '" name="selected_items" value="' +
-                             element.ID + '"/>',
+        element.ID + '" name="selected_items" value="' +
+        element.ID + '"/>',
+        element.ID,
+        element.NAME,
+        element.UNAME,
+        element.GNAME,
+        (LabelsUtils.labelsStr(element[TEMPLATE_ATTR]) || ''),
+      ];
+    } else {
+      return [
+        '<input class="check_item" type="checkbox" id="' + this.resource.toLowerCase() + '_' +
+        element.ID + '" name="selected_items" value="' +
+        element.ID + '"/>',
         element.ID,
         element.NAME,
         element.UNAME,
         element.GNAME,
         Humanize.prettyTimeDatatable(element.REGTIME),
-        (LabelsUtils.labelsStr(element[TEMPLATE_ATTR])||''),
+        (LabelsUtils.labelsStr(element[TEMPLATE_ATTR]) || ''),
         btoa(unescape(encodeURIComponent(JSON.stringify(search))))
-    ];
+      ];
+    }
+
   }
 
   function _preUpdateView() {

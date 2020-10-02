@@ -14,12 +14,12 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   /*
     DEPENDENCIES
    */
 
-//  require('foundation.tab');
+  //  require('foundation.tab');
   var BaseFormPanel = require("utils/form-panels/form-panel");
   var Sunstone = require("sunstone");
   var Locale = require("utils/locale");
@@ -92,7 +92,7 @@ define(function(require) {
     var opts = {
       info: false,
       select: true,
-      selectOptions: {"multiple_choice": true}
+      selectOptions: { "multiple_choice": true }
     };
 
     this.securityGroupsTable = new SecurityGroupsTable("vnet_create", opts);
@@ -105,7 +105,7 @@ define(function(require) {
   }
 
   function _htmlAdvanced() {
-    return TemplateAdvancedHTML({formPanelId: this.formPanelId});
+    return TemplateAdvancedHTML({ formPanelId: this.formPanelId });
   }
 
   function _setup(context) {
@@ -115,31 +115,31 @@ define(function(require) {
     var number_of_ar = 0;
 
     // add new ar tabs
-    $("#vnet_wizard_ar_btn", context).bind("click", function() {
+    $("#vnet_wizard_ar_btn", context).bind("click", function () {
       that.addARTab(number_of_ar, context);
       number_of_ar++;
       var mode = $("#network_mode", context).val();
-      if (mode == "vcenter"){
+      if (mode == "vcenter") {
         $(".sec_groups_datatable", context).hide();
       }
       return false;
     });
 
-    $('#private_ip_div').click(function() {
-      if ($('#input_private_ip').val() == 'on'){
-        $('#input_public_ip').prop('checked',false);
+    $('#private_ip_div').click(function () {
+      if ($('#input_private_ip').val() == 'on') {
+        $('#input_public_ip').prop('checked', false);
       }
     });
 
-    $('#public_ip_div').click(function() {
-      if ($('#input_public_ip').val() == 'on'){
-        $('#input_private_ip').prop('checked',false);
+    $('#public_ip_div').click(function () {
+      if ($('#input_public_ip').val() == 'on') {
+        $('#input_private_ip').prop('checked', false);
       }
     });
 
     $("#vnetCreateARTab #vnetCreateARTabUpdate", context).hide();
 
-    $("#network_mode", context).change(function() {
+    $("#network_mode", context).change(function () {
       $("div.mode_param", context).hide();
       $("div.mode_param [wizard_field]", context).prop("wizard_field_disabled", true);
 
@@ -153,9 +153,9 @@ define(function(require) {
       $('#vnetCreateContextTab-label').show();
       $('#vnetCreateARTab-label').show();
 
-      if ($(this).val() == 'azure'){
+      if ($(this).val() == 'azure') {
         $('#vnetCreateBridgeTab .row').eq(0).hide();
-      }else{
+      } else {
         $('#bridge').val('');
         $('#vnetCreateBridgeTab .row').eq(0).show();
       }
@@ -171,19 +171,23 @@ define(function(require) {
           $('#vnetCreateARTab-label').hide();
           $('#ar0_size').val('1231');
           $('#ar0_ip_start').val('1231');
-          
+
           var azure_group_id;
-          Settings.cloud({success:function(r, res) {
+          Settings.cloud({
+            success: function (r, res) {
               azure_group_id = r.response.AZURE_GROUP_ID;
-              OpenNebula.User.list({success: function(r,res){
-                for(var i in res){
-                  var groups = res[i].USER.GROUPS.ID;
-                  if (typeof(groups) == 'object' && groups.indexOf(azure_group_id) != -1 && groups.indexOf('0') != -1){
-                    $('datalist#vars_resource_group').append('<option value="one-'+res[i].USER.ID+'-'+res[i].USER.NAME+'">');
+              OpenNebula.User.list({
+                success: function (r, res) {
+                  for (var i in res) {
+                    var groups = res[i].USER.GROUPS.ID;
+                    if (typeof (groups) == 'object' && groups.indexOf(azure_group_id) != -1 && groups.indexOf('0') != -1) {
+                      $('datalist#vars_resource_group').append('<option value="one-' + res[i].USER.ID + '-' + res[i].USER.NAME + '">');
+                    }
                   }
                 }
-              }});
-          }});
+              });
+            }
+          });
 
           ResourceSelect.insert({
             context: $("#vcenter_cluster_id", context),
@@ -193,89 +197,89 @@ define(function(require) {
             filterKey: "VM_MAD",
             filterValue: "azure",
             required: true,
-            callback: function(element){
+            callback: function (element) {
               element.attr("wizard_field", "VCENTER_ONE_HOST_ID");
             }
           });
 
           break;
-      case "dummy":
-        $("div.mode_param.dummy", context).show();
-        $("div.mode_param.dummy [wizard_field]", context).prop("wizard_field_disabled", false);
+        case "dummy":
+          $("div.mode_param.dummy", context).show();
+          $("div.mode_param.dummy [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).attr("required", "");
-        break;
-      case "fw":
-        $("div.mode_param.fw", context).show();
-        $("div.mode_param.fw [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).attr("required", "");
+          break;
+        case "fw":
+          $("div.mode_param.fw", context).show();
+          $("div.mode_param.fw [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).attr("required", "");
-        break;
-      case "802.1Q":
-        $("div.mode_param.8021Q", context).show();
-        $("div.mode_param.8021Q [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).attr("required", "");
+          break;
+        case "802.1Q":
+          $("div.mode_param.8021Q", context).show();
+          $("div.mode_param.8021Q [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).removeAttr("required");
-        break;
-      case "vxlan":
-        $("div.mode_param.vxlan", context).show();
-        $("div.mode_param.vxlan [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).removeAttr("required");
+          break;
+        case "vxlan":
+          $("div.mode_param.vxlan", context).show();
+          $("div.mode_param.vxlan [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).removeAttr("required");
-        break;
-      case "ebtables":
-        $("div.mode_param.ebtables", context).show();
-        $("div.mode_param.ebtables [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).removeAttr("required");
+          break;
+        case "ebtables":
+          $("div.mode_param.ebtables", context).show();
+          $("div.mode_param.ebtables [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).attr("required", "");
-        break;
-      case "ovswitch":
-        $("div.mode_param.ovswitch", context).show();
-        $("#vnetCreateSecurityTab-label").hide();
-        $("div.mode_param.ovswitch [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).attr("required", "");
+          break;
+        case "ovswitch":
+          $("div.mode_param.ovswitch", context).show();
+          $("#vnetCreateSecurityTab-label").hide();
+          $("div.mode_param.ovswitch [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).attr("required", "");
-        break;
-      case "vcenter":
-        $("div.mode_param.vcenter", context).show();
-        $(".sec_groups_datatable", context).hide();
-        $("div.mode_param.vcenter [wizard_field]", context).prop("wizard_field_disabled", false);
-        $("input#bridge", context).attr("value", $("#name", context).val());
-        $("#vcenter_switch_name", context).attr("required", "");
-        $("#vnetCreateSecurityTab-label").hide();
-        ResourceSelect.insert({
-          context: $("#vcenter_cluster_id", context),
-          resourceName: "Host",
-          emptyValue: true,
-          nameValues: false,
-          filterKey: "VM_MAD",
-          filterValue: "vcenter",
-          required: true,
-          callback: function(element){
-            element.attr("wizard_field", "VCENTER_ONE_HOST_ID");
-          }
-        });
+          $("input#bridge", context).attr("required", "");
+          break;
+        case "vcenter":
+          $("div.mode_param.vcenter", context).show();
+          $(".sec_groups_datatable", context).hide();
+          $("div.mode_param.vcenter [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("input#bridge", context).attr("value", $("#name", context).val());
+          $("#vcenter_switch_name", context).attr("required", "");
+          $("#vnetCreateSecurityTab-label").hide();
+          ResourceSelect.insert({
+            context: $("#vcenter_cluster_id", context),
+            resourceName: "Host",
+            emptyValue: true,
+            nameValues: false,
+            filterKey: "VM_MAD",
+            filterValue: "vcenter",
+            required: true,
+            callback: function (element) {
+              element.attr("wizard_field", "VCENTER_ONE_HOST_ID");
+            }
+          });
 
-        $("input#vn_mad", context).attr("required", "");
-        $("input#vn_mad", context).attr("value", "vcenter");
+          $("input#vn_mad", context).attr("required", "");
+          $("input#vn_mad", context).attr("value", "vcenter");
 
-        $("#div_vn_mad", context).hide();
-        break;
-      case "custom":
-        $("div.mode_param.custom", context).show();
-        $("div.mode_param.custom [wizard_field]", context).prop("wizard_field_disabled", false);
+          $("#div_vn_mad", context).hide();
+          break;
+        case "custom":
+          $("div.mode_param.custom", context).show();
+          $("div.mode_param.custom [wizard_field]", context).prop("wizard_field_disabled", false);
 
-        $("input#bridge", context).removeAttr("required");
-        $("input#vn_mad", context).attr("required", "");
-        break;
+          $("input#bridge", context).removeAttr("required");
+          $("input#vn_mad", context).attr("required", "");
+          break;
       }
 
       $("div.network_mode_description").hide();
       $("div.network_mode_description[value=\"" + $(this).val() + "\"]").show();
     });
 
-    $("select[wizard_field=AUTOMATIC_VLAN_ID]", context).change(function(){
-      if($(this).val() != "") {
+    $("select[wizard_field=AUTOMATIC_VLAN_ID]", context).change(function () {
+      if ($(this).val() != "") {
         $("input[wizard_field=\"VLAN_ID\"]", context).hide().prop("wizard_field_disabled", true);
       } else {
         $("input[wizard_field=\"VLAN_ID\"]", context).show().prop("wizard_field_disabled", false);
@@ -301,21 +305,21 @@ define(function(require) {
 
   function _add_ar_tab(ar_id, context) {
     var that = this;
-    var str_ar_tab_id  = "ar" + ar_id;
+    var str_ar_tab_id = "ar" + ar_id;
 
     var ar_tab = new ArTab();
     this.arTabObjects[ar_id] = ar_tab;
 
     var html_tab_content =
       "<div id=\"" + str_ar_tab_id + "Tab\" class=\"ar_tab tabs-panel\" ar_id=\"" + ar_id + "\">" +
-        ar_tab.html(str_ar_tab_id) +
+      ar_tab.html(str_ar_tab_id) +
       "</div>";
 
     // Append the new div containing the tab and add the tab to the list
     var a = $("<li class='tabs-title'>" +
-        "<a id='ar_tab" + str_ar_tab_id + "' href='#" + str_ar_tab_id + "Tab'>" +
-        Locale.tr("Address Range") + " <i class='fa fa-times-circle remove-tab'></i></a></li>"
-      ).appendTo($("ul#vnet_wizard_ar_tabs", context));
+      "<a id='ar_tab" + str_ar_tab_id + "' href='#" + str_ar_tab_id + "Tab'>" +
+      Locale.tr("Address Range") + " <i class='fa fa-times-circle remove-tab'></i></a></li>"
+    ).appendTo($("ul#vnet_wizard_ar_tabs", context));
 
     $(html_tab_content).appendTo($("#vnet_wizard_ar_tabs_content", context));
 
@@ -328,7 +332,7 @@ define(function(require) {
 
 
     // close icon: removing the tab on click
-    a.on("click", "i.remove-tab", function() {
+    a.on("click", "i.remove-tab", function () {
       var target = $(this).parent().attr("href");
       var li = $(this).closest("li");
       var ul = $(this).closest("ul");
@@ -379,29 +383,29 @@ define(function(require) {
           network_json["AR"].push(hash);
         }
       });
-    }else{
+    } else {
       $.extend(network_json, WizardFields.retrieve($("#vnetCreateGeneralTab", context)));
       $.extend(network_json, WizardFields.retrieve($("#vnetCreateBridgeTab", context)));
       network_json['AZURE_HOST_ID'] = network_json.VCENTER_ONE_HOST_ID;
       delete network_json.VCENTER_ONE_HOST_ID;
-      if ($('#azure_resource_group').val() != ''){
+      if ($('#azure_resource_group').val() != '') {
         network_json['RESOURCE_GROUP'] = $('#azure_resource_group').val();
       }
-      if ($('#input_public_ip').prop('checked') == true){
+      if ($('#input_public_ip').prop('checked') == true) {
         network_json['NETWORK_TYPE'] = 'PUBLIC';
-      }else if ($('#input_private_ip').prop('checked') == true){
+      } else if ($('#input_private_ip').prop('checked') == true) {
         network_json['NETWORK_TYPE'] = 'PRIVATE';
-      }else{
+      } else {
         Notifier.notifyError('Select Network type')
         return false;
       }
-      network_json.LOCATION="West Europe"
+      network_json.LOCATION = "West Europe"
     }
 
     console.log(this.action, network_json);
     if (this.action == "create") {
       network_json = {
-        "vnet" : network_json
+        "vnet": network_json
       };
 
       Sunstone.runAction("Network.create", network_json);
@@ -415,7 +419,7 @@ define(function(require) {
   function _submitAdvanced(context) {
     if (this.action == "create") {
       var template = $("textarea#template", context).val();
-      var vnet_json = {vnet: {vnet_raw: template}};
+      var vnet_json = { vnet: { vnet_raw: template } };
       Sunstone.runAction("Network.create", vnet_json);
       return false;
 
@@ -430,15 +434,14 @@ define(function(require) {
     var that = this;
 
     this.securityGroupsTable.refreshResourceTableSelect();
-
-    $(".ar_tab", context).each(function() {
+    $(".ar_tab", context).each(function () {
       var ar_id = $(this).attr("ar_id");
       that.arTabObjects[ar_id].onShow();
     });
   }
 
   function _fill(context, element) {
-    if (this.action != "update") {return;}
+    if (this.action != "update") { return; }
     this.setHeader(element);
     this.resourceId = element.ID;
 
@@ -457,12 +460,12 @@ define(function(require) {
 
     WizardFields.fillInput($("input#vn_mad", context), element.TEMPLATE["VN_MAD"]);
 
-    if (element.VLAN_ID_AUTOMATIC == 1){
+    if (element.VLAN_ID_AUTOMATIC == 1) {
       $("select[wizard_field=AUTOMATIC_VLAN_ID]", context).val("YES").
-                                attr("disabled", "disabled").trigger("change");
+        attr("disabled", "disabled").trigger("change");
     } else {
       $("select[wizard_field=AUTOMATIC_VLAN_ID]", context).val("").
-                                attr("disabled", "disabled").trigger("change");
+        attr("disabled", "disabled").trigger("change");
     }
 
     WizardFields.fill($("#vnetCreateGeneralTab", context), element.TEMPLATE);
@@ -470,16 +473,16 @@ define(function(require) {
     WizardFields.fill($("#vnetCreateQoSTab", context), element.TEMPLATE);
     WizardFields.fill($("#vnetCreateContextTab", context), element.TEMPLATE);
 
-    if ($("#network_mode", context).val() == undefined){
+    if ($("#network_mode", context).val() == undefined) {
       $("#network_mode", context).val("custom").change();
     }
 
     if (element.TEMPLATE["SECURITY_GROUPS"] != undefined &&
-        element.TEMPLATE["SECURITY_GROUPS"].length != 0) {
+      element.TEMPLATE["SECURITY_GROUPS"].length != 0) {
 
       var secgroups = element.TEMPLATE["SECURITY_GROUPS"].split(",");
 
-      this.securityGroupsTable.selectResourceTableSelect({ids : secgroups});
+      this.securityGroupsTable.selectResourceTableSelect({ ids: secgroups });
     } else {
       this.securityGroupsTable.refreshResourceTableSelect();
     }
@@ -489,7 +492,7 @@ define(function(require) {
 
     var fields = $("[wizard_field]", context);
 
-    fields.each(function() {
+    fields.each(function () {
       var field = $(this);
       var field_name = field.attr("wizard_field");
 

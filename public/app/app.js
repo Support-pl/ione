@@ -99,7 +99,9 @@ define(function (require) {
 
     this.idGroup = -2; /*All*/
     Config.changeFilter(false);
+    // console.log('Config', config.user_config.default_view);
     if (config.user_config.default_view == 'user') {
+
       var text;
       OpenNebula.User.show({
         data: { 'id': config.user_id }, success: function (a, b) {
@@ -193,7 +195,8 @@ define(function (require) {
       displayName: config['display_name'],
       settingsTabEnabled: Config.isTabEnabled(SETTINGS_TAB_ID),
       availableViews: config['available_views'],
-      zoneName: config['zone_name']
+      zoneName: config['zone_name'],
+      isUser: config.user_config.default_view != 'user'
     })).foundation();
 
     $('#filter-view').hide();

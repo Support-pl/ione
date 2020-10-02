@@ -22,7 +22,10 @@ define(function (require) {
   var ResourceSelect = require("utils/resource-select");
   var Settings = require("opennebula/settings");
   var Tips = require("utils/tips");
-  var lists_month;
+
+  var showbackList = require("./showback/showbackList")
+
+  var reqLists;
   var Colors = {};
   var select_labels = {
     cost: true,
@@ -95,7 +98,7 @@ define(function (require) {
         aTargets: [4]
       },
       {
-        aDataSort: [2],
+        aDataSort: [0],
         aTargets: [3]
       }
       ]
@@ -110,15 +113,15 @@ define(function (require) {
       var year = cells[1];
       var month = cells[2];
 
-      var vms = update_table_template(month);
-      if (lists_month[month].total.cost > 0) {
-        create_diagram(getDataset(month), month);
+      if (showbackList.list[year][month]['MonthTotal']['cost'] > 0) {
+        create_diagram(getDataset(year, month), year, month);
         $("#test_table_graph").show();
         $('#show_all_vms').show();
         $('#test_table_graph_legend p[data-percent="0.00"]').hide();
         $("#test_table_graph_legend").show();
       }
 
+      update_table_template(year, month)
       test_dataTable = $("#test_datatable", context).dataTable({
         scrollX: true,
         scrollCollapse: true,
@@ -153,30 +156,33 @@ define(function (require) {
         function () {
           if (getSelectLabel(this)) {
             test_dataTable.fnClearTable();
-            test_dataTable.fnAddData(getShowback(month, vms));
+            let showback = getShowback(year, month)
+            console.log('showback table data', showback)
+            test_dataTable.fnAddData(showback);
             test_dataTable2.fnClearTable();
-            test_dataTable2.fnAddData(getShowback(month, vms));
+            test_dataTable2.fnAddData(showback);
             ////////
-            var total = 0;
-            var num = 1;
-            for (var j in vms) {
-              var sum = 0;
-              for (var l in select_labels) {
+            let num = 0;
+            let sum = 0;
+            for (let vmId in showbackList.list[year][month]['VMsMonthTotal']) {
+              sum = 0
+              for (let l in select_labels) {
                 if (select_labels[l]) {
-                  sum += vms[j][l];
-                  total += vms[j][l];
+                  sum += showbackList.list[year][month]['VMsMonthTotal'][vmId][l];
                 }
               }
-              $("tr#tr_total:eq(1)")
-                .find("td")
-                .eq(num)
-                .text(sum.toFixed(2));
+
+              console.log('summa', sum);
+              $("#test_datatable #tr_total td").eq(num).text(isNaN(sum) ? 0.00 : sum.toFixed(2));
               num++;
             }
-            $("tr#tr_total:eq(1)")
-              .find("td")
-              .eq(num)
-              .text(total.toFixed(2));
+            let total = 0
+            for (let label in select_labels) {
+              if (select_labels[label]) {
+                total += showbackList.list[year][month]['MonthTotal'][label];
+              }
+            }
+            $("#test_datatable #tr_total td").eq(num).text(total.toFixed(2));
             ////////
 
             $('#test_datatable tbody tr').hover(function () {
@@ -225,7 +231,7 @@ define(function (require) {
             $(second_row).removeClass('Shown').next('tr').remove();
             $(second_row).find("td").eq(0).text(day);
           } else {
-            $(this).addClass("Shown").after(more_info(month, day, vms));
+            $(this).addClass("Shown").after(more_info(year, month, day));
             $(this).next("tr").show(500);
 
             $(second_row).addClass("Shown").find("td").eq(0).text(day + " " + getWeekDay(new Date(2019, month - 1, day)));
@@ -253,7 +259,7 @@ define(function (require) {
             $(this).after("<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>");
             $(this).next("tr").show(500);
 
-            $(second_row).addClass("Shown").after(more_info(month, day, vms));
+            $(second_row).addClass("Shown").after(more_info(year, month, day));
             $(second_row).next("tr").show(500);
           }
         }
@@ -261,7 +267,8 @@ define(function (require) {
 
       test_dataTable.fnClearTable();
       $(".test_table").show();
-      test_dataTable.fnAddData(getShowback(month, vms));
+      let showback = getShowback(year, month)
+      test_dataTable.fnAddData(showback);
 
       test_dataTable.$("tr").css("border-top", "1px solid lightgray");
 
@@ -270,7 +277,7 @@ define(function (require) {
       ]);
 
       test_dataTable2.fnClearTable();
-      test_dataTable2.fnAddData(getShowback(month, vms));
+      test_dataTable2.fnAddData(showback);
 
       $('#test_datatable tbody tr').hover(function () {
         let indx = $('#test_datatable tbody tr').index($(this));
@@ -323,13 +330,16 @@ define(function (require) {
       etime: edate,
       group_by_day: true,
       success: function (req, res) {
-        lists = req.response;
-        lists_month = create_list_months(lists);
+        console.log('Get showback ->', req, res)
+        reqLists = req.response.computing;
+        // lists_month = create_list_months(lists);
+        showbackList.create_list_months(reqLists);
         //console.log(666, req.response);
         _fillShowback(context);
       }
     };
-    Settings.showback(param);
+    Settings.showbackV2(param);
+    // Settings.showback(param);
 
     Tips.setup(context);
 
@@ -343,18 +353,23 @@ define(function (require) {
     showback_dataTable.fnClearTable();
 
     var series = [];
-    for (var i in lists_month) {
-      series.push([
-        123,
-        "2019",
-        i,
-        Locale.months[i - 1] + " 2019",
-        lists_month[i].total.cost.toFixed(2)
-      ]);
-      showback_data.push([
-        new Date(2019, i - 1),
-        lists_month[i].total.cost.toFixed(2)
-      ]);
+    for (let [year, valueY] of Object.entries(showbackList.list)) {
+      for (let [month, valueM] of Object.entries(valueY)) {
+        // console.log(month, valueM);
+        if (valueM.MonthTotal.cost) {
+          series.push([
+            year + month,
+            year,
+            month,
+            Locale.months[month - 1] + " " + year,
+            valueM.MonthTotal.cost.toFixed(2)
+          ]);
+          showback_data.push([
+            new Date(year, month - 1),
+            valueM.MonthTotal.cost.toFixed(2)
+          ]);
+        }
+      }
     }
 
     if (series.length > 0) {
@@ -421,137 +436,9 @@ define(function (require) {
     $("#showback_placeholder", context).hide();
     $("#showback_content", context).show();
   }
+  //////////////////////////////////////////////////////////
 
-  function days_month(year, month) {
-    return 32 - new Date(year, month - 1, 32).getDate();
-  }
-
-  function create_list_months(lists) {
-    var list_months = {};
-
-    for (var i in lists) {
-      //if (lists[i].TOTAL > 0){
-      for (var j in lists[i].showback) {
-        var day = lists[i].showback[j].date.split("/")[0] * 1;
-        var month = lists[i].showback[j].date.split("/")[1] * 1;
-
-        var cost = lists[i].showback[j].TOTAL * 1;
-        var cpu = lists[i].showback[j].CPU * 1;
-        var disk = lists[i].showback[j].DISK * 1;
-        var memor = lists[i].showback[j].MEMORY * 1;
-        var pub_ip = lists[i].showback[j].PUBLIC_IP * 1;
-        var work_time = lists[i].showback[j].work_time * 1;
-
-        if (list_months[month] == undefined) {
-          list_months[month] = {};
-          list_months[month][day] = {};
-          list_months[month][day][i] = {
-            cost: cost,
-            cpu: cpu,
-            disk: disk,
-            memory: memor,
-            pub_ip: pub_ip,
-            work_time: work_time
-          };
-        } else {
-          if (list_months[month][day] == undefined) {
-            list_months[month][day] = {};
-            list_months[month][day][i] = {
-              cost: cost,
-              cpu: cpu,
-              disk: disk,
-              memory: memor,
-              pub_ip: pub_ip,
-              work_time: work_time
-            };
-          } else {
-            list_months[month][day][i] = {
-              cost: cost,
-              cpu: cpu,
-              disk: disk,
-              memory: memor,
-              pub_ip: pub_ip,
-              work_time: work_time
-            };
-          }
-        }
-
-        if (list_months[month][day]["day_total"] == undefined) {
-          list_months[month][day]["day_total"] = {
-            cost: cost,
-            cpu: cpu,
-            disk: disk,
-            memory: memor,
-            pub_ip: pub_ip,
-            work_time: work_time
-          };
-        } else {
-          list_months[month][day]["day_total"]["cost"] += cost;
-          list_months[month][day]["day_total"]["cpu"] += cpu;
-          list_months[month][day]["day_total"]["disk"] += disk;
-          list_months[month][day]["day_total"]["memory"] += memor;
-          list_months[month][day]["day_total"]["pub_ip"] += pub_ip;
-          list_months[month][day]["day_total"]["work_time"] += work_time;
-        }
-
-        if (list_months[month]["total"] == undefined) {
-          list_months[month]["total"] = {
-            cost: cost,
-            cpu: cpu,
-            disk: disk,
-            memory: memor,
-            pub_ip: pub_ip,
-            work_time: work_time
-          };
-        } else {
-          list_months[month]["total"]["cost"] += cost;
-          list_months[month]["total"]["cpu"] += cpu;
-          list_months[month]["total"]["disk"] += disk;
-          list_months[month]["total"]["memory"] += memor;
-          list_months[month]["total"]["pub_ip"] += pub_ip;
-          list_months[month]["total"]["work_time"] += work_time;
-        }
-
-        if (list_months[month]["vms"] == undefined) {
-          list_months[month]["vms"] = {};
-          list_months[month]["vms"][i] = {
-            name: lists[i].name,
-            cost: cost,
-            cpu: cpu,
-            disk: disk,
-            memory: memor,
-            pub_ip: pub_ip,
-            work_time: work_time
-          };
-        } else {
-          if (list_months[month]["vms"][i] == undefined) {
-            list_months[month]["vms"][i] = {
-              name: lists[i].name,
-              cost: cost,
-              cpu: cpu,
-              disk: disk,
-              memory: memor,
-              pub_ip: pub_ip,
-              work_time: work_time
-            };
-          } else {
-            list_months[month]["vms"][i]["cost"] += cost;
-            list_months[month]["vms"][i]["cpu"] += cpu;
-            list_months[month]["vms"][i]["disk"] += disk;
-            list_months[month]["vms"][i]["memory"] += memor;
-            list_months[month]["vms"][i]["pub_ip"] += pub_ip;
-            list_months[month]["vms"][i]["work_time"] += work_time;
-          }
-        }
-      }
-      // }
-    }
-
-    //console.log(111, list_months);
-    return list_months;
-  }
-
-  function update_table_template(month) {
+  function update_table_template(year, month) {
     $(".test_table").hide();
     $("#test_datatable_wrapper").remove();
     $("#test_datatable2_wrapper").remove();
@@ -563,30 +450,28 @@ define(function (require) {
     $("#div_test_datatable2").append(
       '<table id="test_datatable2" class="hover"><thead><tr><th>DAY</th></tr></thead><tbody></tbody><tfoot></tfoot></table>'
     );
-    var months_days = days_month(2019, month);
-    var vms = {};
+    // var months_days = days_month(2019, month);
+    // var vms = {};
 
     $("#test_datatable thead tr").append("<th>" + Locale.tr("DAY") + "</th>");
-    for (var i in lists_month[month]["vms"]) {
+
+    for (let vmId in showbackList.list[year][month]["VMsMonthTotal"]) {
       $("#test_datatable thead tr").append(
-        "<th>" + lists_month[month]["vms"][i].name + "</th>"
+        "<th>" + reqLists[vmId].name + "</th>"
       );
-      vms[i] = lists_month[month]["vms"][i];
+
+      $("#test_datatable #tr_total").append(
+        "<td>" + showbackList.list[year][month]["VMsMonthTotal"][vmId]["cost"].toFixed(2) + "</td>"
+      );
+      // vms[i] = showbackList[year][month]["VMsMonthTotal"][vmId];
     }
+
     $("#test_datatable thead tr").append("<th>" + Locale.tr("Total") + "</th>");
 
     $("#test_datatable #tr_total").append(
-      "<td>" + Locale.tr("Total") + "</td>"
+      "<td>" + showbackList.list[year][month]["MonthTotal"]['cost'].toFixed(2) + "</td>"
     );
-    for (var j in vms) {
-      $("#test_datatable #tr_total").append(
-        "<td>" + vms[j]["cost"].toFixed(2) + "</td>"
-      );
-    }
-    $("#test_datatable #tr_total").append(
-      "<td>" + lists_month[month]["total"].cost.toFixed(2) + "</td>"
-    );
-    return vms;
+    // return showbackList[year][month]["VMsMonthTotal"];
   }
 
   function check_data(data) {
@@ -597,22 +482,22 @@ define(function (require) {
     }
   }
 
-  function more_info(month, day, vms) {
+  function more_info(year, month, day) {
     var more_tr = '<tr hidden>';
     // "<tr hidden><td>CPU<br>Disk<br>Memory<br>Public ip<br>Time</td>";
-    for (var i in vms) {
-      if (lists_month[month][day][i] != undefined) {
+    for (var vmId in showbackList.list[year][month]['VMsMonthTotal']) {
+      if (showbackList.list[year][month][day][vmId]) {
         more_tr +=
           "<td>" +
-          check_data(lists_month[month][day][i].cpu) +
+          check_data(showbackList.list[year][month][day][vmId].cpu) +
           "<br>" +
-          check_data(lists_month[month][day][i].disk) +
+          check_data(showbackList.list[year][month][day][vmId].disk) +
           "<br>" +
-          check_data(lists_month[month][day][i].memory) +
+          check_data(showbackList.list[year][month][day][vmId].memory) +
           "<br>" +
-          check_data(lists_month[month][day][i].pub_ip) +
+          check_data(showbackList.list[year][month][day][vmId].pub_ip) +
           "<br>" +
-          check_data(lists_month[month][day][i].work_time) +
+          check_data(showbackList.list[year][month][day][vmId].work_time) +
           "</td>";
       } else {
         more_tr += "<td></td>";
@@ -620,15 +505,15 @@ define(function (require) {
     }
     more_tr +=
       "<td>" +
-      check_data(lists_month[month][day]["day_total"].cpu) +
+      check_data(showbackList.list[year][month][day]["DayTotal"].cpu) +
       "<br>" +
-      check_data(lists_month[month][day]["day_total"].disk) +
+      check_data(showbackList.list[year][month][day]["DayTotal"].disk) +
       "<br>" +
-      check_data(lists_month[month][day]["day_total"].memory) +
+      check_data(showbackList.list[year][month][day]["DayTotal"].memory) +
       "<br>" +
-      check_data(lists_month[month][day]["day_total"].pub_ip) +
+      check_data(showbackList.list[year][month][day]["DayTotal"].pub_ip) +
       "<br>" +
-      check_data(lists_month[month][day]["day_total"].work_time) +
+      check_data(showbackList.list[year][month][day]["DayTotal"].work_time) +
       "</td></tr>";
     return more_tr;
   }
@@ -646,17 +531,20 @@ define(function (require) {
     return days[date.getDay()];
   }
 
-  function getShowback(month, vms) {
+  function getShowback(year, month) {
     var showback = [];
-    for (var i in lists_month[month]) {
-      if (!isNaN(i)) {
-        var pole = [i];
-        for (var j in vms) {
-          if (lists_month[month][i][j] != undefined) {
-            var sum = 0;
-            for (var l in select_labels) {
-              if (select_labels[l] == true && lists_month[month][i][j][l] > 0) {
-                sum += lists_month[month][i][j][l];
+    let pole = [];
+    let sum = 0;
+    for (let day in showbackList.list[year][month]) {
+      if (!isNaN(day)) {
+        pole = [day];
+        for (let vmId in showbackList.list[year][month]['VMsMonthTotal']) {
+          if (showbackList.list[year][month][day][vmId]) {
+            sum = 0;
+            for (let l in select_labels) {
+              // console.log(year, month, day, vmId, l, '--->', showbackList.list[year][month][day][vmId][l])
+              if (select_labels[l] == true && showbackList.list[year][month][day][vmId][l] > 0) {
+                sum += showbackList.list[year][month][day][vmId][l];
               }
             }
             if (sum > 0) {
@@ -672,9 +560,9 @@ define(function (require) {
         for (var l in select_labels) {
           if (
             select_labels[l] == true &&
-            lists_month[month][i]["day_total"][l] > 0
+            showbackList.list[year][month][day]["DayTotal"][l] > 0
           ) {
-            sum += lists_month[month][i]["day_total"][l];
+            sum += showbackList.list[year][month][day]["DayTotal"][l];
           }
         }
         if (sum > 0) {
@@ -685,7 +573,6 @@ define(function (require) {
         showback.push(pole);
       }
     }
-    //console.log(showback);
     return showback;
   }
 
@@ -758,18 +645,18 @@ define(function (require) {
     }
   }
 
-  function getDataset(month) {
-    var total = lists_month[month].total.cost;
+  function getDataset(year, month) {
+    var total = showbackList.list[year][month]['MonthTotal']['cost'];
     var legend_arr = [];
     var dataset = [];
     var kk = 0;
     $("#test_table_graph_legend").text("");
-    for (let i in lists_month[month].vms) {
-      var percent = (100 / (total / lists_month[month].vms[i].cost)).toFixed(2);
+    for (let vmId in showbackList.list[year][month]['VMsMonthTotal']) {
+      var percent = (100 / (total / showbackList.list[year][month]['VMsMonthTotal'][vmId]['cost'])).toFixed(2);
       legend_arr.push({
         val_percent: percent,
-        vmsId: i,
-        label: i + " - " + lists_month[month].vms[i].name
+        vmsId: vmId,
+        label: vmId + " - " + reqLists[vmId].name
       });
     }
     legend_arr.sort(function (a, b) {
@@ -798,7 +685,7 @@ define(function (require) {
     return dataset;
   }
 
-  function create_diagram(dataset, month) {
+  function create_diagram(dataset, year, month) {
     var maxValue = 25;
     $("#test_table_graph").text("");
     var container = $("#test_table_graph");
@@ -858,10 +745,11 @@ define(function (require) {
       let legend_vm = $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').css('width', '100%').html();
       let info_field_name = { 'Total': 'cost', 'CPU': 'cpu', 'Memory': 'memory', 'Disk': 'disk', 'Public IP': 'pub_ip', 'Work time': 'work_time' };
       let full_info_vm = '<span>';
+      // console.log(showbackList.list[year][month]['VMsMonthTotal'][vmsid]);
       for (let i in info_field_name) {
-        if (!isNaN(lists_month[month].vms[vmsid][info_field_name[i]])) {
-          full_info_vm += '<br>' + i + ': ' + lists_month[month].vms[vmsid][info_field_name[i]].toFixed(2);
-        }
+        // console.log(info_field_name[i])
+        full_info_vm += '<br>' + i + ': ' + showbackList.list[year][month]['VMsMonthTotal'][vmsid][info_field_name[i]].toFixed(2);
+
       }
       full_info_vm += '</span>';
       $('#test_table_graph_legend p[data-vmsid="' + vmsid + '"]').html(legend_vm + full_info_vm);

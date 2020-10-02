@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require){
+define(function (require) {
     var OpenNebulaAction = require('./action');
     var Config = require('sunstone-config');
     var Notifier = require('utils/notifier');
@@ -22,7 +22,7 @@ define(function(require){
 
     var Settings = {
         "resource": RESOURCE,
-        "showback" : function(params) {
+        "showback": function (params) {
             var callback = params.success;
             var data = JSON.stringify(params);
 
@@ -30,22 +30,36 @@ define(function(require){
                 url: '/ione_showback',
                 type: 'POST',
                 data: data,
-                success: function(req, res){
+                success: function (req, res) {
                     return callback ? callback(req, res) : null;
                 },
-                error: function(req, res){ Notifier.notifyError(req) }
+                error: function (req, res) { Notifier.notifyError(req) }
             });
         },
-        "cloud" : function(params) {
+        'showbackV2': function (params) {
+            var callback = params.success;
+            var data = JSON.stringify(params);
+
+            $.ajax({
+                url: '/ione_showback/v2',
+                type: 'POST',
+                data: data,
+                success: function (req, res) {
+                    return callback ? callback(req, res) : null;
+                },
+                error: function (req, res) { console.log('ERROR showbackV2->', req, res); Notifier.notifyError(req) }
+            });
+        },
+        "cloud": function (params) {
             var callback = params.success;
 
             $.ajax({
                 url: 'settings',
                 type: 'GET',
-                success: function(req, res){
+                success: function (req, res) {
                     return callback ? callback(req, res) : null;
                 },
-                error: function(req, res){ Notifier.notifyError(req) }
+                error: function (req, res) { Notifier.notifyError(req) }
             });
         }
     }
