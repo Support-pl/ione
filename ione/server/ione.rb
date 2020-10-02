@@ -187,9 +187,11 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
             post '/ione/:method' do | method |
                 begin
                     args = JSON.parse(@request_body)
-                    u = User.new_with_id(-1, Client.new(args['auth']))
+                    auth = args['auth']
+
+                    u = User.new_with_id(-1, Client.new(auth))
                     rc = u.info!
-                    if OpenNebula.is_error?(rc) or args['auth'].empty?
+                    if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
                         status 401
                         body "False Credentials given"
                         return
@@ -206,10 +208,11 @@ if !defined?(DEBUG_LIB) && MAIN_IONE then
             end
             post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
                 body = JSON.parse(@request_body)
+                auth = body['auth']
 
-                u = User.new_with_id(-1, Client.new(body['auth']))
+                u = User.new_with_id(-1, Client.new(auth))
                 rc = u.info!
-                if OpenNebula.is_error?(rc) or body['auth'].empty?
+                if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
                     status 401
                     body "False Credentials given"
                     return
