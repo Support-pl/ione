@@ -357,7 +357,9 @@ before do
         rescue => e
             halt [401, "Unauthorized"]
         end if !valid_csrftoken?
-    elsif !(%w(/ /login /vnc /spice /version).include?(request.path) || request.path.include?('/ione/'))
+    elsif request.path.include?('/ione/') then
+        halt [401, "Unauthorized"] unless authorized?
+    elsif !%w(/ /login /vnc /spice /version).include?(request.path) then
         halt [401, "csrftoken"] unless authorized? && valid_csrftoken?
     end
 
