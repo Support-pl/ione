@@ -27,8 +27,8 @@
         <label for="vm_name">
           {{tr "VM name"}}
           <span class="tip">
-          {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
-        </span>
+            {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
+          </span>
         </label>
         <input type="text" name="vm_name" readonly onfocus="this.removeAttribute('readonly');" id="vm_name" />
       </div>
@@ -38,16 +38,17 @@
           {{tr "Number of instances"}}
         </label>
         <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
-        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none" disabled>
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none"
+          disabled>
       </div>
 
       <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
         <h6>
           {{element.NAME}}<br>
           <span class="total_cost_div" style="display: none">
-          <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
-          <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
-        </span>
+            <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
+            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+          </span>
         </h6>
         <span id="OC_image">
         </span>
@@ -56,14 +57,15 @@
         </div>
       </div>
 
-      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="padding-top: 20px; width: 100%">
+      <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}"
+        style="padding-top: 20px; width: 100%">
         <fieldset>
           <legend style="width: 100%">
             <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
             <span class="capacity_cost_div" style="display: none">
-            <span class="cost_value">0.00</span>
-            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
-          </span>
+              <span class="cost_value">0.00</span>
+              <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+            </span>
           </legend>
           <div class="capacityContext" style="padding-right: 40px;">
 
@@ -102,15 +104,15 @@
 
       <div class="medium-2 small-12 columns" style="width: 100%;padding-bottom: 17px;">
         {{#if default_user_view}}
-        <label style="height: 22.5px;">{{tr "COST / TIME indicator"}}</label>
+        <label style="height: 22.5px;">{{tr "Cost for the period"}}</label>
         {{else}}
         {{#isTabActionEnabled "vms-tab" "VM.hold"}}
         <label style="height: 22.5px;">
-          <input type="checkbox" name="hold" id="hold"/>
+          <input type="checkbox" name="hold" id="hold" />
           {{tr "Start on hold"}}
           <span class="tip">
-          {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
-        </span>
+            {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
+          </span>
         </label>
         {{/isTabActionEnabled}}
         {{/if}}
@@ -118,13 +120,13 @@
           <option value="1">{{tr "COST"}} / {{tr "HOUR"}}</option>
           <option value="24">{{tr "COST"}} / {{tr "DAY"}}</option>
           <option value="168">{{tr "COST"}} / {{tr "WEEK"}}</option>
-          <option value="706">{{tr "COST"}} / {{tr "MONTH"}}</option>
+          <option value="720">{{tr "COST"}} / {{tr "MONTH"}}</option>
         </select>
       </div>
 
       <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
         <div style="width: 100%">
-          <span class="capacity_cost_div" >
+          <span class="capacity_cost_div">
             <i class="fa fa-desktop"></i> {{tr "Capacity"}}<br>
             <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
             <span class="cost_label"></span>
@@ -148,8 +150,10 @@
 
       </div>
 
-      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">{{tr "Create"}}</button></div>
+      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px">
+      </div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button"
+          href="submit">{{tr "Create"}}</button></div>
     </div>
 
 
@@ -172,7 +176,8 @@
                 {{tr "Expression"}}
                 {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
               </label>
-              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}"
+                name="requirements" />
             </div>
           </div>
         </fieldset>
@@ -193,7 +198,8 @@
                 {{tr "Expression"}}
                 {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
               </label>
-              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}"
+                name="requirements" />
             </div>
           </div>
         </fieldset>
@@ -242,7 +248,8 @@
               {{tr "Expression"}}
               {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
             </label>
-            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}"
+              name="requirements" />
           </div>
         </div>
       </fieldset>
@@ -263,7 +270,8 @@
               {{tr "Expression"}}
               {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
             </label>
-            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}"
+              name="requirements" />
           </div>
         </div>
       </fieldset>
@@ -313,14 +321,15 @@
 <br>
 <div class="template-row" element-id="{{element.ID}}">
   <div class="row" style="background-color: #e9e9e9;">
-    <div id="left_colum" class="medium-8 columns" style="border-right-style: ridge;background-color: white;padding-bottom: 46%;">
+    <div id="left_colum" class="medium-8 columns"
+      style="border-right-style: ridge;background-color: white;padding-bottom: 46%;">
 
       <div class="medium-2 small-12 columns" style="width: 50%">
         <label for="vm_name">
           {{tr "VM name"}}
           <span class="tip">
-          {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
-        </span>
+            {{tr "Defaults to 'template name-<vmid>' when empty. When creating several VMs, the wildcard %i will be replaced with a number starting from 0"}}.
+          </span>
         </label>
         <input type="text" name="vm_name" readonly onfocus="this.removeAttribute('readonly');" id="vm_name" />
       </div>
@@ -330,20 +339,21 @@
           {{tr "Number of instances"}}
         </label>
         <input type="number" name="vm_n_times" id="vm_n_times" value="1" min="1">
-        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none" disabled>
+        <input type="number" name="vm_n_times_disabled" id="vm_n_times_disabled" value="1" style="display: none"
+          disabled>
       </div>
 
       <div id="OC_name" class="medium-2 small-12 columns" style="width: 100%;text-align: center">
         <h6>
           {{element.NAME}}<br>
           <span class="total_cost_div" style="display: none">
-          <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
-          <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
-        </span>
+            <span class="cost_value" style="font-size: 1.4rem;">0.00</span>
+            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+          </span>
         </h6>
         <span>
-        <img src="{{element.TEMPLATE.LOGO}}">
-      </span>
+          <img src="{{element.TEMPLATE.LOGO}}">
+        </span>
       </div>
 
       <div id="capacityContext" class="medium-5 small-12 columns capacityContext{{element.ID}}" style="width: 100%">
@@ -351,9 +361,9 @@
           <legend style="width: 100%">
             <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
             <span class="capacity_cost_div" style="display: none">
-            <span class="cost_value">0.00</span>
-            <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
-          </span>
+              <span class="cost_value">0.00</span>
+              <span>{{tr "COST"}} / {{tr "HOUR"}}</span>
+            </span>
           </legend>
           <div>
             {{{capacityInputsHTML}}}
@@ -415,15 +425,15 @@
 
       <div class="medium-2 small-12 columns" style="width: 100%;padding-bottom: 17px;">
         {{#if default_user_view}}
-        <label style="height: 22.5px;">{{tr "COST / TIME indicator"}}</label>
+        <label style="height: 22.5px;">{{tr "Cost for the period"}}</label>
         {{else}}
         {{#isTabActionEnabled "vms-tab" "VM.hold"}}
         <label style="height: 22.5px;">
-          <input type="checkbox" name="hold" id="hold"/>
+          <input type="checkbox" name="hold" id="hold" />
           {{tr "Start on hold"}}
           <span class="tip">
-          {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
-        </span>
+            {{tr "Sets the new VM to hold state, instead of pending. The scheduler will not deploy VMs in this state. It can be released later, or deployed manually."}}
+          </span>
         </label>
         {{/isTabActionEnabled}}
         {{/if}}
@@ -431,25 +441,25 @@
           <option value="1">{{tr "COST"}} / {{tr "HOUR"}}</option>
           <option value="24">{{tr "COST"}} / {{tr "DAY"}}</option>
           <option value="168">{{tr "COST"}} / {{tr "WEEK"}}</option>
-          <option value="706">{{tr "COST"}} / {{tr "MONTH"}}</option>
+          <option value="720">{{tr "COST"}} / {{tr "MONTH"}}</option>
         </select>
       </div>
 
       <div style="width: 100%;padding-left: 1.2rem;font-size: 16px">
         <div id="element_cost">
           <div style="width: 100%">
-          <span class="capacity_cost_div" >
-            <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
-            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
-            <span class="cost_label"></span>
-          </span>
+            <span class="capacity_cost_div">
+              <i class="fa fa-desktop"></i> {{tr "CPU + RAM"}}<br>
+              <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+              <span class="cost_label"></span>
+            </span>
           </div>
           <div style="width: 100%">
-          <span class="provision_create_template_disk_cost_div">
-            <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
-            <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
-            <span class="cost_label"></span>
-          </span>
+            <span class="provision_create_template_disk_cost_div">
+              <i class="fa fa-hdd-o"></i> {{tr "Disks"}}<br>
+              <span class="cost_value" style="font-size: 1.4rem;">&#8195;0.00</span>
+              <span class="cost_label"></span>
+            </span>
           </div>
         </div>
         <div id="publicip_cost_div" hidden style="width: 100%">
@@ -470,8 +480,10 @@
 
       </div>
 
-      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px"></div>
-      <div style="width: 90%;text-align: right"><button class="button success radius submit_button" href="submit">{{tr "Create"}}</button></div>
+      <div class="medium-5 small-12 columns template_user_inputs{{element.ID}}" style="width: 100%;padding-top: 37px">
+      </div>
+      <div style="width: 90%;text-align: right"><button class="button success radius submit_button"
+          href="submit">{{tr "Create"}}</button></div>
     </div>
 
 
@@ -494,7 +506,8 @@
                 {{tr "Expression"}}
                 {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
               </label>
-              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+              <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}"
+                name="requirements" />
             </div>
           </div>
         </fieldset>
@@ -515,7 +528,8 @@
                 {{tr "Expression"}}
                 {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
               </label>
-              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+              <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}"
+                name="requirements" />
             </div>
           </div>
         </fieldset>
@@ -571,7 +585,8 @@
               {{tr "Expression"}}
               {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
             </label>
-            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}" name="requirements" />
+            <input type="text" wizard_field="SCHED_REQUIREMENTS" id="SCHED_REQUIREMENTS{{element.ID}}"
+              name="requirements" />
           </div>
         </div>
       </fieldset>
@@ -592,7 +607,8 @@
               {{tr "Expression"}}
               {{{tip (tr "Boolean expression that rules out entries from the pool of datastores suitable to run this VM.")}}}
             </label>
-            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}" name="requirements" />
+            <input type="text" wizard_field="SCHED_DS_REQUIREMENTS" id="SCHED_DS_REQUIREMENTS{{element.ID}}"
+              name="requirements" />
           </div>
         </div>
       </fieldset>

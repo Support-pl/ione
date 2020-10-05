@@ -69,7 +69,7 @@ module OpenNebulaJSON
             end
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -77,11 +77,11 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def import_wild(params=Hash.new)
+        def import_wild params = Hash.new
             rc = super(params['name'])
             if OpenNebula.is_error?(rc)
                 return rc

@@ -48,11 +48,11 @@ module OpenNebulaJSON
             end
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i)
         end
 
-        def update_json(params=Hash.new)
+        def update_json params = Hash.new
             if !params['append'].nil?
                 update(params['template_raw'], params['append'])
             else
@@ -60,17 +60,17 @@ module OpenNebulaJSON
             end
         end
 
-        def set_quota(params=Hash.new)
+        def set_quota params = Hash.new
             quota_json = params['quotas']
             quota_template = template_to_str(quota_json)
             super(quota_template)
         end
 
-        def add_admin_json(params=Hash.new)
+        def add_admin_json params = Hash.new
             add_admin(params['admin_id'].to_i)
         end
 
-        def del_admin_json(params=Hash.new)
+        def del_admin_json params = Hash.new
             del_admin(params['admin_id'].to_i)
         end
     end

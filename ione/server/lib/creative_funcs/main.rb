@@ -140,7 +140,7 @@ class IONe
             trace << ":#{__LINE__ + 1}"            
             until STATE_STR(params['vmid']) == 'DONE' do
                 sleep(0.2)
-            end if params['release']
+            end
             LOG_COLOR "Terminate process is over, new VM is deploying now", 'Reinstall', 'green'
             LOG_DEBUG 'Creating new VM'
             trace << "Instantiating template:#{__LINE__ + 1}"

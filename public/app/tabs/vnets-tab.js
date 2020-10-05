@@ -14,7 +14,7 @@
 /* limitations under the License.                                             */
 /* -------------------------------------------------------------------------- */
 
-define(function(require) {
+define(function (require) {
   var Locale = require('utils/locale');
   var Buttons = require('./vnets-tab/buttons');
   var Actions = require('./vnets-tab/actions');
@@ -26,7 +26,8 @@ define(function(require) {
   var _dialogs = [
     require('./vnets-tab/dialogs/add-ar'),
     require('./vnets-tab/dialogs/update-ar'),
-    require('./vnets-tab/dialogs/reserve')
+    require('./vnets-tab/dialogs/reserve'),
+    require('./vnets-tab/dialogs/reserve_vdc')
   ];
 
   var _panels = [
@@ -55,12 +56,12 @@ define(function(require) {
     parentTab: "network-top-tab",
     listHeader: Locale.tr("Virtual Networks"),
     infoHeader: Locale.tr("Virtual Network"),
-    subheader: '<span class="total_vnets"/> <small>'+Locale.tr("TOTAL")+'</small>&emsp;\
-        <span class="addresses_vnets"/> <small>'+Locale.tr("USED IPs")+'</small>',
+    subheader: '<span class="total_vnets"/> <small>' + Locale.tr("TOTAL") + '</small>&emsp;\
+        <span class="addresses_vnets"/> <small>'+ Locale.tr("USED IPs") + '</small>',
     resource: 'Network',
     buttons: Buttons,
     actions: Actions,
-    dataTable: new Table(DATATABLE_ID, {actions: true, info: true}),
+    dataTable: new Table(DATATABLE_ID, { actions: true, info: true }),
     panels: _panels,
     panelsHooks: _panelsHooks,
     formPanels: _formPanels,

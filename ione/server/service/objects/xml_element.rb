@@ -4,4 +4,7 @@ class OpenNebula::XMLElement
     def to_hash!
         self.info! || self.to_hash
     end
+    def to_json opts = {}
+        to_hash!.to_json opts
+    end
 end

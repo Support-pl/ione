@@ -58,7 +58,7 @@ module OpenNebulaJSON
             end
         end
 
-        def instantiate(params=Hash.new)
+        def instantiate params = Hash.new
             if params['template']
                 select_network = self['TEMPLATE/SUNSTONE/NETWORK_SELECT']
                 if (select_network && select_network.upcase == "NO")
@@ -72,7 +72,7 @@ module OpenNebulaJSON
             end
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -80,11 +80,11 @@ module OpenNebulaJSON
             end
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i,params['group_id'].to_i)
         end
 
-        def chmod_json(params=Hash.new)
+        def chmod_json params = Hash.new
             if params['octet']
                 self.chmod_octet(params['octet'])
             else
@@ -100,17 +100,17 @@ module OpenNebulaJSON
             end
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def nic_attach(params=Hash.new)
+        def nic_attach params = Hash.new
             template_json = params['nic_template']
             template = template_to_str(template_json)
             super(template)
         end
 
-        def nic_detach(params=Hash.new)
+        def nic_detach params = Hash.new
             super(params['nic_id'].to_i)
         end
     end

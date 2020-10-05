@@ -61,7 +61,7 @@ module OpenNebulaJSON
             end
         end
 
-        def update(params=Hash.new)
+        def update params = Hash.new
             if !params['append'].nil?
                 super(params['template_raw'], params['append'])
             else
@@ -69,45 +69,45 @@ module OpenNebulaJSON
             end
         end
 
-        def chown(params=Hash.new)
+        def chown params = Hash.new
             super(params['owner_id'].to_i,params['group_id'].to_i)
         end
 
-        def chmod_octet(params=Hash.new)
+        def chmod_octet params = Hash.new
             super(params['octet'])
         end
 
-        def hold(params=Hash.new)
+        def hold params = Hash.new
             super(params['ip'])
         end
 
-        def release(params=Hash.new)
+        def release params = Hash.new
             super(params['ip'])
         end
 
-        def rename(params=Hash.new)
+        def rename params = Hash.new
             super(params['name'])
         end
 
-        def rm_ar(params=Hash.new)
+        def rm_ar params = Hash.new
             super(params['ar_id'])
         end
 
-        def add_ar(params=Hash.new)
+        def add_ar params = Hash.new
             template_json = params['ar_template']
             template = template_to_str(template_json)
 
             super(template)
         end
 
-        def update_ar(params=Hash.new)
+        def update_ar params = Hash.new
             template_json = params['ar_template']
             template = template_to_str(template_json)
 
             super(template)
         end
 
-        def reserve(params=Hash.new)
+        def reserve params = Hash.new
             super(params['name'], params['size'], params['ar_id'],
                 params['addr'], params['vnet'])
         end

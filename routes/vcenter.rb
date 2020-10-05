@@ -104,7 +104,7 @@ helpers do
 
     def new_vcenter_importer(type)
         host_id = params["host"]
-        vi_client = VCenterDriver::VIClient.new_from_host(host_id) if host_id
+        vi_client = host_id ? VCenterDriver::VIClient.new_from_host(host_id) : vcenter_client
         one_client = OpenNebula::Client.new
         $importer = VCenterDriver::VcImporter.new_child(one_client, vi_client, type)
     end
@@ -184,7 +184,6 @@ post '/vcenter/templates' do
 end
 
 get '/vcenter/networks' do
-    p params
     begin
         new_vcenter_importer("networks")
 

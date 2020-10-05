@@ -134,6 +134,7 @@ CloudServer.print_configuration($conf)
 set :config, $conf
 set :bind, $conf[:host]
 set :port, $conf[:port]
+set :server_settings, :timeout => 60
 
 if (proxy = $conf[:proxy])
     ENV['http_proxy'] = proxy
@@ -334,6 +335,10 @@ helpers do
     end
 end
 
+CSRF_BYPASS_PATTERNS = [
+    /\/vmtemplate\/\d+\/action/
+]
+
 before do
     cache_control :no_store
     content_type 'application/json', :charset => 'utf-8'
@@ -341,7 +346,20 @@ before do
     @request_body = request.body.read
     request.body.rewind
 
-    unless %w(/ /login /vnc /spice /version).include?(request.path) || request.path.include?('/ione/')
+    if CSRF_BYPASS_PATTERNS.inject(false){|r, el| r || (el =~ request.path)} then
+        begin
+            body = JSON.parse(@request_body)
+            u = User.new_with_id(-1, Client.new(body['auth']))
+            rc = u.info!
+            if OpenNebula.is_error?(rc) or body['auth'].empty?
+                raise
+            end
+        rescue => e
+            halt [401, "Unauthorized"]
+        end if !valid_csrftoken?
+    elsif request.path.include?('/ione/') then
+        halt [401, "Unauthorized"] unless authorized?
+    elsif !%w(/ /login /vnc /spice /version).include?(request.path) then
         halt [401, "csrftoken"] unless authorized? && valid_csrftoken?
     end
 
