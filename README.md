@@ -88,7 +88,7 @@ Creators:
 
    `rake install`
 
-4. Configure Nginx. In addition to default settings, add API host proxy: 0.0.0.0:8443 ssl -> localhost:8009. See example in the end of this file.
+4. Configure Nginx. In addition to default settings, add API host proxy: `0.0.0.0:8443 ssl -> localhost:8009`. See example in the end of this file.
 
 > Note:
 > Works only with CentOS for now.
