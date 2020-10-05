@@ -144,4 +144,11 @@ class IONe
              
         onblock(:vm, vmid).list_snapshots
     end
+
+    # Returns all @client User vms
+    # @return [Array<Hash>]
+    def get_user_vms
+        r = VirtualMachinePool.new(@client, -1).get_hash['VM_POOL']
+        r.empty? ? [] : r['VM']
+    end
 end
