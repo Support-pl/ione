@@ -144,4 +144,11 @@ class IONe
              
         onblock(:vm, vmid).list_snapshots
     end
+
+    # Returns all User vms. See OpenNebula::User#vms
+    # @param [Integer] uid - User ID
+    # @return [Array<OpenNebula::VirtualMachine>]
+    def get_user_vms uid
+        onblock(:u, uid).vms(@db)
+    end
 end

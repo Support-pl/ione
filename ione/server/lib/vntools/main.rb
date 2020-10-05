@@ -73,6 +73,9 @@ class IONe
         end
     end
 
+    # Returns all User vnets. See OpenNebula::User#vns
+    # @param [Integer] uid - User ID
+    # @return [Array<OpenNebula::VirtualNetwork>]
     def get_user_vnets uid
         onblock(:u, uid).vns(@db)
     end
