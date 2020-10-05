@@ -1,6 +1,7 @@
 # OpenNebula Sunstone with IONe integration
 
 ## Contacts
+
 <p align="left">
     <a href="https://ione-cloud.net" title="Project Homepage" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=Project&message=HomePage&color=blue&style=flat" alt="Project Homepage"/>
@@ -18,13 +19,14 @@ Creators:
 [Support.pl](https://support.pl)
 [slnt_opp](http://slnt-opp.xyz)
 
-
 ## Main additional features
- * Transparent showback
- * Balance
- * Modified user interface for VDC
+
+- Transparent showback
+- Balance
+- Modified user interface for VDC
 
 ## System requirements
+
 <table>
    <thead>
       <tr>
@@ -70,10 +72,9 @@ Creators:
    </tbody>
 </table>
 
-
 ## Install
 
->If you are using a RedHat based distribution install redhat-lsb
+> If you are using a RedHat based distribution install redhat-lsb
 
 1. Download this repo using:
 
@@ -81,11 +82,14 @@ Creators:
 
 2. Enter directory:
 
-    `cd ione-sunstone/`
+   `cd ione-sunstone/`
 
 3. Run install script as root:
 
-    `rake install`
+   `rake install`
+
+4. Configure Nginx. In addition to default settings, add API host proxy: 0.0.0.0:8443 ssl -> localhost:8009. See example in the end of this file.
+
 > Note:
 > Works only with CentOS for now.
 
@@ -101,7 +105,7 @@ Creators:
 
 6. Fill `/usr/lib/one/sunstone/ione/modules/ansible/config.yml` for proper work of Ansible module
 
-    6.1. Add oneadmin ssh-key to Ansible authorized_hosts list
+   6.1. Add oneadmin ssh-key to Ansible authorized_hosts list
 
 7. Fill all settings using UI. Panel "Cloud" at Settings tab._(Accessible only as oneadmin)_:
 
@@ -179,3 +183,32 @@ Creators:
 ---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`
+
+## Nginx host config example
+
+```
+upstream api {
+    server 127.0.0.1:8009;
+}
+
+server {
+
+        listen                  8443 ssl;
+        server_name             vcloud.support.by;
+        ssl_certificate         /etc/one/ssl/example.crt;
+        ssl_certificate_key     /etc/one/ssl/example.key;
+
+   * * *
+
+location / {
+        proxy_pass      http://api;
+        proxy_set_header        X-Real-IP       $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        host    $host;
+        proxy_set_header        X-Forwarded-Server      $host;
+        proxy_read_timeout 600s;
+        proxy_connect_timeout 600s;
+    }
+
+}
+```
