@@ -15,7 +15,7 @@ task :install_ui => [:before, :install_gems] do
     chown_R "oneadmin", "oneadmin", "/usr/lib/one/sunstone/"
 
     cd '/usr/lib/one/sunstone/public'
-    unless system('which npm') then
+    unless system('which python2') then
         puts "No python2 found, installing..."
         sh %{sudo yum install python2}
     end
