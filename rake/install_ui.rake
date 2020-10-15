@@ -9,6 +9,7 @@ task :install_ui => [:before, :install_gems] do
     puts
 
     puts "Moving sunstone src files"
+    rm_r "/usr/lib/one/sunstone/public"
     @sunstone.each do | files |
         cp_r "#{files}", "/usr/lib/one/sunstone/"
     end
