@@ -11,23 +11,16 @@ task :install_gems => :before do
     end
     puts
 
-    puts "2. Appending gems to Gemfile..."
-
-    chown_R "oneadmin", "oneadmin", "/usr/share/one/"
-    gems = File.read('Gemfile')
-    File.open('/usr/share/one/Gemfile', 'a') do | gemfile |
-        gemfile << "\n# Gems for IONe\n"
-        gemfile << gems
-    end
-    puts
-
-    puts "3. Initializing bundler..."
+    puts "2. Installing gems..."
     sh %{/usr/share/one/install_gems --yes}
     puts
+    sh %{gem install nori}
+    sh %{gem install net-ssh -v 6.1.0}
+    sh %{gem install net-sftp -v 3.0.0}
     sh %{gem install colorize}
     puts
 
-    puts "4. Installing required system libs and tools"
+    puts "3. Installing required system libs and tools"
     begin
         sh %{sudo yum install -y #{@sys_packages.join(' ')}}
     rescue
