@@ -24,6 +24,8 @@ task :install_gems => :before do
     puts "3. Initializing bundler..."
     sh %{/usr/share/one/install_gems --yes}
     puts
+    sh %{gem install colorize}
+    puts
 
     puts "4. Installing required system libs and tools"
     begin
