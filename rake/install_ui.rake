@@ -15,6 +15,10 @@ task :install_ui => [:before, :install_gems] do
     chown_R "oneadmin", "oneadmin", "/usr/lib/one/sunstone/"
 
     cd '/usr/lib/one/sunstone/public'
+    unless system('which npm') then
+        puts "No python2 found, installing..."
+        sh %{sudo yum install python2}
+    end
     puts "Installung bower and NPM packages"
     sh %{sudo npm install && bower install --allow-root}
     puts
