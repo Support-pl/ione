@@ -25,7 +25,7 @@ task :install_ui => [:before, :install_gems] do
 
     puts "Building UI..."
     chmod "+x", "build.sh"
-    sh %{sudo ./build.sh}
+    sh %{./build.sh}
     cp "./dist/main-dist.js", "./dist/main.js"
 
     cd @src_dir
