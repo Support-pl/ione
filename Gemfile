@@ -1,6 +1,6 @@
 gem 'nori'
-gem 'net-ssh'
-gem 'net-sftp', '~> 2.1', '>= 2.1.2'
+gem 'net-ssh', '6.1.0'
+gem 'net-sftp', '3.0.0'
 gem 'json'
 gem 'colorize'
 gem 'rbvmomi', '1.11.6'
