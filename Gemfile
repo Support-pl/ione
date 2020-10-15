@@ -1,5 +1,3 @@
 gem 'nori'
 gem 'net-ssh', '6.1.0'
 gem 'net-sftp', '3.0.0'
-gem 'json'
-gem 'sequel', '5.17.0'
