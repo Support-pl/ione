@@ -21,31 +21,54 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.47.0
-        with:
-          ruby-version: 2.5
 
-      - name: Install YARDoc
-        run:  gem install yard
+      - name: Check env
+        run: which ftp
 
-      - name: Copy README
-        run: cp README.md ione/server
+      - name: Check ftp
+        env:
+          HOST: ${{ secrets.DOCS_FTP_DESTINATION }}
+          USER: ${{ secrets.DOCS_FTP_USER }}
+          PASS: ${{ secrets.DOCS_FTP_PASSWORD }}
+        run: |
+          ftp -n -v << FTP_SCRIPT
+              open $HOST
+              quote USER $USER
+              quote PASS $PASS
 
-      - name: Copy YARDoc conf
-        run: cp docs/.yardopts ione/server
+              prompt
+
+              lcd ./doc
+              mput ./*
+
+              quit
+          FTP_SCRIPT
+
+      # - name: Setup Ruby
+      #   uses: ruby/setup-ruby@v1.47.0
+      #   with:
+      #     ruby-version: 2.5
+
+      # - name: Install YARDoc
+      #   run:  gem install yard
+
+      # - name: Copy README
+      #   run: cp README.md ione/server
+
+      # - name: Copy YARDoc conf
+      #   run: cp docs/.yardopts ione/server
       
-      - name: Generating Docs
-        working-directory: ione/server
-        run: yardoc
+      # - name: Generating Docs
+      #   working-directory: ione/server
+      #   run: yardoc
 
-      - name: List doc
-        run: ls -lh ione/server/doc
+      # - name: List doc
+      #   run: ls -lh ione/server/doc
 
-      - name: Deploy docs via FTP
-        uses: SamKirkland/FTP-Deploy-Action@3.1.1
-        with:
-          ftp-server: ${{ secrets.DOCS_FTP_DESTINATION }}
-          ftp-username: ${{ secrets.DOCS_FTP_USER }}
-          ftp-password: ${{ secrets.DOCS_FTP_PASSWORD }}
-          local-dir: ione/server/doc
+      # - name: Deploy docs via FTP
+      #   uses: SamKirkland/FTP-Deploy-Action@3.1.1
+      #   with:
+      #     ftp-server: ${{ secrets.DOCS_FTP_DESTINATION }}
+      #     ftp-username: ${{ secrets.DOCS_FTP_USER }}
+      #     ftp-password: ${{ secrets.DOCS_FTP_PASSWORD }}
+      #     local-dir: ione/server/doc
