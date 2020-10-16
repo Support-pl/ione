@@ -39,5 +39,8 @@ jobs:
         working-directory: ione/server
         run: yardoc
 
+      - name: PWD
+        run: pwd
+
       - name: List files
-        run: ls -lh /doc
+        run: ls -lh doc
