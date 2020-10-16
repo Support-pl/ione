@@ -45,3 +45,4 @@ jobs:
           ftp-server: ${{ secrets.DOCS_FTP_DESTINATION }}
           ftp-username: ${{ secrets.DOCS_FTP_USER }}
           ftp-password: ${{ secrets.DOCS_FTP_PASSWORD }}
+          local-dir: ione/server/doc
