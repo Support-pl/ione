@@ -35,10 +35,8 @@ jobs:
       - name: Copy YARDoc conf
         run: cp docs/.yardopts ione/server
       
-      - name: Changing directory
-        run: cd ione/server
-      
       - name: Generating Docs
+        working-directory: ione/server
         run: yardoc
 
       - name: List files
