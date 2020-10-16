@@ -22,9 +22,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Check env
-        run: which ftp
-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1.47.0
         with:
@@ -42,22 +39,12 @@ jobs:
       - name: Generating Docs
         working-directory: ione/server
         run: yardoc
-
-      - name: Deploy docs bia FTP
-        env:
-          HOST: ${{ secrets.DOCS_FTP_DESTINATION }}
-          USER: ${{ secrets.DOCS_FTP_USER }}
-          PASS: ${{ secrets.DOCS_FTP_PASSWORD }}
-        run: |
-          ftp -n -v << FTP_SCRIPT
-              open $HOST
-              quote USER $USER
-              quote PASS $PASS
-
-              prompt
-
-              lcd ione/server/doc
-              mput ./*
-
-              quit
-          FTP_SCRIPT
+      
+      - name: Deploy docs via FTP
+        uses: sebastianpopp/ftp-action@releases/v2
+        with:
+          host: ${{ secrets.DOCS_FTP_DESTINATION }}
+          user: ${{ secrets.DOCS_FTP_USER }}
+          password: ${{ secrets.DOCS_FTP_PASSWORD }}
+          localDir: "ione/server/doc"
+          remoteDir: "/"
