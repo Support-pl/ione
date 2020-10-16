@@ -11,6 +11,8 @@ rescue
     puts "Table :ars already exists, skipping"
 end
 
+# Address Range Model class
+# @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/ione/server/service/objects/vn.rb#L1-L12 AR Model Defintion
 class AR < Sequel::Model(:ars)
     def to_json opts = {}
         to_hash.to_json opts

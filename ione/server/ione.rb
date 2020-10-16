@@ -51,6 +51,8 @@ $db = Sequel.connect({
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
 
+# Settings Table Model
+# @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/models/SettingsDriver.rb#L13-L37 Settings Model Definition
 class Settings < Sequel::Model(:settings); end
 
 puts 'Including on_helper funcs'

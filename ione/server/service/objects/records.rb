@@ -9,6 +9,8 @@ rescue
     puts "Table :records already exists, skipping"
 end
 
+# History Record Model class
+# @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/ione/server/service/objects/records.rb#L1-L10 History Model Defintion
 class Record < Sequel::Model(:records); end
 
 # States and Notifications records object(linked to VM)
