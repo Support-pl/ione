@@ -77,15 +77,12 @@ Creators:
 > If you are using a RedHat based distribution install redhat-lsb
 
 1. Download this repo using:
-
    `git clone https://github.com/ione-cloud/***`
 
 2. Enter directory:
-
    `cd ione-sunstone/`
 
 3. Run install script as root:
-
    `rake install`
 
 4. Configure Nginx. In addition to default settings, add API host proxy: `0.0.0.0:8443 ssl -> localhost:8009`. See example in the end of this file.
@@ -186,7 +183,7 @@ Thanks for choosing us, contacts for support are in "Contacts" section at the st
 
 ## Nginx host config example
 
-```
+```nginx
 upstream api {
     server 127.0.0.1:8009;
 }
