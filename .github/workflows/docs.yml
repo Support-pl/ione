@@ -27,7 +27,7 @@ jobs:
           ruby-version: 2.5
       
       - name: List files
-      - run:  ls -lh
+        run:  ls -lh
 
       - name: Install YARDoc
-      - run:  gem install yard
+        run:  gem install yard
