@@ -39,6 +39,9 @@ jobs:
         working-directory: ione/server
         run: yardoc
 
+      - name: List doc
+        run: ls -lh ione/server/doc
+
       - name: Deploy docs via FTP
         uses: SamKirkland/FTP-Deploy-Action@3.1.1
         with:
