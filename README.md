@@ -12,7 +12,7 @@
     <a href="https://github.com/ione-cloud" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.1&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.0&color=success&style=flat" alt="version"/>
     <img src="https://github.com/ione-cloud/ione-sunstone/workflows/Generate%20and%20Deploy%20Docs/badge.svg" alt="Generate and Deploy Docs"/>
 </p>
 
@@ -41,10 +41,10 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.8+</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.0-5.8</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Sunstone</td><td align="center">^^^^</td><td align="center"></td>
+         <td align="left">Sunstone</td><td align="center">will be replaced</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">MySQL MariaDB Server</td><td align="center">~5.5</td><td align="center"></td>
