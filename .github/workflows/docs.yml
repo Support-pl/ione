@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Generate Docs
+name: CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -39,10 +39,9 @@ jobs:
         working-directory: ione/server
         run: yardoc
 
-      - name: PWD
-        working-directory: ione/server
-        run: pwd
-
-      - name: List files
-        working-directory: ione/server
-        run: ls -lh doc
+      - name: Deploy docs via FTP
+        uses: SamKirkland/FTP-Deploy-Action@3.1.1
+        with:
+          ftp-server: ${{ secrets.DOCS_FTP_DESTINATION }}
+          ftp-username: ${{ secrets.DOCS_FTP_USER }}
+          ftp-password: ${{ secrets.DOCS_FTP_PASSWORD }}
