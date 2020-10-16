@@ -40,7 +40,9 @@ jobs:
         run: yardoc
 
       - name: PWD
+        working-directory: ione/server
         run: pwd
 
       - name: List files
+        working-directory: ione/server
         run: ls -lh doc
