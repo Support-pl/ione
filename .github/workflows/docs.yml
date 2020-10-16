@@ -25,9 +25,21 @@ jobs:
         uses: ruby/setup-ruby@v1.47.0
         with:
           ruby-version: 2.5
-      
-      - name: List files
-        run:  ls -lh
 
       - name: Install YARDoc
         run:  gem install yard
+
+      - name: Copy README
+        run: cp README.md ione/server
+
+      - name: Copy YARDoc conf
+        run: cp docs/.yardopts ione/server
+      
+      - name: Changing directory
+        run: cd ione/server
+      
+      - name: Generating Docs
+        run: yardoc
+
+      - name: List files
+        run: ls -lh /doc

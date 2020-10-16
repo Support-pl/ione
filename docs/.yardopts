@@ -1,0 +1,10 @@
+*.rb
+lib/**/*.rb
+modules/**/*.rb
+service/*.rb
+service/**/*.rb
+
+--readme README.md
+--files docs/WHMCS.md,docs/WHMCS_module_installation.md,docs/ISPDriver.md
+
+-o /doc
