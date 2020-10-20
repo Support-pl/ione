@@ -1,7 +1,0 @@
-gem 'nori', '2.6.0'
-gem 'net-ssh', '4.2.0'
-gem 'net-sftp', '2.1.2'
-gem 'json'
-gem 'colorize'
-gem 'rbvmomi', '1.11.6'
-gem 'sequel', '5.17.0'

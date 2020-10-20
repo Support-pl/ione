@@ -9,19 +9,24 @@ task :install_ui => [:before, :install_gems] do
     puts
 
     puts "Moving sunstone src files"
+    rm_r "/usr/lib/one/sunstone/public"
     @sunstone.each do | files |
         cp_r "#{files}", "/usr/lib/one/sunstone/"
     end
     chown_R "oneadmin", "oneadmin", "/usr/lib/one/sunstone/"
 
     cd '/usr/lib/one/sunstone/public'
+    unless system('which python2') then
+        puts "No python2 found, installing..."
+        sh %{sudo yum install python2}
+    end
     puts "Installung bower and NPM packages"
     sh %{sudo npm install && bower install --allow-root}
     puts
 
     puts "Building UI..."
     chmod "+x", "build.sh"
-    sh %{sudo ./build.sh}
+    sh %{./build.sh}
     cp "./dist/main-dist.js", "./dist/main.js"
 
     cd @src_dir

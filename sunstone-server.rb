@@ -487,7 +487,7 @@ get '/' do
         error 500, ""
     end
 
-    oned_conf_template = rc.to_hash()['TEMPLATE']
+    oned_conf_template = rc.to_hash['OPENNEBULA_CONFIGURATION']
 
     oned_conf = {}
     ONED_CONF_OPTS['ALLOWED_KEYS'].each do |key|

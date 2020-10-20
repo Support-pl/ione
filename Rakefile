@@ -8,10 +8,10 @@ task :before do
     @src_dir = pwd
 end
 
-load "rake/set_hooks.rake"
-load "rake/install_ui.rake"
 load "rake/install_gems.rake"
 load "rake/install_ione.rake"
+load "rake/install_ui.rake"
+load "rake/set_hooks.rake"
 
 desc "Full IONe Installation"
 task :install => [:before, :install_gems, :install_ione, :install_ui] do
