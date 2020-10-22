@@ -16,6 +16,7 @@ task :install_ione => [:before, :install_gems] do
     end
     chown_R "oneadmin", "oneadmin", "/var/log/one/"
     chmod 0750, "/var/log/one/"
+    puts "chmod -R 644 /var/log/one/*"
     `chmod -R 644 /var/log/one/*`
 
     puts 'Copying IONe'
@@ -24,11 +25,15 @@ task :install_ione => [:before, :install_gems] do
     end
 
     puts 'Restarting OpenNebula'
-    sh %{sudo systemctl restart opennebula && sudo systemctl status opennebula}
-    sh %{sudo systemctl restart opennebula-sunstone && sudo systemctl status opennebula-sunstone}
+    sh %{}
+    sh %{}
 
     puts <<-EOF
-    > If you have one with httpd installed, restart httpd:
+    Fill in DB credentials to /etc/one/ione.conf and restart IONe
+
+        sudo systemctl restart opennebula-sunstone && sudo systemctl status opennebula-sunstone
+    
+    > If you have one with httpd installed, restart httpd as well:
 
         sudo systemctl restart httpd
 
