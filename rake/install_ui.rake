@@ -18,7 +18,7 @@ task :install_ui => [:before, :install_gems] do
     cd '/usr/lib/one/sunstone/public'
     unless system('which python2') then
         puts "No python2 found, installing..."
-        sh %{sudo yum install python2}
+        sh %{sudo yum install python2 -y}
     end
     puts "Installung bower and NPM packages"
     sh %{sudo npm install && bower install --allow-root}
