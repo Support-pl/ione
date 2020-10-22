@@ -24,10 +24,6 @@ task :install_ione => [:before, :install_gems] do
         cp_r "#{files}", "/usr/lib/one/sunstone/"
     end
 
-    puts 'Restarting OpenNebula'
-    sh %{}
-    sh %{}
-
     puts <<-EOF
     Fill in DB credentials to /etc/one/ione.conf and restart IONe
 
