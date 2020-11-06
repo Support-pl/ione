@@ -1,7 +1,7 @@
 require 'pathname'
 
 @ione = %w(
-    models routes modules lib scripts service debug_lib.rb
+    models routes modules lib scripts service ione_server
 )
 @ione_logs = %w(
     ione debug rpc suspend
@@ -34,6 +34,7 @@ task :install_ione => [:before, :install_gems] do
 
     puts <<-EOF
     Fill in DB credentials to /etc/one/ione.conf and start IONe
-
+        systemctl enable ione
+        systemctl start ione
     EOF
 end
