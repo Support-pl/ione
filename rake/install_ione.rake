@@ -1,3 +1,5 @@
+require 'pathname'
+
 @ione = %w(
     models ione debug_lib.rb
 )
@@ -8,7 +10,7 @@
 desc "IONe Back-End Installation"
 task :install_ione => [:before, :install_gems] do
     puts 'Copying conf'
-    cp './ione/ione.conf', '/etc/one/'
+    cp './ione/ione.conf', '/etc/one/' unless Pathname.new("/etc/one/ione.conf").exist?
 
     puts 'Creating log files'
     @ione_logs.each do | file |
@@ -19,10 +21,15 @@ task :install_ione => [:before, :install_gems] do
     puts "chmod -R 644 /var/log/one/*"
     `chmod -R 644 /var/log/one/*`
 
-    puts 'Copying IONe'
+    puts 'Creating IONe directory'
+    mkdir_p '/usr/lib/one/ione'
+
+    puts 'Copying IONe files'
     @ione.each do | files |
-        cp_r "#{files}", "/usr/lib/one/sunstone/"
+        cp_r "#{files}", "/usr/lib/one/ione/"
     end
+
+    puts 'Creating IONe service'
 
     puts <<-EOF
     Fill in DB credentials to /etc/one/ione.conf and restart IONe
