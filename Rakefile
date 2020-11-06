@@ -10,10 +10,10 @@ end
 
 load "rake/install_gems.rake"
 load "rake/install_ione.rake"
-load "rake/install_ui.rake"
-load "rake/set_hooks.rake"
+# load "rake/install_ui.rake"
+# load "rake/set_hooks.rake"
 
 desc "Full IONe Installation"
-task :install => [:before, :install_gems, :install_ione, :install_ui] do
+task :install => [:before, :install_gems, :install_ione] do
     puts "  Thanks, for installation and choosing us!   "
 end
