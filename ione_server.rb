@@ -442,15 +442,6 @@ after do
     end
 end
 
-##############################################################################
-# Custom routes
-##############################################################################
-if $conf[:routes]
-    $conf[:routes].each { |route|
-        require "routes/#{route}"
-    }
-end
-
 ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
 ione_drivers.each do | driver |
     begin
