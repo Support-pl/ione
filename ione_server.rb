@@ -881,7 +881,7 @@ end
 # IONe Actions
 ##############################################################################
 
-require 'ione/server/ione.rb'
+require 'ione_driver.rb'
 post '/ione/:method' do
     begin
         RPC_LOGGER.debug "IONeAPI calls proxy method #{params['method']}(#{JSON.parse(@request_body)['params'].collect {|p| p.inspect}.join(", ")}) | from #{session[:ip]}"
