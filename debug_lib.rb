@@ -93,7 +93,7 @@ end
 
 DEBUG_LIB = true
 begin
-    require 'ione/server/ione.rb'
+    require 'ione.rb'
 rescue => e
     puts e.message, e.backtrace
 end
