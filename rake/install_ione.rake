@@ -10,7 +10,7 @@ require 'pathname'
 desc "IONe Back-End Installation"
 task :install_ione => [:before, :install_gems] do
     puts 'Copying conf'
-    cp './ione/ione.conf', '/etc/one/' unless Pathname.new("/etc/one/ione.conf").exist?
+    cp 'sys/ione.conf', '/etc/one/' unless Pathname.new("/etc/one/ione.conf").exist?
 
     puts 'Creating log files'
     @ione_logs.each do | file |
@@ -30,15 +30,10 @@ task :install_ione => [:before, :install_gems] do
     end
 
     puts 'Creating IONe service'
+    cp 'sys/ione.service', '/usr/lib/systemd/system' unless Pathname.new("/usr/lib/systemd/system/ione.service").exist?
 
     puts <<-EOF
-    Fill in DB credentials to /etc/one/ione.conf and restart IONe
-
-        sudo systemctl restart opennebula-sunstone && sudo systemctl status opennebula-sunstone
-    
-    > If you have one with httpd installed, restart httpd as well:
-
-        sudo systemctl restart httpd
+    Fill in DB credentials to /etc/one/ione.conf and start IONe
 
     EOF
 end
