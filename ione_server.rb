@@ -259,77 +259,64 @@ RPC_LOGGER = Logger.new(rpc_log_file)
 puts 'Pre-init job ended, starting up server'
 RPC_LOGGER.debug "Preparing to start up server"
 RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && MAIN_IONE(#{MAIN_IONE}) => #{!defined?(DEBUG_LIB) && MAIN_IONE}"
+
+#
+# IONe API based on http
+#
+set :bind, 'localhost'
+set :port, 8009
+
+before do
+    @request_body = request.body.read
+end
+
+get '/' do
+    'Hello, World! via IONe Web API'
+end
+post '/ione/:method' do | method |
+    begin
+        args = JSON.parse(@request_body)
+        auth = args['auth']
+
+        u = User.new_with_id(-1, Client.new(auth))
+        rc = u.info!
+        if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
+            status 401
+            body "False Credentials given"
+            return
+        end
+        RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
+        r = IONe.new(Client.new(args['auth']), $db).send(method, *args['params'])
+    rescue => e
+        r = e.message
+        backtrace = e.backtrace
+    end
+    RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+    JSON.pretty_generate response: r
+end
+post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
+    body = JSON.parse(@request_body)
+    auth = body['auth']
+
+    u = User.new_with_id(-1, Client.new(auth))
+    rc = u.info!
+    if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
+        status 401
+        body "False Credentials given"
+        return
+    end
+
+    JSON.pretty_generate(r:
+        onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
+    )
+end
+
+
 if !defined?(DEBUG_LIB) && MAIN_IONE then
-
-    # Public API bindings
-    IONeAPIServerThread = Thread.new do
-        #
-        # IONe API based on http
-        #
-        class IONeAPIServer < Sinatra::Base
-            set :bind, '0.0.0.0'
-            set :port, 8009
-
-            before do
-                @request_body = request.body.read
-            end
-
-            get '/' do
-                'Hello, World! via IONe Web API'
-            end
-            post '/ione/:method' do | method |
-                begin
-                    args = JSON.parse(@request_body)
-                    auth = args['auth']
-
-                    u = User.new_with_id(-1, Client.new(auth))
-                    rc = u.info!
-                    if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
-                        status 401
-                        body "False Credentials given"
-                        return
-                    end
-                    RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
-                    r = IONe.new(Client.new(args['auth']), $db).send(method, *args['params'])
-                rescue => e
-                    r = e.message
-                    backtrace = e.backtrace
-                end
-                RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-                RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
-                JSON.pretty_generate response: r
-            end
-            post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
-                body = JSON.parse(@request_body)
-                auth = body['auth']
-
-                u = User.new_with_id(-1, Client.new(auth))
-                rc = u.info!
-                if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
-                    status 401
-                    body "False Credentials given"
-                    return
-                end
-
-                JSON.pretty_generate(r:
-                    onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
-                )
-            end
-        end
-
         RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
-        begin
-            sleep(5)
-            IONeAPIServer.run!
-        rescue StandardError => e
-            RPC_LOGGER.debug e.message
-        end
-    end
 
-    at_exit do
-        RPC_LOGGER.debug "IONeAPIServer is being stopped due to at_exit directive"
-        IONeAPIServerThread.kill
-    end
+    Sinatra::Application.run! 
 else
     RPC_LOGGER.debug "Condition is false, skipping server"
 end
