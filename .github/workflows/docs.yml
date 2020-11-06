@@ -6,9 +6,9 @@ name: Generate and Deploy Docs
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -28,23 +28,19 @@ jobs:
           ruby-version: 2.5
 
       - name: Install YARDoc
-        run:  gem install yard
-
-      - name: Copy README
-        run: cp README.md ione/server
+        run: gem install yard
 
       - name: Copy YARDoc conf
-        run: cp docs/.yardopts ione/server
-      
+        run: cp docs/.yardopts .
+
       - name: Generating Docs
-        working-directory: ione/server
         run: yardoc
-      
+
       - name: Deploy docs via FTP
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{ secrets.DOCS_FTP_DESTINATION }}
           user: ${{ secrets.DOCS_FTP_USER }}
           password: ${{ secrets.DOCS_FTP_PASSWORD }}
-          localDir: "ione/server/doc"
+          localDir: "doc"
           remoteDir: "/"

@@ -1,10 +1,10 @@
 
 public/dist/
 .vscode/
-ione/server/modules/ansible/config.yml
-ione/server/.yardopts
+modules/ansible/config.yml
+.yardopts
 tests/zfs_snap_acc.rb
 .DS_Store
 tests/*
-ione/server/modules/zfs-snapshots/
+modules/zfs-snapshots/
 *.code-workspace
