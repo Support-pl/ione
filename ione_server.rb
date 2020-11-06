@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
