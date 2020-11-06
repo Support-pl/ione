@@ -45,15 +45,6 @@ require 'CloudAuth'
 require 'SunstoneServer'
 require 'SunstoneViews'
 
-ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
-ione_drivers.each do | driver |
-    begin
-        require driver
-    rescue LoadError => e
-        puts "Driver #{driver} was not included: #{e.message}"
-    end
-end
-
 ##############################################################################
 # Configuration
 ##############################################################################
@@ -184,6 +175,15 @@ class IONe
         @client = client
         @db = db
         @version = VERSION
+    end
+end
+
+ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers.each do | driver |
+    begin
+        require driver
+    rescue LoadError => e
+        puts "Driver #{driver} was not included: #{e.message}"
     end
 end
 
