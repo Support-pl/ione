@@ -7,7 +7,7 @@ require 'securerandom'
 STARTUP_TIME = Time.now().to_i # IONe server start time
 
 puts 'Getting path to the server'
-ROOT = SUNSTONE_ROOT_DIR + '/ione/server' # IONe root path
+ROOT = ROOT_DIR # IONe root path
 LOG_ROOT = LOG_LOCATION # IONe logs path
 
 # Shows if current IONe Sunstone process was started by systemd(first time so). True or False
