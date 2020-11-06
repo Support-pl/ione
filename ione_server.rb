@@ -45,25 +45,6 @@ require 'CloudAuth'
 require 'SunstoneServer'
 require 'SunstoneViews'
 
-##############################################################################
-# Enable logger
-##############################################################################
-
-include CloudLogger
-logger=enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
-
-begin
-    ENV["ONE_CIPHER_AUTH"] = SUNSTONE_AUTH
-    $cloud_auth = CloudAuth.new($conf, logger)
-rescue => e
-    logger.error {
-        "Error initializing authentication system" }
-    logger.error { e.message }
-    exit(-1)
-end
-
-set :cloud_auth, $cloud_auth
-
 ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
 ione_drivers.each do | driver |
     begin
@@ -89,6 +70,24 @@ rescue Exception => e
     STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
     exit 1
 end
+
+##############################################################################
+# Enable logger
+##############################################################################
+include CloudLogger
+logger=enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
+
+begin
+    ENV["ONE_CIPHER_AUTH"] = SUNSTONE_AUTH
+    $cloud_auth = CloudAuth.new($conf, logger)
+rescue => e
+    logger.error {
+        "Error initializing authentication system" }
+    logger.error { e.message }
+    exit(-1)
+end
+
+set :cloud_auth, $cloud_auth
 
 use Rack::Deflater
 
