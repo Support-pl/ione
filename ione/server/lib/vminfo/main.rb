@@ -16,6 +16,8 @@ class IONe
         vm = onblock(:vm, vmid)
         vm.info! || vm.to_xml
     end
+    # @!group VirtualMachines Info
+
     # Returns VM's IP by ID
     # @param [Integer] vm_ref - VM ID
     # @return [String] IP address
@@ -58,6 +60,9 @@ class IONe
         end
         return ""
     end
+
+    # @!endgroup 
+
     # Getting VM ID by IP
     # @param [String] ip - IP address
     # @return [Integer | nil] - VM ID if found, nil if not
@@ -77,6 +82,9 @@ class IONe
         end
         nil
     end
+
+    # @!group VirtualMachines Info
+
     # Getting VM state number by ID
     # @param [Integer] vmid - VM ID
     # @return [Integer] State
@@ -145,10 +153,16 @@ class IONe
         onblock(:vm, vmid).list_snapshots
     end
 
+    # @!endgroup
+
+    # @!group Users Info
+
     # Returns all @client User vms
     # @return [Array<Hash>]
     def get_user_vms
         r = VirtualMachinePool.new(@client, -1).get_hash['VM_POOL']
         r.empty? ? [] : r['VM']
     end
+
+    # @!endgroup
 end

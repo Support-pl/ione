@@ -15,6 +15,9 @@ class IONe
         end
         "DONE"
     end
+
+    # @!group Virtual Machines Info
+
     # Returns vmid by owner id
     # @param [Integer] uid - owner id
     # @return [Integer | 'none']
@@ -48,6 +51,11 @@ class IONe
         end
         vms
     end
+
+    # @!endgroup
+    
+    # @!group Users Info
+
     # Returns user id by username
     # @param [String] name - username
     # @return [Integer| 'none']
@@ -65,6 +73,11 @@ class IONe
         end
         'none'        
     end
+
+    # @!endgroup
+
+    # @!group Virtual Machines Info
+
     # Returns vmid, userid and VM IP by owner username
     # @param [String] name - username
     # @return [Hash]
@@ -188,6 +201,11 @@ class IONe
 
         return info, hosts, free
     end
+
+    # @!endgroup
+
+    # @!group Users Info
+
     # Returns User template in XML
     # @param [Integer] userid
     # @return [String] XML
@@ -201,6 +219,9 @@ class IONe
             user.to_xml
         end
     end
+
+    # @!endgroup
+
     # Returns monitoring information about datastores
     # @param [String] type - choose datastores types for listing: system('sys') or image('img')
     # @return [Array<Hash> | String]
@@ -307,10 +328,18 @@ class IONe
         params.to_sym!
         onblock(:vm, params[:vmid]).hot_resize(params)
     end
+
+    # @!group Users Info
+
     # Checks if User exists
     def user_exists uid
         onblock(:u, uid).exists?
     end
+
+    # @!endgroup
+
+    # @!group User Control
+
     # Deletes user and all his VMs
     def UserDelete uid
         u = onblock(:u, uid)
@@ -323,10 +352,14 @@ class IONe
         LOG_DEBUG e.message
     end
 
+    # @!endgroup
+
     # Returns current IOps conf from `/etc/one/ione.conf`
     def GetvCenterIOpsConf
         $ione_conf['vCenter']['drives-iops']
     end
+
+    # @!group Virtual Machines info
 
     # Returns all vms available with given credentials
     # @param [Integer] chunks - number of chunks per page
@@ -360,4 +393,6 @@ class IONe
             end
         end
     end
+
+    # @!endgroup
 end
