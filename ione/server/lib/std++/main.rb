@@ -115,19 +115,6 @@ class Array
     # @!endgroup
 end
 
-# Basic class 
-class BasicObject
-    # @!group Dev Tools
-
-    # Returns objects self
-    def itself
-     self
-    end
-
-    # @!endgroup
-end 
-
-
 puts 'Extending NilClass by add method'
 # Ruby default Nil class
 class NilClass
