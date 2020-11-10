@@ -35,4 +35,9 @@ class IONe
     def proc
         $PROC
     end
+
+    # Returns whole IONe settings table if user is Admin
+    def get_all_settings
+        return @db[:settings].as_hash(:name, :body) unless onblock(:u, -1, @client).is_admin
+    end
 end
