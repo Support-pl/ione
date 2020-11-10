@@ -115,6 +115,9 @@ class OpenNebula::User
         update({"SUNSTONE" => sunstone}.to_one_template, true)
     end
 
+    # Checks if user is admin
+    # @note Admin means user is a part of oneadmin group
+    # @return [Boolean]
     def is_admin
         info!
         return (groups << gid).include? 0

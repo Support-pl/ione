@@ -37,6 +37,7 @@ class IONe
     end
 
     # Returns whole IONe settings table if user is Admin
+    # @return [Hash]
     def get_all_settings
         return @db[:settings].as_hash(:name, :body) unless onblock(:u, -1, @client).is_admin
     end
