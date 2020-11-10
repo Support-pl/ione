@@ -115,6 +115,11 @@ class OpenNebula::User
         update({"SUNSTONE" => sunstone}.to_one_template, true)
     end
 
+    def is_admin
+        info!
+        return (groups << gid).include? 0
+    end
+
     # User doesn't exist Exception object
     class UserNotExistsError < StandardError
         def initialize msg = "User not exists or error occurred while getting user."
