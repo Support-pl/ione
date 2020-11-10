@@ -16,7 +16,7 @@ class IONe
         "DONE"
     end
 
-    # @!group Virtual Machines Info
+    # @!group VirtualMachines Info
 
     # Returns vmid by owner id
     # @param [Integer] uid - owner id
@@ -76,7 +76,7 @@ class IONe
 
     # @!endgroup
 
-    # @!group Virtual Machines Info
+    # @!group VirtualMachines Info
 
     # Returns vmid, userid and VM IP by owner username
     # @param [String] name - username
@@ -359,7 +359,7 @@ class IONe
         $ione_conf['vCenter']['drives-iops']
     end
 
-    # @!group Virtual Machines info
+    # @!group VirtualMachines info
 
     # Returns all vms available with given credentials
     # @param [Integer] chunks - number of chunks per page
