@@ -94,24 +94,25 @@ module ONeHelper
 
     # {#onblock} supported instances list 
     ON_INSTANCES = {
-        :vm  => VirtualMachine,
-        :t   => Template,
-        :h   => Host,
-        :u   => User,
-        :vn  => VirtualNetwork,
-        :ds  => Datastore,
-        :mpa => MarketPlaceApp,
-        :ma  => MarketPlace,
-        :vr  => VirtualRouter,
-        :vdc => Vdc,
-        :sg  => SecurityGroup,
-        :z   => Zone,
-        :d   => Document,
-        :c   => Cluster,
-        :acl => Acl,
-        :g   => Group,
-        :i   => Image,
-        :p   => Pool
+        vm:  VirtualMachine,
+        t:   Template,
+        h:   Host,
+        u:   User,
+        vn:  VirtualNetwork,
+        ds:  Datastore,
+        mpa: MarketPlaceApp,
+        ma:  MarketPlace,
+        vr:  VirtualRouter,
+        vdc: Vdc,
+        sg:  SecurityGroup,
+        z:   Zone,
+        d:   Document,
+        c:   Cluster,
+        acl: Acl,
+        g:   Group,
+        i:   Image,
+        p:   Pool,
+        hk:  Hook
     }
 
     # Generates any 'Pool' element object or yields it
