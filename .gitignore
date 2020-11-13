@@ -1,10 +1,7 @@
-
-public/dist/
 .vscode/
 modules/ansible/config.yml
 .yardopts
 tests/zfs_snap_acc.rb
 .DS_Store
-tests/*
 modules/zfs-snapshots/
 *.code-workspace
