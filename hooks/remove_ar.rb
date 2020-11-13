@@ -40,7 +40,7 @@ require $ione_conf['DB']['adapter']
 $db = Sequel.connect({
         adapter: $ione_conf['DB']['adapter'].to_sym,
         user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['DB'], host: $ione_conf['DB']['host']  })
+        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 conf = $db[:settings].as_hash(:name, :body)
 
 template = ARGV.first
