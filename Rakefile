@@ -11,6 +11,7 @@ end
 load "rake/install_gems.rake"
 load "rake/install_ione.rake"
 # load "rake/set_hooks.rake"
+load "rake/test_install.rake"
 
 desc "Full IONe Installation"
 task :install => [:before, :install_gems, :install_ione] do
