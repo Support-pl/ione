@@ -36,5 +36,8 @@ task :install_ione => [:before, :install_gems] do
     Fill in DB credentials to /etc/one/ione.conf and start IONe
         systemctl enable ione
         systemctl start ione
+    
+    You can test installation by running
+        rake test_install
     EOF
 end
