@@ -123,11 +123,11 @@ CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['Open
 ENDPOINT = $ione_conf['OpenNebula']['endpoint']
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
-require $ione_conf['DataBase']['adapter']
+require $ione_conf['DB']['adapter']
 $db = Sequel.connect({
-        adapter: $ione_conf['DataBase']['adapter'].to_sym,
-        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
-        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
+        adapter: $ione_conf['DB']['adapter'].to_sym,
+        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
+        database: $ione_conf['DB']['DB'], host: $ione_conf['DB']['host'],
         encoding: 'utf8mb4'   })
 
 $db.extension(:connection_validator)

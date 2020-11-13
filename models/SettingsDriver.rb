@@ -1,10 +1,10 @@
 require 'sequel'
 
-require $ione_conf['DataBase']['gem']
+require $ione_conf['DB']['gem']
 $DB = Sequel.connect({
-        adapter: $ione_conf['DataBase']['adapter'].to_sym,
-        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
-        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host'],
+        adapter: $ione_conf['DB']['adapter'].to_sym,
+        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
+        database: $ione_conf['DB']['DB'], host: $ione_conf['DB']['host'],
         encoding: 'utf8mb4'   })
 
 $DB.extension(:connection_validator)
