@@ -10,7 +10,6 @@ end
 
 load "rake/install_gems.rake"
 load "rake/install_ione.rake"
-# load "rake/install_ui.rake"
 # load "rake/set_hooks.rake"
 
 desc "Full IONe Installation"
