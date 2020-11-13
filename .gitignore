@@ -5,3 +5,4 @@ tests/zfs_snap_acc.rb
 .DS_Store
 modules/zfs-snapshots/
 *.code-workspace
+node_modules
