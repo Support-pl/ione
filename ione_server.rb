@@ -133,6 +133,8 @@ $db = Sequel.connect({
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
 
+require "SettingsDriver"
+
 # Settings Table Model
 # @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/models/SettingsDriver.rb#L13-L37 Settings Model Definition
 class Settings < Sequel::Model(:settings); end
@@ -178,7 +180,7 @@ class IONe
     end
 end
 
-ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
 ione_drivers.each do | driver |
     begin
         require driver
