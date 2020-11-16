@@ -97,15 +97,15 @@ USER_HOOK = [
     arguments = "$TEMPLATE" ]
 
 VNET_HOOK = [
-    name        = "vn_record"
-    on          = "CREATE"
-    command     = "vn_record.rb"
+    name        = "vn_record",
+    on          = "CREATE",
+    command     = "vn_record.rb",
     arguments   = "$ID"
 ]
 VNET_HOOK = [
-    name        = "vn_record"
-    on          = "REMOVE"
-    command     = "vn_record.rb"
+    name        = "vn_record",
+    on          = "REMOVE",
+    command     = "vn_record.rb",
     arguments   = "$ID"
 ]
 
