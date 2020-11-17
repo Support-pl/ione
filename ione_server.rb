@@ -294,7 +294,7 @@ post '/ione/:method' do | method |
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
-    JSON.pretty_generate response: r
+    json response: r
 end
 
 puts "Registering ONe methods"
@@ -310,7 +310,7 @@ post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
         return
     end
 
-    JSON.pretty_generate(r:
+    json(r:
         onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
     )
 end
