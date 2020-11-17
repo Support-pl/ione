@@ -35,6 +35,16 @@ export default {
   methods: {
     performLogin() {
       console.log(this.username, this.password);
+      this.$axios
+        .post("one.u.to_hash!", {
+          auth: `${this.username}:${this.password}`,
+          oid: -1,
+        })
+        .then((res) => {
+          console.log(res);
+          this.$store.commit("login", { ...res.data, loggedIn: true });
+          this.$router.push("/dashboard")
+        });
     },
   },
 };
