@@ -272,9 +272,7 @@ before do
     @request_body = request.body.read
 end
 
-get '/' do
-    'Hello, World! via IONe Web API'
-end
+puts "Registering IONe methods"
 post '/ione/:method' do | method |
     begin
         args = JSON.parse(@request_body)
@@ -297,6 +295,8 @@ post '/ione/:method' do | method |
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
     JSON.pretty_generate response: r
 end
+
+puts "Registering ONe methods"
 post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     body = JSON.parse(@request_body)
     auth = body['auth']
@@ -312,13 +312,4 @@ post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     JSON.pretty_generate(r:
         onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
     )
-end
-
-
-if !defined?(DEBUG_LIB) && MAIN_IONE then
-        RPC_LOGGER.debug "Starting up IONeAPI Server on port 8009"
-
-    Sinatra::Application.run! 
-else
-    RPC_LOGGER.debug "Condition is false, skipping server"
 end
