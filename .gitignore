@@ -8,3 +8,5 @@ tests/zfs_snap_acc.rb
 tests/*
 ione/server/modules/zfs-snapshots/
 *.code-workspace
+
+node_modules
