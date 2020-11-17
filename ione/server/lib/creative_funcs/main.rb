@@ -311,6 +311,7 @@ class IONe
     # @option params [Boolean] :trial (false) VM will be suspended after TRIAL_SUSPEND_DELAY
     # @option params [Boolean] :release (false) VM will be started on HOLD if false
     # @option params [String]  :user-template Addon template, you may append to default template(Use XML-string as OpenNebula requires)
+    # @option params [Boolean] :allow_snapshots Allow user to create snapshots
     # @param [Array<String>] trace - public trace log
     # @return [Hash, nil] UserID, VMID and IP address if success, or error message and backtrace log if error
     # @example Example out
@@ -425,6 +426,11 @@ class IONe
                 'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
                 'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
             ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
+
+            specs['USER_TEMPLATE'] = {
+                'SNAPSHOTS_ALLOWED' => params['allow_snapshots'].to_s.upcase
+            }
+
             specs = specs.to_one_template
             LOG_DEBUG "Resulting capacity template:\n" + specs
             vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
