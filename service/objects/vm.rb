@@ -575,6 +575,23 @@ class OpenNebula::VirtualMachine
 
         JSON.generate res
     end
+
+    alias :snapshot_create_original :snapshot_create
+    def snapshot_create name = ""
+        info!
+
+        unless self['/VM/USER_TEMPLATE/SNAPSHOTS_ALLOWED'] == 'TRUE' then
+            return OpenNebula::Error.new("Snapshots aren't allowed for this VM. Set SNAPSHOTS_ALLOWED attribute to TRUE")
+        end
+
+        snapshots_quota = self['/VM/USER_TEMPLATE/SNAPSHOTS_QUOTA']
+        if !snapshots_quota.nil? and list_snapshots.length >= snapshots_quota.to_i then
+            return OpenNebula::Error.new("Unable to create a snapshot, snapshots quota exceed")
+        end
+
+        snapshot_create_original name
+    end
+
     # Error while processing(calculating) showback Exception
     class ShowbackError < StandardError
 
