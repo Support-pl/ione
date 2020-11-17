@@ -266,7 +266,7 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 #
 # IONe API based on http
 #
-set :bind, 'localhost'
+set :bind, '0.0.0.0'
 set :port, 8009
 
 before do
@@ -298,7 +298,7 @@ post '/ione/:method' do | method |
 end
 
 puts "Registering ONe methods"
-post %r{one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
+post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     body = JSON.parse(@request_body)
     auth = body['auth']
 
