@@ -32,6 +32,7 @@ $: << ROOT_DIR+'/models'
 require 'rubygems'
 require 'sinatra'
 require "sinatra/json"
+require "sinatra/cors"
 require 'erb'
 require 'yaml'
 require 'securerandom'
@@ -268,6 +269,9 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 #
 set :bind, '0.0.0.0'
 set :port, 8009
+
+set :allow_origin, %r{.+}
+set :allow_methods, "GET,HEAD,POST"
 
 before do
     @request_body = request.body.read
