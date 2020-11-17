@@ -31,6 +31,7 @@ $: << ROOT_DIR+'/models'
 ##############################################################################
 require 'rubygems'
 require 'sinatra'
+require "sinatra/json"
 require 'erb'
 require 'yaml'
 require 'securerandom'

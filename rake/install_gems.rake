@@ -9,6 +9,7 @@ task :install_gems => :before do
     sh %{gem install net-ssh -v 6.1.0}
     sh %{gem install net-sftp -v 3.0.0}
     sh %{gem install colorize}
+    sh %{gem install sinatra-contrib}
     puts
 
     puts "2. Installing required system libs and tools"
