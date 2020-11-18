@@ -5,7 +5,7 @@
         <h1>Hello, World! via IONe Web API</h1>
       </a-row>
       <a-row type="flex" justify="space-around">
-        <a-button type="primary" @click="$router.push('/dashboard')"
+        <a-button type="primary" @click="$router.push('/login')"
           >Go to UI</a-button
         >
       </a-row>
