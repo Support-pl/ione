@@ -278,8 +278,10 @@ before do
         halt 200, { 'Allow' => "*" }, ""
     end
     begin
-        @request_body = request.body.read
-        @request_hash = JSON.parse @request_body
+        unless request.request_method == 'GET' then
+            @request_body = request.body.read
+            @request_hash = JSON.parse @request_body
+        end
         if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
             halt 401, { 'Allow' => "*" }, "No Credentials given"
         end
