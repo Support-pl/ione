@@ -8,10 +8,14 @@ export default new Vuex.Store({
     user: {
       loggedIn: false,
     },
+    credentials: "",
   },
   mutations: {
     login(state, user) {
-      state.loggedIn = user;
+      state.user = user;
+    },
+    credentials(state, cred) {
+      state.credentials = cred;
     },
   },
   actions: {},

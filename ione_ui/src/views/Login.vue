@@ -42,8 +42,9 @@ export default {
         })
         .then((res) => {
           console.log(res);
-          this.$store.commit("login", { ...res.data, loggedIn: true });
-          this.$router.push("/dashboard")
+          this.$store.commit("login", { ...res.data.r.USER, loggedIn: true });
+          this.$store.commit("credentials", `${this.username}:${this.password}`)
+          this.$router.push("/dashboard/settings")
         });
     },
   },
