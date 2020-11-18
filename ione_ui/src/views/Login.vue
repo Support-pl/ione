@@ -57,6 +57,7 @@ export default {
             ...res.data.response.USER,
             loggedIn: true,
           });
+          this.$store.commit("credentials", this.auth);
           this.$router.push("/dashboard/settings");
         } else {
           this.$message.error(`User "${this.auth.username}" is not admin`);
