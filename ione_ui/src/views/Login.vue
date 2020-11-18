@@ -6,14 +6,14 @@
       </a-row>
       <a-row type="flex" justify="space-around" class="login-grid-item">
         <a-col :span="12">
-          <a-input placeholder="Username" v-model="username"></a-input>
+          <a-input placeholder="Username" v-model="auth.username"></a-input>
         </a-col>
       </a-row>
       <a-row type="flex" justify="space-around" class="login-grid-item">
         <a-col :span="12">
           <a-input-password
             placeholder="Password or token"
-            v-model="password"
+            v-model="auth.password"
           ></a-input-password>
         </a-col>
       </a-row>
@@ -28,36 +28,40 @@
 export default {
   data() {
     return {
-      username: "oneadmin",
-      password: "",
+      auth: {
+        username: "oneadmin",
+        password: "9q8ReU+#RG*6zGRsvKxM",
+      },
     };
   },
   methods: {
     performLogin() {
-      console.log(this.username, this.password);
-      this.$axios
-        .post("one.u.to_hash!", {
-          auth: `${this.username}:${this.password}`,
-          oid: -1,
-        })
-        .then(async (res) => {
-          let is_admin = (
-            await this.$axios.post("one.u.is_admin", {
-              auth: `${this.username}:${this.password}`,
+      this.$axios({
+        method: "post",
+        url: "one.u.to_hash!",
+        data: { oid: -1 },
+        auth: this.auth,
+      }).then(async (res) => {
+        let is_admin = (
+          await this.$axios({
+            method: "post",
+            url: "one.u.is_admin",
+            data: {
               oid: -1,
-            })
-          ).data.r;
-          if (is_admin) {
-            this.$store.commit("login", { ...res.data.r.USER, loggedIn: true });
-            this.$store.commit(
-              "credentials",
-              `${this.username}:${this.password}`
-            );
-            this.$router.push("/dashboard/settings");
-          } else {
-            this.$message.error(`User "${this.username}" is not admin`);
-          }
-        });
+            },
+            auth: this.auth,
+          })
+        ).data.response;
+        if (is_admin) {
+          this.$store.commit("login", {
+            ...res.data.response.USER,
+            loggedIn: true,
+          });
+          this.$router.push("/dashboard/settings");
+        } else {
+          this.$message.error(`User "${this.auth.username}" is not admin`);
+        }
+      });
     },
   },
 };
