@@ -271,27 +271,36 @@ set :bind, '0.0.0.0'
 set :port, 8009
 
 set :allow_origin, %r{.+}
-set :allow_methods, "GET,HEAD,POST"
+set :allow_methods, "GET,HEAD,POST,OPTIONS"
 
 before do
-    @request_body = request.body.read
+    if request.request_method == 'OPTIONS' then
+        halt 200, { 'Allow' => "*" }, ""
+    end
+    begin
+        @request_body = request.body.read
+        @request_hash = JSON.parse @request_body
+        if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
+            halt 401, { 'Allow' => "*" }, "No Credentials given"
+        end
+        @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
+        @client = Client.new(@auth)
+        u = User.new_with_id(-1, @client)
+        rc = u.info!
+        if OpenNebula.is_error?(rc)
+            halt 401, { 'Allow' => "*" }, "False Credentials given"
+        end
+    rescue => e
+        RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}" 
+        halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
+    end
 end
 
 puts "Registering IONe methods"
 post '/ione/:method' do | method |
     begin
-        args = JSON.parse(@request_body)
-        auth = args['auth']
-
-        u = User.new_with_id(-1, Client.new(auth))
-        rc = u.info!
-        if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
-            status 401
-            body "False Credentials given"
-            return
-        end
-        RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{args['params'].collect {|p| p.inspect}.join(", ")})"
-        r = IONe.new(Client.new(args['auth']), $db).send(method, *args['params'])
+        RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = IONe.new(@client, $db).send(method, *@request_hash['params'])
     rescue => e
         r = e.message
         backtrace = e.backtrace
@@ -303,18 +312,7 @@ end
 
 puts "Registering ONe methods"
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
-    body = JSON.parse(@request_body)
-    auth = body['auth']
-
-    u = User.new_with_id(-1, Client.new(auth))
-    rc = u.info!
-    if OpenNebula.is_error?(rc) or auth.nil? or auth.empty?
-        status 401
-        body "False Credentials given"
-        return
-    end
-
-    json(r:
-        onblock(object.to_sym, body['oid'], Client.new(body['auth'])).send(method.to_s << excl.to_s, *body['args'])
+    json(response:
+        onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
     )
 end
