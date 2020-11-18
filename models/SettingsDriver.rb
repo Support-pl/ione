@@ -1,17 +1,5 @@
-require 'sequel'
-
-require $ione_conf['DB']['gem']
-$DB = Sequel.connect({
-        adapter: $ione_conf['DB']['adapter'].to_sym,
-        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host'],
-        encoding: 'utf8mb4'   })
-
-$DB.extension(:connection_validator)
-$DB.pool.connection_validation_timeout = -1
-
 begin
-    $DB.create_table :settings do 
+    $db.create_table :settings do 
         String :name, size: 128, primary_key: true
         String :body, text: true, null: false
         String :description, text: true, null: true
@@ -30,13 +18,13 @@ begin
         ['CURRENCY_MAIN', "€", ""]
     ]
     required.each do | record |
-        $DB[:settings].insert(name: record[0], body: record[1], description: record[2])
+        $db[:settings].insert(name: record[0], body: record[1], description: record[2])
     end
 rescue
     puts "Table :settings already exists, skipping"
 end
 
-SETTINGS_TABLE = $DB[:settings]
+SETTINGS_TABLE = $db[:settings]
 
 def db_result answer
     answer.as_hash(:name, :body)
