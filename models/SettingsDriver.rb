@@ -38,6 +38,14 @@ get '/settings' do
     end
 end
 
+get '/settings/desc' do
+    begin
+        r response: SETTINGS_TABLE.as_hash(:name, :description)
+    rescue => e
+        r error: e.message, debug: e.class
+    end
+end
+
 get '/settings/:key' do | key |
     begin
         r response: db_result(SETTINGS_TABLE.where(name:key))
