@@ -24,10 +24,16 @@ const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: () => import("@/views/Dashboard.vue"),
+    component: () => import("@/views/dashboard.vue"),
     meta: {
       requiresAuth: true,
     },
+    children: [
+      {
+        path: "settings",
+        component: () => import("@/views/dashboard/settings.vue"),
+      },
+    ],
   },
 ];
 
