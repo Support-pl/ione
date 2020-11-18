@@ -40,11 +40,23 @@ export default {
           auth: `${this.username}:${this.password}`,
           oid: -1,
         })
-        .then((res) => {
-          console.log(res);
-          this.$store.commit("login", { ...res.data.r.USER, loggedIn: true });
-          this.$store.commit("credentials", `${this.username}:${this.password}`)
-          this.$router.push("/dashboard/settings")
+        .then(async (res) => {
+          let is_admin = (
+            await this.$axios.post("one.u.is_admin", {
+              auth: `${this.username}:${this.password}`,
+              oid: -1,
+            })
+          ).data.r;
+          if (is_admin) {
+            this.$store.commit("login", { ...res.data.r.USER, loggedIn: true });
+            this.$store.commit(
+              "credentials",
+              `${this.username}:${this.password}`
+            );
+            this.$router.push("/dashboard/settings");
+          } else {
+            this.$message.error(`User "${this.username}" is not admin`);
+          }
         });
     },
   },
