@@ -28,8 +28,8 @@
     <a-row type="flex" justify="end">
       <a-col style="padding: 15px 50px">
         <a-button-group>
-          <a-button>cancel</a-button>
-          <a-button type="primary">submit</a-button>
+          <a-button>Cancel</a-button>
+          <a-button type="primary">Submit</a-button>
         </a-button-group>
       </a-col>
     </a-row>
@@ -38,7 +38,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import ds_pool from "./datastore/ds";
 const datastoreColumns = [
   {
     dataIndex: "ID",
@@ -74,8 +73,8 @@ export default {
   name: "datastore",
   data() {
     return {
-      ds_pool,
       datastoreColumns,
+      ds_pool: {},
       settings: [],
       editingKey: "",
       cacheData: [],
@@ -87,7 +86,11 @@ export default {
       return types;
     },
     datastores() {
-      return this.ds_pool.DATASTORE_POOL.DATASTORE.filter((el) => el.TYPE == 1);
+      if (Object.keys(this.ds_pool).length !== 0)
+        return this.ds_pool.DATASTORE_POOL.DATASTORE.filter(
+          (el) => el.TYPE == 1
+        );
+      return [];
     },
 
     ...mapGetters(["credentials"]),
@@ -101,6 +104,7 @@ export default {
           auth: this.credentials,
         })
       ).data.response;
+      this.ds_pool;
     },
   },
   mounted() {
