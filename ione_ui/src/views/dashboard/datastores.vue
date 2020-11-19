@@ -104,7 +104,14 @@ export default {
           auth: this.credentials,
         })
       ).data.response;
-      this.ds_pool;
+      this.ds_pool = (
+        await this.$axios({
+          method: "post",
+          url: "/one.ds.pool.to_hash!",
+          auth: this.credentials,
+          data: { params: [] },
+        })
+      ).data.response;
     },
   },
   mounted() {
