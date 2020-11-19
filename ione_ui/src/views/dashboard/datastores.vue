@@ -9,7 +9,7 @@
       <span slot="disktype" slot-scope="type">
         <a-select :default-value="type" style="width: 200px">
           <a-select-option
-            v-for="(select, key) in disktypes.body.split(', ')"
+            v-for="(select, key) in disktypes"
             :key="key"
             :value="select"
             >{{ select }}</a-select-option
@@ -82,7 +82,9 @@ export default {
   },
   computed: {
     disktypes() {
-      let types = this.settings.find((el) => el.name == "DISK_TYPES");
+      let types = (
+        this.settings.find((el) => el.name == "DISK_TYPES") ?? { body: "" }
+      ).body.split(",");
       return types;
     },
     datastores() {
