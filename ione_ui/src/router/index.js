@@ -33,6 +33,10 @@ const routes = [
         path: "settings",
         component: () => import("@/views/dashboard/settings.vue"),
       },
+      {
+        path: "datastores",
+        component: () => import("@/views/dashboard/datastores.vue"),
+      },
     ],
   },
 ];
