@@ -1,4 +1,6 @@
 class IONe
+    # @!group Billing
+    
     #
     # Calculates Showback for given User
     #
@@ -182,4 +184,6 @@ class IONe
             'type'     => e.class
         }
     end
+
+    # @!endgroup
 end

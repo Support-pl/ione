@@ -57,7 +57,7 @@ else
     'pnd'
 end
 
-$db[:records].insert(:id => id, :state => state, :time => Time.now.to_i)
+$db[:records].insert(id: id, state: state, time: Time.now.to_i)
 
 puts "Success. State: #{state}, VM State:#{vm.state_str}"
 # create table records(id int not null, state varchar(10) not null, time int)

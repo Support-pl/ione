@@ -3,6 +3,9 @@ require 'json'
 puts 'Extending Hash class by out method'
 # Ruby default Hash class
 class Hash
+
+    # @!group Debug Tools
+
     # Returns hash as 'pretty generated' JSON String
     def out
         JSON.pretty_generate(self)
@@ -11,6 +14,11 @@ class Hash
     def debug_out
         JSON.pretty_generate(self).gsub("\": ", "\" => ").gsub(" => null", " => nil")
     end
+
+    # @!endgroup
+
+    # @!group Dev Tools
+
     # Replaces string keys with symbol keys
     # @return [Hash]
     def to_sym!
@@ -69,10 +77,12 @@ class Hash
         end
         result.chomp!
     end
+    # @!endgroup
 end
 
 # Standard Ruby class extensions
 class Array
+    # @!group Dev Tools
     # Returns Array values converted to Symbol
     def to_sym
         self.map do | el |
@@ -100,16 +110,9 @@ class Array
         end
         cpy
     end
+
+    # @!endgroup
 end
-
-# Basic class 
-class BasicObject
-    # Returns objects self
-    def itself
-     self
-    end
-end 
-
 
 puts 'Extending NilClass by add method'
 # Ruby default Nil class
