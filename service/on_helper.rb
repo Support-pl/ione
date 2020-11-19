@@ -111,8 +111,26 @@ module ONeHelper
         acl: Acl,
         g:   Group,
         i:   Image,
-        p:   Pool,
         hk:  Hook
+    }
+
+    ON_INSTANCE_POOLS = {
+        vm:  VirtualMachinePool,
+        t:   TemplatePool,
+        h:   HostPool,
+        u:   UserPool,
+        vn:  VirtualNetworkPool,
+        ds:  DatastorePool,
+        vr:  VirtualRouterPool,
+        vdc: VdcPool,
+        sg:  SecurityGroupPool,
+        z:   ZonePool,
+        d:   DocumentPool,
+        c:   ClusterPool,
+        acl: AclPool,
+        g:   GroupPool,
+        i:   ImagePool,
+        hk:  HookPool
     }
 
     # Generates any 'Pool' element object or yields it
