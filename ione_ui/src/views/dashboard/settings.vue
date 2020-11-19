@@ -51,10 +51,10 @@
 
 <script>
 import { mapGetters } from "vuex";
-import num from "./types/num.vue";
-import list from "./types/list.vue";
-import str from "./types/raw.vue";
-import object from "./types/object.vue";
+import num from "@/components/types/num.vue";
+import list from "@/components/types/list.vue";
+import str from "@/components/types/raw.vue";
+import object from "@/components/types/object.vue";
 
 const columns = [
   {
