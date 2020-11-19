@@ -15,7 +15,11 @@
           </a-menu-item>
           <a-menu-item key="costs"> Costs </a-menu-item>
           <a-menu-item key="hosts"> Hosts(Nodes) </a-menu-item>
-          <a-menu-item key="datastores"> Datastores </a-menu-item>
+          <a-menu-item key="datastores">
+            <router-link :to="{ path: '/dashboard/datastores' }">
+              Datastores
+            </router-link>
+					</a-menu-item>
         </a-menu>
       </a-layout-sider>
       <a-layout-content>
