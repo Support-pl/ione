@@ -6,8 +6,12 @@
       rowKey="ID"
       :pagination="false"
     >
-      <span slot="disktype" slot-scope="type">
-        <a-select :default-value="type" style="width: 200px">
+      <span slot="disktype" slot-scope="text, record">
+        <a-select
+          :default-value="record.TEMPLATE.DRIVE_TYPE"
+          style="width: 200px"
+          @change="(type) => updateAttribute(record.ID, 'DRIVE_TYPE', type)"
+        >
           <a-select-option
             v-for="(select, key) in disktypes"
             :key="key"
@@ -17,22 +21,35 @@
         </a-select>
       </span>
 
-      <span slot="hypervisor" slot-scope="current">
-        <a-input :value="current" style="width: 200px"></a-input>
+      <span slot="hypervisor" slot-scope="text, record">
+        <a-tooltip title="Press Enter to save change">
+          <a-input
+            v-model="record.TEMPLATE.HYPERVISOR"
+            style="width: 200px"
+            @pressEnter="
+              updateAttribute(
+                record.ID,
+                'HYPERVISOR',
+                record.TEMPLATE.HYPERVISOR
+              )
+            "
+            @change="
+              record.TEMPLATE.HYPERVISOR = record.TEMPLATE.HYPERVISOR.toUpperCase()
+            "
+          ></a-input>
+        </a-tooltip>
       </span>
 
-      <span slot="deploy" slot-scope="current">
-        <a-switch :checked="current == 'TRUE'"></a-switch>
+      <span slot="deploy" slot-scope="text, record">
+        <a-switch
+          :checked="record.TEMPLATE.DEPLOY == 'TRUE'"
+          @change="
+            (checked) =>
+              updateAttribute(record.ID, 'DEPLOY', checked ? 'TRUE' : 'FALSE')
+          "
+        ></a-switch>
       </span>
     </a-table>
-    <a-row type="flex" justify="end">
-      <a-col style="padding: 15px 50px">
-        <a-button-group>
-          <a-button>Cancel</a-button>
-          <a-button type="primary">Submit</a-button>
-        </a-button-group>
-      </a-col>
-    </a-row>
   </div>
 </template>
 
@@ -50,19 +67,16 @@ const datastoreColumns = [
     title: "NAME",
   },
   {
-    dataIndex: "TEMPLATE.DRIVE_TYPE",
     key: "DISK_TYPE",
-    title: "DISK TYPE",
+    title: "Drive Type",
     scopedSlots: { customRender: "disktype" },
   },
   {
-    dataIndex: "TEMPLATE.HYPERVISOR",
     key: "HYPERVISOR",
-    title: "HYPERVISOR",
+    title: "Hypervisor",
     scopedSlots: { customRender: "hypervisor" },
   },
   {
-    dataIndex: "TEMPLATE.DEPLOY",
     key: "DEPLOY",
     title: "DEPLOY",
     scopedSlots: { customRender: "deploy" },
@@ -76,8 +90,6 @@ export default {
       datastoreColumns,
       ds_pool: {},
       settings: [],
-      editingKey: "",
-      cacheData: [],
     };
   },
   computed: {
@@ -98,22 +110,31 @@ export default {
     ...mapGetters(["credentials"]),
   },
   methods: {
-    async sync() {
-      this.settings = (
-        await this.$axios({
-          method: "get",
-          url: "/settings",
-          auth: this.credentials,
-        })
-      ).data.response;
-      this.ds_pool = (
-        await this.$axios({
-          method: "post",
-          url: "/one.ds.pool.to_hash!",
-          auth: this.credentials,
-          data: { params: [] },
-        })
-      ).data.response;
+    async updateAttribute(id, key, val) {
+      console.log(key, val);
+      await this.$axios({
+        method: "post",
+        url: "/one.ds.update",
+        auth: this.credentials,
+        data: {
+          oid: id,
+          params: [`${key}="${val}"`, true],
+        },
+      });
+      this.sync();
+    },
+    sync() {
+      this.$axios({
+        method: "get",
+        url: "/settings",
+        auth: this.credentials,
+      }).then((res) => (this.settings = res.data.response));
+      this.$axios({
+        method: "post",
+        url: "/one.ds.pool.to_hash!",
+        auth: this.credentials,
+        data: { params: [] },
+      }).then((res) => (this.ds_pool = res.data.response));
     },
   },
   mounted() {
