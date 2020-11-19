@@ -19,7 +19,7 @@
             <router-link :to="{ path: '/dashboard/datastores' }">
               Datastores
             </router-link>
-					</a-menu-item>
+          </a-menu-item>
         </a-menu>
       </a-layout-sider>
       <a-layout-content>
@@ -31,15 +31,15 @@
 
 <script>
 export default {
-    data() {
-        return {
-            route: []
-        }
-    },
-    mounted() {
-        this.route = ['settings']
-    },
-}
+  data() {
+    return {
+      route: [],
+    };
+  },
+  mounted() {
+    this.route = ["settings"];
+  },
+};
 </script>
 
 <style scoped>
