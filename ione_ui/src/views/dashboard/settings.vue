@@ -24,10 +24,7 @@
             @keyup.enter="save(record.name)"
             @keyup.escape="cancel(record.name)"
           />
-          <num v-else-if="record.type == 'num'" :value="record" />
-          <list v-else-if="record.type == 'list'" :value="record" />
-          <obj v-else-if="record.type == 'object'" :value="record" />
-          <raw v-else :value="record" />
+          <component :is="types[record.type]" v-else :value="record" />
         </span>
         <span slot="actions" slot-scope="text, record">
           <a-space class="editable-row-operations">
@@ -56,8 +53,8 @@
 import { mapGetters } from "vuex";
 import num from "./types/num.vue";
 import list from "./types/list.vue";
-import raw from "./types/raw.vue";
-import obj from "./types/object.vue";
+import str from "./types/raw.vue";
+import object from "./types/object.vue";
 
 const columns = [
   {
@@ -88,18 +85,18 @@ const columns = [
 
 export default {
   name: "Settings",
-  components: {
-    num,
-    list,
-    raw,
-    obj,
-  },
   data() {
     return {
       settings: [],
       columns,
       editingKey: "",
       cacheData: [],
+      types: {
+        num,
+        list,
+        str,
+        object,
+      },
     };
   },
   async mounted() {
