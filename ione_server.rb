@@ -293,7 +293,7 @@ before do
             halt 401, { 'Allow' => "*" }, "False Credentials given"
         end
     rescue => e
-        RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}" 
+        RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
         halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
     end
 end
