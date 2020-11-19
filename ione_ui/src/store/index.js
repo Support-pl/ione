@@ -18,6 +18,9 @@ export default new Vuex.Store({
       state.credentials = cred;
     },
   },
+  getters: {
+    credentials: (state) => state.credentials,
+  },
   actions: {},
   modules: {},
 });
