@@ -63,7 +63,7 @@ class Hash
                 result += " ]\n"
             elsif value.class == Array then
                 value.each do | el |
-                    result += { key => el}.to_one_template + "\n"
+                    result += { key => el }.to_one_template + "\n"
                 end
             end
         end

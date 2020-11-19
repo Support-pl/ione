@@ -47,7 +47,7 @@ end
 post '/settings' do
     begin
         data = JSON.parse(@request_body)
-        r response: SETTINGS_TABLE.insert(**data.to_sym)
+        r response: SETTINGS_TABLE.insert(**data.to_sym!)
     rescue => e
         r error: e.message
     end
@@ -56,7 +56,7 @@ end
 post '/settings/:key' do | key |
     begin
         data = JSON.parse(@request_body)
-        data = data.to_sym
+        data = data.to_sym!
         r response: SETTINGS_TABLE.where(name: key).update(name: key, **data)
     rescue => e
         r error: e.message
