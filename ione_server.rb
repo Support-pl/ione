@@ -318,3 +318,10 @@ post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
         onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
     )
 end
+
+puts "Registering ONe Pool methods"
+post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
+    json(response:
+        ON_INSTANCE_POOLS[object.to_sym].new(@client).send(method.to_s << excl.to_s, *@request_hash['params'])
+    )
+end
