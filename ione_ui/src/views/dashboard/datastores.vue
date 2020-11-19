@@ -2,7 +2,7 @@
   <div class="datastore">
     <a-table
       :columns="datastoreColumns"
-      :data-source="filt(dsItems)"
+      :data-source="datastores"
       rowKey="ID"
       :pagination="false"
     >
@@ -38,7 +38,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import dsItems from "./datastore/ds";
+import ds_pool from "./datastore/ds";
 const datastoreColumns = [
   {
     dataIndex: "ID",
@@ -74,7 +74,7 @@ export default {
   name: "datastore",
   data() {
     return {
-      dsItems,
+      ds_pool,
       datastoreColumns,
       settings: [],
       editingKey: "",
@@ -86,13 +86,13 @@ export default {
       let types = this.settings.find((el) => el.name == "DISK_TYPES");
       return types;
     },
+    datastores() {
+      return this.ds_pool.DATASTORE_POOL.DATASTORE.filter((el) => el.TYPE == 1);
+    },
 
     ...mapGetters(["credentials"]),
   },
   methods: {
-    filt(data) {
-      return data.DATASTORE_POOL.DATASTORE.filter((el) => el.TYPE == 1);
-    },
     async sync() {
       this.settings = (
         await this.$axios({
