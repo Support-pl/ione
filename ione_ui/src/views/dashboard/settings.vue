@@ -30,22 +30,22 @@
           <raw v-else :value="record" />
         </span>
         <span slot="actions" slot-scope="text, record">
-          <div class="editable-row-operations">
-            <span v-if="record.editable">
-              <a @click="() => save(record.name)">Save</a>
+          <a-space class="editable-row-operations">
+            <template v-if="record.editable">
               <a-popconfirm
-                title="Sure to cancel?"
-                @confirm="() => cancel(record.name)"
+                title="Sure to save?"
+                @confirm="() => save(record.name)"
               >
-                <a>Cancel</a>
+                <a>Save</a>
               </a-popconfirm>
-            </span>
+              <a @click="() => cancel(record.name)">Cancel</a>
+            </template>
             <span v-else>
               <a :disabled="editingKey !== ''" @click="() => edit(record.name)"
                 >Edit</a
               >
             </span>
-          </div>
+          </a-space>
         </span>
       </a-table>
     </a-col>
