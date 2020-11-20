@@ -5,6 +5,11 @@ task :before do
         exit(-1)
     end
 
+    unless system('which nginx') then
+        puts "NGINX must be installed before proceeding with IONe"
+        exit(-1)
+    end
+
     @src_dir = pwd
 end
 
