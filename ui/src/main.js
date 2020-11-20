@@ -5,7 +5,7 @@ import router from "@/router";
 import axios from "axios";
 
 Vue.prototype.$axios = axios.create({
-  baseURL: "http://185.66.69.108:8009",
+  baseURL: `https://api.ione.${process.env.CLOUD_DOMAIN}`,
 });
 
 Vue.config.productionTip = false;
