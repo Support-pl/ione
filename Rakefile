@@ -13,6 +13,17 @@ task :before do
     @src_dir = pwd
 end
 
+task :useful_questions do
+    @domain = nil
+    while @domain.nil?
+        print "Please enter your base domain: "
+        @domain = STDIN.gets.strip.downcase
+        print "You've entered '#{@domain}', is it correct? (y/n) "
+        a = STDIN.gets.strip.downcase
+        @domain = nil unless a == 'y'
+    end
+end
+
 load "rake/install_gems.rake"
 load "rake/install_ione.rake"
 load "rake/install_ui.rake"
