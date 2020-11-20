@@ -2,6 +2,10 @@ const path = require("path");
 module.exports = {
   chainWebpack: (config) => {
     config.resolve.alias.set("@", path.resolve(__dirname, "src"));
+    config.plugin("html").tap((args) => {
+      args[0].title = "IONe UI";
+      return args;
+    });
   },
 
   devServer: {
@@ -11,5 +15,5 @@ module.exports = {
   },
 
   runtimeCompiler: true,
-  productionSourceMap: false
+  productionSourceMap: false,
 };
