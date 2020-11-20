@@ -1,14 +1,11 @@
 desc "IONe Admin UI Installation"
-task :install_ui do
+task :install_ui => [:useful_questions] do
     puts 'Copying UI files'
     cp_r 'ui', '/usr/lib/one/ione/'
 
     puts "Installing dependencies"
     cd '/usr/lib/one/ione/ui/'
     sh %{sudo npm install}
-
-    puts "Building static UI"
-    sh %{sudo npm run build}
 
     puts "Generating config"
     File.open("/usr/lib/one/ione/ui/src/config/index.js", 'w') do | f |
@@ -18,6 +15,9 @@ task :install_ui do
             };
         EOF
     end
+
+    puts "Building static UI"
+    sh %{sudo npm run build}
 
     puts "Changing owner"
     chown_R "oneadmin", "oneadmin", "/usr/lib/one/ione/ui/dist"
