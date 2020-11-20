@@ -1,6 +1,9 @@
 <template>
-  <a-row type="flex" justify="space-around" style="margin: 10% 0">
+  <a-row type="flex" justify="space-around" style="margin: 8% 0">
     <a-col :span="12">
+      <a-row type="flex" justify="space-around">
+        <img src="/ione_logo.png" width="60%" />
+      </a-row>
       <a-row type="flex" justify="space-around" class="login-grid-item">
         <h1><b>Welcome to IONe UI</b></h1>
       </a-row>

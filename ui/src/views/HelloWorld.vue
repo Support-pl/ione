@@ -1,8 +1,11 @@
 <template>
-  <a-row type="flex" justify="space-around">
+  <a-row type="flex" justify="space-around" style="margin-top: 150px">
     <a-col :span="12">
       <a-row type="flex" justify="space-around">
-        <h1>Hello, World! via IONe Web API</h1>
+        <img src="/ione_logo.png" width="60%" />
+      </a-row>
+      <a-row type="flex" justify="space-around">
+        <h3>Hello, World! via IONe Web API</h3>
       </a-row>
       <a-row type="flex" justify="space-around">
         <a-button type="primary" @click="$router.push('/login')"
