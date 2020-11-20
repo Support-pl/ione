@@ -89,10 +89,10 @@ task :test_api_root do
     begin
         r = Net::HTTP.get_response(api)
     rescue => e
-        fail "Unable to get response from '/', got: #{e.message}"
+        fail "Unable to get response from '/', got: #{r.code} #{e.message}"
     end
     unless r.is_a? Net::HTTPSuccess then
-        fail "Unable to get response from '/', got: #{r.body}" 
+        fail "Unable to get response from '/', got: #{r.code} #{r.body}" 
     end
     passed
 
