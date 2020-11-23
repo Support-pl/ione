@@ -11,7 +11,7 @@ task :install_ui => [:useful_questions] do
     File.open("/usr/lib/one/ione/ui/src/config/index.js", 'w') do | f |
         f.puts <<-EOF
             module.exports = {
-                CLOUD_API_BASE_URL: "https://api.ione.#{@domain}",
+                CLOUD_API_BASE_URL: "https://ione-api.#{@domain}",
             };
         EOF
     end
