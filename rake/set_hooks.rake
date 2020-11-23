@@ -21,7 +21,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'pending',
+        "NAME" => 'hold',
         "ON" => "CUSTOM",
         "STATE" => "HOLD",
         "LCM_STATE" => "LCM_INIT",
@@ -31,7 +31,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'active',
+        "NAME" => 'active-boot',
         "ON" => "CUSTOM",
         "STATE" => "ACTIVE",
         "LCM_STATE" => "BOOT",
@@ -41,7 +41,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'active',
+        "NAME" => 'active-running',
         "ON" => "CUSTOM",
         "STATE" => "ACTIVE",
         "LCM_STATE" => "RUNNING",
@@ -51,7 +51,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'inactive',
+        "NAME" => 'inactive-stopped',
         "ON" => "CUSTOM",
         "STATE" => "STOPPED",
         "LCM_STATE" => "LCM_INIT",
@@ -61,7 +61,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'inactive',
+        "NAME" => 'inactive-suspended',
         "ON" => "CUSTOM",
         "STATE" => "SUSPENDED",
         "LCM_STATE" => "LCM_INIT",
@@ -71,7 +71,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'inactive',
+        "NAME" => 'inactive-done',
         "ON" => "CUSTOM",
         "STATE" => "DONE",
         "LCM_STATE" => "LCM_INIT",
@@ -81,7 +81,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "RESOURCE" => "VM"
     },
     {
-        "NAME" => 'inactive',
+        "NAME" => 'inactive-poweroff',
         "ON" => "CUSTOM",
         "STATE" => "POWEROFF",
         "LCM_STATE" => "LCM_INIT",
@@ -113,16 +113,16 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ARGUMENTS" => '$API'
     },
     {
-        "NAME" => 'vn-record',
+        "NAME" => 'vn-record-crt',
         "TYPE" => 'api',
-        "CALL" => 'one.vn.allocate',
+        "CALL" => 'one.vn.add_ar',
         "COMMAND" => 'vn_record.rb',
         "ARGUMENTS" => '$API crt'
     },
     {
-        "NAME" => 'vn-record',
+        "NAME" => 'vn-record-del',
         "TYPE" => 'api',
-        "CALL" => 'one.vn.delete',
+        "CALL" => 'one.vn.rm_ar',
         "COMMAND" => 'vn_record.rb',
         "ARGUMENTS" => '$API del'
     }
