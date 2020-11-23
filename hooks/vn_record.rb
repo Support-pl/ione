@@ -15,16 +15,28 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
+require 'base64'
+require 'nokogiri'
+
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
+    puts "VNet wasn't allocated/deleted, skipping"
+    exit 0
+end
+
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
 
 $: << RUBY_LIB_LOCATION
-require 'base64'
+require 'opennebula'
+include OpenNebula
+
+vnet = VirtualNetwork.new xml.xpath('//EXTRA/VNET'), Client.new
+vnet.info!
+
 require 'yaml'
 require 'json'
 require 'sequel'
-require 'opennebula'
-include OpenNebula
 
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 require $ione_conf['DB']['adapter']
@@ -34,15 +46,6 @@ $db = Sequel.connect({
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
 class AR < Sequel::Model(:ars); end
-
-xml = Nokogiri::XML(Base64::decode64(ARGV.first))
-unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
-    puts "VNet wasn't allocated/deleted, skipping"
-    exit 0
-end
-
-vnet = VirtualNetwork.new xml.xpath('//EXTRA/VNET'), Client.new
-vnet.info!
 
 AR.create do | r |
     r.vnid  = vnet.id
