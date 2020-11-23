@@ -109,7 +109,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "NAME" => 'release-ar-on-remove',
         "TYPE" => 'api',
         "CALL" => 'one.user.delete',
-        "COMMAND" => '/usr/lib/one/ione/hooks/set_ar.rb',
+        "COMMAND" => '/usr/lib/one/ione/hooks/remove_ar.rb',
         "ARGUMENTS" => '$API'
     },
     {
