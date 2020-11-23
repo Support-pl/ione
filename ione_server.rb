@@ -32,7 +32,6 @@ $: << ROOT_DIR+'/models'
 require 'rubygems'
 require 'sinatra'
 require "sinatra/json"
-require "sinatra/cors"
 require 'erb'
 require 'yaml'
 require 'securerandom'
@@ -267,15 +266,16 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 #
 # IONe API based on http
 #
+puts "Binding on localhost:8009"
 set :bind, '0.0.0.0'
 set :port, 8009
 
-set :allow_origin, %r{.+}
-set :allow_methods, "GET,HEAD,POST,OPTIONS"
-
 before do
     if request.request_method == 'OPTIONS' then
-        halt 200, { 'Allow' => "*" }, ""
+        halt 200, {
+            'Allow' => "HEAD,GET,PUT,POST,DELETE,OPTIONS",
+            "Access-Control-Allow-Headers" => "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept"
+        }, ""
     end
     begin
         unless request.request_method == 'GET' then
@@ -296,6 +296,14 @@ before do
         RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
         halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
     end
+end
+
+puts "Allowing CORS"
+after do
+    response.headers['Allow'] = "*" unless response.headers['Allow']
+    response.headers['Access-Control-Allow-Origin'] = "*" unless response.headers['Access-Control-Allow-Origin']
+    response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
+    response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
 end
 
 puts "Registering IONe methods"
