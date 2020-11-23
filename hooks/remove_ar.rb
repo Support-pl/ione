@@ -16,24 +16,28 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
+require 'base64'
+require 'nokogiri'
 
-if !ONE_LOCATION
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-    RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
+    puts "User wasn't deleted, skipping"
+    exit 0
 end
+
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
 
 $: << RUBY_LIB_LOCATION
 
-require 'yaml'
-require 'json'
-require 'base64'
-require 'sequel'
 require 'opennebula'
 include OpenNebula
+user = User.new xml.xpath('//EXTRA/USER'), Client.new
+user.info!
+
+require 'yaml'
+require 'json'
+require 'sequel'
 
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 require $ione_conf['DB']['adapter']
@@ -43,12 +47,9 @@ $db = Sequel.connect({
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 conf = $db[:settings].as_hash(:name, :body)
 
-template = ARGV.first
+id = user.id
 
-user    = User.new(Nokogiri.parse(Base64.decode64(template)), Client.new)
-id      = user.to_hash['document']['USER']['ID']
-
-unless user.to_hash['document']['USER']['GROUPS']['ID'] == conf['IAAS_GROUP_ID'] then
+unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
     puts "Not IaaS User, skipping..."
     exit 0
 end
@@ -69,7 +70,7 @@ vnet_pool.info_all!
 vnet_pool.each do | vnet |
     vnet.info!
 
-    if vnet['/VNET/UID'].to_i == id.to_i && user.to_hash['document']['USER']['GROUPS']['ID'] == vnet['/VNET/GID'] then
+    if vnet['/VNET/UID'].to_i == id.to_i && user.to_hash['USER']['GROUPS']['ID'] == vnet['/VNET/GID'] then
     
         VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
             "AR = [\n" \
@@ -77,7 +78,7 @@ vnet_pool.each do | vnet |
             "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
             "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
             "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
-        ) if vnet['VN_MAD'] == 'vcenter' then
+        ) if vnet['VN_MAD'] == 'vcenter'
     
         vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID']
     end
