@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # -------------------------------------------------------------------------- #
-# Copyright 2018, IONe Cloud Project, Support.by                             #
+# Copyright 2020, IONe Cloud Project, Support.by                             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -18,32 +18,17 @@
 
 STARTUP_TIME = Time.now.to_f
 
-nk_encoding = nil
-
-if RUBY_VERSION =~ /^1.9/
-    Encoding.default_external = Encoding::UTF_8
-    Encoding.default_internal = Encoding::UTF_8
-    nk_encoding = "UTF-8"
-end
-
-NOKOGIRI_ENCODING = nk_encoding
-
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
-
-if !ONE_LOCATION
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-    RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
-end
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
 
 $: << RUBY_LIB_LOCATION
 $: << RUBY_LIB_LOCATION+'/onedb'
 
+require 'base64'
 require 'yaml'
 require 'json'
 require 'sequel'
+require 'nokogiri'
 require 'opennebula'
 require 'onedb'
 require 'onedb_live'
@@ -58,7 +43,13 @@ $db = Sequel.connect({
 
 id = ARGV.first
 
-vm = VirtualMachine.new_with_id id, Client.new
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
+    puts "VM wasn't allocated, skipping"
+    exit 0
+end
+
+vm = VirtualMachine.new xml.xpath('//EXTRA/VM'), Client.new
 vm.info!
 
 begin
