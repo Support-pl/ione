@@ -33,7 +33,7 @@ export default {
     return {
       auth: {
         username: "oneadmin",
-        password: "9q8ReU+#RG*6zGRsvKxM",
+        password: "",
       },
     };
   },
