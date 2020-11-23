@@ -41,8 +41,6 @@ $db = Sequel.connect({
         user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
-id = ARGV.first
-
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
     puts "VM wasn't allocated, skipping"
