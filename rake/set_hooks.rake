@@ -7,7 +7,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "NAME" => 'set-price',
         "TYPE" => 'api',
         "CALL" => 'one.vm.allocate',
-        "COMMAND" => 'set_price.rb',
+        "COMMAND" => '/usr/lib/one/ione/hooks/set_price.rb',
         "ARGUMENTS" => '$API'
     },
     {
@@ -15,7 +15,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "PENDING",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -25,7 +25,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "HOLD",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -35,7 +35,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "ACTIVE",
         "LCM_STATE" => "BOOT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -45,7 +45,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "ACTIVE",
         "LCM_STATE" => "RUNNING",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -55,7 +55,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "STOPPED",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -65,7 +65,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "SUSPENDED",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -75,7 +75,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "DONE",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -85,7 +85,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "ON" => "CUSTOM",
         "STATE" => "POWEROFF",
         "LCM_STATE" => "LCM_INIT",
-        "COMMAND" => "record.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
         "ARGUMENTS" => "$ID",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -93,7 +93,7 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
     {
         "NAME" => 'set-limits',
         "ON" => "RUNNING",
-        "COMMAND" => "vcenter/set_limits.rb",
+        "COMMAND" => "/usr/lib/one/ione/hooks/vcenter/set_limits.rb",
         "ARGUMENTS" => "$ID $PREV_STATE $PREV_LCM_STATE",
         "TYPE" => "state",
         "RESOURCE" => "VM"
@@ -102,36 +102,36 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "NAME" => 'reserve-ar-on-create',
         "TYPE" => 'api',
         "CALL" => 'one.user.allocate',
-        "COMMAND" => 'set_ar.rb',
+        "COMMAND" => '/usr/lib/one/ione/hooks/set_ar.rb',
         "ARGUMENTS" => '$API'
     },
     {
         "NAME" => 'release-ar-on-remove',
         "TYPE" => 'api',
         "CALL" => 'one.user.delete',
-        "COMMAND" => 'set_ar.rb',
+        "COMMAND" => '/usr/lib/one/ione/hooks/set_ar.rb',
         "ARGUMENTS" => '$API'
     },
     {
         "NAME" => 'vn-record-crt',
         "TYPE" => 'api',
-        "CALL" => 'one.vn.add_ar',
-        "COMMAND" => 'vn_record.rb',
+        "CALL" => 'one.vn.allocate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/vn_record.rb',
         "ARGUMENTS" => '$API crt'
     },
     {
         "NAME" => 'vn-record-del',
         "TYPE" => 'api',
-        "CALL" => 'one.vn.rm_ar',
-        "COMMAND" => 'vn_record.rb',
+        "CALL" => 'one.vn.delete',
+        "COMMAND" => '/usr/lib/one/ione/hooks/vn_record.rb',
         "ARGUMENTS" => '$API del'
     }
 ]
 
 task :hooks do
     puts 'Copying hooks scripts'
-    cp_r "hooks", "/var/lib/one/remotes/"
-    chmod_R "+x", "/var/lib/one/remotes/hooks/"
+    cp_r "hooks", "/usr/lib/one/ione/"
+    chmod_R "+x", "/usr/lib/one/ione/hooks/"
 
     puts 'Adding hooks to HookPool'
     for hook in @hooks do
