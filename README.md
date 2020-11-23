@@ -41,7 +41,7 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.12(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">Sunstone</td><td align="center">will be replaced</td><td align="center"></td>
