@@ -15,8 +15,6 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-STARTUP_TIME = Time.now.to_f
-
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
 
