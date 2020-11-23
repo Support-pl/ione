@@ -117,14 +117,14 @@ require '/usr/lib/one/ione/lib/std++/main.rb'
         "TYPE" => 'api',
         "CALL" => 'one.vn.allocate',
         "COMMAND" => 'vn_record.rb',
-        "ARGUMENTS" => '$API'
+        "ARGUMENTS" => '$API crt'
     },
     {
         "NAME" => 'vn-record',
         "TYPE" => 'api',
         "CALL" => 'one.vn.delete',
         "COMMAND" => 'vn_record.rb',
-        "ARGUMENTS" => '$API'
+        "ARGUMENTS" => '$API del'
     }
 ]
 
