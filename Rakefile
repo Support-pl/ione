@@ -52,7 +52,7 @@ load "rake/configure_nginx.rake"
 load "rake/test_install.rake"
 
 desc "Full IONe Installation"
-task :install => [:before, :install_gems, :install_ione] do
+task :install => [:before, :install_gems, :install_ione, :configure_nginx, :set_hooks] do
     puts "  Thanks, for installation and choosing us!   "
     puts "Test install with: rake test_install"
 end
