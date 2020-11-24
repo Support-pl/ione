@@ -7,8 +7,6 @@ class IONe
     #                                                => Exception -> Service down
     def Test(msg, log = "Test")
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Test') }
         LOG "Test message received, text: #{msg}", log if msg != 'PING'
         if msg == "PING" then
             return "PONG"
@@ -26,8 +24,6 @@ class IONe
     #   => 'none'  => no user or now vm exists
     def get_vm_by_uid(uid)
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'get_vm_by_uid') }
         vmp = VirtualMachinePool.new(@client)
         vmp.info_all!
         vmp.each do | vm |
@@ -42,8 +38,6 @@ class IONe
     #   => [{:id => ..., :name => ...}, {:id => ..., :name => ...}, ...]
     def get_vms_by_uid(uid)
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'get_vm_by_uid') }
         vmp, vms = VirtualMachinePool.new(@client), []
         vmp.info_all!
         vmp.each do | vm |
@@ -64,8 +58,6 @@ class IONe
     #   => 'none'  => no user exists
     def get_uid_by_name(name)
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'get_uid_by_name') }
         up = UserPool.new(@client)
         up.info_all!
         up.each do | u |
@@ -86,8 +78,6 @@ class IONe
     #   => {:vmid => 'none', :userid => 'none', :ip => String}
     def get_vm_by_uname name
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'get_vm_by_uname') }
         userid = get_uid_by_name(name)
         vmid = get_vm_by_uid(userid)
         unless vmid.nil? then
@@ -143,8 +133,6 @@ class IONe
     def compare_info vms = []
         LOG_STAT()
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'compare_info') }
         info = []
         infot = Thread.new do
             unless vms.empty? then
@@ -211,9 +199,6 @@ class IONe
     # @return [String] XML
     def GetUserInfo(userid)
         LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'GetUserInfo') }
         onblock(:u, userid) do |user|
             user.info!
             user.to_xml
@@ -231,8 +216,6 @@ class IONe
     def DatastoresMonitoring(type)
         LOG_STAT()
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'DatastoresMonitoring') }    
         return "WrongTypeExeption: type '#{type}' not exists" if type != 'sys' && type != 'img'
 
         # @!visibility private
@@ -265,8 +248,6 @@ class IONe
     def HostsMonitoring()
         LOG_STAT()
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'HostsMonitoring') }
 
         # @!visibility private
         # Converts MB to GB

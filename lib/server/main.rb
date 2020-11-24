@@ -9,8 +9,6 @@ class IONe
     def version
         LOG_STAT()
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'version') }
         VERSION
     end
     # Returns IONe Cloud Server uptime(formated)
@@ -18,13 +16,7 @@ class IONe
     def uptime
         LOG_STAT()
         id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'uptime') }
         fmt_time(Time.now.to_i - STARTUP_TIME)
-    end
-    # Returns active processes list
-    def proc
-        $PROC
     end
 
     # Returns whole IONe settings table if user is Admin
