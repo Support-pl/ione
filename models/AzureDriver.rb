@@ -1,3 +1,4 @@
+begin
 require 'azure_driver'
 
 post '/vnet/:id/register_azure_ip' do | id |
@@ -47,4 +48,7 @@ post '/vnet/:id/unregister_azure_ip' do | id |
     rescue => e
         r error: e.message, backtrace: e.backtrace  
     end
+end
+rescue LoadError => e
+    puts "No Azure Driver found, skipping"
 end

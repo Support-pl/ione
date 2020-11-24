@@ -577,6 +577,7 @@ class OpenNebula::VirtualMachine
     end
 
     alias :snapshot_create_original :snapshot_create
+    # Create snapshot overload, brings restriction and quota check
     def snapshot_create name = ""
         info!
 
