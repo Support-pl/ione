@@ -9,7 +9,7 @@
     <a href="https://docs.ione-cloud.net" title="IONe Docs Page" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=IONe&message=Docs&color=informational&style=flat" alt="IONe Docs Page"/>
     </a>
-    <a href="https://github.com/ione-cloud" title="github" rel="nofollow">
+    <a href="https://github.com/ione" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
     <img src="https://img.shields.io/static/v1?label=version&message=v0.9.1&color=success&style=flat" alt="version"/>
@@ -18,7 +18,7 @@
 
 Creators:
 [Support.pl](https://support.pl)
-[slnt_opp](http://slnt-opp.xyz)
+[slnt_opp](https://slnt-opp.xyz)
 
 ## Main additional features
 
