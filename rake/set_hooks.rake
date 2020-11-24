@@ -128,6 +128,8 @@ require 'opennebula'
 ]
 
 task :hooks do
+    cd @src_dir
+
     puts 'Copying hooks scripts'
     cp_r "hooks", "/usr/lib/one/ione/"
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
