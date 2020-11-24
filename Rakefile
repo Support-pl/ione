@@ -54,4 +54,5 @@ load "rake/test_install.rake"
 desc "Full IONe Installation"
 task :install => [:before, :install_gems, :install_ione] do
     puts "  Thanks, for installation and choosing us!   "
+    puts "Test install with: rake test_install"
 end
