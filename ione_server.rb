@@ -56,19 +56,10 @@ rescue Exception => e
     exit 1
 end
 
-##############################################################################
-# Enable logger
-##############################################################################
-include CloudLogger
-logger = enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
-
 use Rack::Deflater
 
 require 'ipaddr'
 require 'sequel'
-require 'logger'
-
-STARTUP_TIME = Time.now().to_i # IONe server start time
 
 puts 'Getting path to the server'
 ROOT = ROOT_DIR # IONe root path
