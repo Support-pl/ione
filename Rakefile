@@ -22,6 +22,17 @@ task :useful_questions do
         a = STDIN.gets.strip.downcase
         @domain = nil unless a == 'y'
     end
+
+    nginx = nil
+    until ['y', 'n'].includes? nginx do
+        puts "IONe installer is going to overwrite your nginx configuration."
+        print "Do you want to continue? (y/n)"
+        nginx = STDIN.gets.strip.downcase
+    end
+    if nginx == 'n' then
+        puts "Exiting"
+        exit 0
+    end
 end
 
 load "rake/install_gems.rake"
