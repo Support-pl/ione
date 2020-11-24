@@ -6,6 +6,8 @@ task :generate_certificate => [ :useful_questions ] do
 end
 desc "Configure Nginx"
 task :configure_nginx => [ :useful_questions ] do
+    cd @src_dir
+    
     puts
     print "Do you want installer to generate self-signed cert? (y/n) "
     cert = nil
