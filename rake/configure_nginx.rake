@@ -36,4 +36,6 @@ task :configure_nginx => [ :useful_questions ] do
     puts "If nginx conf is okay, restart nginx via:"
     puts "  systemctl restart nginx"
     puts
+    puts "We highly recommend to change sunstone-server.conf 'bind' from 0.0.0.0 to localhost"
+    puts
 end
