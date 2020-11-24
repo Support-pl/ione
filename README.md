@@ -1,4 +1,4 @@
-# OpenNebula Sunstone with IONe integration
+# IONe
 
 ## Contacts
 
