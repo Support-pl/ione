@@ -1,8 +1,11 @@
-require "colorize"
 require 'pathname'
-require 'net/http'
 require 'yaml'
-require 'sequel'
+
+task :test_install_gems do 
+    require "colorize"
+    require 'net/http'
+    require 'sequel'
+end
 
 def passed
     puts "--- " + "Passed".green
@@ -110,6 +113,6 @@ task :test_api_root do
 end
 
 desc "Check if IONe is installed and running"
-task :test_install => [:test_config_exists, :test_configured, :test_api_root] do
+task :test_install => [:test_install_gems, :test_config_exists, :test_configured, :test_api_root] do
 
 end
