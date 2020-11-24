@@ -249,7 +249,7 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 # IONe API based on http
 #
 puts "Binding on localhost:8009"
-set :bind, '0.0.0.0'
+set :bind, 'localhost'
 set :port, 8009
 
 before do
