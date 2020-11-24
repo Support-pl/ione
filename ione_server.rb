@@ -5,26 +5,20 @@ if !ONE_LOCATION
     LOG_LOCATION = "/var/log/one"
     VAR_LOCATION = "/var/lib/one"
     ETC_LOCATION = "/etc/one"
-    SHARE_LOCATION = "/usr/share/one"
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 else
     VAR_LOCATION = ONE_LOCATION + "/var"
     LOG_LOCATION = ONE_LOCATION + "/var"
     ETC_LOCATION = ONE_LOCATION + "/etc"
-    SHARE_LOCATION = ONE_LOCATION + "/share"
-    RUBY_LIB_LOCATION = ONE_LOCATION+"/lib/ruby"
 end
 
-SUNSTONE_AUTH             = VAR_LOCATION + "/.one/sunstone_auth"
-SUNSTONE_LOG              = LOG_LOCATION + "/sunstone.log"
 CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
 
 ROOT_DIR = File.dirname(__FILE__)
 
-$: << RUBY_LIB_LOCATION
-$: << RUBY_LIB_LOCATION+'/cloud'
-$: << ROOT_DIR
-$: << ROOT_DIR+'/models'
+$: << '/usr/lib/one/ruby'
+$: << '/usr/lib/one/ruby/cloud'
+$: << '/usr/lib/one/ione'
+$: << '/usr/lib/one/ione/models'
 
 ##############################################################################
 # Required libraries
