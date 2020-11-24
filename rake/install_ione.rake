@@ -28,6 +28,7 @@ task :install_ione => [:before, :install_gems] do
     @ione.each do | files |
         cp_r "#{files}", "/usr/lib/one/ione/"
     end
+    chown_R "oneadmin", "oneadmin", "/usr/lib/one/ione/"
 
     puts 'Creating IONe service'
     cp 'sys/ione.service', '/usr/lib/systemd/system' unless Pathname.new("/usr/lib/systemd/system/ione.service").exist?
