@@ -291,11 +291,6 @@ class IONe
         end
         mon
     end
-    # @api private
-    # Returns current server session LOG
-    def getglog
-        $log
-    end
     # Checks if resources hot add enabled
     # @param [Integer] vmid VM ID
     # @param [String] name VM name on vCenter node
