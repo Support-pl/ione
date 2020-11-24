@@ -2,6 +2,8 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import HelloWorld from "@/views/HelloWorld.vue";
 
+import store from "@/store";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -25,9 +27,6 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: () => import("@/views/dashboard.vue"),
-    meta: {
-      requiresAuth: true,
-    },
     children: [
       {
         path: "settings",
@@ -43,6 +42,16 @@ const routes = [
 
 const router = new VueRouter({
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.guest)) {
+    next();
+  } else if (store.state.user.loggedIn) {
+    next();
+  } else {
+    next("/login");
+  }
 });
 
 export default router;
