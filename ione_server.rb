@@ -42,10 +42,6 @@ require 'rexml/document'
 require 'uri'
 require 'open3'
 
-require 'CloudAuth'
-require 'SunstoneServer'
-require 'SunstoneViews'
-
 ##############################################################################
 # Configuration
 ##############################################################################
@@ -67,19 +63,7 @@ end
 # Enable logger
 ##############################################################################
 include CloudLogger
-logger=enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
-
-begin
-    ENV["ONE_CIPHER_AUTH"] = SUNSTONE_AUTH
-    $cloud_auth = CloudAuth.new($conf, logger)
-rescue => e
-    logger.error {
-        "Error initializing authentication system" }
-    logger.error { e.message }
-    exit(-1)
-end
-
-set :cloud_auth, $cloud_auth
+logger = enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
 
 use Rack::Deflater
 
@@ -191,7 +175,7 @@ class IONe
     end
 end
 
-ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver)
 ione_drivers.each do | driver |
     begin
         require driver
