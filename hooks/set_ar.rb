@@ -15,35 +15,36 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
+require 'base64'
+require 'nokogiri'
 
-if !ONE_LOCATION
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-    RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
+    puts "User wasn't allocated, skipping"
+    exit 0
 end
 
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
+
 $: << RUBY_LIB_LOCATION
+
+require 'opennebula'
+include OpenNebula
+user = User.new xml.xpath('//EXTRA/USER'), Client.new
+user.info!
+
 require 'yaml'
 require 'json'
 require 'sequel'
-require 'opennebula'
-include OpenNebula
 
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require $ione_conf['DataBase']['adapter']
+require $ione_conf['DB']['adapter']
 $db = Sequel.connect({
-        adapter: $ione_conf['DataBase']['adapter'].to_sym,
-        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
-        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host']  })
+        adapter: $ione_conf['DB']['adapter'].to_sym,
+        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
+        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 conf = $db[:settings].as_hash(:name, :body)
-
-id = ARGV.first
-
-user = User.new_with_id id, Client.new
-user.info!
 
 unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
     puts "Not IaaS User, skipping..."

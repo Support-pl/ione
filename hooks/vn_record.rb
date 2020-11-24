@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # -------------------------------------------------------------------------- #
-# Copyright 2018, IONe Cloud Project, Support.by                             #
+# Copyright 2020, IONe Cloud Project, Support.by                             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -15,34 +15,40 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
+require 'base64'
+require 'nokogiri'
 
-if !ONE_LOCATION
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-    RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-    ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
+    puts "VNet wasn't allocated/deleted, skipping"
+    exit 0
 end
 
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
+
 $: << RUBY_LIB_LOCATION
-require 'yaml'
-require 'json'
-require 'sequel'
 require 'opennebula'
 include OpenNebula
 
+vnet = VirtualNetwork.new xml.xpath('//EXTRA/VNET'), Client.new
+vnet.info!
+
+require 'yaml'
+require 'json'
+require 'sequel'
+
 $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require $ione_conf['DataBase']['adapter']
+require $ione_conf['DB']['adapter']
 $db = Sequel.connect({
-        adapter: $ione_conf['DataBase']['adapter'].to_sym,
-        user: $ione_conf['DataBase']['user'], password: $ione_conf['DataBase']['pass'],
-        database: $ione_conf['DataBase']['database'], host: $ione_conf['DataBase']['host']  })
+        adapter: $ione_conf['DB']['adapter'].to_sym,
+        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
+        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
 class AR < Sequel::Model(:ars); end
 
 AR.create do | r |
-    r.vnid  = ARGV.first
+    r.vnid  = vnet.id
     r.arid  = ARGV.last == 'crt' ? 0 : -1
     r.time  = Time.now.to_i
     r.state = ARGV.last
