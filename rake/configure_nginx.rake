@@ -32,4 +32,8 @@ task :configure_nginx => [ :useful_questions ] do
     puts
     puts "Test nginx configuration:"
     sh %{nginx -t}
+
+    puts "If nginx conf is okay, restart nginx via:"
+    puts "  systemctl restart nginx"
+    puts
 end
