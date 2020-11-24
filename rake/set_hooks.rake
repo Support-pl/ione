@@ -1,6 +1,5 @@
 $: << '/usr/lib/one/ruby'
 require 'opennebula'
-require '/usr/lib/one/ione/lib/std++/main.rb'
 
 @hooks = [
     {
@@ -132,6 +131,8 @@ task :hooks do
     puts 'Copying hooks scripts'
     cp_r "hooks", "/usr/lib/one/ione/"
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
+
+    require '/usr/lib/one/ione/lib/std++/main.rb'
 
     puts 'Adding hooks to HookPool'
     for hook in @hooks do
