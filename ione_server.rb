@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+
+STARTUP_TIME = Time.now().to_i # IONe server start time
+
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
