@@ -7,15 +7,11 @@ class IONe
     # Returns current running IONe Cloud Server version
     # @return [String]
     def version
-        LOG_STAT()
-        id = id_gen()
         VERSION
     end
     # Returns IONe Cloud Server uptime(formated)
     # @return [String]
     def uptime
-        LOG_STAT()
-        id = id_gen()
         fmt_time(Time.now.to_i - STARTUP_TIME)
     end
 

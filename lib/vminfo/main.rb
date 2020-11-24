@@ -55,7 +55,6 @@ class IONe
     # @param [String] ip - IP address
     # @return [Integer | nil] - VM ID if found, nil if not
     def GetVMIDbyIP(ip)
-        LOG_STAT()
         vm_pool = VirtualMachinePool.new(@client)
         vm_pool.info_all!
         vm_pool.each do |vm|
@@ -130,8 +129,6 @@ class IONe
     # @param [Integer] vmid - VM ID
     # @return [Array<Hash> | Hash]
     def GetSnapshotList(vmid)
-        LOG_STAT()
-             
         onblock(:vm, vmid).list_snapshots
     end
 

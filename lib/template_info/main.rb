@@ -5,8 +5,6 @@ class IONe
     # @param [Fixnum] group_id - group if to filter by(optional)
     # @return [Array]
     def get_templates_list group_id = nil
-        LOG_STAT()
-        id = id_gen()
         tp_pool = TemplatePool.new(@client)
         tp_pool.info_all!
         tp_pool.inject([]) do | res, tp |

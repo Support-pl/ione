@@ -131,8 +131,6 @@ class IONe
     #               :login => 'username', :ip => '192.168.10.3', :state => 'RUNNING'
     #           }, ...], ['example-node0', 'example-node1', ...], ['192.168.10.2', '192.168.10.4', '192.168.10.5', ...]
     def compare_info vms = []
-        LOG_STAT()
-        id = id_gen()
         info = []
         infot = Thread.new do
             unless vms.empty? then
@@ -198,7 +196,6 @@ class IONe
     # @param [Integer] userid
     # @return [String] XML
     def GetUserInfo(userid)
-        LOG_STAT()
         onblock(:u, userid) do |user|
             user.info!
             user.to_xml
@@ -214,8 +211,6 @@ class IONe
     #   DatastoresMonitoring('sys') => [{"id"=>101, "name"=>"NASX", "full_size"=>"16TB", "used"=>"3.94TB", "type"=>"HDD", "deploy"=>"TRUE"}, ...]
     #   DatastoresMonitoring('ing') => String("WrongTypeExeption: type 'ing' not exists")
     def DatastoresMonitoring(type)
-        LOG_STAT()
-        id = id_gen()
         return "WrongTypeExeption: type '#{type}' not exists" if type != 'sys' && type != 'img'
 
         # @!visibility private
@@ -246,9 +241,6 @@ class IONe
     # @example
     #   HostsMonitoring() => {"id"=>0, "name"=>"vCloud", "full_size"=>"875.76GB", "reserved"=>"636.11GB", "running_vms"=>179, "cpu"=>"16.14%"}
     def HostsMonitoring()
-        LOG_STAT()
-        id = id_gen()
-
         # @!visibility private
         # Converts MB to GB
         def sizeConvert(mb)

@@ -111,7 +111,6 @@ class IONe
     # Get log from ione.log file
     # @return [String] Log
     def activity_log()
-        LOG_STAT()        
         LOG "Log file content has been copied remotely", "activity_log"
         log = File.read("#{LOG_ROOT}/ione.log")
         log
@@ -120,7 +119,6 @@ class IONe
     # @param [String] msg - your message
     # @return [String] returns given message
     def log(msg)
-        LOG_STAT()        
         LOG(msg, "RemoteLOG")
         msg
     end

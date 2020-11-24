@@ -54,7 +54,6 @@ class IONe
     #   Debug turn method off: nil
     #   Debug return fake data: { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0', 'ip_old' => '0.0.0.0' } 
     def Reinstall(params, trace = ["Reinstall method called:#{__LINE__}"])
-        LOG_STAT()
             params.to_s!
             LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
             return nil if params['debug'] == 'turn_method_off'
@@ -318,11 +317,8 @@ class IONe
     #   User create Error: {'error' => "UserAllocateError", 'trace' => trace(Array<String>)}
     #   Unknown error: { 'error' => e.message, 'trace' => trace(Array<String>)} 
     def CreateVMwithSpecs(params, trace = ["#{__method__.to_s} method called:#{__LINE__}"])
-        LOG_STAT()
         LOG_DEBUG params.merge!(:method => __method__.to_s).debug_out
-        # return {'userid' => 6666, 'vmid' => 6666, 'ip' => '127.0.0.1'}
         trace << "Checking params types:#{__LINE__ + 1}"
-            
             
         params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
 
