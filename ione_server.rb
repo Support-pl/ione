@@ -1,22 +1,4 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
-
-# -------------------------------------------------------------------------- #
-# Copyright 2002-2017, OpenNebula Project, OpenNebula Systems                #
-#                                                                            #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may    #
-# not use this file except in compliance with the License. You may obtain    #
-# a copy of the License at                                                   #
-#                                                                            #
-# http://www.apache.org/licenses/LICENSE-2.0                                 #
-#                                                                            #
-# Unless required by applicable law or agreed to in writing, software        #
-# distributed under the License is distributed on an "AS IS" BASIS,          #
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   #
-# See the License for the specific language governing permissions and        #
-# limitations under the License.                                             #
-#--------------------------------------------------------------------------- #
-
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
@@ -37,53 +19,19 @@ SUNSTONE_AUTH             = VAR_LOCATION + "/.one/sunstone_auth"
 SUNSTONE_LOG              = LOG_LOCATION + "/sunstone.log"
 CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
 
-PLUGIN_CONFIGURATION_FILE = ETC_LOCATION + "/sunstone-plugins.yaml"
-LOGOS_CONFIGURATION_FILE = ETC_LOCATION + "/sunstone-logos.yaml"
-
-SUNSTONE_ROOT_DIR = File.dirname(__FILE__)
+ROOT_DIR = File.dirname(__FILE__)
 
 $: << RUBY_LIB_LOCATION
 $: << RUBY_LIB_LOCATION+'/cloud'
-$: << SUNSTONE_ROOT_DIR
-$: << SUNSTONE_ROOT_DIR+'/models'
-
-DISPLAY_NAME_XPATH = 'TEMPLATE/SUNSTONE/DISPLAY_NAME'
-TABLE_ORDER_XPATH = 'TEMPLATE/SUNSTONE/TABLE_ORDER'
-DEFAULT_VIEW_XPATH = 'TEMPLATE/SUNSTONE/DEFAULT_VIEW'
-GROUP_ADMIN_DEFAULT_VIEW_XPATH = 'TEMPLATE/SUNSTONE/GROUP_ADMIN_DEFAULT_VIEW'
-TABLE_DEFAULT_PAGE_LENGTH_XPATH = 'TEMPLATE/SUNSTONE/TABLE_DEFAULT_PAGE_LENGTH'
-LANG_XPATH = 'TEMPLATE/SUNSTONE/LANG'
-
-ONED_CONF_OPTS = {
-    # If no costs are defined in oned.conf these values will be used
-    'DEFAULT_COST' => {
-        'CPU_COST' => 0,
-        'MEMORY_COST' => 0,
-        'DISK_COST' => 0
-    },
-    # Only these values will be shown when retrieving oned.conf from the browser
-    'ALLOWED_KEYS' => [
-        'DEFAULT_COST',
-        'DS_MAD_CONF',
-        'MARKET_MAD_CONF',
-        'VM_MAD',
-        'IM_MAD',
-        'AUTH_MAD'
-    ],
-    # Generate an array if there is only 1 element
-    'ARRAY_KEYS' => [
-        'DS_MAD_CONF',
-        'MARKET_MAD_CONF',
-        'VM_MAD',
-        'IM_MAD'
-    ]
-}
+$: << ROOT_DIR
+$: << ROOT_DIR+'/models'
 
 ##############################################################################
 # Required libraries
 ##############################################################################
 require 'rubygems'
 require 'sinatra'
+require "sinatra/json"
 require 'erb'
 require 'yaml'
 require 'securerandom'
@@ -115,64 +63,9 @@ rescue Exception => e
     exit 1
 end
 
-if $conf[:one_xmlrpc_timeout]
-    ENV['ONE_XMLRPC_TIMEOUT'] = $conf[:one_xmlrpc_timeout].to_s unless ENV['ONE_XMLRPC_TIMEOUT']
-end
-
-$conf[:debug_level] ||= 3
-
-# Set Sunstone Session Timeout
-$conf[:session_expire_time] ||= 3600
-
-# Set the TMPDIR environment variable for uploaded images
-ENV['TMPDIR']=$conf[:tmpdir] if $conf[:tmpdir]
-
-CloudServer.print_configuration($conf)
-
-#Sinatra configuration
-
-set :config, $conf
-set :bind, $conf[:host]
-set :port, $conf[:port]
-set :server_settings, :timeout => 60
-
-if (proxy = $conf[:proxy])
-    ENV['http_proxy'] = proxy
-    ENV['HTTP_PROXY'] = proxy
-end
-
-case $conf[:sessions]
-when 'memory', nil
-    use Rack::Session::Pool, :key => 'sunstone'
-when 'memcache'
-    memcache_server=$conf[:memcache_host]+':'<<
-        $conf[:memcache_port].to_s
-
-    STDERR.puts memcache_server
-
-    use Rack::Session::Memcache,
-        :memcache_server => memcache_server,
-        :namespace => $conf[:memcache_namespace]
-when 'memcache-dalli'
-    require 'rack/session/dalli'
-    memcache_server=$conf[:memcache_host]+':'<<
-        $conf[:memcache_port].to_s
-
-    STDERR.puts memcache_server
-
-    use Rack::Session::Dalli,
-      :memcache_server => memcache_server,
-      :namespace => $conf[:memcache_namespace],
-      :cache => Dalli::Client.new
-else
-    STDERR.puts "Wrong value for :sessions in configuration file"
-    exit(-1)
-end
-
-use Rack::Deflater
-
+##############################################################################
 # Enable logger
-
+##############################################################################
 include CloudLogger
 logger=enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
 
@@ -188,270 +81,107 @@ end
 
 set :cloud_auth, $cloud_auth
 
-$views_config = SunstoneViews.new
+use Rack::Deflater
 
-#start VNC proxy
+require 'ipaddr'
+require 'sequel'
+require 'logger'
 
-$vnc = OpenNebulaVNC.new($conf, logger)
+STARTUP_TIME = Time.now().to_i # IONe server start time
 
-configure do
-    set :run, false
-    set :vnc, $vnc
-    set :erb, :trim => '-'
-end
+puts 'Getting path to the server'
+ROOT = ROOT_DIR # IONe root path
+LOG_ROOT = LOG_LOCATION # IONe logs path
 
-DEFAULT_TABLE_ORDER = "desc"
-DEFAULT_PAGE_LENGTH = 10
+# Shows if current IONe Sunstone process was started by systemd(first time so). True or False
+MAIN_IONE = Process.ppid == 1
 
-##############################################################################
-# Helpers
-##############################################################################
-helpers do
-    def valid_csrftoken?
-        csrftoken = nil
+$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
+CONF = $ione_conf # for sure
 
-        if params[:csrftoken]
-            csrftoken = params[:csrftoken]
-        else
-            begin
-                # Extract "csrftoken" and remove from @request_body if present
-                request_body  = JSON.parse(@request_body)
-                csrftoken     = request_body.delete("csrftoken")
-                @request_body = request_body.to_json
-            rescue
-            end
-        end
-        (session[:csrftoken] && session[:csrftoken] == csrftoken) || ($ione_conf['APIAccessList'] and $ione_conf['APIAccessList'].include?(request.ip))
-    end
+puts 'Including log-library'
+require "#{ROOT}/service/log.rb"
+include IONeLoggerKit
 
-    def authorized?
-        session[:ip] && session[:ip] == request.ip
-    end
+puts 'Checking service version'
+VERSION = File.read("#{ROOT}/meta/version.txt") # IONe version
+USERS_GROUP = $ione_conf['OpenNebula']['users-group'] # OpenNebula users group
+TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay'] # Trial VMs suspend delay
 
-    def build_session
-        begin
-            result = $cloud_auth.auth(request.env, params)
-        rescue Exception => e
-            logger.error { e.message }
-            return [500, ""]
-        end
+USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port'] # Default SSH port at OpenNebula Virtual Machines 
 
-        if result.nil?
-            logger.info { "Unauthorized login attempt" }
-            return [401, ""]
-        else
-            client  = $cloud_auth.client(result, session[:active_zone_endpoint])
-            user_id = OpenNebula::User::SELF
+puts 'Setting up Environment(OpenNebula API)'
+###########################################
+# Setting up Environment                   #
+###########################################
 
-            user    = OpenNebula::User.new_with_id(user_id, client)
-            rc = user.info
-            if OpenNebula.is_error?(rc)
-                logger.error { rc.message }
-                return [500, ""]
-            end
+require "opennebula"
+include OpenNebula
+###########################################
+# OpenNebula credentials
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
+# XML_RPC endpoint where OpenNebula is listening
+ENDPOINT = $ione_conf['OpenNebula']['endpoint']
+$client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
-            session[:user]         = user['NAME']
-            session[:user_id]      = user['ID']
-            session[:user_gid]     = user['GID']
-            session[:user_gname]   = user['GNAME']
-            session[:ip]           = request.ip
-            session[:remember]     = params[:remember]
-            session[:display_name] = user[DISPLAY_NAME_XPATH] || user['NAME']
+require $ione_conf['DB']['adapter']
+$db = Sequel.connect({
+        adapter: $ione_conf['DB']['adapter'].to_sym,
+        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
+        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host'],
+        encoding: 'utf8mb4'   })
 
-            csrftoken_plain = Time.now.to_f.to_s + SecureRandom.base64
-            session[:csrftoken] = Digest::MD5.hexdigest(csrftoken_plain)
+$db.extension(:connection_validator)
+$db.pool.connection_validation_timeout = -1
 
-            group = OpenNebula::Group.new_with_id(user['GID'], client)
-            rc = group.info
-            if OpenNebula.is_error?(rc)
-                logger.error { rc.message }
-                return [500, ""]
-            end
+require "SettingsDriver"
 
-            #User IU options initialization
-            #Load options either from user settings or default config.
-            # - LANG
-            # - WSS CONECTION
-            # - TABLE ORDER
+# Settings Table Model
+# @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/models/SettingsDriver.rb#L13-L37 Settings Model Definition
+class Settings < Sequel::Model(:settings); end
 
-            if user[LANG_XPATH]
-                session[:lang] = user[LANG_XPATH]
-            else
-                session[:lang] = $conf[:lang]
-            end
+puts 'Including on_helper funcs'
+require "#{ROOT}/service/on_helper.rb"
+include ONeHelper
+puts 'Including Deferable module'
+require "#{ROOT}/service/defer.rb"
 
-            if user[TABLE_DEFAULT_PAGE_LENGTH_XPATH]
-                session[:page_length] = user[TABLE_DEFAULT_PAGE_LENGTH_XPATH]
-            else
-                session[:page_length] = DEFAULT_PAGE_LENGTH
-            end
+LOG(
+"\n" +
+"       ################################################################\n".light_green.bold +
+"       ##                                                            ##\n".light_green.bold +
+"       ##".light_green.bold + "       " + "I".red.bold + "ntegrated " + "O".red.bold + "pen" + "Ne".red.bold + "bula Cloud  " +
+                                    "v#{VERSION.chomp}".cyan.underline + "#{" " if VERSION.split(' ').last == 'stable'}        " + "##\n".light_green.bold +
+"       ##                                                            ##\n".light_green.bold +
+"       ################################################################\n".light_green.bold +
+"\n", 'none', false
+)
 
-            wss = $conf[:vnc_proxy_support_wss]
-            #limit to yes,no options
-            session[:vnc_wss] = (wss == true || wss == "yes" || wss == "only" ?
-                             "yes" : "no")
 
-            if user[TABLE_ORDER_XPATH]
-                session[:table_order] = user[TABLE_ORDER_XPATH]
-            else
-                session[:table_order] = $conf[:table_order] || DEFAULT_TABLE_ORDER
-            end
-
-            if user[DEFAULT_VIEW_XPATH]
-                session[:default_view] = user[DEFAULT_VIEW_XPATH]
-            elsif group.contains_admin(user.id) && group[GROUP_ADMIN_DEFAULT_VIEW_XPATH]
-                session[:default_view] = group[GROUP_ADMIN_DEFAULT_VIEW_XPATH]
-            elsif group[DEFAULT_VIEW_XPATH]
-                session[:default_view] = group[DEFAULT_VIEW_XPATH]
-            else
-                session[:default_view] = $views_config.available_views(session[:user], session[:user_gname]).first
-            end
-
-            #end user options
-
-            if params[:remember] == "true"
-                env['rack.session.options'][:expire_after] = 30*60*60*24-1
-            end
-
-            serveradmin_client = $cloud_auth.client(nil, session[:active_zone_endpoint])
-            rc = OpenNebula::System.new(serveradmin_client).get_configuration
-            return [500, rc.message] if OpenNebula.is_error?(rc)
-            return [500, "Couldn't find out zone identifier"] if !rc['FEDERATION/ZONE_ID']
-
-            zone = OpenNebula::Zone.new_with_id(rc['FEDERATION/ZONE_ID'].to_i, client)
-            zone.info
-            session[:zone_name] = zone.name
-            session[:zone_id]   = zone.id
-
-            session[:federation_mode] = rc['FEDERATION/MODE'].upcase
-
-            return [204, ""]
-        end
-    end
-
-    def destroy_session
-        session.clear
-        return [204, ""]
+puts 'Generating "at_exit" directive'
+at_exit do
+    begin
+        LOG_COLOR("Server was stopped. Uptime: #{fmt_time(Time.now.to_i - STARTUP_TIME)}", "")
+        LOG "", "", false
+        LOG("       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", "", false)
+    rescue => e
+        LOG_DEBUG e.message
     end
 end
 
-CSRF_BYPASS_PATTERNS = [
-    /\/vmtemplate\/\d+\/action/
-]
-
-before do
-    cache_control :no_store
-    content_type 'application/json', :charset => 'utf-8'
-
-    @request_body = request.body.read
-    request.body.rewind
-
-    if CSRF_BYPASS_PATTERNS.inject(false){|r, el| r || (el =~ request.path)} then
-        begin
-            body = JSON.parse(@request_body)
-            u = User.new_with_id(-1, Client.new(body['auth']))
-            rc = u.info!
-            if OpenNebula.is_error?(rc) or body['auth'].empty?
-                raise
-            end
-        rescue => e
-            halt [401, "Unauthorized"]
-        end if !valid_csrftoken?
-    elsif request.path.include?('/ione/') then
-        halt [401, "Unauthorized"] unless authorized?
-    elsif !%w(/ /login /vnc /spice /version).include?(request.path) then
-        halt [401, "csrftoken"] unless authorized? && valid_csrftoken?
-    end
-
-    request_vars = {}
-
-    request.env.each do |k, v|
-        if v && String === v && !v.empty?
-            request_vars[k] = v
-        end
-    end
-
-    hpref        = "HTTP-"
-    head_zone    = "ZONE-NAME"
-    reqenv       = request_vars
-
-    zone_name_header = reqenv[head_zone] ? reqenv[head_zone] : reqenv[hpref+head_zone]
-
-    # Try with underscores
-    if zone_name_header.nil?
-        hpref        = "HTTP_"
-        head_zone    = "ZONE_NAME"
-
-        zone_name_header = reqenv[head_zone] ? reqenv[head_zone] : reqenv[hpref+head_zone]
-    end
-
-    if zone_name_header && !zone_name_header.empty?
-        client = $cloud_auth.client(session[:user], session[:active_zone_endpoint])
-        zpool = ZonePoolJSON.new(client)
-
-        rc = zpool.info
-
-        halt [500, rc.to_json] if OpenNebula.is_error?(rc)
-
-        found = false
-        zpool.each{|z|
-            if z.name == zone_name_header
-                found = true
-                serveradmin_client = $cloud_auth.client(nil, z['TEMPLATE/ENDPOINT'])
-                rc = OpenNebula::System.new(serveradmin_client).get_configuration
-
-                if OpenNebula.is_error?(rc)
-                    msg = "Zone #{zone_name_header} not available " + rc.message
-                    logger.error { msg }
-                    halt [410, OpenNebula::Error.new(msg).to_json]
-                end
-
-                if !rc['FEDERATION/ZONE_ID']
-                    msg = "Couldn't find out zone identifier"
-                    logger.error { msg }
-                    halt [500, OpenNebula::Error.new(msg).to_json]
-                end
-
-                session[:active_zone_endpoint] = z['TEMPLATE/ENDPOINT']
-                session[:zone_name] = zone_name_header
-                session[:zone_id]   = z.id
-            end
-         }
-
-        if !found
-            msg = "Zone #{zone_name_header} does not exist"
-            logger.error { msg }
-            halt [404, OpenNebula::Error.new(msg).to_json]
-        end
-    end
-
-    client = $cloud_auth.client(session[:user], session[:active_zone_endpoint])
-
-    @SunstoneServer = SunstoneServer.new(client, $conf, logger)
-end
-
-after do
-    unless request.path == '/login' || request.path == '/' || request.path == '/'
-        unless session[:remember] == "true"
-            if params[:timeout] == "true"
-                env['rack.session.options'][:defer] = true
-            else
-                env['rack.session.options'][:expire_after] = $conf[:session_expire_time]
-            end
-        end
+# Main App class. All methods, which must be available as JSON-RPC methods, should be defined in this class
+class IONe
+    include Deferable
+    # IONe initializer, stores auth-client and version
+    # @param [OpenNebula::Client] client 
+    def initialize(client, db)
+        @client = client
+        @db = db
+        @version = VERSION
     end
 end
 
-##############################################################################
-# Custom routes
-##############################################################################
-if $conf[:routes]
-    $conf[:routes].each { |route|
-        require "routes/#{route}"
-    }
-end
-
-ione_drivers = %w( SettingsDriver AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
 ione_drivers.each do | driver |
     begin
         require driver
@@ -460,447 +190,146 @@ ione_drivers.each do | driver |
     end
 end
 
-##############################################################################
-# HTML Requests
-##############################################################################
-get '/' do
-    content_type 'text/html', :charset => 'utf-8'
-    if !authorized?
-        return erb :login
-    end
-
-    logos_conf = nil
-
-    begin
-        logos_conf = YAML.load_file(LOGOS_CONFIGURATION_FILE)
-    rescue Exception => e
-        logger.error { "Error parsing config file #{LOGOS_CONFIGURATION_FILE}: #{e.message}" }
-        error 500, ""
-    end
-
-    serveradmin_client = $cloud_auth.client(nil, session[:active_zone_endpoint])
-
-    rc = OpenNebula::System.new(serveradmin_client).get_configuration
-
-    if OpenNebula.is_error?(rc)
-        logger.error { rc.message }
-        error 500, ""
-    end
-
-    oned_conf_template = rc.to_hash['OPENNEBULA_CONFIGURATION']
-
-    oned_conf = {}
-    ONED_CONF_OPTS['ALLOWED_KEYS'].each do |key|
-        value = oned_conf_template[key]
-        if key == 'DEFAULT_COST'
-            if value
-                oned_conf[key] = value
-            else
-                oned_conf[key] = ONED_CONF_OPTS['DEFAULT_COST']
-            end
-        else
-            if ONED_CONF_OPTS['ARRAY_KEYS'].include?(key) && !value.is_a?(Array)
-                oned_conf[key] = [value]
-            else
-                oned_conf[key] = value
-            end
-        end
-    end
-
-    response.set_cookie("one-user", :value=>"#{session[:user]}")
-
-    erb :index, :locals => {
-        :logos_conf => logos_conf,
-        :oned_conf  => oned_conf
-    }
-end
-
-get '/login' do
-    content_type 'text/html', :charset => 'utf-8'
-    if !authorized?
-        erb :login
-    else
-        redirect to('/')
-    end
-end
-
-get '/vnc' do
-    content_type 'text/html', :charset => 'utf-8'
-    if !authorized?
-        erb :login
-    else
-        erb :vnc
-    end
-end
-
-get '/spice' do
-    content_type 'text/html', :charset => 'utf-8'
-    if !authorized?
-        erb :login
-    else
-        params[:title] = CGI::escape(params[:title])
-        erb :spice
-    end
-end
-
-get '/version' do
-    version = {}
-
-    if (remote_version_url = $conf[:remote_version])
+puts 'Including Libs'
+LOG_COLOR 'Including Libs:', 'none', 'green', 'bold'
+begin
+    $ione_conf['Include'].each do | lib |
+        puts "\tIncluding #{lib}"    
         begin
-            version = JSON.parse(Net::HTTP.get(URI(remote_version_url)))
-        rescue Exception
+            require "#{ROOT}/lib/#{lib}/main.rb"
+            LOG_COLOR "\t - #{lib} -- included", 'none', 'green', 'itself'
+        rescue => e
+            LOG_COLOR "Library \"#{lib}\" was not included | Error: #{e.message}", 'LibraryController'
+            puts "Library \"#{lib}\" was not included | Error: #{e.message}"
         end
-    end
-
-    if !version["version"] || version["version"].empty?
-        version["version"] = OpenNebula::VERSION
-    end
-
-    [200, version.to_json]
+    end if $ione_conf['Include'].class == Array
+rescue => e
+    LOG_ERROR "LibraryController fatal error | #{e}", 'LibraryController', 'red', 'underline'
+    puts "\tLibraryController fatal error | #{e}"
 end
 
-##############################################################################
-# Login
-##############################################################################
-post '/login' do
-    build_session
-end
-
-post '/logout' do
-    destroy_session
-end
-
-##############################################################################
-# User configuration and VM logs
-##############################################################################
-
-get '/config' do
-    uconf = {
-        :user_config => {
-            :lang => session[:lang],
-            :vnc_wss  => session[:vnc_wss],
-        },
-        :system_config => {
-            :marketplace_url => $conf[:marketplace_url],
-            :vnc_proxy_port => $vnc.proxy_port
-        }
-    }
-
-    [200, uconf.to_json]
-end
-
-post '/config' do
-    @SunstoneServer.perform_action('user',
-                               OpenNebula::User::SELF,
-                               @request_body)
-
-    user = OpenNebula::User.new_with_id(
-                OpenNebula::User::SELF,
-                $cloud_auth.client(session[:user], session[:active_zone_endpoint]))
-
-    rc = user.info
-    if OpenNebula.is_error?(rc)
-        logger.error { rc.message }
-        error 500, ""
-    end
-
-    session[:lang]         = user[LANG_XPATH] if user[LANG_XPATH]
-    session[:default_view] = user[DEFAULT_VIEW_XPATH] if user[DEFAULT_VIEW_XPATH]
-    session[:table_order]  = user[TABLE_ORDER_XPATH] if user[TABLE_ORDER_XPATH]
-    session[:page_length]  = user[TABLE_DEFAULT_PAGE_LENGTH_XPATH] if user[TABLE_DEFAULT_PAGE_LENGTH_XPATH]
-    session[:display_name] = user[DISPLAY_NAME_XPATH] || user['NAME']
-
-    [204, ""]
-end
-
-get '/infrastructure' do
-    serveradmin_client = $cloud_auth.client(nil, session[:active_zone_endpoint])
-
-    hpool = OpenNebula::HostPool.new(serveradmin_client)
-
-    rc = hpool.info
-
-    if OpenNebula.is_error?(rc)
-        logger.error { rc.message }
-        error 500, ""
-    end
-
-    infrastructure = {}
-
-    set = Set.new
-    xml = XMLElement.new
-    xml.initialize_xml(hpool.to_xml, 'HOST_POOL')
-    xml.each('HOST/HOST_SHARE/PCI_DEVICES/PCI') do |pci|
-        set.add({
-            :device => pci['DEVICE'],
-            :class  => pci['CLASS'],
-            :vendor => pci['VENDOR'],
-            :device_name => pci['DEVICE_NAME']
-        })
-    end
-
-    infrastructure[:pci_devices] = set.to_a
-
-    set = Set.new
-
-    xml.each('HOST/TEMPLATE/CUSTOMIZATION') do |customization|
-        set.add(customization['NAME'])
-    end
-
-    infrastructure[:vcenter_customizations] = set.to_a
-
-    set_cpu_models = Set.new
-    set_kvm_machines = Set.new
-
-    xml.each('HOST/TEMPLATE') do |kvm|
-        if !kvm['KVM_CPU_MODELS'].nil?
-            set_cpu_models += kvm['KVM_CPU_MODELS'].split(" ")
+puts 'Including Modules'
+LOG_COLOR 'Including Modules:', 'none', 'green', 'bold'
+begin
+    $ione_conf['Modules'].each do | mod |
+        puts "\tIncluding #{mod}"    
+        begin
+            $ione_conf.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
+            require "#{ROOT}/modules/#{mod}/main.rb"
+            LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
+        rescue => e
+            LOG_COLOR "Module \"#{mod}\" was not included | Error: #{e.message}", 'ModuleController'
+            puts "Module \"#{mod}\" was not included | Error: #{e.message}"
         end
-        if !kvm['KVM_MACHINES'].nil?
-            set_kvm_machines += kvm['KVM_MACHINES'].split(" ")
+    end if $ione_conf['Modules'].class == Array
+rescue => e
+    LOG_ERROR "ModuleController fatal error | #{e}", 'ModuleController', 'red', 'underline'
+    puts "\tModuleController fatal error | #{e}"
+end
+
+puts 'Including Scripts'
+LOG_COLOR 'Starting scripts:', 'none', 'green', 'bold'
+begin
+    $ione_conf['Scripts'].each do | script |
+        puts "\tIncluding #{script}"
+        begin
+            Thread.new { require "#{ROOT}/scripts/#{script}/main.rb" }
+            LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
+        rescue => e
+            LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
+            puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
         end
-    end
+    end if $ione_conf['Scripts'].class == Array
+rescue => e
+    LOG_ERROR "ScriptsController fatal error | #{e}", 'ScriptController', 'red', 'underline'
+    puts "ScriptsController fatal error | #{e}"
+end if MAIN_IONE
 
-    infrastructure[:kvm_info] = { :set_cpu_models => set_cpu_models.to_a, :set_kvm_machines => set_kvm_machines.to_a }
-
-    [200, infrastructure.to_json]
-end
-
-get '/vm/:id/log' do
-    @SunstoneServer.get_vm_log(params[:id])
-end
-
-##############################################################################
-# Monitoring
-##############################################################################
-
-get '/:resource/monitor' do
-    @SunstoneServer.get_pool_monitoring(
-        params[:resource],
-        params[:monitor_resources])
-end
-
-get '/user/:id/monitor' do
-    @SunstoneServer.get_user_accounting(params)
-end
-
-get '/group/:id/monitor' do
-    params[:gid] = params[:id]
-    @SunstoneServer.get_user_accounting(params)
-end
-
-get '/:resource/:id/monitor' do
-    @SunstoneServer.get_resource_monitoring(
-        params[:id],
-        params[:resource],
-        params[:monitor_resources])
-end
-
-##############################################################################
-# Accounting
-##############################################################################
-
-get '/vm/accounting' do
-    @SunstoneServer.get_vm_accounting(params)
-end
-
-##############################################################################
-# Showback
-##############################################################################
-
-get '/vm/showback' do
-    @SunstoneServer.get_vm_showback(params)
-end
-
-##############################################################################
-# GET Pool information
-##############################################################################
-get '/:pool' do
-    zone_client = nil
-    filter = params[:pool_filter]
-
-    if params[:zone_id] && session[:federation_mode] != "STANDALONE"
-        zone = OpenNebula::Zone.new_with_id(params[:zone_id].to_i,
-                                            $cloud_auth.client(session[:user],
-                                                session[:active_zone_endpoint]))
-
-        rc   = zone.info
-        return [500, rc.message] if OpenNebula.is_error?(rc)
-        zone_client = $cloud_auth.client(session[:user],
-                                         zone['TEMPLATE/ENDPOINT'])
-    end
-
-    if params[:pool_filter].nil?
-        filter = session[:user_gid]
-    end
-
-    @SunstoneServer.get_pool(params[:pool],
-                             filter,
-                             zone_client)
-end
-
-##############################################################################
-# GET Resource information
-##############################################################################
-get '/:resource/:id/template' do
-    @SunstoneServer.get_template(params[:resource], params[:id])
-end
-
-get '/:resource/:id' do
-    if  params[:extended] && params[:extended] != "false"
-        @SunstoneServer.get_resource(params[:resource], params[:id], true)
-    else
-        @SunstoneServer.get_resource(params[:resource], params[:id])
+puts 'Making IONe methods deferable'
+class IONe
+    self.instance_methods(false).each do | method |
+        deferable method
     end
 end
 
-##############################################################################
-# Delete Resource
-##############################################################################
-delete '/:resource/:id' do
-    @SunstoneServer.delete_resource(params[:resource], params[:id])
-end
+$methods = IONe.instance_methods(false).map { | method | method.to_s }
 
-##############################################################################
-# Upload image
-##############################################################################
-post '/upload' do
-    tmpfile = nil
+rpc_log_file = "#{LOG_ROOT}/rpc.log"
+`touch #{rpc_log_file}` unless File.exist? rpc_log_file
+# Logger instance for rpc calls
+RPC_LOGGER = Logger.new(rpc_log_file)
 
-    name = params[:tempfile]
+puts 'Pre-init job ended, starting up server'
+RPC_LOGGER.debug "Preparing to start up server"
+RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && MAIN_IONE(#{MAIN_IONE}) => #{!defined?(DEBUG_LIB) && MAIN_IONE}"
 
-    if !name
-        [500, OpenNebula::Error.new("There was a problem uploading the file, " \
-                "please check the permissions on the file").to_json]
-    else
-        tmpfile = File.join(Dir.tmpdir, name)
-        res = @SunstoneServer.upload(params[:img], tmpfile)
-        FileUtils.rm(tmpfile)
-        res
+#
+# IONe API based on http
+#
+puts "Binding on localhost:8009"
+set :bind, '0.0.0.0'
+set :port, 8009
+
+before do
+    if request.request_method == 'OPTIONS' then
+        halt 200, {
+            'Allow' => "HEAD,GET,PUT,POST,DELETE,OPTIONS",
+            "Access-Control-Allow-Headers" => "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept"
+        }, ""
     end
-end
-
-post '/upload_chunk' do
-    info = env['rack.request.form_hash']
-    chunk_number = info['resumableChunkNumber'].to_i - 1
-    chunk_size = info['resumableChunkSize'].to_i
-    chunk_start = chunk_number * chunk_size
-
-    file_name = info['resumableIdentifier']
-    file_path = File.join(Dir.tmpdir, file_name)
-
-    tmpfile=info['file'][:tempfile]
-
     begin
-        chunk = tmpfile.read
+        unless request.request_method == 'GET' then
+            @request_body = request.body.read
+            @request_hash = JSON.parse @request_body
+        end
+        if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
+            halt 401, { 'Allow' => "*" }, "No Credentials given"
+        end
+        @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
+        @client = Client.new(@auth)
+        @one_user = User.new_with_id(-1, @client)
+        rc = @one_user.info!
+        if OpenNebula.is_error?(rc)
+            halt 401, { 'Allow' => "*" }, "False Credentials given"
+        end
     rescue => e
-        STDERR.puts e.backtrace
-        return [500, OpenNebula::Error.new("Could not read the uploaded " \
-                                           "chunk.".to_json)]
+        RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
+        halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
     end
+end
 
-    if File.exist? file_path
-        mode = "r+"
-    else
-        mode = "w"
-    end
+puts "Allowing CORS"
+after do
+    response.headers['Allow'] = "*" unless response.headers['Allow']
+    response.headers['Access-Control-Allow-Origin'] = "*" unless response.headers['Access-Control-Allow-Origin']
+    response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
+    response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
+end
 
+puts "Registering IONe methods"
+post '/ione/:method' do | method |
     begin
-        open(file_path, mode) do |f|
-            f.seek(chunk_start)
-            f.write_nonblock(chunk)
-        end
-        tmpfile.unlink
+        RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = IONe.new(@client, $db).send(method, *@request_hash['params'])
     rescue => e
-        STDERR.puts e.backtrace
-        return [500, OpenNebula::Error.new("Can not write to the temporary" \
-                                           " image file").to_json]
+        r = e.message
+        backtrace = e.backtrace
     end
-
-    ""
+    RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+    json response: r
 end
 
-##############################################################################
-# Download marketplaceapp
-##############################################################################
-get '/marketplaceapp/:id/download' do
-    dl_resource = @SunstoneServer.download_marketplaceapp(params[:id])
-
-    # If the first element of dl_resource is a number, it is the exit_code after
-    # an error happend, so return it.
-    return dl_resource if dl_resource[0].kind_of?(Fixnum)
-
-    download_cmd, filename = dl_resource
-
-    # Send headers
-    headers['Cache-Control']       = "no-transform" # Do not use Rack::Deflater
-    headers['Content-Disposition'] = "attachment; filename=\"#{filename}\""
-
-    content_type :'application/octet-stream'
-
-    # Start stream
-    stream do |out|
-        Open3.popen3(download_cmd) do |_,o,e,w|
-
-            until o.eof?
-                # Read in chunks of 16KB
-                out << o.read(16384)
-            end
-
-            if !w.value.success?
-                error_message = "downloader.sh: " << e.read
-                logger.error { error_message }
-
-                if request.user_agent == "OpenNebula CLI"
-                    out << "@^_^@ #{error_message} @^_^@"
-                end
-            end
-        end
-    end
-end
-
-##############################################################################
-# Create a new Resource
-##############################################################################
-post '/:pool' do
-    @SunstoneServer.create_resource(params[:pool], @request_body)
-end
-
-##############################################################################
-# Start VNC Session for a target VM
-##############################################################################
-post '/vm/:id/startvnc' do
-    vm_id = params[:id]
-    @SunstoneServer.startvnc(vm_id, $vnc)
-end
-
-##############################################################################
-# Perform an action on a Resource
-##############################################################################
-post '/:resource/:id/action' do
-    @SunstoneServer.perform_action(
-        params[:resource],
-        params[:id],
-        @request_body
+puts "Registering ONe methods"
+post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
+    json(response:
+        onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
     )
 end
 
-##############################################################################
-# IONe Actions
-##############################################################################
-
-require 'ione/server/ione.rb'
-post '/ione/:method' do
-    begin
-        RPC_LOGGER.debug "IONeAPI calls proxy method #{params['method']}(#{JSON.parse(@request_body)['params'].collect {|p| p.inspect}.join(", ")}) | from #{session[:ip]}"
-        r = IONe.new($cloud_auth.client(session[:user], session[:active_zone_endpoint]), $db).send(params['method'], *JSON.parse(@request_body)['params'])
-    rescue => e
-        r = e.message
-    end
-    RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    JSON.pretty_generate response: r
+puts "Registering ONe Pool methods"
+post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
+    json(response:
+        ON_INSTANCE_POOLS[object.to_sym].new(@client).send(method.to_s << excl.to_s, *@request_hash['params'])
+    )
 end
-
-Sinatra::Application.run! if(!defined?(WITH_RACKUP))

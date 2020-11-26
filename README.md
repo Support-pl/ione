@@ -1,4 +1,4 @@
-# OpenNebula Sunstone with IONe integration
+# IONe
 
 ## Contacts
 
@@ -9,7 +9,7 @@
     <a href="https://docs.ione-cloud.net" title="IONe Docs Page" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=IONe&message=Docs&color=informational&style=flat" alt="IONe Docs Page"/>
     </a>
-    <a href="https://github.com/ione-cloud" title="github" rel="nofollow">
+    <a href="https://github.com/ione" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
     <img src="https://img.shields.io/static/v1?label=version&message=v1.0.0&color=success&style=flat" alt="version"/>
@@ -18,7 +18,7 @@
 
 Creators:
 [Support.pl](https://support.pl)
-[slnt_opp](http://slnt-opp.xyz)
+[slnt_opp](https://slnt-opp.xyz)
 
 ## Main additional features
 
@@ -41,7 +41,7 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.12(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">Sunstone</td><td align="center">will be replaced</td><td align="center"></td>
@@ -78,34 +78,26 @@ Creators:
 > If you are using a RedHat based distribution install redhat-lsb
 
 1. Download this repo using:
-   `git clone https://github.com/ione-cloud/ione-sunstone`
+   `git clone https://github.com/ione-cloud/ione`
 
 2. Enter directory:
-   `cd ione-sunstone/`
+   `cd ione`
 
 3. Run install script as root:
    `rake install`
 
-4. Configure Nginx. In addition to default settings, add API host proxy: `0.0.0.0:8443 ssl -> localhost:8009`. See example in the end of this file.
-
 > Note:
 > Works only with CentOS for now.
-
-> Note:
-> Additionaly installer isn't tested much times, so it's quite "buggy".
-
-> Note:
-> Make sure you are able to restart OpenNebula via systemd, otherwise script will fail on this step.
 
 4. Wait for complection.
 
 5. Fill `/etc/one/ione.conf` for proper work of IONe
 
-6. Fill `/usr/lib/one/sunstone/ione/modules/ansible/config.yml` for proper work of Ansible module
+6. Fill `/usr/lib/one/ione/modules/ansible/config.yml` for proper work of Ansible module
 
    6.1. Add oneadmin ssh-key to Ansible authorized_hosts list
 
-7. Fill all settings using UI. Panel "Cloud" at Settings tab._(Accessible only as oneadmin)_:
+7. Fill all settings using IONe UI at ione-admin.your.domain._(Accessible only as oneadmin)_:
 
 <table>
    <thead>
@@ -181,32 +173,3 @@ Creators:
 ---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`
-
-## Nginx host config example
-
-```nginx
-upstream api {
-    server 127.0.0.1:8009;
-}
-
-server {
-
-        listen                  8443 ssl;
-        server_name             vcloud.support.by;
-        ssl_certificate         /etc/one/ssl/example.crt;
-        ssl_certificate_key     /etc/one/ssl/example.key;
-
-   * * *
-
-location / {
-        proxy_pass      http://api;
-        proxy_set_header        X-Real-IP       $remote_addr;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header        host    $host;
-        proxy_set_header        X-Forwarded-Server      $host;
-        proxy_read_timeout 600s;
-        proxy_connect_timeout 600s;
-    }
-
-}
-```

@@ -1,6 +1,6 @@
 class IONe
     # @!group Billing
-
+    
     #
     # Calculates Showback for given User
     #

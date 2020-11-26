@@ -4,21 +4,15 @@ desc "Install Gems"
 task :install_gems => :before do
     puts "Installing Gems:\n"
 
-    puts "1. Checking distro..."
-    `lsb_release -a 2>/dev/null`
-    if $?.exitstatus != 0
-        sh %{sudo yum install redhat-lsb}
-    end
-    puts
-
-    puts "2. Installing gems..."
+    puts "1. Installing gems..."
     sh %{gem install nori}
     sh %{gem install net-ssh -v 6.1.0}
     sh %{gem install net-sftp -v 3.0.0}
     sh %{gem install colorize}
+    sh %{gem install sinatra-contrib}
     puts
 
-    puts "3. Installing required system libs and tools"
+    puts "2. Installing required system libs and tools"
     begin
         sh %{sudo yum install -y #{@sys_packages.join(' ')}}
     rescue
