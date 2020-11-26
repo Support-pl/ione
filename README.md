@@ -12,7 +12,7 @@
     <a href="https://github.com/ione-cloud" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.1&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.0&color=success&style=flat" alt="version"/>
     <img src="https://github.com/ione-cloud/ione-sunstone/workflows/Generate%20and%20Deploy%20Docs/badge.svg" alt="Generate and Deploy Docs"/>
 </p>
 
