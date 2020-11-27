@@ -50,6 +50,9 @@ Creators:
          <td align="left">Ruby</td><td align="center">2.5.5</td><td align="center"></td>
       </tr>
       <tr>
+         <td align="left">Node</td><td align="center">12+</td><td align="center"></td>
+      </tr>
+      <tr>
          <td align="left">Ansible</td><td align="center">2.x.x</td><td align="center">yes</td>
       </tr>
       <tr>
