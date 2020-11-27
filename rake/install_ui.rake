@@ -5,7 +5,7 @@ task :install_ui => [:useful_questions] do
 
     puts "Installing dependencies"
     cd '/usr/lib/one/ione/ui/'
-    sh %{sudo npm install}
+    sh %{sudo npm install --quiet --no-progress}
 
     puts "Generating config"
     File.open("/usr/lib/one/ione/ui/src/config/index.js", 'w') do | f |
