@@ -35,9 +35,10 @@ task :configure_nginx => [ :useful_questions ] do
     puts "Test nginx configuration:"
     sh %{nginx -t}
 
-    puts "If nginx conf is okay, restart nginx via:"
-    puts "  systemctl restart nginx"
-    puts
-    puts "We highly recommend to change sunstone-server.conf 'bind' from 0.0.0.0 to localhost"
-    puts
+    $messages << <<-EOF
+    If nginx conf is okay, restart nginx via:
+       systemctl restart nginx"
+    
+     We highly recommend to change sunstone-server.conf 'bind' from 0.0.0.0 to localhost
+    EOF
 end

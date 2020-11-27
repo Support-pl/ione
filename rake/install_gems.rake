@@ -16,20 +16,16 @@ task :install_gems => :before do
     begin
         sh %{sudo yum install -y #{@sys_packages.join(' ')}}
     rescue
-        puts <<-EOF
+        $messages << <<-EOF
         It seems to be, that you aren't using CentOS or yum doesn't work properly, follow next steps:
     
         1. Install this packages manually:
             
             #{@sys_packages.join(' ')}
         
-        2. If wanted to install our Sunstone version too, run
-            
-            rake install
-        
-        3. If you want to install IONe only, run
+        2. Install need parts using commands from:
 
-            rake install_ione
+            rake --tasks
     
         Thanks, for installation and choosing us!
         EOF

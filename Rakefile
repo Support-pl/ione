@@ -1,3 +1,5 @@
+$messages = []
+
 task :before do
     whoami = `whoami`.chomp
     if whoami != 'root' then
@@ -53,6 +55,12 @@ load "rake/test_install.rake"
 
 desc "Full IONe Installation"
 task :install => [:before, :useful_questions, :install_gems, :install_ione, :install_ui, :configure_nginx, :hooks] do
-    puts "  Thanks, for installation and choosing us!   "
-    puts "Configure ione with ione.conf & IONe UI and test install with: rake test_install"
+    $messages << <<-EOF
+      Thanks, for installation and choosing us!   
+    Configure ione with ione.conf & IONe UI and test install with: rake test_install
+    EOF
+
+    for msg in $messages do
+        puts msg
+    end
 end
