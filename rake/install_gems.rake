@@ -1,4 +1,4 @@
-@sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel)
+@sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel)
 
 desc "Install Gems"
 task :install_gems => :before do
@@ -10,6 +10,8 @@ task :install_gems => :before do
     sh %{gem install net-sftp -v 3.0.0 --no-document}
     sh %{gem install colorize --no-document}
     sh %{gem install sinatra-contrib --no-document}
+    sh %{gem install sequel --no-document}
+    # sh %{gem install mysql2 --no-document} | Ask about DB adapter
     puts
 
     puts "2. Installing required system libs and tools"
