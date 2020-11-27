@@ -106,7 +106,7 @@ Creators:
    </thead>
    <tbody>
       <tr>
-         <td align="left">__CAPACITY_COST__</td>
+         <td align="left"><strong>CAPACITY_COST</strong></td>
          <td align="left">CPU_COST</td>
          <td align="right"><code>CPU cost per hour</code></td>
       </tr>
@@ -116,7 +116,7 @@ Creators:
          <td align="right"><code>RAM cost per hour</code></td>
       </tr>
       <tr>
-         <td align="left">__DISK_COSTS__</td>
+         <td align="left"><strong>DISK_COSTS</strong></td>
          <td align="left">DISKTYPE_0(e.g. SSD)</td>
          <td align="right"><code>cost per hour</code></td>
       </tr>
@@ -126,7 +126,7 @@ Creators:
          <td align="right"><code>cost per hour</code></td>
       </tr>
       <tr>
-         <td align="left">__DISK_TYPES__</td>
+         <td align="left"><strong>DISK_TYPES</strong></td>
          <td align="left"></td>
          <td align="right"><code>comma separated list of types: SSD,HDD</code></td>
       </tr>
@@ -151,7 +151,7 @@ Creators:
          <td align="right"><code>Private Networks pool network ID</code></td>
       </tr>
       <tr>
-         <td align="left">__NODES_DEFAULT__</td>
+         <td align="left"><strong>NODES_DEFAULT</strong></td>
          <td align="left">HYPERIVSOR_0(e.g. VCENTER)</td>
          <td align="right"><code>OpenNebula host id</code></td>
       </tr>
@@ -161,7 +161,7 @@ Creators:
          <td align="right"><code>OpenNebula host id</code></td>
       </tr>
       <tr>
-         <td align="left">__CURRENCY_MAIN__</td>
+         <td align="left"><strong>CURRENCY_MAIN</strong></td>
          <td align="left"></td>
          <td align="right"><code>$/€/etc... this will be shown to user</code></td>
       </tr>
