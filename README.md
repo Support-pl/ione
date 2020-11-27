@@ -41,16 +41,13 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Sunstone</td><td align="center">will be replaced</td><td align="center"></td>
+         <td align="left">MySQL MariaDB Server</td><td align="center">~8.0</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">MySQL MariaDB Server</td><td align="center">~5.5</td><td align="center"></td>
-      </tr>
-      <tr>
-         <td align="left">Ruby</td><td align="center">2.0.0</td><td align="center"></td>
+         <td align="left">Ruby</td><td align="center">2.5.5</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">Ansible</td><td align="center">2.x.x</td><td align="center">yes</td>
