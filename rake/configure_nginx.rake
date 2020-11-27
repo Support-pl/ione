@@ -5,7 +5,7 @@ task :generate_certificate => [ :useful_questions ] do
     sh %{openssl dhparam -out /etc/one/ssl/dhparam.pem 1024}
 end
 desc "Configure Nginx"
-task :configure_nginx => [ :useful_questions ] do
+task :configure_nginx => [ :before, :useful_questions ] do
     cd @src_dir
     
     puts
