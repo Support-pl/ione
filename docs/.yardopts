@@ -5,6 +5,6 @@ service/*.rb
 service/**/*.rb
 
 --readme README.md
---files docs/WHMCS.md,docs/WHMCS_module_installation.md,docs/ISPDriver.md
+--files docs/WHMCS.md,docs/WHMCS_module_installation.md,docs/ISPDriver.md,docs/VMSnapshots.md
 
 -o doc
