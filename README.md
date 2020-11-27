@@ -173,3 +173,12 @@ Creators:
 ---------------------------------------------------------------------------------------------------------
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`
+
+## Important Notes
+
+### CentOS, gem mysql2 and MariaDB
+
+Most probably `gem install mysql2` will fail on building native extentions. The most common solutions here are:
+
+1. Check if ruby-devel is installed correctly(`yum install ruby-devel` or `rvm install 2.5-devel`)
+2. Check if package MariaDB-shared is installed(`yum install MariaDB-shared`, it's case-sensistive)
