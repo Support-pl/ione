@@ -80,5 +80,5 @@ Process has the following fields:
 #### Run
 Runs playbook at given hosts
 
-#### Удалить    | Delete
+#### Delete
 Sets Process status to **DONE**
