@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div v-for="[key, value] of pairs()" :key="key">
-      {{ key }}: <objectItem :value="value" deepness=1 :path="key"/>
-    </div>
+		<objectItem :value="parse(value.body)" deepness=0 :path="''" :opened="true"/>
   </div>
 </template>
 
@@ -15,9 +13,9 @@ export default {
 	},
   props: ["value"],
   methods: {
-    pairs() {
-      return Object.entries(JSON.parse(this.value.body ?? ""));
-    },
+		parse(JsonString){
+			return JSON.parse(JsonString);
+		},
   },
 };
 </script>
