@@ -12,9 +12,10 @@ end
 begin
     $db.create_table :snapshot_records do
         primary_key :key
-        foreign_key :vm, :vm_pool, null: false
-        Integer     :id, null: false
-        String      :action, size: 3, null: false
+        foreign_key :vm,     :vm_pool,   null: false
+        Integer     :id,     null: false
+        Integer     :time,   null: false
+        String      :action, size: 3,    null: false
     end
 rescue
     puts "Table :snapshot_records already exists, skipping"
@@ -26,17 +27,38 @@ class Record < Sequel::Model(:records); end
 
 class SnapshotRecord < Sequel::Model(:snapshot_records); end
 
-# States and Notifications records object(linked to VM)
-class OpenNebula::Records
-    attr_reader :id, :records
+class RecordsSource
+    attr_reader :id
+
+    @@key = :id
+    @@time_delimeter_col = :time
 
     # @param [Fixnum] id - VM ID
-    def initialize id
+    def initialize cls, id
         @id = id
-        @records = Record.where(id:id).all # Getting records from DB[table :settings]
-        raise NoRecordsError if @records.empty?
+        @records = cls.where(Hash[@@key, @id])
     end
 
-    # No records in DB Exception
-    class NoRecordsError < StandardError; end
+    def records
+        @records.all
+    end
+
+    def find stime, etime
+        @records.where(Hash[@@time_delimeter_col, stime..etime])
+    end
 end
+
+class OpenNebula::Records < RecordsSource
+    def initialize id
+        super(Record, id)
+    end
+end
+class OpenNebula::SnapshotRecords < RecordsSource
+
+    @@key = :vm
+
+    def initialize id
+        super(SnapshotRecord, id)
+    end
+end
+
