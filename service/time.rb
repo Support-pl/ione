@@ -1,9 +1,3 @@
-# Returns current time in ctime format
-# @return [String]
-def time
-    Time.now.ctime
-end
-
 # Formats time from seconds from the start of Time to dd:hh:mm:ss format
 # @param [Integer] sec
 # @return [String]
