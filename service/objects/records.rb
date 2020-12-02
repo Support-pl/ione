@@ -46,6 +46,10 @@ class RecordsSource
     def find stime, etime
         @records.where(Hash[@@time_delimeter_col, stime..etime])
     end
+
+    def self.tl_filter records
+        records
+    end
 end
 
 class OpenNebula::Records < RecordsSource
