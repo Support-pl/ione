@@ -12,10 +12,10 @@ end
 begin
     $db.create_table :snapshot_records do
         primary_key :key
-        foreign_key :vm,     :vm_pool,   null: false
-        Integer     :id,     null: false
-        Integer     :time,   null: false
-        String      :action, size: 3,    null: false
+        foreign_key :vm,  :vm_pool,   null: false
+        Integer     :id,  null: false
+        Integer     :crt, null: false
+        Integer     :del, null: true
     end
 rescue
     puts "Table :snapshot_records already exists, skipping"
@@ -63,6 +63,12 @@ class OpenNebula::SnapshotRecords < RecordsSource
 
     def initialize id
         super(SnapshotRecord, id)
+    end
+    def find stime, etime
+        @records.where{
+            (((del == nil) | (del >= etime)) & (crt <= stime)) ||
+            (crt =~ (stime..etime))
+        }
     end
 end
 
