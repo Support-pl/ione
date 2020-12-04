@@ -6,14 +6,20 @@ class Timeline
         Records, SnapshotRecords
     ]
 
-    def initialize vmid, stime, etime, group_by_day = false
-        @vmid, @stime, @etime, @group_by_day = vmid, stime, etime, group_by_day
+    def initialize vm, stime, etime, group_by_day = false
+        @vm, @stime, @etime, @group_by_day = vm, stime, etime, group_by_day
+
+        @sources = SOURCES
+    end
+
+    def set_state state
+        @state = state
     end
 
     def compile
-        records = SOURCES.inject([]) do | r, source |
+        records = @sources.inject([]) do | r, source |
             r.concat source.tl_filter(
-                source.new(@vmid).find(@stime, @etime).all
+                source.new(@vm.id).find(@stime, @etime).all
             )
         end
 
