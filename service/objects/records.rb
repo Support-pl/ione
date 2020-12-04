@@ -108,4 +108,3 @@ class OpenNebula::SnapshotRecords < RecordsSource
         }
     end
 end
-
