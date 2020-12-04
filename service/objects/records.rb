@@ -80,7 +80,7 @@ class RecordsSource
 
     # Find records for given time period
     def find stime, etime
-        @records.where(Hash[:time, stime..etime])
+        @records.where(time: stime..etime)
     end
 
     def init_state stime
