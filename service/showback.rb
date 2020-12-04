@@ -1,5 +1,6 @@
 require "#{ROOT}/service/biller.rb"
 
+# Class for compiling all history records from all records sources into one readable timeline
 class Timeline
 
     attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled
@@ -32,6 +33,7 @@ class Timeline
     end
 end
 
+# Class for billing through Timeline using different billers
 class Billing
     BILLERS = [
         CapacityBiller
@@ -51,7 +53,7 @@ class Billing
         @state = state
     end
 end
-        
+
         self
     end
 end
