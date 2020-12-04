@@ -28,9 +28,22 @@ class Record < Sequel::Model(:records)
         self
     end
 
+    def sorter
+        time
+    end
+end
+
+class SnapshotRecord < Sequel::Model(:snapshot_records)
+    
     class CreateSnapshotRecord < SnapshotRecord
+        def sorter
+            crt
+        end
     end
     class DeleteSnapshotRecord < SnapshotRecord
+        def sorter
+            del
+        end
     end
     
     def values
