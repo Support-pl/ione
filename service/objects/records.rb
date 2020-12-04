@@ -31,6 +31,7 @@ class Record < Sequel::Model(:records)
     def sorter
         time
     end
+    alias :ts :sorter
 end
 
 class SnapshotRecord < Sequel::Model(:snapshot_records)
@@ -39,11 +40,13 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
         def sorter
             crt
         end
+        alias :ts :sorter
     end
     class DeleteSnapshotRecord < SnapshotRecord
         def sorter
             del
         end
+        alias :ts :sorter
     end
     
     def values
