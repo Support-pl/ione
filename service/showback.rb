@@ -3,7 +3,7 @@ require "#{ROOT}/service/biller.rb"
 # Class for compiling all history records from all records sources into one readable timeline
 class Timeline
 
-    attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled
+    attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled, :state
 
     SOURCES = [
         Records, SnapshotRecords
@@ -28,8 +28,15 @@ class Timeline
         records.flatten!
     
         @timeline = records.sort_by { |rec| rec.sorter }
+        @timeline.select! { |rec| rec.sorter.between?(stime, etime)}
         @compiled = true
         self
+    end
+
+    def init
+        @state = @sources.inject({}) do | r, source |
+            r.merge source.new(@vm.id).init_state(@stime)
+        end
     end
 end
 
