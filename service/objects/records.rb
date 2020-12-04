@@ -30,13 +30,16 @@ class SnapshotRecord < Sequel::Model(:snapshot_records); end
 class RecordsSource
     attr_reader :id
 
-    @@key = :id
+    def key
+        :id
+    end
+
     @@time_delimeter_col = :time
 
     # @param [Fixnum] id - VM ID
     def initialize cls, id
         @id = id
-        @records = cls.where(Hash[@@key, @id])
+        @records = cls.where(Hash[key, @id])
     end
 
     def records
@@ -59,7 +62,9 @@ class OpenNebula::Records < RecordsSource
 end
 class OpenNebula::SnapshotRecords < RecordsSource
 
-    @@key = :vm
+    def key
+        :vm
+    end
 
     def initialize id
         super(SnapshotRecord, id)
