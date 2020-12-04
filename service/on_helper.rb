@@ -1,5 +1,6 @@
 require 'rbvmomi'
 require "#{ROOT}/service/custom_objects.rb"
+require "#{ROOT}/service/showback.rb"
 
 # Useful methods for OpenNebula classes, functions and constants.
 module ONeHelper
