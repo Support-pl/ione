@@ -83,6 +83,10 @@ class RecordsSource
         @records.where(Hash[:time, stime..etime])
     end
 
+    def init_state stime
+        {}
+    end
+
     # Filter records needed for Showback Timeline
     def self.tl_filter records
         records
@@ -97,6 +101,18 @@ end
 class OpenNebula::Records < RecordsSource
     def initialize id
         super(Record, id)
+    end
+    def init_state stime
+        prev = @records.where{ time < stime }.order(Sequel.desc :time).limit(1).to_a.last
+        if prev.nil? then
+            {
+                'state': @records.where{ time >= stime}.limit(1).to_a.first.state
+            }
+        else
+            {
+                state: prev.state
+            }
+        end
     end
 end
 class OpenNebula::SnapshotRecords < RecordsSource
