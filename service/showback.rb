@@ -42,6 +42,9 @@ end
 
 # Class for billing through Timeline using different billers
 class Billing
+
+    attr_reader :timeline
+
     BILLERS = [
         CapacityBiller
     ]
@@ -53,6 +56,7 @@ class Billing
 
         @timeline = Timeline.new vm, stime, etime
         @timeline.compile
+        @timeline.init
     end
 
 
