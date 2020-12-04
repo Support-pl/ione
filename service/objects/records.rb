@@ -59,14 +59,14 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
     end
 end
 
+# Source of History records class
 class RecordsSource
     attr_reader :id
 
+    # VMID field key
     def key
         :id
     end
-
-    @@time_delimeter_col = :time
 
     # @param [Fixnum] id - VM ID
     def initialize cls, id
@@ -78,12 +78,19 @@ class RecordsSource
         @records.all
     end
 
+    # Find records for given time period
     def find stime, etime
-        @records.where(Hash[@@time_delimeter_col, stime..etime])
+        @records.where(Hash[:time, stime..etime])
     end
 
+    # Filter records needed for Showback Timeline
     def self.tl_filter records
         records
+    end
+
+    # Check if source should be used with given VM
+    def self.check_source vm
+        true
     end
 end
 
