@@ -128,6 +128,10 @@ class OpenNebula::SnapshotRecords < RecordsSource
         @records.where(crt: stime..etime).or(del: stime..etime)
     end
 
+    def init_state stime
+        # SELECT * FROM `snapshot_records` WHERE ((`crt` < 0) AND ((`del` >= 0) OR NOT `del`))
+        {
+            snaps: @records.where{ crt < stime }.where{(del >= stime) | ~del}.count
         }
     end
 end
