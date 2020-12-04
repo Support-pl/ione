@@ -1,4 +1,5 @@
 class CapacityBiller < Biller
+    # Checking if Capacity costs are given, otherwise there is no point to calculate it
     def check_biller
         @costs = JSON.parse(costs['CAPACITY_COST'])
         return false if @costs.nil?
