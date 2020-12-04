@@ -23,9 +23,28 @@ end
 
 # History Record Model class
 # @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/ione/server/service/objects/records.rb#L1-L10 History Model Defintion
-class Record < Sequel::Model(:records); end
+class Record < Sequel::Model(:records)
+    def sortable
+        self
+    end
 
-class SnapshotRecord < Sequel::Model(:snapshot_records); end
+    class CreateSnapshotRecord < SnapshotRecord
+    end
+    class DeleteSnapshotRecord < SnapshotRecord
+    end
+    
+    def values
+        @values.without(:key)
+    end
+
+    def sortable
+        if self.del then
+            [ CreateSnapshotRecord.new(values), DeleteSnapshotRecord.new(values) ]
+        else
+            CreateSnapshotRecord.new(values)
+        end
+    end
+end
 
 class RecordsSource
     attr_reader :id
