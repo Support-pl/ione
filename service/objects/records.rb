@@ -125,9 +125,9 @@ class OpenNebula::SnapshotRecords < RecordsSource
         super(SnapshotRecord, id)
     end
     def find stime, etime
-        @records.where{
-            (((del == nil) | (del >= etime)) & (crt <= stime)) ||
-            (crt =~ (stime..etime))
+        @records.where(crt: stime..etime).or(del: stime..etime)
+    end
+
         }
     end
 end
