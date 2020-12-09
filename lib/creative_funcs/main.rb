@@ -417,7 +417,8 @@ class IONe
                                 "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
                                 "DEV_PREFIX" => "vd",
                                 "DRIVER" => "qcow2",
-                                "OPENNEBULA_MANAGED" => "NO"
+                                "OPENNEBULA_MANAGED" => "NO",
+                                "TYPE" => "FILE"
                             }
                         }
             end
