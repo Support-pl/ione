@@ -2,9 +2,11 @@ require 'pathname'
 require 'yaml'
 
 task :test_install_gems do 
-    require "colorize"
+    require 'colorize'
     require 'net/http'
     require 'sequel'
+    require 'base64'
+    require 'json'
 end
 
 def passed
@@ -94,19 +96,35 @@ task :test_api_root do
     puts "Testing '/'"
     api = URI("http://localhost:8009/")
     begin
-        r = Net::HTTP.get_response(api)
+        req = Net::HTTP::Get.new(api)
+        req.basic_auth *@one_auth.split(':')
+        r = Net::HTTP.start(api.hostname, api.port) do | http |
+            http.request(req)
+        end
     rescue => e
         fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
     end
-    unless r.is_a? Net::HTTPSuccess then
-        fail "Unable to get response from '/', got: #{r.code} #{r.body}" unless r.code == 401 
+    unless r.code == "404" then
+        fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
     end
     passed
 
     puts "Can get response from 'Test'"
     api = URI("http://localhost:8009/ione/Test")
     begin
-        r = Net::HTTP.post(api, nil)
+        req = Net::HTTP::Post.new(api)
+        req.basic_auth *@one_auth.split(':')
+        r = Net::HTTP.start(api.hostname, api.port) do | http |
+            http.request(req)
+        end
+    rescue => e
+        fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+    end
+    if r.code != "200" then
+        fail "Got #{r.code} response from Test, should be 200."
+    end
+    passed
+
     rescue => e
         fail "Unable to get response from '/ione/Test', got: #{e.message}" 
     end
