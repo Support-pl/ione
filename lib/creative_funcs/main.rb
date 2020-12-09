@@ -413,16 +413,13 @@ class IONe
                             "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
                             "DRIVE" => params['ds_type'],
                             "DISK" => {
+                                "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
                                 "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
                                 "DEV_PREFIX" => "vd",
                                 "DRIVER" => "qcow2",
                                 "OPENNEBULA_MANAGED" => "NO"
                             }
                         }
-                
-                vd = t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK'].select {|d| d['DEV_PREFIX'] == 'vd' }.first
-                key = vd['IMAGE_ID'].nil? ? 'IMAGE' : 'IMAGE_ID'
-                specs['DISK'][key] = vd[key]
             end
             trace << "Updating user quota:#{__LINE__ + 1}"
             user.update_quota_by_vm(
