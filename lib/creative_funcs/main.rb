@@ -432,7 +432,7 @@ class IONe
                 'SNAPSHOTS_ALLOWED' => params['allow_snapshots'].to_s.upcase
             }
 
-            LOG_DEBUG "Resulting capacity template:\n" + specs.out
+            LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
             specs = specs.to_one_template
             vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
         end
