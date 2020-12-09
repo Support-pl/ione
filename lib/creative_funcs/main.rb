@@ -408,6 +408,7 @@ class IONe
                         }
             elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'KVM' then
                 specs = {
+                            "CPU" => 1,
                             "VCPU" => params['cpu'],
                             "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
                             "DRIVE" => params['ds_type'],
