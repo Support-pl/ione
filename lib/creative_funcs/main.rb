@@ -440,7 +440,7 @@ class IONe
             vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
         end
 
-        raise "Template instantiate Error: #{vmid.message}" if vmid.class != Fixnum
+        raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid
         
         host =  if params['host'].nil? then
                     JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
