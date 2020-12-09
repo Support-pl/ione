@@ -528,8 +528,8 @@ class IONe
             out[:params] = params
             return out
         ensure
-            onblock(:vm, vmid).recover(3)    if defined? vmid && !(OpenNebula.is_error? vmid)
-            user.delete      if defined? user
+            onblock(:vm, vmid).recover(3)   if (defined? vmid) && !(OpenNebula.is_error? vmid)
+            user.delete                     if defined? user
         end
     end
     # Class for pst-deploy activities methods
