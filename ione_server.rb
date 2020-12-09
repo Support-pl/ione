@@ -329,7 +329,7 @@ post '/ione/:method' do | method |
         backtrace = e.backtrace
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
     json response: r
 end
 
