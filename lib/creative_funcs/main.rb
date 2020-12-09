@@ -531,7 +531,7 @@ class IONe
             return out
         ensure
             onblock(:vm, vmid).recover(3)    if defined? vmid
-            onblock(:u, userid).delete      if defined? userid
+            user.delete      if defined? user
         end
     end
     # Class for pst-deploy activities methods
