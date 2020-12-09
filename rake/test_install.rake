@@ -125,11 +125,28 @@ task :test_api_root do
     end
     passed
 
+    puts "Can get PONG from PING"
+    api = URI("http://localhost:8009/ione/Test")
+    begin
+        req = Net::HTTP::Post.new(api)
+        req.body = JSON.generate params: ['PING']
+        req.basic_auth *@one_auth.split(':')
+        r = Net::HTTP.start(api.hostname, api.port) do | http |
+            http.request(req)
+        end
     rescue => e
         fail "Unable to get response from '/ione/Test', got: #{e.message}" 
     end
     if r.code != "200" then
         fail "Got #{r.code} response from Test, should be 200."
+    end
+    begin
+        res = JSON.parse r.body
+        r = res['response']
+        fail "Wrong response schema: #{res}" if r.nil?
+        fail "Expected PONG, got: #{r}" unless r == 'PONG'
+    rescue JSON::ParserError
+        fail "Got un-parseable string: #{r.body}"
     end
     passed
 end
