@@ -18,6 +18,10 @@ def warn msg
     puts msg.yellow
 end
 
+task :load_installed_env do
+    @one_auth  = File.read('/var/lib/one/.one/one_auth').chomp
+end
+
 desc "Check if IONe config exists and correct"
 task :test_config_exists do
     puts "Checking if config exists"
