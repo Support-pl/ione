@@ -525,6 +525,7 @@ class IONe
     rescue => err
         begin
             out = { :exception => err.message, :trace => trace << 'END_TRACE' }
+            LOG_DEBUG err.backtrace
             LOG_DEBUG out.debug_out
             out[:params] = params
             return out
