@@ -134,6 +134,10 @@ task :test_api_root do
         rescue => e
             fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
         end
+        if uri.scheme == 'http' && r.code == "301" then
+            passed
+            next
+        end
         unless r.code == "404" then
             fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
         end
