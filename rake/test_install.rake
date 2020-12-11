@@ -93,62 +93,95 @@ end
 
 desc "Check if IONe UI is up"
 task :test_api_root do
-    puts "Testing '/'"
-    api = URI("http://localhost:8009/")
-    begin
-        req = Net::HTTP::Get.new(api)
-        req.basic_auth *@one_auth.split(':')
-        r = Net::HTTP.start(api.hostname, api.port) do | http |
-            http.request(req)
-        end
-    rescue => e
-        fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
-    end
-    unless r.code == "404" then
-        fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
-    end
-    passed
 
-    puts "Can get response from 'Test'"
-    api = URI("http://localhost:8009/ione/Test")
-    begin
-        req = Net::HTTP::Post.new(api)
-        req.basic_auth *@one_auth.split(':')
-        r = Net::HTTP.start(api.hostname, api.port) do | http |
-            http.request(req)
-        end
-    rescue => e
-        fail "Unable to get response from '/ione/Test', got: #{e.message}" 
-    end
-    if r.code != "200" then
-        fail "Got #{r.code} response from Test, should be 200."
-    end
-    passed
+    @uris = [URI("http://localhost:8009/")]
 
-    puts "Can get PONG from PING"
-    api = URI("http://localhost:8009/ione/Test")
-    begin
-        req = Net::HTTP::Post.new(api)
-        req.body = JSON.generate params: ['PING']
-        req.basic_auth *@one_auth.split(':')
-        r = Net::HTTP.start(api.hostname, api.port) do | http |
-            http.request(req)
+    r = nil
+    until ['y', 'n'].include? r do
+        print "Do you have DNS configured? (y/n) "
+        r = gets.chomp.downcase
+    end
+    if r == 'y' then
+        r = uri = nil
+        until ['y', 'n'].include? r do
+            print "Enter your domain name: "
+            uri = gets.chomp.downcase
+            print "Is '#{uri}' correct? (y/n) "
+            r = gets.chomp.downcase
         end
-    rescue => e
-        fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        if r == 'y' then
+            @uris << URI("http://#{uri}/")
+            @uris << URI("https://#{uri}/")
+        end
     end
-    if r.code != "200" then
-        fail "Got #{r.code} response from Test, should be 200."
+
+    def fail msg
+        puts msg.red
     end
+
+    for uri in @uris do
     begin
-        res = JSON.parse r.body
-        r = res['response']
-        fail "Wrong response schema: #{res}" if r.nil?
-        fail "Expected PONG, got: #{r}" unless r == 'PONG'
-    rescue JSON::ParserError
-        fail "Got un-parseable string: #{r.body}"
+        puts "Testing #{uri.to_s}"
+        puts "-------------------"
+        puts "Testing '/'"
+        api = uri
+        begin
+            req = Net::HTTP::Get.new(api)
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
+        end
+        unless r.code == "404" then
+            fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
+        end
+        passed
+
+        puts "Can get response from 'Test'"
+        api = uri + "/ione/Test"
+        begin
+            req = Net::HTTP::Post.new(api)
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        end
+        if r.code != "200" then
+            fail "Got #{r.code} response from Test, should be 200."
+        end
+        passed
+
+        puts "Can get PONG from PING"
+        api = uri + "/ione/Test"
+        begin
+            req = Net::HTTP::Post.new(api)
+            req.body = JSON.generate params: ['PING']
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        end
+        if r.code != "200" then
+            fail "Got #{r.code} response from Test, should be 200."
+        end
+        begin
+            res = JSON.parse r.body
+            r = res['response']
+            fail "Wrong response schema: #{res}" if r.nil?
+            fail "Expected PONG, got: #{r}" unless r == 'PONG'
+        rescue JSON::ParserError
+            fail "Got un-parseable string: #{r.body}"
+        end
+        passed
+    rescue => e
+        puts e.message
     end
-    passed
 end
 
 desc "Check if IONe is installed and running"
