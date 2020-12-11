@@ -99,15 +99,15 @@ task :test_api_root do
     r = nil
     until ['y', 'n'].include? r do
         print "Do you have DNS configured? (y/n) "
-        r = gets.chomp.downcase
+        r = STDIN.gets.strip.downcase
     end
     if r == 'y' then
         r = uri = nil
         until ['y', 'n'].include? r do
             print "Enter your domain name: "
-            uri = gets.chomp.downcase
+            uri = STDIN.gets.strip.downcase
             print "Is '#{uri}' correct? (y/n) "
-            r = gets.chomp.downcase
+            r = STDIN.gets.strip.downcase
         end
         if r == 'y' then
             @uris << URI("http://#{uri}/")
