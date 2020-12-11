@@ -429,9 +429,11 @@ class IONe
                 'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
             ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
 
-            specs['USER_TEMPLATE'] = {
-                'SNAPSHOTS_ALLOWED' => params['allow_snapshots'].to_s.upcase
-            }
+            unless params['allow_snapshots'].nil? then
+                specs['USER_TEMPLATE'] = {
+                    'SNAPSHOTS_ALLOWED' => params['allow_snapshots'].to_s.upcase
+                }
+            end
 
             LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
             specs = specs.to_one_template
