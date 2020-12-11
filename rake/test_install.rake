@@ -110,8 +110,8 @@ task :test_api_root do
             r = STDIN.gets.strip.downcase
         end
         if r == 'y' then
-            @uris << URI("http://#{uri}/")
-            @uris << URI("https://#{uri}/")
+            @uris << URI("http://ione-api.#{uri}/")
+            @uris << URI("https://ione-api.#{uri}/")
         end
     end
 
