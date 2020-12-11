@@ -128,7 +128,7 @@ task :test_api_root do
         begin
             req = Net::HTTP::Get.new(api)
             req.basic_auth *@one_auth.split(':')
-            r = Net::HTTP.start(api.hostname, api.port) do | http |
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
                 http.request(req)
             end
         rescue => e
@@ -144,7 +144,7 @@ task :test_api_root do
         begin
             req = Net::HTTP::Post.new(api)
             req.basic_auth *@one_auth.split(':')
-            r = Net::HTTP.start(api.hostname, api.port) do | http |
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
                 http.request(req)
             end
         rescue => e
@@ -161,7 +161,7 @@ task :test_api_root do
             req = Net::HTTP::Post.new(api)
             req.body = JSON.generate params: ['PING']
             req.basic_auth *@one_auth.split(':')
-            r = Net::HTTP.start(api.hostname, api.port) do | http |
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
                 http.request(req)
             end
         rescue => e
