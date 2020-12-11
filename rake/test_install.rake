@@ -5,7 +5,6 @@ task :test_install_gems do
     require 'colorize'
     require 'net/http'
     require 'sequel'
-    require 'base64'
     require 'json'
 end
 
