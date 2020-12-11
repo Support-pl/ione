@@ -115,6 +115,8 @@ task :test_api_root do
         end
     end
 
+    puts
+
     def fail msg
         puts msg.red
     end
@@ -186,6 +188,7 @@ task :test_api_root do
     rescue => e
         puts e.message
     end
+        puts
     end
 end
 
