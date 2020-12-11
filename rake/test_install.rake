@@ -182,6 +182,7 @@ task :test_api_root do
     rescue => e
         puts e.message
     end
+    end
 end
 
 desc "Check if IONe is installed and running"
