@@ -72,7 +72,7 @@ class Billing
     attr_reader :timeline, :bill
 
     BILLERS = [
-        CapacityBiller
+        CapacityBiller, DiskBiller
     ]
 
     def initialize vm, stime, etime

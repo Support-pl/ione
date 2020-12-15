@@ -10,8 +10,16 @@ class DiskBiller < Biller
             rescue
                 r
             end
-        return r > 0
+        return false if r <= 0
+
+        @cost = r[@vm['/VM/USER_TEMPLATE/DRIVE']].to_f
+        return @cost > 0
     rescue
         return false
+    end
+
+    def bill bill, state, delta
+        bill[:capacity] = delta * @cost
+        bill
     end
 end
