@@ -4,13 +4,13 @@ class CapacityBiller < Biller
         @costs = JSON.parse(costs['CAPACITY_COST'])
         return false if @costs.nil?
 
-        r = 
+        @cost = 
             @costs.values.inject(0) do | r, c |
-                r += c.to_i
+                r += c.to_f
             rescue
                 r
             end
-        return r > 0
+        return @cost > 0
     rescue
         return false
     end
