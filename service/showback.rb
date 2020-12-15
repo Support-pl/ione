@@ -51,7 +51,7 @@ class Billing
 
     def initialize vm, stime, etime
         @vm = vm
-        @billers = BILLERS.map { | bill | bill.new(vm) }
+        @billers = BILLERS.map { | bill | bill.new(@vm) }
         @billers.select! { |bill| bill.check_biller }
 
         @timeline = Timeline.new vm, stime, etime
