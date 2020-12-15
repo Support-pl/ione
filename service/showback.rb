@@ -74,6 +74,11 @@ class Billing
         @bill
     end
 
+    def receipt
+        @bill.map! do | el |
+            el.merge total: el.without(:time).values.sum
+        end
+    end
     end
 end
 
