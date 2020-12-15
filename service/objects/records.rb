@@ -32,6 +32,10 @@ class Record < Sequel::Model(:records)
         time
     end
     alias :ts :sorter
+
+    def mod st
+        st[:state] = state
+    end
 end
 
 class SnapshotRecord < Sequel::Model(:snapshot_records)
@@ -41,12 +45,20 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
             crt
         end
         alias :ts :sorter
+
+        def mod st
+            st[:snaps] += 1
+        end
     end
     class DeleteSnapshotRecord < SnapshotRecord
         def sorter
             del
         end
         alias :ts :sorter
+
+        def mod st
+            st[:snaps] -= 1
+        end
     end
     
     def values
