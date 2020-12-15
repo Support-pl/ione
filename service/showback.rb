@@ -59,9 +59,21 @@ class Billing
         @timeline.init
     end
 
+    def make_bill
+        state, @bill = @timeline.state, []
+        @timeline.timeline.each_cons(2) do | curr, con |
+            delta = con.ts - curr.ts
+            curr.mod state
+            bill_rec = {time: con.ts}
+            @billers.each do | biller |
+                bill_rec.merge! biller.bill(bill_rec, state, delta)
+            end
+            @bill << bill_rec
+        end
 
-    def set_state state
-        @state = state
+        @bill
+    end
+
     end
 end
 
