@@ -28,7 +28,13 @@ class Timeline
         records.flatten!
     
         @timeline = records.sort_by { |rec| rec.sorter }
-        @timeline.select! { |rec| rec.sorter.between?(stime, etime)}
+        @timeline.select! { |rec| rec.sorter.between?(@stime, @etime)}
+        
+        init
+        init_rec = InitRecord.new @stime, @state
+        @timeline.unshift init_rec
+        @timeline << FinalRecord.new(@etime)
+
         @compiled = true
         self
     end
@@ -36,6 +42,26 @@ class Timeline
     def init
         @state = @sources.inject({}) do | r, source |
             r.merge source.new(@vm.id).init_state(@stime)
+        end
+    end
+
+    class InitRecord
+        def initialize time, state
+            @time, @state = time, state
+        end
+        def ts
+            @time
+        end
+        def mod st
+            st.merge! @state
+        end
+    end
+    class FinalRecord
+        def initialize time
+            @time = time
+        end
+        def ts
+            @time
         end
     end
 end
@@ -56,11 +82,10 @@ class Billing
 
         @timeline = Timeline.new vm, stime, etime
         @timeline.compile
-        @timeline.init
     end
 
     def make_bill
-        state, @bill = @timeline.state, []
+        state, @bill = {}, []
         @timeline.timeline.each_cons(2) do | curr, con |
             delta = con.ts - curr.ts
             curr.mod state
