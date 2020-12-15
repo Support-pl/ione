@@ -4,7 +4,6 @@ task :cap_showback_test => :before_test do
 
     $db[:settings].where(name: "CAPACITY_COST").update(body: "{\"CPU_COST\":\"0.5\",\"MEMORY_COST\":\"0.5\"}")
     $db[:settings].where(name: "DISK_COSTS").update(body: "{\"HDD\":\"0.0\"}")
-    $db[:settings].where(name: "PUBLIC_IP_COST").update(body: "0.0")
 
     r = onblock(:vm, 3).calculate_showback 0, 1200
     if r[:TOTAL] == 600 then
@@ -38,7 +37,6 @@ task :disk_showback_test => :before_test do
 
     $db[:settings].where(name: "CAPACITY_COST").update(body: "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}")
     $db[:settings].where(name: "DISK_COSTS").update(body: "{\"HDD\":\"1\"}")
-    $db[:settings].where(name: "PUBLIC_IP_COST").update(body: "0.0")
 
     r = onblock(:vm, 3).calculate_showback 0, 1200
     if r[:TOTAL] == 1200 then
