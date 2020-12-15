@@ -13,6 +13,10 @@ class Biller
     def check_biller
         true
     end
+
+    def bill bill, state, delta
+        0
+    end
 end
 
 Dir["#{ROOT}/service/billers/*.rb"].each {|file| require file }

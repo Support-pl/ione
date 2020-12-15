@@ -14,4 +14,11 @@ class CapacityBiller < Biller
     rescue
         return false
     end
+
+    def bill bill, state, delta
+        if state[:state] == 'on' then
+            bill[:capacity] = delta * @cost
+        end
+        bill
+    end
 end
