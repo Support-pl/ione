@@ -79,6 +79,9 @@ class Billing
             el.merge total: el.without(:time).values.sum
         end
     end
+
+    def total
+        @bill.inject(0) { |r, el| r += el[:total] }
     end
 end
 
