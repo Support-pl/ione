@@ -1,7 +1,7 @@
 class DiskBiller < Biller
     # Checking if Capacity costs are given, otherwise there is no point to calculate it
     def check_biller
-        @costs = JSON.parse(costs['DISK_COST'])
+        @costs = JSON.parse(costs['DISK_COSTS'])
         return false if @costs.nil?
 
         r = 
@@ -12,7 +12,7 @@ class DiskBiller < Biller
             end
         return false if r <= 0
 
-        @cost = r[@vm['/VM/USER_TEMPLATE/DRIVE']].to_f
+        @cost = @costs[@vm['/VM/USER_TEMPLATE/DRIVE']].to_f
         return @cost > 0
     rescue
         return false

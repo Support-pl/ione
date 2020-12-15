@@ -34,7 +34,7 @@ end
 
 desc "Test Disk Showback"
 task :disk_showback_test => :before_test do
-    puts "\n####################\n# Testing capacity #\n####################"
+    puts "\n################\n# Testing Disk #\n################"
 
     $db[:settings].where(name: "CAPACITY_COST").update(body: "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}")
     $db[:settings].where(name: "DISK_COSTS").update(body: "{\"HDD\":\"1\"}")
@@ -65,3 +65,6 @@ task :disk_showback_test => :before_test do
         warn "#{300}, #{1400} => #{r[:TOTAL]}"
     end
 end
+
+desc "Showback Tests"
+task :showback_test => [:cap_showback_test, :disk_showback_test] do; end
