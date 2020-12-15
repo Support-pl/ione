@@ -43,7 +43,7 @@ end
 # Class for billing through Timeline using different billers
 class Billing
 
-    attr_reader :timeline
+    attr_reader :timeline, :bill
 
     BILLERS = [
         CapacityBiller
