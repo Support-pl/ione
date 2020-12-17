@@ -6,7 +6,7 @@ class DiskBiller < Biller
 
         r = 
             @costs.values.inject(0) do | r, c |
-                r += c.to_i
+                r += c.to_f
             rescue
                 r
             end
