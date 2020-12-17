@@ -44,7 +44,6 @@ export default {
 	name: 'cost',
 	data(){
 		return {
-			datt: 24,
 			settings: {},
 			cacheData: {},
 			loading: true,
