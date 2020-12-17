@@ -134,6 +134,7 @@ export default {
 						this.$message.warn("Now all was success...");
 						console.log(respones);
 					}
+					this.changed = [];
 					this.sync();
 				})
 				.catch(err => {
