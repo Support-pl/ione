@@ -13,7 +13,11 @@
               Settings
             </router-link>
           </a-menu-item>
-          <a-menu-item key="costs"> Costs </a-menu-item>
+          <a-menu-item key="costs"> 
+            <router-link :to="{ path: '/dashboard/costs' }">
+              Costs
+            </router-link>
+					</a-menu-item>
           <a-menu-item key="hosts"> Hosts(Nodes) </a-menu-item>
           <a-menu-item key="datastores">
             <router-link :to="{ path: '/dashboard/datastores' }">
