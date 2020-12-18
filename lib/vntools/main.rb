@@ -34,6 +34,9 @@ class IONe
                     vn.update('TYPE="PUBLIC"', true)
                 end
             end
+            if OpenNebula.is_error? uvnet && uvnet.errno == 2048 then
+                return { error: "No free addresses left" }
+            end
         end
 
         vn = onblock(:vn, uvnet, @client)
