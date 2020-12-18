@@ -83,7 +83,8 @@ class IONe
     # Returns all @client User vnets
     # @return [Array<Hash>]
     def get_user_vnets
-        r = VirtualNetworkPool.new(@client, -1).get_hash['VNET_POOL']
-        r.empty? ? [] : r['VNET']
+        onblock(:u, -1, @client) do | u |
+            u.vns(@db).map { |vn| vn.to_hash }
+        end
     end
 end
