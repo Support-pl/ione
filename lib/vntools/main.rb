@@ -14,10 +14,10 @@ class IONe
         params.to_sym!
 
         conf = @db[:settings].as_hash(:name, :body)
-        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'])
+        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'], @client)
         vnet.info!
 
-        u = onblock(:u, params[:u])
+        u = onblock(:u, params[:u], @client)
         u.info!
 
         if (uvnet = u.vns(@db).select{|v| v.type == 'PUBLIC'}.first) then
@@ -29,7 +29,7 @@ class IONe
                 uvnet ? nil : "user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet
             )
         end
-        vn = onblock(:vn, uvnet)
+        vn = onblock(:vn, uvnet, @client)
         vn.chown(u.id, u.groups.first)
         ar = vn.ar_pool.sort_by{|o| o['AR_ID']}.last
 
