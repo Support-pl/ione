@@ -25,10 +25,17 @@ class IONe
         end
 
         params[:n].times do
-            uvnet = vnet.reserve(
-                uvnet ? nil : "user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet
-            )
+            if uvnet then
+                uvnet = vnet.reserve(nil, 1, nil, nil, uvnet)
+            else
+                uvnet = vnet.reserve("user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet)
+                
+                onblock(:vn, uvnet, @client) do | vn |
+                    vn.update('TYPE="PUBLIC"', true)
+                end
+            end
         end
+
         vn = onblock(:vn, uvnet, @client)
         vn.chown(u.id, u.groups.first)
         ar = vn.ar_pool.sort_by{|o| o['AR_ID']}.last
