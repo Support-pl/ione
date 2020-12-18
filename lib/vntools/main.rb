@@ -33,6 +33,12 @@ class IONe
                 onblock(:vn, uvnet, @client) do | vn |
                     vn.update('TYPE="PUBLIC"', true)
                 end
+
+                clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
+                clusters = [ clusters ] if clusters.class != Array
+                for c in clusters do
+                    onblock(:c, c).addvnet(uvnet)
+                end
             end
             if OpenNebula.is_error? uvnet && uvnet.errno == 2048 then
                 return { error: "No free addresses left" }
