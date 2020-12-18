@@ -84,6 +84,7 @@ class IONe
     # @return [Array<Hash>]
     def get_user_vnets
         onblock(:u, -1, @client) do | u |
+            u.info!
             u.vns(@db).map { |vn| vn.to_hash }
         end
     end
