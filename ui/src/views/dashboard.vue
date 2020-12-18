@@ -8,18 +8,12 @@
           v-model="route"
           :style="{ height: '100%', borderRight: 0 }"
         >
-          <a-menu-item key="settings">
-            <router-link :to="{ path: '/dashboard/settings' }">
-              Settings
+          <a-menu-item v-for="item in asideBtns" :key="item.name">
+            <router-link :to="{ path: item.route ? item.route : `/dashboard/${item.name}` }">
+              {{item.name | capitalize}}
             </router-link>
           </a-menu-item>
-          <a-menu-item key="costs"> Costs </a-menu-item>
-          <a-menu-item key="hosts"> Hosts(Nodes) </a-menu-item>
-          <a-menu-item key="datastores">
-            <router-link :to="{ path: '/dashboard/datastores' }">
-              Datastores
-            </router-link>
-          </a-menu-item>
+
         </a-menu>
       </a-layout-sider>
       <a-layout-content>
@@ -30,15 +24,34 @@
 </template>
 
 <script>
+const asideBtns = [
+	{
+		name: "settings",
+	},
+	{
+		name: "costs",
+	},
+	{
+		name: "datastores",
+	},
+]
 export default {
   data() {
     return {
-      route: [],
+			route: [],
+			asideBtns
     };
   },
   mounted() {
     this.route = ["settings"];
-  },
+	},
+	filters: {
+		capitalize(value) {
+			if (!value) return ''
+			value = value.toString()
+			return value.charAt(0).toUpperCase() + value.slice(1)
+		}
+	}
 };
 </script>
 

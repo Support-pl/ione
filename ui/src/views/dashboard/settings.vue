@@ -148,9 +148,9 @@ export default {
         })
           .then((res) => {
             if (res.data.response == 1) {
-              this.$message.success("Успешно");
+              this.$message.success("Success");
             } else {
-              this.$message.error("Ошибка");
+              this.$message.error("Error");
               this.cancel(key);
               return;
             }
@@ -160,7 +160,7 @@ export default {
           })
           .catch((err) => {
             console.error(err);
-            this.$message.error("Ошибка");
+            this.$message.error("Error");
             this.cancel(key);
           });
       }

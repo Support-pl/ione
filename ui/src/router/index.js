@@ -36,6 +36,10 @@ const routes = [
         path: "datastores",
         component: () => import("@/views/dashboard/datastores.vue"),
       },
+      {
+        path: "costs",
+        component: () => import("@/views/dashboard/costs.vue"),
+      },
     ],
   },
 ];
