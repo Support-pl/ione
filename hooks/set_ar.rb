@@ -90,4 +90,10 @@ else
 end
 
 user_vnet.chown(user.id, conf['IAAS_GROUP_ID'].to_i)
+clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
+clusters = [ clusters ] if clusters.class != Array
+for c in clusters do
+    Cluster.new_with_id(c.to_i, Client.new).addvnet(user_vnet.id)
+end
+
 puts "Virtual Network for User##{user.id} successfuly created with id #{user_vnet.id}"
