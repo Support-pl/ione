@@ -65,11 +65,18 @@ end
 
 ar = ar_pool.sample
 
+bridge = vnet['//BRIDGE_PATTERN']
+if bridge.nil? then
+    bridge = "user-#{user.id}-vnet"
+else
+    bridge = bridge.gsub('<%VLAN_ID%>', ar['VLAN_ID'])
+end
+
 if vnet['VN_MAD'] == 'vcenter' then
     user_vnet = vnet.clone
     user_vnet.allocate("
         NAME = \"user-#{user.id}-vnet\"
-        BRIDGE = \"user-#{user.id}-vnet\"
+        BRIDGE = \"#{bridge}\"
         VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
         VCENTER_SWITCH_NAME = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NAME']}\"
         VCENTER_SWITCH_NPORTS = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NPORTS']}\"

@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # -------------------------------------------------------------------------- #
 # Copyright 2020, IONe Cloud Project, Support.by                             #
 #                                                                            #
