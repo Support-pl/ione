@@ -40,6 +40,10 @@ const routes = [
         path: "costs",
         component: () => import("@/views/dashboard/costs.vue"),
       },
+      {
+        path: "hosts",
+        component: () => import("@/views/dashboard/hosts.vue"),
+      },
     ],
   },
 ];

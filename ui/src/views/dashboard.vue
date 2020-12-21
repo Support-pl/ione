@@ -32,6 +32,10 @@ const asideBtns = [
 		name: "costs",
 	},
 	{
+		name: "hosts (Nodes)",
+		route: "hosts",
+	},
+	{
 		name: "datastores",
 	},
 ]
