@@ -58,6 +58,10 @@ def pool id
     $db[:vm_pool].select(:oid).where(uid: id).exclude(state: 6).to_a
 end
 
+def vn_pool id
+    $db[:network_pool].select(:oid).where(uid: id).to_a
+end
+
 until pool(id) == []
     pool(id).each do | vm |
         VirtualMachine.new_with_id(vm[:oid], Client.new).terminate(true)
