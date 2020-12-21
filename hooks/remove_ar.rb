@@ -55,7 +55,7 @@ unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
 end
 
 def pool id
-    $db[:vm_pool].select(:oid).where(:uid => id).exclude(:state => 6).to_a
+    $db[:vm_pool].select(:oid).where(uid: id).exclude(state: 6).to_a
 end
 
 until pool(id) == []
