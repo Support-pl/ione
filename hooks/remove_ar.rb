@@ -72,15 +72,14 @@ vn_pool(id).each do | vnet |
     vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
     vnet.info!
 
-    if vnet['/VNET/UID'].to_i == id.to_i && user.to_hash['USER']['GROUPS']['ID'] == vnet['/VNET/GID'] then
-    
-        VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
-            "AR = [\n" \
-            "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
-            "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
-            "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
-            "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
-        ) if vnet['VN_MAD'] == 'vcenter'
+
+    VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
+        "AR = [\n" \
+        "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
+        "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
+        "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
+        "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
+    ) if vnet['VN_MAD'] == 'vcenter'
     
         vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID']
     end
