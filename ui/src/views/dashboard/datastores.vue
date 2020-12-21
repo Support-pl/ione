@@ -100,10 +100,13 @@ export default {
       return types;
     },
     datastores() {
-      if (Object.keys(this.ds_pool).length !== 0)
-        return this.ds_pool.DATASTORE_POOL.DATASTORE.filter(
-          (el) => el.TYPE == 1
-        );
+			const isType1 = (el) => el.TYPE == 1
+      if (Object.keys(this.ds_pool).length !== 0){
+				if(Array.isArray(this.ds_pool.DATASTORE_POOL.DATASTORE)){
+					return this.ds_pool.DATASTORE_POOL.DATASTORE.filter(isType1);
+				}
+				return [this.ds_pool.DATASTORE_POOL.DATASTORE].filter(isType1);
+			}
       return [];
     },
 
@@ -111,7 +114,6 @@ export default {
   },
   methods: {
     async updateAttribute(id, key, val) {
-      console.log(key, val);
       await this.$axios({
         method: "post",
         url: "/one.ds.update",
