@@ -68,10 +68,8 @@ until pool(id) == []
     end
 end
 
-vnet_pool = VirtualNetworkPool.new Client.new
-vnet_pool.info_all!
-
-vnet_pool.each do | vnet |
+vn_pool(id).each do | vnet |
+    vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
     vnet.info!
 
     if vnet['/VNET/UID'].to_i == id.to_i && user.to_hash['USER']['GROUPS']['ID'] == vnet['/VNET/GID'] then
