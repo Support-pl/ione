@@ -297,20 +297,20 @@ class IONe
     end
     # Creates new virtual machine from the given OS template and resize it to given specs, and new user account, which becomes owner of this VM 
     # @param [Hash] params - all needed data for new User and VM creation
-    # @option params [String] :login Username for new OpenNebula account
-    # @option params [String] :password Password for new OpenNebula account
-    # @option params [String] :passwd Password for new Virtual Machine 
+    # @option params [String]  :login Username for new OpenNebula account
+    # @option params [String]  :password Password for new OpenNebula account
+    # @option params [String]  :passwd Password for new Virtual Machine 
     # @option params [Integer] :templateid Template ID to instantiate
     # @option params [Integer] :cpu vCPU cores amount for new VM
     # @option params [Integer] :iops IOPS limit for new VM's drive 
-    # @option params [String] :units Units for RAM and drive size, can be 'MB' or 'GB'
+    # @option params [String]  :units Units for RAM and drive size, can be 'MB' or 'GB'
     # @option params [Integer] :ram RAM size for new VM
     # @option params [Integer] :drive Drive size for new VM
-    # @option params [String] :ds_type VM deploy target datastore drives type, 'SSD' or 'HDD'
+    # @option params [String]  :ds_type VM deploy target datastore drives type, 'SSD' or 'HDD'
     # @option params [Integer] :groupid Additional group, in which user should be
     # @option params [Boolean] :trial (false) VM will be suspended after TRIAL_SUSPEND_DELAY
     # @option params [Boolean] :release (false) VM will be started on HOLD if false
-    # @option params [String]  :user-template Addon template, you may append to default template(Use XML-string as OpenNebula requires)
+    # @option params [Hash]    :user-template Addon template, you may append to default template
     # @option params [Boolean] :allow_snapshots Allow user to create snapshots
     # @param [Array<String>] trace - public trace log
     # @return [Hash, nil] UserID, VMID and IP address if success, or error message and backtrace log if error
@@ -330,6 +330,7 @@ class IONe
             
             
         params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
+        params['user-template'] = {} if params['user-template'].nil?
 
         begin
             params['iops'] = params['iops'] == 0 ? $ione_conf['vCenter']['drives-iops'][params['ds-type']] : params['iops']
@@ -430,14 +431,12 @@ class IONe
             ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
 
             unless params['allow_snapshots'].nil? then
-                specs['USER_TEMPLATE'] = {
-                    'SNAPSHOTS_ALLOWED' => params['allow_snapshots'].to_s.upcase
-                }
+                params['user-template']['SNAPSHOTS_ALLOWED'] = params['allow_snapshots'].to_s.upcase
             end
 
             LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
             specs = specs.to_one_template
-            vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_s)
+            vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_one_template)
         end
 
         raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid

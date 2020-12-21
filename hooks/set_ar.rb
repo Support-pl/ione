@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # -------------------------------------------------------------------------- #
-# Copyright 2018, IONe Cloud Project, Support.by                             #
+# Copyright 2020, IONe Cloud Project, Support.by                             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -65,11 +65,18 @@ end
 
 ar = ar_pool.sample
 
+bridge = vnet['//BRIDGE_PATTERN']
+if bridge.nil? then
+    bridge = "user-#{user.id}-vnet"
+else
+    bridge = bridge.gsub('<%VLAN_ID%>', ar['VLAN_ID'])
+end
+
 if vnet['VN_MAD'] == 'vcenter' then
     user_vnet = vnet.clone
     user_vnet.allocate("
         NAME = \"user-#{user.id}-vnet\"
-        BRIDGE = \"user-#{user.id}-vnet\"
+        BRIDGE = \"#{bridge}\"
         VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
         VCENTER_SWITCH_NAME = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NAME']}\"
         VCENTER_SWITCH_NPORTS = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NPORTS']}\"
@@ -90,4 +97,10 @@ else
 end
 
 user_vnet.chown(user.id, conf['IAAS_GROUP_ID'].to_i)
+clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
+clusters = [ clusters ] if clusters.class != Array
+for c in clusters do
+    Cluster.new_with_id(c.to_i, Client.new).addvnet(user_vnet.id)
+end
+
 puts "Virtual Network for User##{user.id} successfuly created with id #{user_vnet.id}"

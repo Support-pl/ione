@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
-
 # -------------------------------------------------------------------------- #
-# Copyright 2018, IONe Cloud Project, Support.by                             #
+# Copyright 2020, IONe Cloud Project, Support.by                             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -55,7 +54,11 @@ unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
 end
 
 def pool id
-    $db[:vm_pool].select(:oid).where(:uid => id).exclude(:state => 6).to_a
+    $db[:vm_pool].select(:oid).where(uid: id).exclude(state: 6).to_a
+end
+
+def vn_pool id
+    $db[:network_pool].select(:oid).where(uid: id).to_a
 end
 
 until pool(id) == []
@@ -64,14 +67,11 @@ until pool(id) == []
     end
 end
 
-vnet_pool = VirtualNetworkPool.new Client.new
-vnet_pool.info_all!
-
-vnet_pool.each do | vnet |
+vn_pool(id).each do | vnet |
+    vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
     vnet.info!
 
-    if vnet['/VNET/UID'].to_i == id.to_i && user.to_hash['USER']['GROUPS']['ID'] == vnet['/VNET/GID'] then
-    
+    if vnet['/VNET/TEMPLATE/TYPE'] == 'PRIVATE' then
         VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
             "AR = [\n" \
             "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
@@ -79,9 +79,9 @@ vnet_pool.each do | vnet |
             "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
             "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
         ) if vnet['VN_MAD'] == 'vcenter'
-    
-        vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID']
     end
+    
+    vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'].to_i
 end
 
 puts "User##{id} Virtual Networks successfully cleaned up"

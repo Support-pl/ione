@@ -14,10 +14,10 @@ class IONe
         params.to_sym!
 
         conf = @db[:settings].as_hash(:name, :body)
-        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'])
+        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'], @client)
         vnet.info!
 
-        u = onblock(:u, params[:u])
+        u = onblock(:u, params[:u], @client)
         u.info!
 
         if (uvnet = u.vns(@db).select{|v| v.type == 'PUBLIC'}.first) then
@@ -25,11 +25,27 @@ class IONe
         end
 
         params[:n].times do
-            uvnet = vnet.reserve(
-                uvnet ? nil : "user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet
-            )
+            if uvnet then
+                uvnet = vnet.reserve(nil, 1, nil, nil, uvnet)
+            else
+                uvnet = vnet.reserve("user-#{params[:u]}-pub-vnet", 1, nil, nil, uvnet)
+                
+                onblock(:vn, uvnet, @client) do | vn |
+                    vn.update('TYPE="PUBLIC"', true)
+                end
+
+                clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
+                clusters = [ clusters ] if clusters.class != Array
+                for c in clusters do
+                    onblock(:c, c).addvnet(uvnet)
+                end
+            end
+            if OpenNebula.is_error? uvnet && uvnet.errno == 2048 then
+                return { error: "No free addresses left" }
+            end
         end
-        vn = onblock(:vn, uvnet)
+
+        vn = onblock(:vn, uvnet, @client)
         vn.chown(u.id, u.groups.first)
         ar = vn.ar_pool.sort_by{|o| o['AR_ID']}.last
 
@@ -76,7 +92,9 @@ class IONe
     # Returns all @client User vnets
     # @return [Array<Hash>]
     def get_user_vnets
-        r = VirtualNetworkPool.new(@client, -1).get_hash['VNET_POOL']
-        r.empty? ? [] : r['VNET']
+        onblock(:u, -1, @client) do | u |
+            u.info!
+            u.vns(@db).map { |vn| vn.to_hash }
+        end
     end
 end
