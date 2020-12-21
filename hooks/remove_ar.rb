@@ -81,8 +81,7 @@ vn_pool(id).each do | vnet |
         "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
     ) if vnet['VN_MAD'] == 'vcenter'
     
-        vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID']
-    end
+    vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'].to_i
 end
 
 puts "User##{id} Virtual Networks successfully cleaned up"
