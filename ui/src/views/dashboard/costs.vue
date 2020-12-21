@@ -73,7 +73,6 @@ export default {
 				});
 			this.cacheData = JSON.parse(JSON.stringify(this.settings));
 			this.loading = false;
-			console.log(this.settings)
 		},
 		getIndexByName(name){
 			return this.settings.findIndex(el => el.name == name);
@@ -105,7 +104,6 @@ export default {
 					this.changed.push(name);
 				}
 			} else {
-				console.log(ind);
 				this.changed.splice(ind, 1);
 			}
 		},
@@ -132,7 +130,7 @@ export default {
 						this.$message.success("Success");
 					} else {
 						this.$message.warn("Now all was success...");
-						console.log(respones);
+						console.warn(respones);
 					}
 					this.changed = [];
 					this.sync();

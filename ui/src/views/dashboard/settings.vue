@@ -179,9 +179,6 @@ export default {
         this.settings = newData;
       }
     },
-    log() {
-      console.log(...arguments);
-    },
   },
 };
 </script>
