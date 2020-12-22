@@ -40,7 +40,7 @@ class IONe
                     onblock(:c, c).addvnet(uvnet)
                 end
             end
-            if OpenNebula.is_error? uvnet && uvnet.errno == 2048 then
+            if OpenNebula.is_error?(uvnet) && uvnet.errno == 2048 then
                 return { error: "No free addresses left" }
             end
         end
