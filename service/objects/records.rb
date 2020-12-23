@@ -26,7 +26,7 @@ begin
         primary_key :key
         foreign_key :vm,    :vm_pool,   null: false
         Integer     :ts,    null: false
-        Integer     :val,   null: false
+        String      :val,   null: false
         String      :type,  null: false
     end
 rescue
@@ -83,6 +83,12 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
         else
             CreateSnapshotRecord.new(values)
         end
+    end
+end
+
+class TrafficRecord < Sequel::Model(:traffic_records)
+    def sorter
+        ts
     end
 end
 
