@@ -1,4 +1,25 @@
 
+def 100to101
+    # Write TrafficRecorder to conf and scripts
+    # touch traffic-recorder log file
+
+    # Update hooks
+
+    # Update UI
+
+    # Update service/objects/records
+    # Add service/billers, service/biller.rb, showback.rb
+
+    # Update meta
+    # Update lib
+
+    # Update ione_server.rb
+    # update service/log.rb
+end
+
+available_versions = [
+    ['v1.0.0', 'v1.0.1', method(:100to101)]
+]
 
 desc "Update IONe"
 task :update do
