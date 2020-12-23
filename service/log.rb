@@ -31,6 +31,8 @@ module IONeLoggerKit
             destination = "#{LOG_ROOT}/debug.log"
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
+        when "TrafficRecorder"
+            destination = "#{LOG_ROOT}/traffic_recorder.log"
         else
             destination = "#{LOG_ROOT}/ione.log"
         end
@@ -49,6 +51,7 @@ module IONeLoggerKit
     def LOG_COLOR(msg, method = caller_locations(1,1)[0].label.dup, color = 'red', font = 'bold')
         destination = "#{LOG_ROOT}/ione.log"
         destination = "#{LOG_ROOT}/snapshot.log" if method == "SnapController"
+        destination = "#{LOG_ROOT}/traffic_recorder.log" if method == "TrafficRecorder"
         msg = msg.to_s.send(color).send(font)
         msg = "[ #{Time.now.ctime} ] " + msg
         method.slice!('block in '.dup)
@@ -83,6 +86,8 @@ module IONeLoggerKit
             destination = "#{LOG_ROOT}/debug.log"
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
+        when "TrafficRecorder"
+            destination = "#{LOG_ROOT}/traffic_recorder.log"
         else
             destination = "#{LOG_ROOT}/ione.log"
         end
