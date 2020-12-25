@@ -109,7 +109,3 @@ class Billing
         @bill.inject(0) { |r, el| r += el[:total] }
     end
 end
-
-        self
-    end
-end
