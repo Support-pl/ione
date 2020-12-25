@@ -21,18 +21,6 @@ rescue
     puts "Table :snapshot_records already exists, skipping"
 end
 
-begin
-    $db.create_table :traffic_records do
-        primary_key :key
-        foreign_key :vm,    :vm_pool,   null: false
-        Integer     :ts,    null: false
-        String      :val,   null: false
-        String      :type,  null: false
-    end
-rescue
-    puts "Table :traffic_records already exists, skipping"
-end
-
 # History Record Model class
 # @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/ione/server/service/objects/records.rb#L1-L10 History Model Defintion
 class Record < Sequel::Model(:records)
@@ -83,51 +71,6 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
         else
             CreateSnapshotRecord.new(values)
         end
-    end
-end
-
-class TrafficRecord < Sequel::Model(:traffic_records)
-    def sorter
-        ts
-    end
-end
-
-# Source of History records class
-class RecordsSource
-    attr_reader :id
-
-    # VMID field key
-    def key
-        :id
-    end
-
-    # @param [Fixnum] id - VM ID
-    def initialize cls, id
-        @id = id
-        @records = cls.where(Hash[key, @id])
-    end
-
-    def records
-        @records.all
-    end
-
-    # Find records for given time period
-    def find stime, etime
-        @records.where(time: stime..etime)
-    end
-
-    def init_state stime
-        {}
-    end
-
-    # Filter records needed for Showback Timeline
-    def self.tl_filter records
-        records
-    end
-
-    # Check if source should be used with given VM
-    def self.check_source vm
-        true
     end
 end
 
