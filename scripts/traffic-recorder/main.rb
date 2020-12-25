@@ -7,16 +7,26 @@ begin
             inserts_total = 0
 
             vm_pool.each do | vm |
-                mon = vm.monitoring(['NETTX', 'NETRX'])
+                mon_raw = vm.monitoring(['NETTX', 'NETRX'])
+                mon = {}
+                mon_raw['NETTX'].each do | el |
+                    mon[el.first] = {}
+                    mon[el.first][:tx] = el.last
+                end
+                mon_raw['NETRX'].each do | el |
+                    mon[el.first][:rx] = el.last
+                end
+
                 inserts = 0
-                for key, data in mon do
-                    last = TrafficRecord.where(type: key, vm: vm.id).order(Sequel.asc(:ts)).last
-                    last = { ts: 0 } if last.nil?
-                    for rec in data do
-                        if rec.first.to_i > last[:ts] then
-                            TrafficRecord.insert vm: vm.id, ts: rec.first.to_i, val: rec.last, type: key
-                            inserts += 1
-                        end
+                last = TrafficRecord.where(vm: vm.id).order(Sequel.asc(:ts)).last
+                last = { ts: 0 } if last.nil?
+
+                for ts, data in mon do
+                    ts = ts.to_i
+                    if ts > last[:ts] then
+                        args = data.merge(vm: vm.id, ts: ts)
+                        TrafficRecord.insert **args
+                        inserts += 1
                     end
                 end
                 LOG "VM #{vm.id}: Inserted #{inserts} new traffic records", "TrafficRecorder"
