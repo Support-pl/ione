@@ -1,3 +1,4 @@
+require "#{ROOT}/service/records.rb"
 require "#{ROOT}/service/biller.rb"
 
 # Class for compiling all history records from all records sources into one readable timeline
