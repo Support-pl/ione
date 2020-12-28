@@ -275,12 +275,14 @@ before do
             halt 401, { 'Allow' => "*" }, "False Credentials given"
         end
     rescue => e
+        RPC_LOGGER.debug "Exception #{e.message}"
         RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
         halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
     end
 end
 
 puts "Allowing CORS"
+# Sinatra :after helper allowing Cors by adding needed headers
 after do
     response.headers['Allow'] = "*" unless response.headers['Allow']
     response.headers['Access-Control-Allow-Origin'] = "*" unless response.headers['Access-Control-Allow-Origin']
@@ -289,6 +291,18 @@ after do
 end
 
 puts "Registering IONe methods"
+# Endpoint to invoke IONe methods
+# @example Request:
+#    POST /ione/Test
+#        Headers:
+#            Authorization: Basic base64_encoded_credentials
+#        Body:
+#        {
+#            "params": [ "PING" ]
+#        }
+#    Response:
+#        200 - { "response": "PONG" }
+# @see IONe#Test
 post '/ione/:method' do | method |
     begin
         RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
@@ -298,11 +312,24 @@ post '/ione/:method' do | method |
         backtrace = e.backtrace
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
     json response: r
 end
 
 puts "Registering ONe methods"
+# Endpoint to invoke ONe Instances methods
+# @example Request:
+#    POST /one.vm.name
+#        Headers:
+#            Authorization: Basic base64_encoded_credentials
+#        Body:
+#        {
+#            "oid": 777,
+#            "params": [ ]
+#        }
+#    Response:
+#        200 - { "response": "one-vm-777-name" }
+# @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     json(response:
         onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
@@ -310,8 +337,25 @@ post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
 end
 
 puts "Registering ONe Pool methods"
+# Endpoint to invoke ONe Pool methods
+# @example Request:
+#    POST /one.vm.pool.monitoring
+#        Headers:
+#            Authorization: Basic base64_encoded_credentials
+#        Body:
+#        {
+#            "uid": "0"  // optional
+#            "params": [ ]
+#        }
+#    Response:
+#        200 - { "response": [...] }
+# @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
     json(response:
-        ON_INSTANCE_POOLS[object.to_sym].new(@client).send(method.to_s << excl.to_s, *@request_hash['params'])
+        (
+            @request_hash['uid'].nil? ? 
+                ON_INSTANCE_POOLS[object.to_sym].new(@client) :
+                ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
+        ).send(method.to_s << excl.to_s, *@request_hash['params'])
     )
 end

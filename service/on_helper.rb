@@ -150,8 +150,7 @@ module ONeHelper
     #       vm.info!
     #       puts JSON.pretty_generate(vm.to_hash)
     #   end
-    def onblock(object, id, client = 'none')
-        client = $client if client == 'none'
+    def onblock(object, id, client = $client)
         if object.class != Class then
             object = ON_INSTANCES[object]
             return 'Error: Unknown instance name given' if object.nil?

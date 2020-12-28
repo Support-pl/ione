@@ -12,7 +12,7 @@
     <a href="https://github.com/ione" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v0.9.1&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.0&color=success&style=flat" alt="version"/>
     <img src="https://github.com/ione-cloud/ione-sunstone/workflows/Generate%20and%20Deploy%20Docs/badge.svg" alt="Generate and Deploy Docs"/>
 </p>
 
@@ -41,16 +41,16 @@ Creators:
          <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione-sunstone/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Sunstone</td><td align="center">will be replaced</td><td align="center"></td>
+         <td align="left">MySQL MariaDB Server</td><td align="center">~8.0</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">MySQL MariaDB Server</td><td align="center">~5.5</td><td align="center"></td>
+         <td align="left">Ruby</td><td align="center">2.5.5</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">Ruby</td><td align="center">2.0.0</td><td align="center"></td>
+         <td align="left">Node</td><td align="center">12+</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">Ansible</td><td align="center">2.x.x</td><td align="center">yes</td>
@@ -109,7 +109,7 @@ Creators:
    </thead>
    <tbody>
       <tr>
-         <td align="left">__CAPACITY_COST__</td>
+         <td align="left"><strong>CAPACITY_COST</strong></td>
          <td align="left">CPU_COST</td>
          <td align="right"><code>CPU cost per hour</code></td>
       </tr>
@@ -119,7 +119,7 @@ Creators:
          <td align="right"><code>RAM cost per hour</code></td>
       </tr>
       <tr>
-         <td align="left">__DISK_COSTS__</td>
+         <td align="left"><strong>DISK_COSTS</strong></td>
          <td align="left">DISKTYPE_0(e.g. SSD)</td>
          <td align="right"><code>cost per hour</code></td>
       </tr>
@@ -129,7 +129,7 @@ Creators:
          <td align="right"><code>cost per hour</code></td>
       </tr>
       <tr>
-         <td align="left">__DISK_TYPES__</td>
+         <td align="left"><strong>DISK_TYPES</strong></td>
          <td align="left"></td>
          <td align="right"><code>comma separated list of types: SSD,HDD</code></td>
       </tr>
@@ -154,7 +154,7 @@ Creators:
          <td align="right"><code>Private Networks pool network ID</code></td>
       </tr>
       <tr>
-         <td align="left">__NODES_DEFAULT__</td>
+         <td align="left"><strong>NODES_DEFAULT</strong></td>
          <td align="left">HYPERIVSOR_0(e.g. VCENTER)</td>
          <td align="right"><code>OpenNebula host id</code></td>
       </tr>
@@ -164,7 +164,7 @@ Creators:
          <td align="right"><code>OpenNebula host id</code></td>
       </tr>
       <tr>
-         <td align="left">__CURRENCY_MAIN__</td>
+         <td align="left"><strong>CURRENCY_MAIN</strong></td>
          <td align="left"></td>
          <td align="right"><code>$/€/etc... this will be shown to user</code></td>
       </tr>

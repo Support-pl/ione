@@ -4,6 +4,7 @@ class OpenNebula::Template
     # @return [Boolean]
     def win?
         self.info!
-        self.to_hash['VMTEMPLATE']['TEMPLATE']['USER_INPUTS'].include? 'USERNAME'
+        user_inputs = self.to_hash['VMTEMPLATE']['TEMPLATE']['USER_INPUTS']
+        !(user_inputs.nil?) && (user_inputs.include? 'USERNAME')
     end
 end

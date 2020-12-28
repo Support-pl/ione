@@ -60,7 +60,7 @@ class Hash
         result = ""
         self.each do | key, value |
             key = key.to_s.upcase
-            if value.class == String || value.class == Fixnum then
+            if value.class == String || value.class == Integer then
                 result += "#{key}=\"#{value.to_s.gsub("\"", "\\\"")}\"\n"
             elsif value.class == Hash then
                 result += "#{key}=[\n"

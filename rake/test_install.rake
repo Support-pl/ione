@@ -2,9 +2,10 @@ require 'pathname'
 require 'yaml'
 
 task :test_install_gems do 
-    require "colorize"
+    require 'colorize'
     require 'net/http'
     require 'sequel'
+    require 'json'
 end
 
 def passed
@@ -16,6 +17,10 @@ def fail msg
 end
 def warn msg
     puts msg.yellow
+end
+
+task :load_installed_env do
+    @one_auth  = File.read('/var/lib/one/.one/one_auth').chomp
 end
 
 desc "Check if IONe config exists and correct"
@@ -87,32 +92,106 @@ end
 
 desc "Check if IONe UI is up"
 task :test_api_root do
-    puts "Testing '/'"
-    api = URI("http://localhost:8009/")
-    begin
-        r = Net::HTTP.get_response(api)
-    rescue => e
-        fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
-    end
-    unless r.is_a? Net::HTTPSuccess then
-        fail "Unable to get response from '/', got: #{r.code} #{r.body}" unless r.code == 401 
-    end
-    passed
 
-    puts "Can get response from 'Test'"
-    api = URI("http://localhost:8009/ione/Test")
+    @uris = [URI("http://localhost:8009/")]
+
+    r = nil
+    until ['y', 'n'].include? r do
+        print "Do you have DNS configured? (y/n) "
+        r = STDIN.gets.strip.downcase
+    end
+    if r == 'y' then
+        r = uri = nil
+        until ['y', 'n'].include? r do
+            print "Enter your domain name: "
+            uri = STDIN.gets.strip.downcase
+            print "Is '#{uri}' correct? (y/n) "
+            r = STDIN.gets.strip.downcase
+        end
+        if r == 'y' then
+            @uris << URI("http://ione-api.#{uri}/")
+            @uris << URI("https://ione-api.#{uri}/")
+        end
+    end
+
+    puts
+
+    def fail msg
+        puts msg.red
+    end
+
+    for uri in @uris do
     begin
-        r = Net::HTTP.post(api, nil)
+        puts "Testing #{uri.to_s}"
+        puts "-------------------"
+        puts "Testing '/'"
+        api = uri
+        begin
+            req = Net::HTTP::Get.new(api)
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401 
+        end
+        if uri.scheme == 'http' && r.code == "301" then
+            passed
+            next
+        end
+        unless r.code == "404" then
+            fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
+        end
+        passed
+
+        puts "Can get response from 'Test'"
+        api = uri + "/ione/Test"
+        begin
+            req = Net::HTTP::Post.new(api)
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        end
+        if r.code != "200" then
+            fail "Got #{r.code} response from Test, should be 200."
+        end
+        passed
+
+        puts "Can get PONG from PING"
+        api = uri + "/ione/Test"
+        begin
+            req = Net::HTTP::Post.new(api)
+            req.body = JSON.generate params: ['PING']
+            req.basic_auth *@one_auth.split(':')
+            r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
+                http.request(req)
+            end
+        rescue => e
+            fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        end
+        if r.code != "200" then
+            fail "Got #{r.code} response from Test, should be 200."
+        end
+        begin
+            res = JSON.parse r.body
+            r = res['response']
+            fail "Wrong response schema: #{res}" if r.nil?
+            fail "Expected PONG, got: #{r}" unless r == 'PONG'
+        rescue JSON::ParserError
+            fail "Got un-parseable string: #{r.body}"
+        end
+        passed
     rescue => e
-        fail "Unable to get response from '/ione/Test', got: #{e.message}" 
+        puts e.message
     end
-    if r.code != "200" then
-        fail "Got #{r.code} response from Test, should be 200."
+        puts
     end
-    passed
 end
 
 desc "Check if IONe is installed and running"
-task :test_install => [:test_install_gems, :test_config_exists, :test_configured, :test_api_root] do
+task :test_install => [:test_install_gems, :load_installed_env, :test_config_exists, :test_configured, :test_api_root] do
 
 end

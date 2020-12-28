@@ -7,8 +7,7 @@ name: Generate and Deploy Docs
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -28,13 +27,10 @@ jobs:
           ruby-version: 2.5
 
       - name: Install YARDoc
-        run: gem install yard
-
-      - name: Copy YARDoc conf
-        run: cp docs/.yardopts .
+        run: gem install yard yard-sinatra
 
       - name: Generating Docs
-        run: yardoc
+        run: yard --yardopts docs/.yardopts --plugin yard-sinatra 
 
       - name: Deploy docs via FTP
         uses: sebastianpopp/ftp-action@releases/v2

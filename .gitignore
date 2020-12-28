@@ -1,5 +1,6 @@
 .vscode/
-.yardopts
 .DS_Store
 *.code-workspace
 node_modules
+doc
+.yardoc
