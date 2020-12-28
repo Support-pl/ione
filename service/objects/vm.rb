@@ -351,16 +351,41 @@ class OpenNebula::VirtualMachine
         stime = self['/VM/STIME'].to_i if self['/VM/STIME'].to_i > stime
         etime = self['/VM/ETIME'].to_i if self['/VM/ETIME'].to_i < etime && self['/VM/ETIME'].to_i != 0
 
+        bp = self['//BILLING_PERIOD']
 
-        billing = Billing.new self, stime, etime
-        billing.make_bill
-        billing.receipt
+        if bp.nil? || bp == 'PAYG' then
+            billing = Billing.new self, stime, etime
+            billing.make_bill
+            billing.receipt
+            
+            return {
+                id: id, name: name,
+                showback: billing.bill,
+                TOTAL: billing.total
+            }
+        elsif bp.include? 'PRE' then
+            curr = self['/VM/STIME'].to_i
+            delta = bp.split('_')[1].to_i * 86400
 
-        return {
-            id: id, name: name,
-            showback: billing.bill,
-            TOTAL: billing.total
-        }
+            s, e = self['/VM/STIME'].to_i, self['/VM/ETIME'].to_i
+            total = 0
+
+            while curr < etime do
+                if (stime..etime).include? curr then
+                    b = Billing.new self, curr, curr + delta
+                    b.make_bill
+                    b.receipt
+
+                    total += b.total
+                end
+                curr += delta
+            end
+
+            return {
+                id: id, name: name,
+                TOTAL: total
+            }
+        end
     end
     # Returns important data in JSON format
     # @param [IONe] ione - IONe object for calling its methods
