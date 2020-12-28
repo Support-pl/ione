@@ -19,7 +19,7 @@ class DiskBiller < Biller
     end
 
     def bill bill, state, delta
-        bill[:capacity] = delta * @cost
+        bill[:disk] = delta * @cost
         bill
     end
 end
