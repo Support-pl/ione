@@ -14,6 +14,10 @@ class Biller
         true
     end
 
+    def billing_period
+        @vm['//BILLING_PERIOD']
+    end
+
     def bill bill, state, delta
         0
     end
