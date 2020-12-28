@@ -21,7 +21,7 @@ class OpenNebula::VirtualMachine
         snapshot-create
     )
     # Generates template for OpenNebula scheduler record
-    def generate_schedule_str(id, action, time)
+    def generate_schedule_str id, action, time
         "\nSCHED_ACTION=[\n" + 
         "  ACTION=\"#{action}\",\n" + 
         "  ID=\"#{id}\",\n" + 
@@ -37,7 +37,7 @@ class OpenNebula::VirtualMachine
     # @param [Integer] time - Time when action schould be perfomed in secs
     # @param [String] periodic - Not working now
     # @return true
-    def schedule(action, time, periodic = nil)
+    def schedule action, time, periodic = nil
         return 'Unsupported action' if !SCHEDULABLE_ACTIONS.include? action
         self.info!
         id = 
@@ -62,7 +62,7 @@ class OpenNebula::VirtualMachine
     end
     # Unschedules given action by ID
     # @note Not working, if action is already initialized
-    def unschedule(id)
+    def unschedule id
         self.info!
         schedule_data, object = self.to_hash['VM']['USER_TEMPLATE']['SCHED_ACTION'], nil
 
@@ -91,7 +91,7 @@ class OpenNebula::VirtualMachine
     # @param [Integer] s - VM state to wait for
     # @param [Integer] lcm_s - VM LCM state to wait for
     # @return [Boolean]
-    def wait_for_state(s = 3, lcm_s = 3)
+    def wait_for_state s = 3, lcm_s = 3
         i = 0
         until state!() == s && lcm_state!() == lcm_s do
             return false if i >= 3600
@@ -119,7 +119,7 @@ class OpenNebula::VirtualMachine
     #       => 'Reconfigure Success' -- Task finished with success code, all specs are equal to given
     #       => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
     #       => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
-    def setResourcesAllocationLimits(spec)
+    def setResourcesAllocationLimits spec
         LOG_DEBUG spec.debug_out
         return 'Unsupported query' if IONe.new($client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'        
         
@@ -163,7 +163,7 @@ class OpenNebula::VirtualMachine
         return nil
     end
     # Checks if vm is on given vCenter Datastore
-    def is_at_ds?(ds_name)
+    def is_at_ds? ds_name
         host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
         datacenter = get_vcenter_dc(host)
         begin
@@ -199,7 +199,7 @@ class OpenNebula::VirtualMachine
     # @option spec [String] :name VM name on vCenter node
     # @return [Boolean | String]
     # @note Method returns true if resize action ended correct, false if VM not support hot reconfiguring
-    def hot_resize(spec = {:name => nil})
+    def hot_resize spec = {:name => nil}
         return false if !self.hotAddEnabled?
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
@@ -221,7 +221,7 @@ class OpenNebula::VirtualMachine
     # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
     # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
     # @return [Hash | String] Returns limits Hash if success or exception message if fails
-    def hotAddEnabled?(name = nil)
+    def hotAddEnabled? name = nil
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
@@ -240,7 +240,7 @@ class OpenNebula::VirtualMachine
     # @option spec [Boolean] :ram
     # @option spec [String]  :name VM name on vCenter node
     # @return [true | String]
-    def hotResourcesControlConf(spec = {:cpu => true, :ram => true, :name => nil})
+    def hotResourcesControlConf spec = {:cpu => true, :ram => true, :name => nil}
         begin
             host, name = onblock(:h, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
             datacenter = get_vcenter_dc(host)
@@ -275,7 +275,7 @@ class OpenNebula::VirtualMachine
     # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
     # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
     # @return [Hash | String] Returns limits Hash if success or exception message if fails
-    def getResourcesAllocationLimits(name = nil)
+    def getResourcesAllocationLimits name = nil
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
@@ -293,7 +293,7 @@ class OpenNebula::VirtualMachine
     # Returns owner user ID
     # @param [Boolean] info - method doesn't get object full info one more time -- usefull if collecting data from pool
     # @return [Integer]
-    def uid(info = true)
+    def uid info = true
         self.info! if info
         self['UID']
     end
@@ -301,7 +301,7 @@ class OpenNebula::VirtualMachine
     # @param [Boolean] info - method doesn't get object full info one more time -- usefull if collecting data from pool
     # @param [Boolean] from_pool - levels differenct between object and object received from pool.each | object |
     # @return [String]
-    def uname(info = true, from_pool = false)
+    def uname info = true, from_pool = false
         self.info! if info
         return @xml[0].children[3].text.to_i unless from_pool
         @xml.children[3].text
