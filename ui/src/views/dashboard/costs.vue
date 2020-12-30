@@ -2,7 +2,7 @@
 	<div class="costs__wrapper">
 		<template v-if="!loading">
 			<template v-for="(setting, index) in settings">
-				<a-input v-if="!setting.value" v-model="settings[index].body" :key="setting.name" size="large" style="margin-bottom: 15px" @change="addChanged(setting.name)">
+				<a-input v-if="setting.value == undefined" v-model="settings[index].body" :key="setting.name" size="large" style="margin-bottom: 15px" @change="addChanged(setting.name)">
 					<div
 						slot="addonBefore"
 						style="width: 100px"
@@ -66,7 +66,7 @@ export default {
 				.filter( element => this.showSettings.includes(element.name))
 				.sort( (a, b) => this.showSettings.indexOf(a.name) - this.showSettings.indexOf(b.name) )
 				.map(item => {
-					if(this.isJson(item.body)){
+					if(this.isJson(item.body) && (~item.body.indexOf('[') || ~item.body.indexOf('{'))){
 						item.value = JSON.parse(item.body)
 					}
 					return item;
@@ -91,6 +91,7 @@ export default {
 		},
 		addChanged(name){
 			const ind = this.changed.indexOf(name);
+			console.log('work');
 			if(
 				this.settings.find(el => el.name == name).body
 				!==
@@ -111,8 +112,10 @@ export default {
 			const promises = [];
 			for (const name of this.changed) {
 				const field = this.settings.find(el => el.name == name);
-				if(field.value){
+				console.log(field);
+				if(field.value != undefined){
 					field.body = JSON.stringify(field.value);
+					console.log('remove value');
 					delete field.value;
 				}
 				promises.push(
