@@ -337,7 +337,7 @@ class IONe
 
     # Deletes user and all his VMs
     def UserDelete uid
-        u = onblock(:u, uid)
+        u = onblock(:u, uid, @client)
         u.vms(@db).each do | vm |
             vm.terminate true
         end

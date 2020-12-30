@@ -51,7 +51,7 @@ class IONe
             stream_data << '}, "networking":'
         end
 
-        networking = onblock(:u, uid).calculate_networking_showback(stime, etime)
+        networking = onblock(:u, uid, @client).calculate_networking_showback(stime, etime)
         showback['networking'] = networking
         if stream then
             stream_data << JSON.generate(networking) << ', '
@@ -157,7 +157,7 @@ class IONe
             u['vms'] = u['vms'] || []
             showback = CalculateShowback(u['uid'], u['time'])
             
-            user = onblock :u, u['uid']
+            user = onblock :u, u['uid'], @client
             user.balance = u['balance']
             balance = user.balance
             alert, alert_at = user.alert
