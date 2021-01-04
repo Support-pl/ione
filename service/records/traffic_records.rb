@@ -1,10 +1,13 @@
 begin
     $db.create_table :traffic_records do
         primary_key :key
-        foreign_key :vm,    :vm_pool,   null: false
-        Integer     :ts,    null: false
-        String      :rx,    null: false
-        String      :tx,    null: false
+        foreign_key :vm,        :vm_pool,   null: false
+        String      :rx,        null: false
+        String      :rx_last,   null: false
+        String      :tx,        null: false
+        String      :tx_last,   null: false
+        Integer     :stime,     null: false
+        Integer     :etime
     end
 rescue
     puts "Table :traffic_records already exists, skipping"
@@ -34,6 +37,7 @@ class OpenNebula::TrafficRecords < RecordsSource
     end
 
     def sync vm = nil
+        return 0
         inserts = 0
 
         if vm.nil? then

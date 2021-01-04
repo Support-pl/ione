@@ -10,6 +10,13 @@ require 'opennebula'
         "ARGUMENTS" => '$API'
     },
     {
+        "NAME" => 'insert-zero-traffic-record',
+        "TYPE" => 'api',
+        "CALL" => 'one.vm.allocate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb',
+        "ARGUMENTS" => '$API'
+    },
+    {
         "NAME" => 'pending',
         "ON" => "CUSTOM",
         "STATE" => "PENDING",
