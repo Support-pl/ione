@@ -15,7 +15,7 @@ begin
             LOG "TrafficRecorder inserted totally #{inserts_total} new traffic records", 'TrafficRecorder'
             sleep($ione_conf['TrafficRecorder']['check-period'])
         rescue => e
-            LOG "TrafficRecorder Error, code: #{e.message}\TrafficRecorder is down now", 'TrafficRecorder'
+            LOG "TrafficRecorder Error, code: #{e.message}\nTrafficRecorder is down now", 'TrafficRecorder'
             sleep(30)
         end
     end
