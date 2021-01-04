@@ -18,10 +18,10 @@ class TrafficRecord < Sequel::Model(:traffic_records)
         self
     end
     def sorter
-        ts
+        etime
     end
     def mod st
-        st[:traffic] = 0
+        st.merge! rx: rx, tx: tx
     end
 
     def conv_keys
