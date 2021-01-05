@@ -9,15 +9,17 @@ begin
 
     required = [
         ['ALERT', "0.0", "Balance, when user will be alerted", 0, "num"],
-        ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs", 1, "object"],
+        ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs per sec", 1, "object"],
         ['DISK_TYPES', "HDD,SSD,NVMe", "Comma-separated list of existing disk types", 1, "list"],
-        ['DISK_COSTS', "{\"disk_type\":\"price\"}", "Costs of different disk types", 1, "object"],
+        ['DISK_COSTS', "{\"disk_type\":\"price\"}", "Costs of different disk types GB/sec", 1, "object"],
         ['IAAS_GROUP_ID', 'iaas_group_id', "IaaS(VDC) Users group ID", 1, "num"],
         ['NODES_DEFAULT', "{\"hypervisor_name\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
-        ['PUBLIC_IP_COST', "0.0", "Public IP Address cost", 0, "num"],
+        ['PUBLIC_IP_COST', "0.0", "Public IP Address cost per sec", 0, "num"],
         ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
         ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
-        ['CURRENCY_MAIN', "€", "Currency", 0, "str"]
+        ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
+        ['TRAFFIC_COST', "0.0", "Cost per 1 kByte traffic", 1, "num"],
+        ['SNAPSHOT_COST', "0.0", "Cost 1 Snapshot per sec", 1, "num"]
     ]
     required.each do | record |
         $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])

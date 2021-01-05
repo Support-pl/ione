@@ -115,6 +115,8 @@ class Settings < Sequel::Model(:settings); end
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
 include ONeHelper
+puts 'Including showback'
+require "#{ROOT}/service/showback.rb"
 puts 'Including Deferable module'
 require "#{ROOT}/service/defer.rb"
 

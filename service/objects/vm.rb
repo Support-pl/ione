@@ -20,14 +20,8 @@ class OpenNebula::VirtualMachine
         undeploy-hard
         snapshot-create
     )
-    # List of possible billing periods
-    # @note Read it in source by pressing button View source down
-    BILLING_PERIODS = [
-        "0", # Pay-as-you-Go -- default
-        /\d/, # Number of days
-    ]
     # Generates template for OpenNebula scheduler record
-    def generate_schedule_str(id, action, time)
+    def generate_schedule_str id, action, time
         "\nSCHED_ACTION=[\n" + 
         "  ACTION=\"#{action}\",\n" + 
         "  ID=\"#{id}\",\n" + 
@@ -43,7 +37,7 @@ class OpenNebula::VirtualMachine
     # @param [Integer] time - Time when action schould be perfomed in secs
     # @param [String] periodic - Not working now
     # @return true
-    def schedule(action, time, periodic = nil)
+    def schedule action, time, periodic = nil
         return 'Unsupported action' if !SCHEDULABLE_ACTIONS.include? action
         self.info!
         id = 
@@ -68,7 +62,7 @@ class OpenNebula::VirtualMachine
     end
     # Unschedules given action by ID
     # @note Not working, if action is already initialized
-    def unschedule(id)
+    def unschedule id
         self.info!
         schedule_data, object = self.to_hash['VM']['USER_TEMPLATE']['SCHED_ACTION'], nil
 
@@ -97,7 +91,7 @@ class OpenNebula::VirtualMachine
     # @param [Integer] s - VM state to wait for
     # @param [Integer] lcm_s - VM LCM state to wait for
     # @return [Boolean]
-    def wait_for_state(s = 3, lcm_s = 3)
+    def wait_for_state s = 3, lcm_s = 3
         i = 0
         until state!() == s && lcm_state!() == lcm_s do
             return false if i >= 3600
@@ -125,7 +119,7 @@ class OpenNebula::VirtualMachine
     #       => 'Reconfigure Success' -- Task finished with success code, all specs are equal to given
     #       => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
     #       => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
-    def setResourcesAllocationLimits(spec)
+    def setResourcesAllocationLimits spec
         LOG_DEBUG spec.debug_out
         return 'Unsupported query' if IONe.new($client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'        
         
@@ -169,7 +163,7 @@ class OpenNebula::VirtualMachine
         return nil
     end
     # Checks if vm is on given vCenter Datastore
-    def is_at_ds?(ds_name)
+    def is_at_ds? ds_name
         host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
         datacenter = get_vcenter_dc(host)
         begin
@@ -205,7 +199,7 @@ class OpenNebula::VirtualMachine
     # @option spec [String] :name VM name on vCenter node
     # @return [Boolean | String]
     # @note Method returns true if resize action ended correct, false if VM not support hot reconfiguring
-    def hot_resize(spec = {:name => nil})
+    def hot_resize spec = {:name => nil}
         return false if !self.hotAddEnabled?
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
@@ -227,7 +221,7 @@ class OpenNebula::VirtualMachine
     # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
     # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
     # @return [Hash | String] Returns limits Hash if success or exception message if fails
-    def hotAddEnabled?(name = nil)
+    def hotAddEnabled? name = nil
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
@@ -246,7 +240,7 @@ class OpenNebula::VirtualMachine
     # @option spec [Boolean] :ram
     # @option spec [String]  :name VM name on vCenter node
     # @return [true | String]
-    def hotResourcesControlConf(spec = {:cpu => true, :ram => true, :name => nil})
+    def hotResourcesControlConf spec = {:cpu => true, :ram => true, :name => nil}
         begin
             host, name = onblock(:h, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
             datacenter = get_vcenter_dc(host)
@@ -281,7 +275,7 @@ class OpenNebula::VirtualMachine
     # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
     # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
     # @return [Hash | String] Returns limits Hash if success or exception message if fails
-    def getResourcesAllocationLimits(name = nil)
+    def getResourcesAllocationLimits name = nil
         begin
             host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
             datacenter = get_vcenter_dc(host)
@@ -299,7 +293,7 @@ class OpenNebula::VirtualMachine
     # Returns owner user ID
     # @param [Boolean] info - method doesn't get object full info one more time -- usefull if collecting data from pool
     # @return [Integer]
-    def uid(info = true)
+    def uid info = true
         self.info! if info
         self['UID']
     end
@@ -307,7 +301,7 @@ class OpenNebula::VirtualMachine
     # @param [Boolean] info - method doesn't get object full info one more time -- usefull if collecting data from pool
     # @param [Boolean] from_pool - levels differenct between object and object received from pool.each | object |
     # @return [String]
-    def uname(info = true, from_pool = false)
+    def uname info = true, from_pool = false
         self.info! if info
         return @xml[0].children[3].text.to_i unless from_pool
         @xml.children[3].text
@@ -357,210 +351,41 @@ class OpenNebula::VirtualMachine
         stime = self['/VM/STIME'].to_i if self['/VM/STIME'].to_i > stime
         etime = self['/VM/ETIME'].to_i if self['/VM/ETIME'].to_i < etime && self['/VM/ETIME'].to_i != 0
 
-        requested_time = (etime - stime) / 3600.0
-        
-        ### Quick response for HOLD and PENDING vms ###
-        return {
-            "id" => id,
-            "name" => name,
-            "work_time" => 0,
-            "time_period_requested" => etime_req - stime_req,
-            "time_period_corrected" => etime - stime,
-            "CPU" => 0,
-            "MEMORY" => 0,
-            "DISK" => 0,
-            "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
-            "EXCEPTION" => "State #{state == 0 ? "HOLD" : "PENDING"}",
-            "TOTAL" => 0
-        } if state == 0 || state == 1
+        bp = self['//BILLING_PERIOD']
 
-        records = OpenNebula::Records.new(id).records
-    
-        if self['//BILLING_PERIOD'] == 'month' then
-            first = records.select{|r| r[:state] != 'pnd'}.sort_by{|r| r[:time]}.first[:time]
-
-            unless group_by_day then
-                stime = Time.at(stime).to_datetime
-                first = Time.at(first).to_datetime
-                etime = Time.at(etime).to_datetime
-                current, periods = stime > first ? stime : first, 0
-
-                while current <= etime do
-                    periods += 1
-                    current = current >> 1
-                end
-
-                return {"id" => id, "name" => name, "work_time" => etime.to_time.to_i - first.to_time.to_i, "EXCEPTION" => "Billed by calendar month", "TOTAL" => (periods * self['//PRICE'].to_f).round(2)}
-            end
-        elsif self['//BILLING_PERIOD'].to_i != 0 then
+        if bp.nil? || bp == 'PAYG' then
+            billing = Billing.new self, stime, etime
+            billing.make_bill
+            billing.receipt
             
-            first = records.select{|r| r[:state] != 'pnd'}.sort_by{|r| r[:time]}.first[:time]
-            delta = self['//BILLING_PERIOD'].to_i * 86400
-
-            unless group_by_day then
-                
-                periods = stime > first ? 0 : 1
-                periods += (etime - first) / delta
-                
-                return {"id" => id, "name" => name, "work_time" => etime - first, "EXCEPTION" => "Billed per #{self['//BILLING_PERIOD'].to_i} days", "TOTAL" => (periods * self['//PRICE'].to_f).round(2)}
-            else
-                showback = []
-
-                diff = (Time.at(etime).to_date - Time.at(first).to_date).to_i + 1
-                diff.times do | day |
-                    showback << {
-                        'date' => Time.at(first + day * 86400).to_a[3..5].join('/'),
-                        'TOTAL' => (
-                            day % self['//BILLING_PERIOD'].to_i == 0 ? self['//PRICE'].to_f : 0.0 )
-                    }
-                end
-                return {
-                    "id" => id, "name" => name, "work_time" => first - stime,
-                    "EXCEPTION" => "Billed per #{self['//BILLING_PERIOD'].to_i} days",
-                    "showback" => showback,
-                    "TOTAL" => showback.inject(0){|total, record| total + record['TOTAL']}
-                }
-            end
-        end
-
-        
-
-        ### Generating Timeline ###
-        timeline = []
-        records.each_with_index do | record, i |
-            timeline << {
-                'stime' => record[:time],
-                'etime' => i + 1 != records.size ? records[i + 1][:time] - 1 : etime,
-                'state' => record[:state]
-            }
-        end
-
-        timeline.delete_if { |r| (r['etime'] < stime) || (r['stime'] > etime)   }
-        raise OpenNebula::Records::NoRecordsError if timeline.empty?
-        timeline[0]['stime'] = stime if timeline[0]['stime'] < stime
-        timeline[-1]['etime'] = etime if timeline.last['etime'] > etime
-
-
-        ### Calculating Capacity ###
-        cpu     = self['/VM/TEMPLATE/VCPU'].to_f * self['/VM/TEMPLATE/CPU'].to_f
-        memory  = self['/VM/TEMPLATE/MEMORY'].to_f / 1024
-        disk    = self['/VM/TEMPLATE/DISK/SIZE'].to_f / 1024
-
-        ### Calculating Showback ###
-        cpu_cost        = cpu       * self['/VM/TEMPLATE/CPU_COST'].to_f
-        memory_cost     = memory    * self['/VM/TEMPLATE/MEMORY_COST'].to_f
-        disk_cost       = disk      * self['/VM/TEMPLATE/DISK_COST'].to_f
-
-        unless group_by_day then
-            ### Calculating Work Time ###
-            work_time = 0
-            timeline.each do | record |
-                next unless record['state'] == 'on'
-                work_time += record['etime'] - record['stime']
-            end
-            work_time = work_time / 3600.0
-
-            
-
-            ### Calculating Showback ###
-            cpu_cost        *= work_time     
-            memory_cost     *= work_time     
-            disk_cost       *= requested_time
-
             return {
-                "id" => id,
-                "name" => name,
-                "work_time" => work_time,
-                "time_period_requested" => etime_req - stime_req,
-                "time_period_corrected" => etime - stime,
-                "CPU" => cpu_cost,
-                "MEMORY" => memory_cost,
-                "DISK" => disk_cost,
-                "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
-                "TOTAL" => cpu_cost + memory_cost + disk_cost
+                id: id, name: name,
+                showback: billing.bill,
+                TOTAL: billing.total
             }
-        else
-            timeline.clone.each_with_index do | r, i |
-                diff = (Time.at(r['etime']).to_date - Time.at(r['stime']).to_date).to_i
-                if diff >= 1 then
-                    result, border = [], Time.at(r['stime']).to_a
-                    border[0..2] = 59, 59, 23
-                    border = Time.local(*border).to_i
+        elsif bp.include? 'PRE' then
+            curr = self['/VM/STIME'].to_i
+            delta = bp.split('_')[1].to_i * 86400
 
-                    result << { 'stime' => r['stime'], 'etime' => border, 'state' => r['state'], 'date' => Time.at(r['stime']).to_a[3..5].join('/') }
+            s, e = self['/VM/STIME'].to_i, self['/VM/ETIME'].to_i
+            total = 0
 
-                    (diff).times do | day |
-                        result << { 'stime' => border += 1, 'date' => Time.at(border).to_a[3..5].join('/'), 'etime' => border += 86399, 'state' => r['state'] }
-                    end
+            while curr < etime do
+                if (stime..etime).include? curr then
+                    b = Billing.new self, curr, curr + delta
+                    b.make_bill
+                    b.receipt
 
-                    result[diff]['etime'] = r['etime']
-                    
-                    timeline[i] = result
-                else
-                    timeline[i]['date'] = Time.at(r['stime']).to_a[3..5].join('/')
+                    total += b.total
                 end
-            end
-            timeline.flatten!
-
-            timeline.map! do | r |
-                {
-                    "date" => r['date'],
-                    "requested_time" => (r['etime'] - r['stime']),
-                    'state' => r['state']
-                }
-            end
-            timeline = timeline.group_by { | r | r['date'] }
-            timeline = timeline.map do | date, date_records |
-                result = date_records.inject({
-                    'date' => date,
-                    'work_time' => 0,
-                    'requested_time' => 0,
-                    'CPU' => 0,
-                    'MEMORY' => 0,
-                    'DISK' => 0,
-                    'TOTAL' => 0
-                }) do | showback, record |
-                    requested_time = record['requested_time'] / 3600.0
-                    work_time = record['state'] == 'on' ? requested_time : 0
-                    showback['work_time'] += work_time
-                    showback['requested_time'] += record['requested_time']
-                    showback['CPU'] += cpu_cost * work_time
-                    showback['MEMORY'] += memory_cost * work_time
-                    showback['DISK'] +=  disk_cost * requested_time if record['state'] != 'pnd'
-                    
-                    showback
-                end
-
-                result['TOTAL'] += (result['CPU'] + result['MEMORY'] + result['DISK'])
-                result
+                curr += delta
             end
 
             return {
-                "id" => id,
-                "name" => name,
-                "work_time" => timeline.inject(0){|total, record| total + record['work_time']},
-                "requested_time" => timeline.inject(0){|total, record| total + record['requested_time']},
-                "time_period_requested" => etime_req - stime_req,
-                "time_period_corrected" => etime - stime,
-                "showback" => timeline,
-                "DISK_TYPE" => self['/VM/USER_TEMPLATE/DRIVE'],
-                "TOTAL" => timeline.inject(0){|total, record| total + record['TOTAL']}
+                id: id, name: name,
+                TOTAL: total
             }
         end
-    rescue OpenNebula::Records::NoRecordsError
-        return {
-            "id" => id,
-            "name" => name,
-            "work_time" => 0,
-            "time_period_requested" => etime_req - stime_req,
-            "time_period_corrected" => etime - stime,
-            "CPU" => 0,
-            "MEMORY" => 0,
-            "DISK" => 0,
-            "DISK_TYPE" => 'no_type',
-            "EXCEPTION" => "No Records",
-            "TOTAL" => 0
-        }
     end
     # Returns important data in JSON format
     # @param [IONe] ione - IONe object for calling its methods
@@ -602,5 +427,12 @@ class OpenNebula::VirtualMachine
             @params = params[1...params.length]
             super "#{params[0]}\nParams:#{@params.inspect}"
         end
+    end
+
+    # List VM Drives
+    # @return [Array<Hash>]
+    def drives
+        r = to_hash!['VM']['TEMPLATE']['DISK']
+        r.class == Array ? r : [ r ]
     end
 end
