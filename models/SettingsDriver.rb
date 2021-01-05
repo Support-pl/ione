@@ -19,6 +19,7 @@ begin
         ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
         ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
         ['TRAFFIC_COST', "0.0", "Cost per 1 kByte traffic", 1, "num"],
+        ['SNAPSHOT_COST', "0.0", "Cost 1 Snapshot per sec", 1, "num"]
     ]
     required.each do | record |
         $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
