@@ -116,6 +116,14 @@ class OpenNebula::TrafficRecords < RecordsSource
 
         @records.exclude(etime: nil).exclude{ etime - stime < 86400 }.where(etime: st..et)
     end
+
+    def init_state stime
+        state = { rx: 0, tx: 0 }
+        rec = TrafficRecord.where(vm: @id).where(stime: stime).all.last
+        unless rec.nil? then
+            state[:rx], state[:tx] = rec.rx, rec.tx
+        end
+        state
     end
     
 end
