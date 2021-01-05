@@ -428,4 +428,11 @@ class OpenNebula::VirtualMachine
             super "#{params[0]}\nParams:#{@params.inspect}"
         end
     end
+
+    # List VM Drives
+    # @return [Array<Hash>]
+    def drives
+        r = to_hash!['VM']['TEMPLATE']['DISK']
+        r.class == Array ? r : [ r ]
+    end
 end
