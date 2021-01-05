@@ -14,4 +14,12 @@ class TrafficBiller < Biller
     rescue
         return false
     end
+
+    def bill bill:, state:, delta:, record: 
+        if record.class == TrafficRecord then
+            bill[:rx] = state[:rx] / 1000 * @costs[:rx]
+            bill[:tx] = state[:tx] / 1000 * @costs[:tx]
+        end
+        bill
+    end
 end
