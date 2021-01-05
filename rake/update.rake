@@ -7,14 +7,31 @@ def 100to101
 
     # Update UI
 
-    # Update service/objects/records
-    # Add service/billers, service/biller.rb, showback.rb
+    # Remove service/objects/records
+    # Add service/billers/*, service/biller.rb, showback.rb
+    # Add service/records/*
+    # Add service/records.rb
+
+    # Add insert_zero_traffic_record.rb hook
 
     # Update meta
     # Update lib
 
+    # Update service/objects/*
+
     # Update ione_server.rb
-    # update service/log.rb
+    # Update service/log.rb
+    # Update models/SettingsDriver.rb
+
+    # Delete models/SunstoneServer.rb
+    # Delete models/SunstoneViews.rb
+
+    # Delete modules/stat/main.rb
+    # Delete service/handlers/cache_handler.rb
+
+    # remove lib/appbindings/main.rb
+
+    # Update sys/ione.service
 end
 
 available_versions = [
