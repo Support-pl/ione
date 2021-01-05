@@ -10,7 +10,7 @@
           style="margin-bottom: 15px"
           @change="addChanged(setting.name)"
         >
-          <div slot="addonBefore" style="width: 100px">
+          <div slot="addonBefore" style="min-width: 100px">
             {{ setting.name | fieldName }}
           </div>
         </a-input>
