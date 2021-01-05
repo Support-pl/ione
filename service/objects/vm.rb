@@ -387,19 +387,6 @@ class OpenNebula::VirtualMachine
             }
         end
     end
-    # Returns important data in JSON format
-    # @param [IONe] ione - IONe object for calling its methods
-    def JSONObject ione
-        info!
-        res = {}
-        res['id'] = id
-        res['name'] = name
-        res['ip'] = ione.GetIP self
-        res['state'] = state_str
-        res['lcm_state'] = lcm_state_str
-
-        JSON.generate res
-    end
 
     alias :snapshot_create_original :snapshot_create
     # Create snapshot overload, brings restriction and quota check
