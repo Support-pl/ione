@@ -13,13 +13,14 @@ class DiskBiller < Biller
         return false if r <= 0
 
         @cost = @costs[@vm['/VM/USER_TEMPLATE/DRIVE']].to_f
+        @size = vm.drives.inject(0) { | r, d | r += d['SIZE'].to_i } / 1000.0
         return @cost > 0
     rescue
         return false
     end
 
     def bill bill:, state:, delta:, record: nil
-        bill[:disk] = delta * @cost
+        bill[:disk] = delta * @cost * @size
         bill
     end
 end
