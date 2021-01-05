@@ -23,7 +23,7 @@ class TrafficRecord < Sequel::Model(:traffic_records)
     alias :ts :sorter
 
     def mod st
-        st.merge! rx: rx, tx: tx
+        st.merge! rx: rx.to_i, tx: tx.to_i
     end
 
     def conv_keys
