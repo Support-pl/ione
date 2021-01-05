@@ -7,7 +7,7 @@ class Timeline
     attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled, :state
 
     SOURCES = [
-        Records, SnapshotRecords
+        Records, SnapshotRecords, TrafficRecords
     ]
 
     def initialize vm, stime, etime, group_by_day = false
@@ -73,7 +73,7 @@ class Billing
     attr_reader :timeline, :bill
 
     BILLERS = [
-        CapacityBiller, DiskBiller, SnapshotsBiller
+        CapacityBiller, DiskBiller, SnapshotsBiller, TrafficBiller
     ]
 
     def initialize vm, stime, etime
