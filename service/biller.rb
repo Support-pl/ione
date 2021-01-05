@@ -18,7 +18,7 @@ class Biller
         @vm['//BILLING_PERIOD']
     end
 
-    def bill bill, state, delta
+    def bill bill:, state:, delta:, record: nil
         0
     end
 end

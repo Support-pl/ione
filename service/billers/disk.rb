@@ -18,7 +18,7 @@ class DiskBiller < Biller
         return false
     end
 
-    def bill bill, state, delta
+    def bill bill:, state:, delta:, record: nil
         bill[:disk] = delta * @cost
         bill
     end
