@@ -92,7 +92,7 @@ class Billing
             curr.mod state
             bill_rec = {time: con.ts}
             @billers.each do | biller |
-                bill_rec.merge! biller.bill(bill_rec, state, delta)
+                bill_rec.merge! biller.bill(bill: bill_rec, state: state, delta: delta, record: curr)
             end
             @bill << bill_rec
         end
