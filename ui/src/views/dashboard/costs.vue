@@ -37,8 +37,14 @@
 <script>
 // the position of the elements in this array determines the position of the elements on the page
 const showSettings = [
-	'CURRENCY_MAIN', 'PUBLIC_IP_COST', 'DISK_COSTS', 'CAPACITY_COST'
-]
+  "CURRENCY_MAIN",
+  "CAPACITY_COST",
+  "DISK_COSTS",
+  "PUBLIC_IP_COST",
+  "TRAFFIC_COST",
+  "SNAPSHOT_COST",
+];
+
 import { mapGetters } from "vuex";
 export default {
 	name: 'cost',
