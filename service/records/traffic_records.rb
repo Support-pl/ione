@@ -121,6 +121,7 @@ class OpenNebula::TrafficRecords < RecordsSource
         state = { rx: 0, tx: 0 }
         rec = TrafficRecord.where(vm: @id).where(stime: stime).all.last
         unless rec.nil? then
+            rec = rec.to_i
             state[:rx], state[:tx] = rec.rx, rec.tx
         end
         state
