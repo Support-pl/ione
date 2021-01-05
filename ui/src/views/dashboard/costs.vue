@@ -167,11 +167,7 @@ export default {
   filters: {
     fieldName(value) {
       if (!value) return "";
-      value = value.toString();
-      return (
-        value.charAt(0).toUpperCase() +
-        value.slice(1).toLowerCase().replace(/_/g, " ")
-      );
+      return value.toString().replace(/_/g, " ");
     },
   },
 };
