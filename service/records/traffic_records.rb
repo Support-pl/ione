@@ -20,6 +20,8 @@ class TrafficRecord < Sequel::Model(:traffic_records)
     def sorter
         etime
     end
+    alias :ts :sorter
+
     def mod st
         st.merge! rx: rx, tx: tx
     end
