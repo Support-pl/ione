@@ -6,7 +6,7 @@ class Timeline
 
     attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled, :state
 
-    SOURCES = [
+    SOURCES = [ # Should be generated automaticaly in the future
         Records, SnapshotRecords, TrafficRecords
     ]
 
@@ -77,7 +77,7 @@ class Billing
 
     attr_reader :timeline, :bill
 
-    BILLERS = [
+    BILLERS = [ # Should be generated automaticaly in the future
         CapacityBiller, DiskBiller, SnapshotsBiller, TrafficBiller
     ]
 
