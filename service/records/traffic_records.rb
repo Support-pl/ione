@@ -110,6 +110,7 @@ class OpenNebula::TrafficRecords < RecordsSource
 
     def find st, et
         last = TrafficRecord.where(vm: @id).order(Sequel.asc(:stime)).last
+        return EmptyQuery.new if last.nil?
         if last[:etime] - last[:stime] >= 86400 then # If record is elder than 24 hours
             args = last.values.without(:key, :rx, :tx, :stime)
             args.merge! rx: 0, tx: 0, stime: args[:etime] # Setting up new record with zero rx, tx and same rx_last, tx_last
