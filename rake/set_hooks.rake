@@ -22,7 +22,7 @@ require 'opennebula'
         "STATE" => "PENDING",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE pnd",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -32,7 +32,7 @@ require 'opennebula'
         "STATE" => "HOLD",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE pnd",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -42,7 +42,7 @@ require 'opennebula'
         "STATE" => "ACTIVE",
         "LCM_STATE" => "BOOT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE on",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -52,7 +52,7 @@ require 'opennebula'
         "STATE" => "ACTIVE",
         "LCM_STATE" => "RUNNING",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE on",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -62,7 +62,7 @@ require 'opennebula'
         "STATE" => "STOPPED",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -72,7 +72,7 @@ require 'opennebula'
         "STATE" => "SUSPENDED",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -82,7 +82,7 @@ require 'opennebula'
         "STATE" => "DONE",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -92,7 +92,7 @@ require 'opennebula'
         "STATE" => "POWEROFF",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
