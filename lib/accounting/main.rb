@@ -67,47 +67,6 @@ class IONe
 
         showback unless stream
     end
-    # Calculates Showback for given User
-    # @param [Integer] uid - User ID
-    # @param [Integer] stime - Point from which calculation starts(timestamp)
-    # @param [Integer] etime - Point at which calculation stops(timestamp)
-    # @param [Boolean] group_by_day - Groups showbacks by days
-    # @param [Sinatra::Stream] stream_data - sinatra stream object
-    def CalculateShowback uid, stime, etime = Time.now.to_i, group_by_day = false, stream_data = nil
-        vm_pool = @db[:vm_pool].select(:oid).where(:uid => uid).to_a.map! {| vm | vm[:oid]}
-
-        showback = {}
-        stream = !stream_data.nil?
-
-        vm_pool.each do | vm |
-            vm = onblock :vm, vm, @client
-            vm.info!
-
-            next if vm['/VM/ETIME'].to_i < stime && vm['/VM/ETIME'].to_i != 0
-            begin
-                r = vm.calculate_showback(stime, etime, group_by_day).without('time_period_requested', 'time_period_corrected')
-                showback[vm.id] = r
-                if stream then
-                    stream_data << "\"#{vm.id}\": " << JSON.generate(r) << ","
-                end
-            rescue OpenNebula::VirtualMachine::ShowbackError => e
-                if e.message.include? "VM didn't exist in given time-period" then
-                    next
-                else
-                    raise e
-                end
-            end
-        end
-
-        showback['TOTAL'] = showback.values.inject(0){| result, record | result += record['TOTAL'].to_f }
-        showback['time_period_requested'] = etime - stime
-        if stream then
-            stream_data << '"TOTAL": ' << showback['TOTAL'] << ','
-            stream_data << '"time_period_requested": ' << showback['time_period_requested']
-        end
-
-        showback unless stream
-    end
     
     # Does very complicated things, don't think about it)))))
     # @param [Hash] params
@@ -120,7 +79,7 @@ class IONe
         user = onblock :u, params['uid'], @client
         e = user.info!
         return 401 unless e.nil?
-        showback = CalculateShowback(*params.get('uid', 'time'))
+        showback = calculate_showback(*params.get('uid', 'time'))
         
         user.balance = params['balance']
         balance = user.balance
@@ -156,7 +115,7 @@ class IONe
 
         params["users"].each do | u |
             u['vms'] = u['vms'] || []
-            showback = CalculateShowback(u['uid'], u['time'])
+            showback = calculate_showback(u['uid'], u['time'])
             
             user = onblock :u, u['uid']
             user.balance = u['balance']
