@@ -10,14 +10,14 @@ require 'opennebula'
         "ARGUMENTS" => '$API'
     },
     {
-        "NAME" => 'insert-zero-traffic-record',
+        "NAME" => 'insert-zero-traffic-record-vm-allocate',
         "TYPE" => 'api',
         "CALL" => 'one.vm.allocate',
         "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb vm',
         "ARGUMENTS" => '$API'
     },
     {
-        "NAME" => 'insert-zero-traffic-record',
+        "NAME" => 'insert-zero-traffic-record-template-instantiate',
         "TYPE" => 'api',
         "CALL" => 'one.template.instantiate',
         "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb tmpl',
