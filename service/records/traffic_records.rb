@@ -42,7 +42,7 @@ class TrafficRecord < Sequel::Model(:traffic_records)
         self
     end
 
-    def to_json(*a)
+    def to_json *a
         @values.without(:key).to_json(*a)
     end
 end
