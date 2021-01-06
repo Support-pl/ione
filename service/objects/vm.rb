@@ -422,4 +422,14 @@ class OpenNebula::VirtualMachine
         r = to_hash!['VM']['TEMPLATE']['DISK']
         r.class == Array ? r : [ r ]
     end
+
+    # List TrafficRecords
+    # @return [Hash]
+    def traffic_records
+        info!
+        {
+            records: TrafficRecords.new(id).records,
+            monitoring: monitoring(['NETTX', 'NETRX'])
+        }
+    end
 end
