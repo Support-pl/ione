@@ -72,6 +72,7 @@ class IONe
     # @param [Integer] stime - Point from which calculation starts(timestamp)
     # @param [Integer] etime - Point at which calculation stops(timestamp)
     # @param [Boolean] group_by_day - Groups showbacks by days
+    # @param [Sinatra::Stream] stream_data - sinatra stream object
     def CalculateShowback uid, stime, etime = Time.now.to_i, group_by_day = false, stream_data = nil
         vm_pool = @db[:vm_pool].select(:oid).where(:uid => uid).to_a.map! {| vm | vm[:oid]}
 
