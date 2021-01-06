@@ -33,6 +33,7 @@ class Record < Sequel::Model(:records)
     end
     alias :ts :sorter
 
+    # Modifies state by just replacing :state with state from Record
     def mod st
         st[:state] = state
     end
@@ -40,22 +41,26 @@ end
 
 class SnapshotRecord < Sequel::Model(:snapshot_records)
     
+    # Snapshot Created Record class 
     class CreateSnapshotRecord < SnapshotRecord
         def sorter
             crt
         end
         alias :ts :sorter
 
+        # Increments :snaps
         def mod st
             st[:snaps] += 1
         end
     end
+    # Snapshot Deleted Record class 
     class DeleteSnapshotRecord < SnapshotRecord
         def sorter
             del
         end
         alias :ts :sorter
 
+        # Decrements :snaps
         def mod st
             st[:snaps] -= 1
         end
@@ -65,6 +70,7 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
         @values.without(:key)
     end
 
+    # Splits itself into Create- and Delete-(if snap has been deleted) SnapshotRecord
     def sortable
         if self.del then
             [ CreateSnapshotRecord.new(values), DeleteSnapshotRecord.new(values) ]
@@ -104,6 +110,7 @@ class OpenNebula::SnapshotRecords < RecordsSource
         @records.where(crt: stime..etime).or(del: stime..etime)
     end
 
+    # Gets All of the SnapshotRecords before stime and with deletion time greater than stime or nil and counts(which is initial quantity of snaps)
     def init_state stime
         # SELECT * FROM `snapshot_records` WHERE ((`crt` < 0) AND ((`del` >= 0) OR NOT `del`))
         {
