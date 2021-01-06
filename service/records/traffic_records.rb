@@ -121,7 +121,7 @@ class OpenNebula::TrafficRecords < RecordsSource
             TrafficRecord.insert(**args.without(:etime))
         end
 
-        @records.exclude(etime: nil).exclude{ etime - stime < 86400 }.where(etime: st..et) # All Records between given time
+        @records.exclude(etime: nil).exclude{ etime - stime < 86400 }.where(etime: st..et) # All Records between given time and elder than 24h
     end
 
     def init_state stime
