@@ -18,13 +18,21 @@
 require 'base64'
 require 'nokogiri'
 
-xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+xml = Nokogiri::XML(Base64::decode64(ARGV[1]))
 unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
     puts "VM wasn't allocated, skipping"
     exit 0
 end
 
-vmid = xml.xpath('//ID').text.to_i
+vmid = nil
+if ARGV.first == 'vm' then
+    vmid = xml.xpath('//ID').text.to_i
+elsif ARGV.first == 'tmpl' then
+    vmid = xml.xpath('/CALL_INFO/PARAMETERS/PARAMETER[TYPE="OUT"][POSITION=2]/VALUE').text.to_i
+else
+    puts "IDK what to do🤷‍♂️"
+    exit 0
+end
 
 require 'yaml'
 require 'json'
