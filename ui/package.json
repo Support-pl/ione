@@ -24,7 +24,7 @@
     "@vue/cli-plugin-vuex": "^4.5.8",
     "@vue/cli-service": "~4.5.0",
     "@vue/test-utils": "^1.0.3",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
