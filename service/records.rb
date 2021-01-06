@@ -37,4 +37,10 @@ class RecordsSource
     end
 end
 
+class EmptyQuery
+    def all
+        return []
+    end
+end
+
 Dir["#{ROOT}/service/records/*.rb"].each {|file| require file }
