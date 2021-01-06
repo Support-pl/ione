@@ -24,7 +24,7 @@ unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
     exit 0
 end
 
-vmid = xml.xpath('//EXTRA/VM')
+vmid = xml.xpath('//ID').text.to_i
 
 require 'yaml'
 require 'json'
