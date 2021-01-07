@@ -10,6 +10,20 @@ require 'opennebula'
         "ARGUMENTS" => '$API'
     },
     {
+        "NAME" => 'check-balance-vm-allocate',
+        "TYPE" => 'api',
+        "CALL" => 'one.vm.allocate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb vm',
+        "ARGUMENTS" => '$API'
+    },
+    {
+        "NAME" => 'check-balance-tmpl-instantiate',
+        "TYPE" => 'api',
+        "CALL" => 'one.template.instantiate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb tmpl',
+        "ARGUMENTS" => '$API'
+    },
+    {
         "NAME" => 'insert-zero-traffic-record-vm-allocate',
         "TYPE" => 'api',
         "CALL" => 'one.vm.allocate',
@@ -17,7 +31,7 @@ require 'opennebula'
         "ARGUMENTS" => '$API'
     },
     {
-        "NAME" => 'insert-zero-traffic-record-template-instantiate',
+        "NAME" => 'insert-zero-traffic-record-tmpl-instantiate',
         "TYPE" => 'api',
         "CALL" => 'one.template.instantiate',
         "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb tmpl',

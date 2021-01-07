@@ -34,7 +34,26 @@ else
     exit 0
 end
 
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
+
+$: << RUBY_LIB_LOCATION
+
+require 'opennebula'
+include OpenNebula
+
+vm = VirtualMachine.new_with_id(vmid, Client.new)
+vm.lock 0
+vm.info!
+
+u = User.new_with_id vm['UID'].to_i, Client.new
+u.info!
+balance = u['TEMPLATE/BALANCE'].to_f
+
+vm.recover 3 if balance == 0
+
 require 'yaml'
+require 'json'
 require 'sequel'
 
 $ione_conf = YAML.load_file("/etc/one/ione.conf") # IONe configuration constants
@@ -45,6 +64,16 @@ $db = Sequel.connect({
         user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
-$db[:traffic_records].insert(
-    vm: vmid, rx: "0", tx: "0", rx_last: "0", tx_last: "0", stime: Time.now.to_i
-)
+conf = $db[:settings].as_hash(:name, :body)
+
+capacity = JSON.parse(conf['CAPACITY_COST'])
+vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i
+
+if balance < vm_price * 86400 then
+    puts "User balance isn't enough to deploy this VM, deleting..."
+    vm.recover 3
+else
+    puts "User has enough balance, do whatever you want"
+    vm.unlock
+end
+
