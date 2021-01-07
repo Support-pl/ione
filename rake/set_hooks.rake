@@ -141,17 +141,26 @@ require 'opennebula'
     }
 ]
 
+desc "Setting needed Hooks"
 task :hooks do
-    cd @src_dir
+    if defined? @src_dir then
+        cd @src_dir
 
-    puts 'Copying hooks scripts'
-    cp_r "hooks", "/usr/lib/one/ione/"
-    chmod_R "+x", "/usr/lib/one/ione/hooks/"
+        puts 'Copying hooks scripts'
+        cp_r "hooks", "/usr/lib/one/ione/"
+        chmod_R "+x", "/usr/lib/one/ione/hooks/"
+    end
 
+    require 'colorize'
     require '/usr/lib/one/ione/lib/std++/main.rb'
 
     puts 'Adding hooks to HookPool'
     for hook in @hooks do
-        OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
+        rc = OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
+        if OpenNebula.is_error? rc then
+            puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- X".red
+        else
+            puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- V".green
+        end
     end
 end
