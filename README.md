@@ -172,7 +172,7 @@ Creators:
 </table>
 ---------------------------------------------------------------------------------------------------------
 
-Thanks for choosing us, contacts for support are in "Contacts" section at the start of this `README`
+Thanks for choosing us, contacts for support are in "Contacts" section at the beginning of this `README`
 
 ## Important Notes
 
