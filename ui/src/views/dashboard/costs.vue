@@ -41,6 +41,73 @@
                 </a-input>
               </a-row>
             </a-collapse-panel>
+            <a-collapse-panel
+              key="drives"
+              header="Drives costs"
+              v-if="Object.keys(drive).length > 0"
+            >
+              <a-row
+                v-for="[type, data] in Object.entries(drive.types)"
+                :key="type"
+                :gutter="10"
+                style="margin-bottom: 10px"
+              >
+                <a-col :span="2"
+                  ><a-row type="flex" align="middle">{{ type }} </a-row></a-col
+                >
+                <a-col :span="20">
+                  <a-input v-model="data.cost">
+                    <div slot="addonAfter">
+                      <a-select v-model="drive.s_unit">
+                        <a-select-option key="mb" value="mb"
+                          >MB</a-select-option
+                        >
+                        <a-select-option key="gb" value="gb"
+                          >GB</a-select-option
+                        >
+                      </a-select>
+                      /
+                      <a-select v-model="drive.t_unit">
+                        <a-select-option
+                          :value="unit"
+                          v-for="unit in Object.keys(t_units)"
+                          :key="unit"
+                        >
+                          {{ unit }}
+                        </a-select-option>
+                      </a-select>
+                    </div>
+                  </a-input>
+                </a-col>
+                <a-col :span="2">
+                  <a-button
+                    type="danger"
+                    icon="delete"
+                    @click="() => $delete(drive.types, type)"
+                  />
+                </a-col>
+              </a-row>
+              <a-row :gutter="10">
+                <a-col :span="6"
+                  ><a-row type="flex" align="middle"
+                    >Enter New Drive Type
+                  </a-row></a-col
+                >
+                <a-col :span="16">
+                  <a-input v-model="new_drive_type"> </a-input>
+                </a-col>
+                <a-col :span="2">
+                  <a-button
+                    type="primary"
+                    icon="save"
+                    @click="
+                      () =>
+                        $set(drive.types, new_drive_type, { orig: 0, cost: 0 })
+                    "
+                  />
+                </a-col>
+              </a-row>
+            </a-collapse-panel>
           </a-collapse>
         </a-col>
       </a-row>
@@ -51,31 +118,28 @@
 <script>
 import { mapGetters } from "vuex";
 
-const t_units = {
-  sec: { div: 1 },
-  min: { div: 60 },
-  hour: { div: 3600 },
-  day: { div: 86400 },
-};
-const s_units = {
-  mb: { div: 1 },
-  gb: { div: 1000 },
-};
-
 export default {
   name: "cost",
   data() {
     return {
+      t_units: {
+        sec: { div: 1 },
+        min: { div: 60 },
+        hour: { div: 3600 },
+        day: { div: 86400 },
+      },
+      s_units: {
+        mb: { div: 1 },
+        gb: { div: 1000 },
+      },
+
       settings: {},
       loading: true,
 
-      disks_costs: {},
-
       cpu: {},
       ram: {},
-
-      t_units,
-      s_units,
+      drive: {},
+      new_drive_type: "",
     };
   },
   computed: {
@@ -86,7 +150,7 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        if (!val) return;
+        if (!val || !val.unit) return;
         this.cpu.cost = this.convertByTimeTo(val.orig, val.unit);
       },
     },
@@ -94,11 +158,24 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        if (!val) return;
+        if (!val || !val.t_unit || !val.s_unit) return;
         this.ram.cost = this.convertBySizeTo(
           this.convertByTimeTo(val.orig, val.t_unit),
           val.s_unit
         );
+      },
+    },
+    drive: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val || !val.t_unit || !val.s_unit) return;
+        for (let type of Object.keys(val.types)) {
+          this.drive.types[type].cost = this.convertBySizeTo(
+            this.convertByTimeTo(this.drive.types[type].orig, val.t_unit),
+            val.s_unit
+          );
+        }
       },
     },
   },
@@ -139,6 +216,19 @@ export default {
         t_unit: "sec",
       };
 
+      let drive = {
+        s_unit: "gb",
+        t_unit: "sec",
+        types: this.settings.DISK_COSTS.value,
+      };
+      for (let [type, orig] of Object.entries(drive.types)) {
+        drive.types[type] = {
+          orig: orig,
+          cost: orig,
+        };
+      }
+      this.drive = drive;
+
       this.loading = false;
     },
 
@@ -151,18 +241,22 @@ export default {
       return true;
     },
     convertByTimeTo(val, to) {
+      console.log(to);
       // val - value for seconds, to - unit to convert to
-      return val * t_units[to].div;
+      return val * this.t_units[to].div;
     },
     convertByTimeFrom(val, from) {
+      console.log(from);
       // val - value for seconds, from - unit to convert from
-      return val / t_units[from].div;
+      return val / this.t_units[from].div;
     },
     convertBySizeTo(val, to) {
-      return val / s_units[to].div;
+      console.log(to);
+      return val / this.s_units[to].div;
     },
     convertBySizeFrom(val, from) {
-      return val * s_units[from].div;
+      console.log(from);
+      return val * this.s_units[from].div;
     },
   },
   mounted() {
