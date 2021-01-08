@@ -1,5 +1,9 @@
 <template>
-  <a-row type="flex" justify="space-around" style="margin-top: 1rem">
+  <a-row
+    type="flex"
+    justify="space-around"
+    style="margin-top: 1rem; max-width: 720px"
+  >
     <a-col :span="23" v-if="!loading">
       <a-row>
         <a-col>
