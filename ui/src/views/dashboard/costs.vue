@@ -208,10 +208,18 @@ export default {
       immediate: true,
       handler(val) {
         if (!val || !val.t_unit || !val.s_unit) return;
-        this.ram.cost = this.convertBySizeTo(
-          this.convertByTimeTo(val.orig, val.t_unit),
-          val.s_unit
-        );
+        if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
+          this.ram.cost = this.convertBySizeTo(
+            this.convertByTimeTo(val.orig, val.t_unit),
+            val.s_unit
+          );
+          this.ram.prev_s_unit = val.s_unit;
+          this.ram.prev_t_unit = val.t_unit;
+        } else
+          this.ram.orig = this.convertBySizeFrom(
+            this.convertByTimeFrom(val.cost, val.t_unit),
+            val.s_unit
+          );
       },
     },
     drive: {
@@ -219,11 +227,22 @@ export default {
       immediate: true,
       handler(val) {
         if (!val || !val.t_unit || !val.s_unit) return;
-        for (let type of Object.keys(val.types)) {
-          this.drive.types[type].cost = this.convertBySizeTo(
-            this.convertByTimeTo(this.drive.types[type].orig, val.t_unit),
-            val.s_unit
-          );
+        if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
+          for (let type of Object.keys(val.types)) {
+            this.drive.types[type].cost = this.convertBySizeTo(
+              this.convertByTimeTo(this.drive.types[type].orig, val.t_unit),
+              val.s_unit
+            );
+          }
+          this.drive.prev_s_unit = val.s_unit;
+          this.drive.prev_t_unit = val.t_unit;
+        } else {
+          for (let type of Object.keys(val.types)) {
+            this.drive.types[type].orig = this.convertBySizeFrom(
+              this.convertByTimeFrom(this.drive.types[type].cost, val.t_unit),
+              val.s_unit
+            );
+          }
         }
       },
     },
