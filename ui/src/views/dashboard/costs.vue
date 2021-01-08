@@ -42,16 +42,6 @@
 </template>
 
 <script>
-// the position of the elements in this array determines the position of the elements on the page
-const showSettings = [
-  "CURRENCY_MAIN",
-  "CAPACITY_COST",
-  "DISK_COSTS",
-  "PUBLIC_IP_COST",
-  "TRAFFIC_COST",
-  "SNAPSHOT_COST",
-];
-
 import { mapGetters } from "vuex";
 export default {
   name: "cost",
@@ -60,7 +50,6 @@ export default {
       settings: {},
       cacheData: {},
       loading: true,
-      showSettings,
       changed: [],
     };
   },
@@ -76,12 +65,7 @@ export default {
           auth: this.credentials,
         })
       ).data.response
-        .filter((element) => this.showSettings.includes(element.name))
-        .sort(
-          (a, b) =>
-            this.showSettings.indexOf(a.name) -
-            this.showSettings.indexOf(b.name)
-        )
+        .filter((element) => element.name.includes("_COST"))
         .map((item) => {
           if (
             this.isJson(item.body) &&
@@ -111,7 +95,6 @@ export default {
     },
     addChanged(name) {
       const ind = this.changed.indexOf(name);
-      console.log("work");
       if (
         this.settings.find((el) => el.name == name).body !==
           this.cacheData.find((el) => el.name == name).body ||
@@ -129,10 +112,8 @@ export default {
       const promises = [];
       for (const name of this.changed) {
         const field = this.settings.find((el) => el.name == name);
-        console.log(field);
         if (field.value != undefined) {
           field.body = JSON.stringify(field.value);
-          console.log("remove value");
           delete field.value;
         }
         promises.push(
