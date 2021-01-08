@@ -1,64 +1,110 @@
 <template>
-  <div class="costs__wrapper">
-    <template v-if="!loading">
-      <template v-for="(setting, index) in settings">
-        <a-input
-          v-if="setting.value == undefined"
-          v-model="settings[index].body"
-          :key="setting.name"
-          size="large"
-          style="margin-bottom: 15px"
-          @change="addChanged(setting.name)"
-        >
-          <div slot="addonBefore" style="min-width: 100px">
-            {{ setting.name | fieldName }}
-          </div>
-        </a-input>
-        <template v-else>
-          <a-input
-            v-for="(v, k) in setting.value"
-            v-model="settings[index].value[k]"
-            :key="k"
-            size="large"
-            style="margin-bottom: 15px"
-            @change="addChanged(setting.name)"
-          >
-            <div slot="addonBefore" style="min-width: 100px">
-              {{ k | fieldName }}
-            </div>
-          </a-input>
-        </template>
-      </template>
-      <a-row type="flex" justify="end">
+  <a-row type="flex" justify="space-around" style="margin-top: 1rem">
+    <a-col :span="23" v-if="!loading">
+      <a-row>
         <a-col>
-          <a-button-group>
-            <a-button type="danger" @click="cancelChanges">Cancel</a-button>
-            <a-button @click="acceptChanges">Accept</a-button>
-          </a-button-group>
+          <a-collapse>
+            <a-collapse-panel key="capacity" header="Capacity costs">
+              <a-row>
+                CPU
+                <a-input v-model="cpu.cost">
+                  <a-select slot="addonAfter" v-model="cpu.unit">
+                    <a-select-option
+                      :value="unit"
+                      v-for="unit in Object.keys(t_units)"
+                      :key="unit"
+                    >
+                      Core / {{ unit }}
+                    </a-select-option>
+                  </a-select>
+                </a-input>
+              </a-row>
+              <a-row>
+                RAM
+                <a-input v-model="ram.cost">
+                  <div slot="addonAfter">
+                    <a-select v-model="ram.s_unit">
+                      <a-select-option key="mb" value="mb">MB</a-select-option>
+                      <a-select-option key="gb" value="gb">GB</a-select-option>
+                    </a-select>
+                    /
+                    <a-select v-model="ram.t_unit">
+                      <a-select-option
+                        :value="unit"
+                        v-for="unit in Object.keys(t_units)"
+                        :key="unit"
+                      >
+                        {{ unit }}
+                      </a-select-option>
+                    </a-select>
+                  </div>
+                </a-input>
+              </a-row>
+            </a-collapse-panel>
+          </a-collapse>
         </a-col>
       </a-row>
-    </template>
-  </div>
+    </a-col>
+  </a-row>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+
+const t_units = {
+  sec: { div: 1 },
+  min: { div: 60 },
+  hour: { div: 3600 },
+  day: { div: 86400 },
+};
+const s_units = {
+  mb: { div: 1 },
+  gb: { div: 1000 },
+};
+
 export default {
   name: "cost",
   data() {
     return {
       settings: {},
-      cacheData: {},
       loading: true,
-      changed: [],
+
+      disks_costs: {},
+
+      cpu: {},
+      ram: {},
+
+      t_units,
+      s_units,
     };
   },
   computed: {
     ...mapGetters(["credentials"]),
   },
+  watch: {
+    cpu: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val) return;
+        this.cpu.cost = this.convertByTimeTo(val.orig, val.unit);
+      },
+    },
+    ram: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val) return;
+        this.ram.cost = this.convertBySizeTo(
+          this.convertByTimeTo(val.orig, val.t_unit),
+          val.s_unit
+        );
+      },
+    },
+  },
   methods: {
     async sync() {
-      this.settings = (
+      let settings_array = (
         await this.$axios({
           method: "get",
           url: "/settings",
@@ -75,12 +121,27 @@ export default {
           }
           return item;
         });
-      this.cacheData = JSON.parse(JSON.stringify(this.settings));
+      this.settings = {};
+      for (let rec of settings_array) {
+        this.settings[rec.name] = rec;
+      }
+
+      this.cpu = {
+        orig: this.settings.CAPACITY_COST.value.CPU_COST,
+        cost: this.settings.CAPACITY_COST.value.CPU_COST,
+        unit: "sec",
+      };
+
+      this.ram = {
+        orig: this.settings.CAPACITY_COST.value.MEMORY_COST,
+        cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
+        s_unit: "gb",
+        t_unit: "sec",
+      };
+
       this.loading = false;
     },
-    getIndexByName(name) {
-      return this.settings.findIndex((el) => el.name == name);
-    },
+
     isJson(str) {
       try {
         JSON.parse(str);
@@ -89,57 +150,19 @@ export default {
       }
       return true;
     },
-    cancelChanges() {
-      this.changed = [];
-      this.sync();
+    convertByTimeTo(val, to) {
+      // val - value for seconds, to - unit to convert to
+      return val * t_units[to].div;
     },
-    addChanged(name) {
-      const ind = this.changed.indexOf(name);
-      if (
-        this.settings.find((el) => el.name == name).body !==
-          this.cacheData.find((el) => el.name == name).body ||
-        JSON.stringify(this.settings.find((el) => el.name == name).value) !==
-          JSON.stringify(this.cacheData.find((el) => el.name == name).value)
-      ) {
-        if (ind == -1) {
-          this.changed.push(name);
-        }
-      } else {
-        this.changed.splice(ind, 1);
-      }
+    convertByTimeFrom(val, from) {
+      // val - value for seconds, from - unit to convert from
+      return val / t_units[from].div;
     },
-    acceptChanges() {
-      const promises = [];
-      for (const name of this.changed) {
-        const field = this.settings.find((el) => el.name == name);
-        if (field.value != undefined) {
-          field.body = JSON.stringify(field.value);
-          delete field.value;
-        }
-        promises.push(
-          this.$axios({
-            method: "post",
-            url: `/settings/${name}`,
-            auth: this.credentials,
-            data: field,
-          })
-        );
-      }
-      Promise.all(promises)
-        .then((respones) => {
-          if (respones.every((resp) => resp.data.response == 1)) {
-            this.$message.success("Success");
-          } else {
-            this.$message.warn("Now all was success...");
-            console.warn(respones);
-          }
-          this.changed = [];
-          this.sync();
-        })
-        .catch((err) => {
-          console.error(err);
-          this.$message.error("Error");
-        });
+    convertBySizeTo(val, to) {
+      return val / s_units[to].div;
+    },
+    convertBySizeFrom(val, from) {
+      return val * s_units[from].div;
     },
   },
   mounted() {
@@ -153,9 +176,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.costs__wrapper {
-  padding: 10px 20px;
-}
-</style>
