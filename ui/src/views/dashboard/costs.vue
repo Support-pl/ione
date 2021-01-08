@@ -358,10 +358,10 @@ export default {
       return val / this.t_units[from].div;
     },
     convertBySizeTo(val, to) {
-      return val / this.s_units[to].div;
+      return val * this.s_units[to].div;
     },
     convertBySizeFrom(val, from) {
-      return val * this.s_units[from].div;
+      return val / this.s_units[from].div;
     },
   },
   mounted() {
