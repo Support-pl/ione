@@ -3,42 +3,50 @@
     <a-col :span="23" v-if="!loading">
       <a-row>
         <a-col>
-          <a-collapse>
+          <a-collapse :active-key="['capacity', 'drives', 'public_ip']">
             <a-collapse-panel key="capacity" header="Capacity costs">
               <a-row>
-                CPU
-                <a-input v-model="cpu.cost">
-                  <a-select slot="addonAfter" v-model="cpu.unit">
-                    <a-select-option
-                      :value="unit"
-                      v-for="unit in Object.keys(t_units)"
-                      :key="unit"
-                    >
-                      Core / {{ unit }}
-                    </a-select-option>
-                  </a-select>
-                </a-input>
-              </a-row>
-              <a-row>
-                RAM
-                <a-input v-model="ram.cost">
-                  <div slot="addonAfter">
-                    <a-select v-model="ram.s_unit">
-                      <a-select-option key="mb" value="mb">MB</a-select-option>
-                      <a-select-option key="gb" value="gb">GB</a-select-option>
-                    </a-select>
-                    /
-                    <a-select v-model="ram.t_unit">
+                <a-col :span="2"> CPU </a-col>
+                <a-col :span="20">
+                  <a-input v-model="cpu.cost">
+                    <a-select slot="addonAfter" v-model="cpu.unit">
                       <a-select-option
                         :value="unit"
                         v-for="unit in Object.keys(t_units)"
                         :key="unit"
                       >
-                        {{ unit }}
+                        Core / {{ unit }}
                       </a-select-option>
                     </a-select>
-                  </div>
-                </a-input>
+                  </a-input>
+                </a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="2"> RAM </a-col>
+                <a-col :span="20">
+                  <a-input v-model="ram.cost">
+                    <div slot="addonAfter">
+                      <a-select v-model="ram.s_unit">
+                        <a-select-option key="mb" value="mb"
+                          >MB</a-select-option
+                        >
+                        <a-select-option key="gb" value="gb"
+                          >GB</a-select-option
+                        >
+                      </a-select>
+                      /
+                      <a-select v-model="ram.t_unit">
+                        <a-select-option
+                          :value="unit"
+                          v-for="unit in Object.keys(t_units)"
+                          :key="unit"
+                        >
+                          {{ unit }}
+                        </a-select-option>
+                      </a-select>
+                    </div>
+                  </a-input>
+                </a-col>
               </a-row>
             </a-collapse-panel>
             <a-collapse-panel
@@ -88,12 +96,12 @@
                 </a-col>
               </a-row>
               <a-row :gutter="10">
-                <a-col :span="6"
+                <a-col :span="8"
                   ><a-row type="flex" align="middle"
                     >Enter New Drive Type
                   </a-row></a-col
                 >
-                <a-col :span="16">
+                <a-col :span="14">
                   <a-input v-model="new_drive_type"> </a-input>
                 </a-col>
                 <a-col :span="2">
