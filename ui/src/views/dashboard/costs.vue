@@ -3,9 +3,11 @@
     <a-col :span="23" v-if="!loading">
       <a-row>
         <a-col>
-          <a-collapse :active-key="['capacity', 'drives', 'public_ip']">
+          <a-collapse
+            :active-key="['capacity', 'drives', 'public_ip', 'snapshot']"
+          >
             <a-collapse-panel key="capacity" header="Capacity costs">
-              <a-row>
+              <a-row style="margin-bottom: 10px">
                 <a-col :span="2"> CPU </a-col>
                 <a-col :span="20">
                   <a-input v-model="cpu.cost">
@@ -15,7 +17,7 @@
                         v-for="unit in Object.keys(t_units)"
                         :key="unit"
                       >
-                        Core / {{ unit }}
+                        1 Core / {{ unit }}
                       </a-select-option>
                     </a-select>
                   </a-input>
@@ -126,7 +128,24 @@
                         v-for="unit in Object.keys(t_units)"
                         :key="unit"
                       >
-                        Address / {{ unit }}
+                        1 Address / {{ unit }}
+                      </a-select-option>
+                    </a-select>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-collapse-panel>
+            <a-collapse-panel key="snapshot" header="Snapshot Cost">
+              <a-row>
+                <a-col :span="20">
+                  <a-input v-model="snap.cost">
+                    <a-select slot="addonAfter" v-model="snap.unit">
+                      <a-select-option
+                        :value="unit"
+                        v-for="unit in Object.keys(t_units)"
+                        :key="unit"
+                      >
+                        1 Snapshot / {{ unit }}
                       </a-select-option>
                     </a-select>
                   </a-input>
@@ -166,6 +185,7 @@ export default {
       drive: {},
       new_drive_type: "",
       ip: {},
+      snap: {},
     };
   },
   computed: {
@@ -177,7 +197,10 @@ export default {
       immediate: true,
       handler(val) {
         if (!val || !val.unit) return;
-        this.cpu.cost = this.convertByTimeTo(val.orig, val.unit);
+        if (val.prev_unit != val.unit) {
+          this.cpu.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.cpu.prev_unit = val.unit;
+        } else this.cpu.orig = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
     ram: {
@@ -209,7 +232,21 @@ export default {
       immediate: true,
       handler(val) {
         if (!val || !val.unit) return;
-        this.ip.cost = this.convertByTimeTo(val.orig, val.unit);
+        if (val.prev_unit != val.unit) {
+          this.ip.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.ip.prev_unit = val.unit;
+        } else this.ip.orig = this.convertByTimeFrom(val.cost, val.unit);
+      },
+    },
+    snap: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val || !val.unit) return;
+        if (val.prev_unit != val.unit) {
+          this.snap.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.snap.prev_unit = val.unit;
+        } else this.snap.orig = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
   },
@@ -241,18 +278,23 @@ export default {
         orig: this.settings.CAPACITY_COST.value.CPU_COST,
         cost: this.settings.CAPACITY_COST.value.CPU_COST,
         unit: "sec",
+        prev_unit: "sec",
       };
 
       this.ram = {
         orig: this.settings.CAPACITY_COST.value.MEMORY_COST,
         cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
         s_unit: "gb",
+        prev_s_unit: "gb",
         t_unit: "sec",
+        prev_t_unit: "sec",
       };
 
       let drive = {
         s_unit: "gb",
+        prev_s_unit: "gb",
         t_unit: "sec",
+        prev_t_unit: "sec",
         types: this.settings.DISK_COSTS.value,
       };
       for (let [type, orig] of Object.entries(drive.types)) {
@@ -267,6 +309,14 @@ export default {
         orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
         cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
         unit: "sec",
+        prev_unit: "sec",
+      };
+
+      this.snap = {
+        orig: parseFloat(this.settings.SNAPSHOT_COST.body),
+        cost: parseFloat(this.settings.SNAPSHOT_COST.body),
+        unit: "sec",
+        prev_unit: "sec",
       };
 
       this.loading = false;
