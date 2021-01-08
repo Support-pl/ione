@@ -116,6 +116,23 @@
                 </a-col>
               </a-row>
             </a-collapse-panel>
+            <a-collapse-panel key="public_ip" header="Public IP Cost">
+              <a-row>
+                <a-col :span="20">
+                  <a-input v-model="ip.cost">
+                    <a-select slot="addonAfter" v-model="ip.unit">
+                      <a-select-option
+                        :value="unit"
+                        v-for="unit in Object.keys(t_units)"
+                        :key="unit"
+                      >
+                        Address / {{ unit }}
+                      </a-select-option>
+                    </a-select>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-collapse-panel>
           </a-collapse>
         </a-col>
       </a-row>
@@ -148,6 +165,7 @@ export default {
       ram: {},
       drive: {},
       new_drive_type: "",
+      ip: {},
     };
   },
   computed: {
@@ -184,6 +202,14 @@ export default {
             val.s_unit
           );
         }
+      },
+    },
+    ip: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val || !val.unit) return;
+        this.ip.cost = this.convertByTimeTo(val.orig, val.unit);
       },
     },
   },
@@ -236,6 +262,12 @@ export default {
         };
       }
       this.drive = drive;
+
+      this.ip = {
+        orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
+        cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
+        unit: "sec",
+      };
 
       this.loading = false;
     },
