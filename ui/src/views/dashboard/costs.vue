@@ -281,21 +281,17 @@ export default {
       return true;
     },
     convertByTimeTo(val, to) {
-      console.log(to);
       // val - value for seconds, to - unit to convert to
       return val * this.t_units[to].div;
     },
     convertByTimeFrom(val, from) {
-      console.log(from);
       // val - value for seconds, from - unit to convert from
       return val / this.t_units[from].div;
     },
     convertBySizeTo(val, to) {
-      console.log(to);
       return val / this.s_units[to].div;
     },
     convertBySizeFrom(val, from) {
-      console.log(from);
       return val * this.s_units[from].div;
     },
   },
