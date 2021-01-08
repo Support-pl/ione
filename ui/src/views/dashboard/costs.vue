@@ -4,7 +4,13 @@
       <a-row>
         <a-col>
           <a-collapse
-            :active-key="['capacity', 'drives', 'public_ip', 'snapshot']"
+            :active-key="[
+              'capacity',
+              'drives',
+              'public_ip',
+              'snapshot',
+              'traffic',
+            ]"
           >
             <a-collapse-panel key="capacity" header="Capacity costs">
               <a-row style="margin-bottom: 10px">
@@ -152,6 +158,37 @@
                 </a-col>
               </a-row>
             </a-collapse-panel>
+            <a-collapse-panel key="traffic" header="Traffic Cost">
+              <a-row>
+                <a-col :span="20">
+                  <a-input v-model="traff.cost">
+                    <div slot="addonAfter">
+                      <a-select v-model="traff.s_unit">
+                        <a-select-option key="kb" value="kb"
+                          >kB</a-select-option
+                        >
+                        <a-select-option key="mb" value="mb"
+                          >MB</a-select-option
+                        >
+                        <a-select-option key="gb" value="gb"
+                          >GB</a-select-option
+                        >
+                      </a-select>
+                      /
+                      <a-select v-model="traff.t_unit">
+                        <a-select-option
+                          :value="unit"
+                          v-for="unit in Object.keys(t_units)"
+                          :key="unit"
+                        >
+                          {{ unit }}
+                        </a-select-option>
+                      </a-select>
+                    </div>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-collapse-panel>
           </a-collapse>
         </a-col>
       </a-row>
@@ -173,6 +210,7 @@ export default {
         day: { div: 86400 },
       },
       s_units: {
+        kb: { div: 0.001 },
         mb: { div: 1 },
         gb: { div: 1000 },
       },
@@ -186,6 +224,7 @@ export default {
       new_drive_type: "",
       ip: {},
       snap: {},
+      traff: {},
     };
   },
   computed: {
@@ -268,6 +307,25 @@ export default {
         } else this.snap.orig = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
+    traff: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val || !val.t_unit || !val.s_unit) return;
+        if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
+          this.traff.cost = this.convertBySizeTo(
+            this.convertByTimeTo(val.orig, val.t_unit),
+            val.s_unit
+          );
+          this.traff.prev_s_unit = val.s_unit;
+          this.traff.prev_t_unit = val.t_unit;
+        } else
+          this.traff.orig = this.convertBySizeFrom(
+            this.convertByTimeFrom(val.cost, val.t_unit),
+            val.s_unit
+          );
+      },
+    },
   },
   methods: {
     async sync() {
@@ -336,6 +394,15 @@ export default {
         cost: parseFloat(this.settings.SNAPSHOT_COST.body),
         unit: "sec",
         prev_unit: "sec",
+      };
+
+      this.traff = {
+        orig: parseFloat(this.settings.TRAFFIC_COST.body),
+        cost: parseFloat(this.settings.TRAFFIC_COST.body),
+        s_unit: "kb",
+        prev_s_unit: "kb",
+        t_unit: "sec",
+        prev_t_unit: "sec",
       };
 
       this.loading = false;
