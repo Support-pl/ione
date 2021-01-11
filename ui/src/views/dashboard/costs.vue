@@ -296,6 +296,7 @@
 </template>
 
 <script>
+
 import { mapGetters } from "vuex";
 
 export default {
@@ -617,7 +618,6 @@ export default {
       await this.syncSettings();
       this.reset(resets);
     },
-
     isJson(str) {
       try {
         JSON.parse(str);

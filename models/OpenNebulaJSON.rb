@@ -39,7 +39,7 @@ require 'OpenNebulaJSON/MarketPlaceAppJSON'
 
 module OpenNebula
     class Error
-        def to_json
+        def to_json defuq = nil
             error_hash = self.to_hash
 
             return JSON.pretty_generate error_hash
