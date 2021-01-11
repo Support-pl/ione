@@ -123,6 +123,22 @@
                   />
                 </a-col>
               </a-row>
+							<a-row v-if="DiskTyepsWithNoCost.length > 0">
+								<span class="warning">
+									<a-icon type="warning" />
+									WARNING:
+								</span>
+								You don't have prices to following disk types:
+								<template v-for="(type, index) in DiskTyepsWithNoCost">
+									<span :key='type' class='diskTypeToClick' @click="
+										() =>
+											$set(drive.types, type, { orig: 0, cost: 0 })
+									">
+										{{type}}
+									</span>
+									{{index == DiskTyepsWithNoCost.length-1? ".": ", "}}
+								</template>
+							</a-row>
             </a-collapse-panel>
             <a-collapse-panel key="public_ip" header="Public IP Cost">
               <a-row>
@@ -215,6 +231,7 @@ export default {
         gb: { div: 1000 },
       },
 
+			fullSettings: {},
       settings: {},
       loading: true,
 
@@ -228,7 +245,16 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["credentials"]),
+		...mapGetters(["credentials"]),
+		DISK_TYPES(){
+			return this.fullSettings.find( el => el.name == 'DISK_TYPES' ).body.split(',');
+		},
+		DISK_COSTS_KEYS(){
+			return Object.keys(this.drive.types);
+		},
+		DiskTyepsWithNoCost(){
+			return this.DISK_TYPES.filter( el => !this.DISK_COSTS_KEYS.includes(el) );
+		}
   },
   watch: {
     cpu: {
@@ -329,14 +355,14 @@ export default {
   },
   methods: {
     async sync() {
-      let settings_array = (
+      this.fullSettings = (
         await this.$axios({
           method: "get",
           url: "/settings",
           auth: this.credentials,
         })
-      ).data.response
-        .filter((element) => element.name.includes("_COST"))
+			).data.response;
+			let settings_array = this.fullSettings.filter((element) => element.name.includes("_COST"))
         .map((item) => {
           if (
             this.isJson(item.body) &&
@@ -442,3 +468,19 @@ export default {
   },
 };
 </script>
+
+<style>
+.warning{
+	color: #ff7600;
+}
+.warning i{
+	font-size: 1.2rem;
+}
+.diskTypeToClick{
+	color: #8649ff;
+	cursor: pointer;
+}
+.diskTypeToClick:hover{
+	text-decoration: underline;
+}
+</style>
