@@ -30,7 +30,7 @@
                   ></a-col
                 >
                 <a-col :span="12"
-                  ><a-button type="primary" @click="save(['cpu', 'ram'])"
+                  ><a-button type="primary" @click="save(['capacity'])"
                     >Save</a-button
                   ></a-col
                 >
@@ -455,6 +455,13 @@ export default {
   },
   methods: {
     async sync() {
+      await this.syncSettings();
+
+      this.reset(["cpu", "ram", "drive", "ip", "snap", "traff"]);
+
+      this.loading = false;
+    },
+    async syncSettings() {
       this.fullSettings = (
         await this.$axios({
           method: "get",
@@ -477,12 +484,7 @@ export default {
       for (let rec of settings_array) {
         this.settings[rec.name] = rec;
       }
-
-      this.reset(["cpu", "ram", "drive", "ip", "snap", "traff"]);
-
-      this.loading = false;
     },
-
     reset(objects) {
       let reseters = {
         cpu: () => {
@@ -545,8 +547,8 @@ export default {
             base: parseFloat(this.settings.TRAFFIC_COST.body),
             orig: parseFloat(this.settings.TRAFFIC_COST.body),
             cost: parseFloat(this.settings.TRAFFIC_COST.body),
-            s_unit: "kb",
-            prev_s_unit: "kb",
+            s_unit: "gb",
+            prev_s_unit: "gb",
             t_unit: "sec",
             prev_t_unit: "sec",
           };
@@ -555,6 +557,88 @@ export default {
       for (let obj of objects) {
         this[obj] = reseters[obj]();
       }
+    },
+    async save(objects) {
+      let modifiers = {
+        capacity: () => {
+          return {
+            r: ["cpu", "ram"],
+            d: {
+              CAPACITY_COST: {
+                body: JSON.stringify({
+                  CPU_COST: this.cpu.base,
+                  MEMORY_COST: this.ram.base,
+                }),
+              },
+            },
+          };
+        },
+        drive: () => {
+          let res = {};
+          for (let [type, data] of Object.entries(this.drive.types)) {
+            res[type] = data.base;
+          }
+          return {
+            r: ["drive"],
+            d: {
+              DISK_COSTS: {
+                body: JSON.stringify(res),
+              },
+            },
+          };
+        },
+        ip: () => {
+          return {
+            r: ["ip"],
+            d: {
+              PUBLIC_IP_COST: {
+                body: JSON.stringify(this.ip.base),
+              },
+            },
+          };
+        },
+        snap: () => {
+          return {
+            r: ["snap"],
+            d: {
+              SNAPSHOT_COST: {
+                body: JSON.stringify(this.snap.base),
+              },
+            },
+          };
+        },
+        traff: () => {
+          return {
+            r: ["traff"],
+            d: {
+              TRAFFIC_COST: {
+                body: JSON.stringify(this.traff.base),
+              },
+            },
+          };
+        },
+      };
+      let changes = {};
+      let resets = [];
+      for (let obj of objects) {
+        let r = modifiers[obj]();
+        changes = { ...changes, ...r.d };
+        resets = [...resets, ...r.r];
+      }
+      let promises = [];
+      for (let [key, body] of Object.entries(changes)) {
+        promises.push(
+          this.$axios({
+            method: "post",
+            url: `/settings/${key}`,
+            auth: this.credentials,
+            data: body,
+          })
+        );
+      }
+      Promise.all(promises);
+      await this.syncSettings();
+      this.reset(resets);
     },
 
     isJson(str) {
