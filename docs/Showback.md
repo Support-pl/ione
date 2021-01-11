@@ -29,6 +29,6 @@ Traffic is being biller in 24h periods. Which means that you won't get bill imme
 |   RAM    |  GB / sec   |
 |  DRIVE   |  GB / sec   |
 |    IP    |  Addr / sec |
-| Traffic  |   kB / sec  |
+| Traffic  |   GB / sec  |
 | Snapshot |  Snap / sec |
 
