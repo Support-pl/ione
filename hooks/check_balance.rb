@@ -67,7 +67,7 @@ $db = Sequel.connect({
 conf = $db[:settings].as_hash(:name, :body)
 
 capacity = JSON.parse(conf['CAPACITY_COST'])
-vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i
+vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i / 1000
 
 if balance < vm_price * 86400 then
     puts "User balance isn't enough to deploy this VM, deleting..."

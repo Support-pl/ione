@@ -11,7 +11,7 @@ class CapacityBiller < Biller
                 r
             end
         if costs > 0 then
-            @cost = @costs['CPU_COST'].to_f * @vm['//TEMPLATE/VCPU'].to_i + @costs['MEMORY_COST'].to_f * @vm['//TEMPLATE/MEMORY'].to_i
+            @cost = @costs['CPU_COST'].to_f * @vm['//TEMPLATE/VCPU'].to_i + @costs['MEMORY_COST'].to_f * @vm['//TEMPLATE/MEMORY'].to_i / 1000
             return true
         end
 
