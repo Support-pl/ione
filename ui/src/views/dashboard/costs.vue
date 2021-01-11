@@ -198,16 +198,8 @@
               </a-row>
               <a-row>
                 <a-col :span="20">
-                  <a-input v-model="ip.cost">
-                    <a-select slot="addonAfter" v-model="ip.unit">
-                      <a-select-option
-                        :value="unit"
-                        v-for="unit in Object.keys(t_units)"
-                        :key="unit"
-                      >
-                        1 Address / {{ unit }}
-                      </a-select-option>
-                    </a-select>
+                  <a-input v-model="ip.base">
+                    <span slot="addonAfter"> 1 Address / month </span>
                   </a-input>
                 </a-col>
               </a-row>
@@ -411,17 +403,6 @@ export default {
         }
       },
     },
-    ip: {
-      deep: true,
-      immediate: true,
-      handler(val) {
-        if (!val || !val.unit) return;
-        if (val.prev_unit != val.unit) {
-          this.ip.cost = this.convertByTimeTo(val.base, val.unit);
-          this.ip.prev_unit = val.unit;
-        } else this.ip.base = this.convertByTimeFrom(val.cost, val.unit);
-      },
-    },
     snap: {
       deep: true,
       immediate: true,
@@ -472,12 +453,10 @@ export default {
       let settings_array = this.fullSettings
         .filter((element) => element.name.includes("_COST"))
         .map((item) => {
-          if (
-            this.isJson(item.body) &&
-            (~item.body.indexOf("[") || ~item.body.indexOf("{"))
-          ) {
+          try {
             item.value = JSON.parse(item.body);
-          }
+            // eslint-disable-next-line no-empty
+          } catch {}
           return item;
         });
       this.settings = {};
@@ -528,9 +507,6 @@ export default {
           return {
             base: parseFloat(this.settings.PUBLIC_IP_COST.body),
             orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
-            cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
-            unit: "sec",
-            prev_unit: "sec",
           };
         },
         snap: () => {
@@ -592,7 +568,7 @@ export default {
             r: ["ip"],
             d: {
               PUBLIC_IP_COST: {
-                body: JSON.stringify(this.ip.base),
+                body: this.ip.base,
               },
             },
           };
@@ -636,7 +612,8 @@ export default {
           })
         );
       }
-      Promise.all(promises);
+      await Promise.all(promises);
+      console.log("syncing");
       await this.syncSettings();
       this.reset(resets);
     },
