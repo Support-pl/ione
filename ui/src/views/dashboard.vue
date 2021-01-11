@@ -1,5 +1,5 @@
 <template>
-  <a-layout>
+  <a-layout style="min-height: 100%">
     <a-layout-header class="header"><h1>IONe</h1></a-layout-header>
     <a-layout>
       <a-layout-sider>
