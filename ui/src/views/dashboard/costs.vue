@@ -241,9 +241,9 @@ export default {
         day: { div: 86400 },
       },
       s_units: {
-        kb: { div: 0.001 },
-        mb: { div: 1 },
-        gb: { div: 1000 },
+        kb: { div: 0.000001 },
+        mb: { div: 0.001 },
+        gb: { div: 1 },
       },
 
       fullSettings: {},
