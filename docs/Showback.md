@@ -23,12 +23,12 @@ Traffic is being biller in 24h periods. Which means that you won't get bill imme
 
 ## Costs units
 
-|  Field   |    Units    |
-|----------|-------------|
-|   CPU    | Core / sec  |
-|   RAM    |  GB / sec   |
-|  DRIVE   |  GB / sec   |
-|    IP    |  Addr / sec |
-| Traffic  |   GB / sec  |
-| Snapshot |  Snap / sec |
+|  Field   |      Units      |
+|----------|-----------------|
+|   CPU    |   Core / sec    |
+|   RAM    |    GB / sec     |
+|  DRIVE   |    GB / sec     |
+|    IP    |    Addr / month |
+| Traffic  |     GB / sec    |
+| Snapshot |    Snap / sec   |
 
