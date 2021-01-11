@@ -16,7 +16,25 @@
               'traffic',
             ]"
           >
-            <a-collapse-panel key="capacity" header="Capacity costs">
+            <a-collapse-panel disabled key="capacity" header="Capacity costs">
+              <a-row
+                class="cost-panel-extra"
+                slot="extra"
+                :gutter="10"
+                v-if="changed.includes('cpu') || changed.includes('ram')"
+              >
+                <a-col :span="12"
+                  ><a-button
+                    @click="(e) => e.preventDefault() || reset(['cpu', 'ram'])"
+                    >Reset</a-button
+                  ></a-col
+                >
+                <a-col :span="12"
+                  ><a-button type="primary" @click="save(['cpu', 'ram'])"
+                    >Save</a-button
+                  ></a-col
+                >
+              </a-row>
               <a-row style="margin-bottom: 10px">
                 <a-col :span="2"> CPU </a-col>
                 <a-col :span="20">
@@ -62,20 +80,25 @@
               </a-row>
             </a-collapse-panel>
             <a-collapse-panel
+              disabled
               key="drives"
               header="Drives costs"
               v-if="Object.keys(drive).length > 0"
             >
-              <a-tooltip
-                slot="extra"
-                v-if="DiskTypesWithNoCost.length > 0"
-                placement="topRight"
-              >
-                <template slot="title">
-                  Some disk types don't have prices set
-                </template>
-                <a-icon type="warning" style="color: #ff7600" />
-              </a-tooltip>
+              <a-row class="cost-panel-extra" slot="extra" :gutter="10">
+                <a-col :span="12" v-if="drive.changed"
+                  ><a-button
+                    @click="(e) => e.preventDefault() || reset(['drive'])"
+                    >Reset</a-button
+                  ></a-col
+                >
+                <a-col :span="12" v-if="drive.changed"
+                  ><a-button type="primary" @click="save(['drive'])"
+                    >Save</a-button
+                  ></a-col
+                >
+              </a-row>
+
               <a-row
                 v-for="[type, data] in Object.entries(drive.types)"
                 :key="type"
@@ -155,7 +178,24 @@
                 </template>
               </a-row>
             </a-collapse-panel>
-            <a-collapse-panel key="public_ip" header="Public IP Cost">
+            <a-collapse-panel disabled key="public_ip" header="Public IP Cost">
+              <a-row
+                class="cost-panel-extra"
+                slot="extra"
+                :gutter="10"
+                v-if="changed.includes('ip')"
+              >
+                <a-col :span="12"
+                  ><a-button @click="(e) => e.preventDefault() || reset(['ip'])"
+                    >Reset</a-button
+                  ></a-col
+                >
+                <a-col :span="12"
+                  ><a-button type="primary" @click="save(['ip'])"
+                    >Save</a-button
+                  ></a-col
+                >
+              </a-row>
               <a-row>
                 <a-col :span="20">
                   <a-input v-model="ip.cost">
@@ -172,7 +212,25 @@
                 </a-col>
               </a-row>
             </a-collapse-panel>
-            <a-collapse-panel key="snapshot" header="Snapshot Cost">
+            <a-collapse-panel disabled key="snapshot" header="Snapshot Cost">
+              <a-row
+                class="cost-panel-extra"
+                slot="extra"
+                :gutter="10"
+                v-if="changed.includes('snap')"
+              >
+                <a-col :span="12"
+                  ><a-button
+                    @click="(e) => e.preventDefault() || reset(['snap'])"
+                    >Reset</a-button
+                  ></a-col
+                >
+                <a-col :span="12"
+                  ><a-button type="primary" @click="save(['snap'])"
+                    >Save</a-button
+                  ></a-col
+                >
+              </a-row>
               <a-row>
                 <a-col :span="20">
                   <a-input v-model="snap.cost">
@@ -189,7 +247,25 @@
                 </a-col>
               </a-row>
             </a-collapse-panel>
-            <a-collapse-panel key="traffic" header="Traffic Cost">
+            <a-collapse-panel disabled key="traffic" header="Traffic Cost">
+              <a-row
+                class="cost-panel-extra"
+                slot="extra"
+                :gutter="10"
+                v-if="changed.includes('traff')"
+              >
+                <a-col :span="12"
+                  ><a-button
+                    @click="(e) => e.preventDefault() || reset(['traff'])"
+                    >Reset</a-button
+                  ></a-col
+                >
+                <a-col :span="12"
+                  ><a-button type="primary" @click="save(['traff'])"
+                    >Save</a-button
+                  ></a-col
+                >
+              </a-row>
               <a-row>
                 <a-col :span="20">
                   <a-input v-model="traff.cost">
@@ -272,6 +348,11 @@ export default {
     DiskTypesWithNoCost() {
       return this.DISK_TYPES.filter((el) => !this.DISK_COSTS_KEYS.includes(el));
     },
+    changed() {
+      return ["cpu", "ram", "ip", "snap", "traff"].filter(
+        (obj) => this[obj].base != this[obj].orig
+      );
+    },
   },
   watch: {
     cpu: {
@@ -324,6 +405,8 @@ export default {
               this.convertByTimeFrom(this.drive.types[type].cost, val.t_unit),
               val.s_unit
             );
+            if (this.drive.types[type].base != this.drive.types[type].orig)
+              this.drive.changed = true;
           }
         }
       },
@@ -395,67 +478,83 @@ export default {
         this.settings[rec.name] = rec;
       }
 
-      this.cpu = {
-        base: this.settings.CAPACITY_COST.value.CPU_COST,
-        orig: this.settings.CAPACITY_COST.value.CPU_COST,
-        cost: this.settings.CAPACITY_COST.value.CPU_COST,
-        unit: "sec",
-        prev_unit: "sec",
-      };
-
-      this.ram = {
-        base: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
-        orig: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
-        cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
-        s_unit: "gb",
-        prev_s_unit: "gb",
-        t_unit: "sec",
-        prev_t_unit: "sec",
-      };
-
-      let drive = {
-        s_unit: "gb",
-        prev_s_unit: "gb",
-        t_unit: "sec",
-        prev_t_unit: "sec",
-        types: this.settings.DISK_COSTS.value,
-      };
-      for (let [type, orig] of Object.entries(drive.types)) {
-        drive.types[type] = {
-          base: parseFloat(orig),
-          orig: parseFloat(orig),
-          cost: orig,
-        };
-      }
-      this.drive = drive;
-
-      this.ip = {
-        base: parseFloat(this.settings.PUBLIC_IP_COST.body),
-        orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
-        cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
-        unit: "sec",
-        prev_unit: "sec",
-      };
-
-      this.snap = {
-        base: parseFloat(this.settings.SNAPSHOT_COST.body),
-        orig: parseFloat(this.settings.SNAPSHOT_COST.body),
-        cost: parseFloat(this.settings.SNAPSHOT_COST.body),
-        unit: "sec",
-        prev_unit: "sec",
-      };
-
-      this.traff = {
-        base: parseFloat(this.settings.TRAFFIC_COST.body),
-        orig: parseFloat(this.settings.TRAFFIC_COST.body),
-        cost: parseFloat(this.settings.TRAFFIC_COST.body),
-        s_unit: "kb",
-        prev_s_unit: "kb",
-        t_unit: "sec",
-        prev_t_unit: "sec",
-      };
+      this.reset(["cpu", "ram", "drive", "ip", "snap", "traff"]);
 
       this.loading = false;
+    },
+
+    reset(objects) {
+      let reseters = {
+        cpu: () => {
+          return {
+            base: this.settings.CAPACITY_COST.value.CPU_COST,
+            orig: this.settings.CAPACITY_COST.value.CPU_COST,
+            cost: this.settings.CAPACITY_COST.value.CPU_COST,
+            unit: "sec",
+            prev_unit: "sec",
+          };
+        },
+        ram: () => {
+          return {
+            base: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
+            orig: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
+            cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
+            s_unit: "gb",
+            prev_s_unit: "gb",
+            t_unit: "sec",
+            prev_t_unit: "sec",
+          };
+        },
+        drive: () => {
+          let drive = {
+            s_unit: "gb",
+            prev_s_unit: "gb",
+            t_unit: "sec",
+            prev_t_unit: "sec",
+            types: this.settings.DISK_COSTS.value,
+          };
+          for (let [type, orig] of Object.entries(drive.types)) {
+            drive.types[type] = {
+              base: parseFloat(orig),
+              orig: parseFloat(orig),
+              cost: orig,
+            };
+          }
+          return drive;
+        },
+        ip: () => {
+          return {
+            base: parseFloat(this.settings.PUBLIC_IP_COST.body),
+            orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
+            cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
+            unit: "sec",
+            prev_unit: "sec",
+          };
+        },
+        snap: () => {
+          return {
+            base: parseFloat(this.settings.SNAPSHOT_COST.body),
+            orig: parseFloat(this.settings.SNAPSHOT_COST.body),
+            cost: parseFloat(this.settings.SNAPSHOT_COST.body),
+            unit: "sec",
+            prev_unit: "sec",
+          };
+        },
+        traff: () => {
+          return {
+            base: parseFloat(this.settings.TRAFFIC_COST.body),
+            orig: parseFloat(this.settings.TRAFFIC_COST.body),
+            cost: parseFloat(this.settings.TRAFFIC_COST.body),
+            s_unit: "kb",
+            prev_s_unit: "kb",
+            t_unit: "sec",
+            prev_t_unit: "sec",
+          };
+        },
+      };
+      for (let obj of objects) {
+        this[obj] = reseters[obj]();
+      }
     },
 
     isJson(str) {
@@ -506,5 +605,15 @@ export default {
 }
 .diskTypeToClick:hover {
   text-decoration: underline;
+}
+.cost-panel-extra button.ant-btn {
+  height: 24px;
+  width: 72px;
+}
+</style>
+<style scoped>
+.ant-collapse .ant-collapse-item-disabled > .ant-collapse-header,
+.ant-collapse .ant-collapse-item-disabled > .ant-collapse-header > .arrow {
+  color: rgba(0, 0, 0, 0.85) !important;
 }
 </style>
