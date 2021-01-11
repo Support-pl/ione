@@ -20,3 +20,15 @@ In order to enable it, you should do following steps:
 
 After doing this, you should begin getting traffic showback.
 Traffic is being biller in 24h periods. Which means that you won't get bill immediately unless every step except step 2 has been already completed.
+
+## Costs units
+
+|  Field   |    Units    |
+|----------|-------------|
+|   CPU    | Core / sec  |
+|   RAM    |  GB / sec   |
+|  DRIVE   |  GB / sec   |
+|    IP    |  Addr / sec |
+| Traffic  |   kB / sec  |
+| Snapshot |  Snap / sec |
+
