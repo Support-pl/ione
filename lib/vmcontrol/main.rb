@@ -109,10 +109,9 @@ class IONe
         user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
-                LOG "Unsuspending VM##{vm.id}", "Unsuspend"
-                trace << "Unlocking VM:#{__LINE__ + 1}"         
-                vm.unlock 
-                trace << "Resuming VM:#{__LINE__ + 1}"                
+                LOG "Unlocking VM##{vm.id}", "Unsuspend"
+                vm.unlock
+                LOG "Resuming VM##{vm.id}", "Unsuspend"
                 vm.resume
             rescue => e
                 LOG "Error occured while unsuspending VM##{vm.id}\nCheck Debug log for error-codes and backtrace", "Unsuspend"
