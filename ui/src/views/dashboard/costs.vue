@@ -610,10 +610,7 @@ export default {
   height: 24px;
   width: 72px;
 }
-</style>
-<style scoped>
-.ant-collapse .ant-collapse-item-disabled > .ant-collapse-header,
-.ant-collapse .ant-collapse-item-disabled > .ant-collapse-header > .arrow {
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
   color: rgba(0, 0, 0, 0.85) !important;
 }
 </style>
