@@ -74,7 +74,7 @@
                 <template slot="title">
                   Some disk types don't have prices set
                 </template>
-                <a-icon type="warning" />
+                <a-icon type="warning" style="color: #ff7600" />
               </a-tooltip>
               <a-row
                 v-for="[type, data] in Object.entries(drive.types)"
