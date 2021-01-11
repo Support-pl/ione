@@ -4,13 +4,18 @@ class CapacityBiller < Biller
         @costs = JSON.parse(costs['CAPACITY_COST'])
         return false if @costs.nil?
 
-        @cost = 
+        costs = 
             @costs.values.inject(0) do | r, c |
                 r += c.to_f
             rescue
                 r
             end
-        return @cost > 0
+        if costs > 0 then
+            @cost = @costs['CPU_COST'].to_f * @vm['//TEMPLATE/VCPU'].to_i + @costs['MEMORY_COST'].to_f * @vm['//TEMPLATE/MEMORY'].to_i
+            return true
+        end
+
+        return false
     rescue
         return false
     end
