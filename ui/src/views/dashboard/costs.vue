@@ -68,7 +68,7 @@
             >
               <a-tooltip
                 slot="extra"
-                v-if="DiskTyepsWithNoCost.length > 0"
+                v-if="DiskTypesWithNoCost.length > 0"
                 placement="topRight"
               >
                 <template slot="title">
@@ -137,13 +137,13 @@
                   />
                 </a-col>
               </a-row>
-              <a-row v-if="DiskTyepsWithNoCost.length > 0">
+              <a-row v-if="DiskTypesWithNoCost.length > 0">
                 <span class="warning">
                   <a-icon type="warning" />
                   WARNING:
                 </span>
                 You don't have prices to following disk types:
-                <template v-for="(type, index) in DiskTyepsWithNoCost">
+                <template v-for="(type, index) in DiskTypesWithNoCost">
                   <span
                     :key="type"
                     class="diskTypeToClick"
@@ -151,7 +151,7 @@
                   >
                     {{ type }}
                   </span>
-                  {{ index == DiskTyepsWithNoCost.length - 1 ? "." : ", " }}
+                  {{ index == DiskTypesWithNoCost.length - 1 ? "." : ", " }}
                 </template>
               </a-row>
             </a-collapse-panel>
@@ -269,7 +269,7 @@ export default {
     DISK_COSTS_KEYS() {
       return Object.keys(this.drive.types);
     },
-    DiskTyepsWithNoCost() {
+    DiskTypesWithNoCost() {
       return this.DISK_TYPES.filter((el) => !this.DISK_COSTS_KEYS.includes(el));
     },
   },
