@@ -165,7 +165,7 @@
                   <a-icon type="warning" />
                   WARNING:
                 </span>
-                You don't have prices to following disk types:
+                You don't have prices for following disk types:
                 <template v-for="(type, index) in DiskTypesWithNoCost">
                   <span
                     :key="type"
@@ -296,7 +296,6 @@
 </template>
 
 <script>
-
 import { mapGetters } from "vuex";
 
 export default {
