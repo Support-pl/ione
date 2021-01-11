@@ -403,7 +403,7 @@ export default {
       };
 
       this.ram = {
-        orig: this.settings.CAPACITY_COST.value.MEMORY_COST,
+        orig: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
         cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
         s_unit: "gb",
         prev_s_unit: "gb",
@@ -420,7 +420,7 @@ export default {
       };
       for (let [type, orig] of Object.entries(drive.types)) {
         drive.types[type] = {
-          orig: orig,
+          orig: parseFloat(orig),
           cost: orig,
         };
       }
