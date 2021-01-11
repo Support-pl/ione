@@ -132,7 +132,7 @@
                     icon="save"
                     @click="
                       () =>
-                        $set(drive.types, new_drive_type, { orig: 0, cost: 0 })
+                        $set(drive.types, new_drive_type, { base: 0, cost: 0 })
                     "
                   />
                 </a-col>
@@ -147,7 +147,7 @@
                   <span
                     :key="type"
                     class="diskTypeToClick"
-                    @click="() => $set(drive.types, type, { orig: 0, cost: 0 })"
+                    @click="() => $set(drive.types, type, { base: 0, cost: 0 })"
                   >
                     {{ type }}
                   </span>
@@ -280,9 +280,9 @@ export default {
       handler(val) {
         if (!val || !val.unit) return;
         if (val.prev_unit != val.unit) {
-          this.cpu.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.cpu.cost = this.convertByTimeTo(val.base, val.unit);
           this.cpu.prev_unit = val.unit;
-        } else this.cpu.orig = this.convertByTimeFrom(val.cost, val.unit);
+        } else this.cpu.base = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
     ram: {
@@ -292,13 +292,13 @@ export default {
         if (!val || !val.t_unit || !val.s_unit) return;
         if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
           this.ram.cost = this.convertBySizeTo(
-            this.convertByTimeTo(val.orig, val.t_unit),
+            this.convertByTimeTo(val.base, val.t_unit),
             val.s_unit
           );
           this.ram.prev_s_unit = val.s_unit;
           this.ram.prev_t_unit = val.t_unit;
         } else
-          this.ram.orig = this.convertBySizeFrom(
+          this.ram.base = this.convertBySizeFrom(
             this.convertByTimeFrom(val.cost, val.t_unit),
             val.s_unit
           );
@@ -312,7 +312,7 @@ export default {
         if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
           for (let type of Object.keys(val.types)) {
             this.drive.types[type].cost = this.convertBySizeTo(
-              this.convertByTimeTo(this.drive.types[type].orig, val.t_unit),
+              this.convertByTimeTo(this.drive.types[type].base, val.t_unit),
               val.s_unit
             );
           }
@@ -320,7 +320,7 @@ export default {
           this.drive.prev_t_unit = val.t_unit;
         } else {
           for (let type of Object.keys(val.types)) {
-            this.drive.types[type].orig = this.convertBySizeFrom(
+            this.drive.types[type].base = this.convertBySizeFrom(
               this.convertByTimeFrom(this.drive.types[type].cost, val.t_unit),
               val.s_unit
             );
@@ -334,9 +334,9 @@ export default {
       handler(val) {
         if (!val || !val.unit) return;
         if (val.prev_unit != val.unit) {
-          this.ip.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.ip.cost = this.convertByTimeTo(val.base, val.unit);
           this.ip.prev_unit = val.unit;
-        } else this.ip.orig = this.convertByTimeFrom(val.cost, val.unit);
+        } else this.ip.base = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
     snap: {
@@ -345,9 +345,9 @@ export default {
       handler(val) {
         if (!val || !val.unit) return;
         if (val.prev_unit != val.unit) {
-          this.snap.cost = this.convertByTimeTo(val.orig, val.unit);
+          this.snap.cost = this.convertByTimeTo(val.base, val.unit);
           this.snap.prev_unit = val.unit;
-        } else this.snap.orig = this.convertByTimeFrom(val.cost, val.unit);
+        } else this.snap.base = this.convertByTimeFrom(val.cost, val.unit);
       },
     },
     traff: {
@@ -357,13 +357,13 @@ export default {
         if (!val || !val.t_unit || !val.s_unit) return;
         if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
           this.traff.cost = this.convertBySizeTo(
-            this.convertByTimeTo(val.orig, val.t_unit),
+            this.convertByTimeTo(val.base, val.t_unit),
             val.s_unit
           );
           this.traff.prev_s_unit = val.s_unit;
           this.traff.prev_t_unit = val.t_unit;
         } else
-          this.traff.orig = this.convertBySizeFrom(
+          this.traff.base = this.convertBySizeFrom(
             this.convertByTimeFrom(val.cost, val.t_unit),
             val.s_unit
           );
@@ -396,6 +396,7 @@ export default {
       }
 
       this.cpu = {
+        base: this.settings.CAPACITY_COST.value.CPU_COST,
         orig: this.settings.CAPACITY_COST.value.CPU_COST,
         cost: this.settings.CAPACITY_COST.value.CPU_COST,
         unit: "sec",
@@ -403,6 +404,7 @@ export default {
       };
 
       this.ram = {
+        base: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
         orig: parseFloat(this.settings.CAPACITY_COST.value.MEMORY_COST),
         cost: this.settings.CAPACITY_COST.value.MEMORY_COST,
         s_unit: "gb",
@@ -420,6 +422,7 @@ export default {
       };
       for (let [type, orig] of Object.entries(drive.types)) {
         drive.types[type] = {
+          base: parseFloat(orig),
           orig: parseFloat(orig),
           cost: orig,
         };
@@ -427,6 +430,7 @@ export default {
       this.drive = drive;
 
       this.ip = {
+        base: parseFloat(this.settings.PUBLIC_IP_COST.body),
         orig: parseFloat(this.settings.PUBLIC_IP_COST.body),
         cost: parseFloat(this.settings.PUBLIC_IP_COST.body),
         unit: "sec",
@@ -434,6 +438,7 @@ export default {
       };
 
       this.snap = {
+        base: parseFloat(this.settings.SNAPSHOT_COST.body),
         orig: parseFloat(this.settings.SNAPSHOT_COST.body),
         cost: parseFloat(this.settings.SNAPSHOT_COST.body),
         unit: "sec",
@@ -441,6 +446,7 @@ export default {
       };
 
       this.traff = {
+        base: parseFloat(this.settings.TRAFFIC_COST.body),
         orig: parseFloat(this.settings.TRAFFIC_COST.body),
         cost: parseFloat(this.settings.TRAFFIC_COST.body),
         s_unit: "kb",
