@@ -75,7 +75,7 @@ class OpenNebula::TrafficRecords < RecordsSource
         # Next block does generate hash structure like { timestamp => {rx, tx} }
         mon_raw = vm.monitoring(['NETTX', 'NETRX'])
         return 0 if OpenNebula.is_error? mon_raw
-        
+
         mon = {}
         mon_raw['NETTX'].each do | el |
             el[0] = el[0].to_i
@@ -119,7 +119,7 @@ class OpenNebula::TrafficRecords < RecordsSource
         if last[:etime] - last[:stime] >= 86400 then # If record is elder than 24 hours
             args = last.values.without(:key, :rx, :tx, :stime)
             args.merge! rx: 0, tx: 0, stime: args[:etime] # Setting up new record with zero rx, tx and same rx_last, tx_last
-            TrafficRecord.insert(**args.without(:etime))
+            TrafficRecord.insert(**args)
         end
 
         @records.exclude(etime: nil).exclude{ etime - stime < 86400 }.where(etime: st..et) # All Records between given time and elder than 24h

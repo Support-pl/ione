@@ -46,5 +46,5 @@ $db = Sequel.connect({
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
 $db[:traffic_records].insert(
-    vm: vmid, rx: "0", tx: "0", rx_last: "0", tx_last: "0", stime: Time.now.to_i
+    vm: vmid, rx: "0", tx: "0", rx_last: "0", tx_last: "0", stime: Time.now.to_i, etime: Time.now.to_i
 )
