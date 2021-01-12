@@ -105,7 +105,6 @@ class OpenNebula::TrafficRecords < RecordsSource
             last[:etime] = ts
         end
 
-        last = last.to_s
         TrafficRecord.where(stime: last[:stime]).update(**last.values) # Write down updated data
 
         mon.keys.size # Just for logs
