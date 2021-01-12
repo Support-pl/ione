@@ -19,6 +19,7 @@ begin
         ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
         ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
         ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 1, "num"],
+        ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "num"],
         ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 1, "num"]
     ]
     required.each do | record |

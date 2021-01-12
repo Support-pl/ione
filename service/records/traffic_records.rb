@@ -52,6 +52,7 @@ class OpenNebula::TrafficRecords < RecordsSource
 
     def initialize id, nosync = false
         super(TrafficRecord, id)
+        @bill_freq = SETTINGS_TABLE.where(name: 'TRAFFIC_BILL_FREQ').to_a.last[:body].to_i
         sync unless nosync
     end
 
@@ -116,7 +117,7 @@ class OpenNebula::TrafficRecords < RecordsSource
     def find st, et
         last = TrafficRecord.where(vm: @id).order(Sequel.asc(:stime)).last
         return EmptyQuery.new if last.nil? # EmptyQuerySet for Biller
-        if last[:etime] - last[:stime] >= 86400 then # If record is elder than 24 hours
+        if last[:etime] - last[:stime] >= @bill_freq then # If record is elder than 24 hours
             args = last.values.without(:key, :rx, :tx, :stime)
             args.merge! rx: 0, tx: 0, stime: args[:etime] # Setting up new record with zero rx, tx and same rx_last, tx_last
             TrafficRecord.insert(**args)
