@@ -65,7 +65,10 @@ class OpenNebula::TrafficRecords < RecordsSource
 
         last = TrafficRecord.where(vm: vm.id).order(Sequel.asc(:stime)).last # Get last Trafficrecord
         if last.nil? then # Give up if nil
-            return 0
+            TrafficRecord.insert(
+                vm: @id, rx: "0", tx: "0", rx_last: "0", tx_last: "0", stime: 0, etime: 0
+            )
+            last = TrafficRecord.where(vm: vm.id).order(Sequel.asc(:stime)).last # Get last Trafficrecord
         end
         last = last.to_i # @see TrafficRecord#to_i
 
