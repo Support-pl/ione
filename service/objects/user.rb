@@ -79,11 +79,15 @@ class OpenNebula::User
                 etime = etime_req
             end
 
-            stime = Time.at(stime).to_datetime
-            first = Time.at(first).to_datetime
-            etime = Time.at(etime).to_datetime
-            current, periods = stime > first ? stime : first, 0
+            stime   = Time.at(stime).to_datetime
+            current = Time.at(first).to_datetime
+            etime   = Time.at(etime).to_datetime
 
+            while current < stime do
+                current = current >> 1
+            end
+            
+            periods = 0
             while current <= etime do
                 periods += 1
                 current = current >> 1
