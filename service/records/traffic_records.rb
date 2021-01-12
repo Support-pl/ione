@@ -74,6 +74,8 @@ class OpenNebula::TrafficRecords < RecordsSource
 
         # Next block does generate hash structure like { timestamp => {rx, tx} }
         mon_raw = vm.monitoring(['NETTX', 'NETRX'])
+        return 0 if OpenNebula.is_error? mon_raw
+        
         mon = {}
         mon_raw['NETTX'].each do | el |
             el[0] = el[0].to_i
