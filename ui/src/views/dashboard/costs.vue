@@ -273,16 +273,6 @@
                           >GB</a-select-option
                         >
                       </a-select>
-                      /
-                      <a-select v-model="traff.t_unit">
-                        <a-select-option
-                          :value="unit"
-                          v-for="unit in Object.keys(t_units)"
-                          :key="unit"
-                        >
-                          {{ unit }}
-                        </a-select-option>
-                      </a-select>
                     </div>
                   </a-input>
                 </a-col>
@@ -418,19 +408,11 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        if (!val || !val.t_unit || !val.s_unit) return;
-        if (val.prev_s_unit != val.s_unit || val.prev_t_unit != val.t_unit) {
-          this.traff.cost = this.convertBySizeTo(
-            this.convertByTimeTo(val.base, val.t_unit),
-            val.s_unit
-          );
+        if (!val || !val.s_unit) return;
+        if (val.prev_s_unit != val.s_unit) {
+          this.traff.cost = this.convertBySizeTo(val.base, val.s_unit);
           this.traff.prev_s_unit = val.s_unit;
-          this.traff.prev_t_unit = val.t_unit;
-        } else
-          this.traff.base = this.convertBySizeFrom(
-            this.convertByTimeFrom(val.cost, val.t_unit),
-            val.s_unit
-          );
+        } else this.traff.base = this.convertBySizeFrom(val.cost, val.s_unit);
       },
     },
   },
@@ -525,8 +507,6 @@ export default {
             cost: parseFloat(this.settings.TRAFFIC_COST.body),
             s_unit: "gb",
             prev_s_unit: "gb",
-            t_unit: "sec",
-            prev_t_unit: "sec",
           };
         },
       };
