@@ -18,7 +18,7 @@ task :install_gems => :before do
     puts "Following packages are going to be installed:\n\t@sys_packages.join(' ')\nProceed? (y/n) "
     a = nil
     until %w(y n).include? a do
-        a = gets.downcase.strip
+        a = STDIN.gets.downcase.strip
     end
     exit 0 if a == 'n'
     puts "Installing..."
