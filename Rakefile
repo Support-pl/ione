@@ -54,7 +54,7 @@ load "rake/set_hooks.rake"
 load "rake/test_install.rake"
 
 desc "Full IONe Installation"
-task :install => [:before, :useful_questions, :install_gems, :install_ione, :install_ui, :configure_nginx, :hooks] do
+task :install => [:before, :useful_questions, :install_gems, :install_ione,  :hooks, :install_ui, :configure_nginx] do
     $messages << <<-EOF
       Thanks, for installation and choosing us!   
     Configure ione with ione.conf & IONe UI and test install with: rake test_install
