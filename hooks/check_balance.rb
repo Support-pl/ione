@@ -48,9 +48,10 @@ vm.info!
 
 u = User.new_with_id vm['UID'].to_i, Client.new
 u.info!
-balance = u['TEMPLATE/BALANCE'].to_f
 
-vm.recover 3 if balance == 0
+exit 0 if u.groups.include? 0
+
+balance = u['TEMPLATE/BALANCE'].to_f
 
 require 'yaml'
 require 'json'
@@ -65,6 +66,8 @@ $db = Sequel.connect({
         database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
 
 conf = $db[:settings].as_hash(:name, :body)
+
+vm.recover 3 if balance == 0 && u.groups.include? conf['IAAS_GROUP_ID'].to_i
 
 capacity = JSON.parse(conf['CAPACITY_COST'])
 vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i / 1000
