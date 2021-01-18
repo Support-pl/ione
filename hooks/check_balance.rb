@@ -43,7 +43,6 @@ require 'opennebula'
 include OpenNebula
 
 vm = VirtualMachine.new_with_id(vmid, Client.new)
-vm.lock 0
 vm.info!
 
 u = User.new_with_id vm['UID'].to_i, Client.new
@@ -77,6 +76,5 @@ if balance < vm_price * 86400 then
     vm.recover 3
 else
     puts "User has enough balance, do whatever you want"
-    vm.unlock
 end
 
