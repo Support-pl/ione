@@ -432,4 +432,51 @@ class OpenNebula::VirtualMachine
             monitoring: monitoring(['NETTX', 'NETRX'])
         }
     end
+
+    # Generates VNC proxy token file
+    def start_vnc
+        info!
+
+        if self['TEMPLATE/GRAPHICS/TYPE'].nil? ||
+           !(["vnc", "spice"].include?(self['TEMPLATE/GRAPHICS/TYPE'].downcase))
+            return {error: "VM has no VNC configured"}
+        end
+
+        # Proxy data
+        host       = self['/VM/HISTORY_RECORDS/HISTORY[last()]/HOSTNAME']
+        vnc_port   = self['TEMPLATE/GRAPHICS/PORT']
+        vnc_pw     = self['TEMPLATE/GRAPHICS/PASSWD']
+
+        # If it is a vCenter VM
+        if self['USER_TEMPLATE/HYPERVISOR'] == "vcenter"
+            if self['MONITORING/VCENTER_ESX_HOST']
+                host = self['MONITORING/VCENTER_ESX_HOST']
+            else
+                return {error: "Could not determine the vCenter ESX host where the VM is running. Wait till the VCENTER_ESX_HOST attribute is retrieved once the host has been monitored"}
+            end
+        end
+
+        # Generate token random_str: host:port
+        random_str = rand(36**20).to_s(36) #random string a-z0-9 length 20
+        token = "#{random_str}: #{host}:#{vnc_port}"
+        token_file = 'one-'+self['ID']
+
+        # Create token file
+        begin
+            f = File.open(File.join('/var/lib/one/sunstone_vnc_tokens/', token_file), 'w')
+            f.write(token)
+            f.close
+        rescue Exception => e
+            return {error: "Cannot create VNC proxy token"}
+        end
+
+        return {
+            :token => random_str,
+            :vm_name => self['NAME']
+        }
+    end
+    # Deletes VNC proxy token file
+    def stop_vnc
+        File.delete(File.join('/var/lib/one/sunstone_vnc_tokens/', "one-#{id}"))
+    end
 end
