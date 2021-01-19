@@ -2,7 +2,7 @@ $messages = []
 
 task :before, [:silent] do | task, args |
 
-    @silent = args[:silent] == "-y"
+    @silent = args[:silent]
 
     whoami = `whoami`.chomp
     if whoami != 'root' then
@@ -21,7 +21,7 @@ end
 task :useful_questions do
     puts
     puts "IONe installer is going to overwrite your nginx configuration."
-    nginx = nil
+    nginx = @silent
     until ['y', 'n'].include? nginx do
         print "Do you want to continue? (y/n) "
         nginx = STDIN.gets.strip.downcase

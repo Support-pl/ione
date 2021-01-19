@@ -10,7 +10,7 @@ task :configure_nginx => [ :before, :useful_questions ] do
     
     puts
     print "Do you want installer to generate self-signed cert? (y/n) "
-    cert = nil
+    cert = @silent
     until ['y', 'n'].include? cert do
         cert = STDIN.gets.strip.downcase
     end
