@@ -1,8 +1,8 @@
 $messages = []
 
-task :before, [:silent] do | task, args |
-
+task :before, [:silent, :domain] do | task, args |
     @silent = args[:silent]
+    @domain = args[:domain]
 
     whoami = `whoami`.chomp
     if whoami != 'root' then
@@ -31,7 +31,6 @@ task :useful_questions do
         exit 0
     end
 
-    @domain = nil
     while @domain.nil?
         print "Please enter your base domain: "
         @domain = STDIN.gets.strip.downcase
@@ -47,6 +46,7 @@ task :useful_questions do
         a = STDIN.gets.strip.downcase
         @domain = nil unless a == 'y'
     end
+    puts "Using '#{@domain}' as base domain."
 end
 
 load "rake/install_gems.rake"
@@ -57,7 +57,7 @@ load "rake/set_hooks.rake"
 load "rake/test_install.rake"
 
 desc "Full IONe Installation"
-task :install, [:silent] => [:before, :useful_questions, :install_gems, :install_ione,  :hooks, :install_ui, :configure_nginx] do
+task :install, [:silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione,  :hooks, :install_ui, :configure_nginx] do
     $messages << <<-EOF
       Thanks, for installation and choosing us!   
     Configure ione with ione.conf & IONe UI and test install with: rake test_install
