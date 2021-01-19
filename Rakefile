@@ -1,6 +1,9 @@
 $messages = []
 
-task :before do
+task :before, [:silent] do | task, args |
+
+    @silent = args[:silent] == "-y"
+
     whoami = `whoami`.chomp
     if whoami != 'root' then
         puts "You must be root to run this installer."
