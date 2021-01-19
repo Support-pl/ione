@@ -17,14 +17,14 @@
         </span>
         <span slot="body" slot-scope="text, record">
           <a-input
-            v-if="record.editable && !selfEdit.includes(record.type)"
+            v-if="record.editable"
             style="margin: -5px 0"
             :value="text"
             @change="(e) => handleChange(e.target.value, record.name, 'body')"
             @keyup.enter="save(record.name)"
             @keyup.escape="cancel(record.name)"
           />
-          <component :is="types[record.type]" v-else :value="record" :edit="record.editable" />
+          <component :is="types[record.type]" v-else :value="record"/>
         </span>
         <span slot="actions" slot-scope="text, record">
           <a-space class="editable-row-operations">
