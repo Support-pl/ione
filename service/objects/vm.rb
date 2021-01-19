@@ -435,7 +435,9 @@ class OpenNebula::VirtualMachine
 
     # Generates VNC proxy token file
     def start_vnc
-        info!
+
+        r = info!
+        return { error: "No access to VM" } if OpenNebula.is_error? r
 
         if self['TEMPLATE/GRAPHICS/TYPE'].nil? ||
            !(["vnc", "spice"].include?(self['TEMPLATE/GRAPHICS/TYPE'].downcase))
