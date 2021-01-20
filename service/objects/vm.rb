@@ -393,7 +393,7 @@ class OpenNebula::VirtualMachine
     def snapshot_create name = ""
         info!
 
-        unless self['/VM/USER_TEMPLATE/SNAPSHOTS_ALLOWED'] == 'TRUE' then
+        if self['/VM/USER_TEMPLATE/SNAPSHOTS_ALLOWED'] != 'TRUE' && !IONe::Settings['SNAPSHOTS_ALLOWED_DEFAULT'] then
             return OpenNebula::Error.new("Snapshots aren't allowed for this VM. Set SNAPSHOTS_ALLOWED attribute to TRUE")
         end
 
