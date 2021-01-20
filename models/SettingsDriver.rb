@@ -46,6 +46,8 @@ class IONe
                 rec[:body] == "TRUE"
             when "list"
                 rec[:body].split(',')
+            when "str"
+                rec[:body]
             else
                 JSON.parse rec[:body]
             end
