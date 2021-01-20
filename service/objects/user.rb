@@ -36,7 +36,7 @@ class OpenNebula::User
     end
     # Returns true if user balance is less than user alert point
     def alert
-        alert_at = (info! || self['TEMPLATE/ALERT']) || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
+        alert_at = (info! || self['TEMPLATE/ALERT']) || IONe::Settings['ALERT']
         return balance.to_f <= alert_at.to_f, alert_at.to_f
     end
     # Sets users alert point
