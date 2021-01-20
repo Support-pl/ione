@@ -6,7 +6,8 @@ begin
         Integer :access_level, null: false, default: 1
         String  :type, null: false
     end
-
+rescue
+    puts "Table :settings already exists, skipping"
     required = [
         ['ALERT', "0.0", "Balance, when user will be alerted", 0, "num"],
         ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs per sec", 1, "object"],
@@ -20,10 +21,17 @@ begin
         ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
         ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 1, "num"],
         ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "num"],
-        ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 1, "num"]
+        ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 1, "num"],
+        ['SNAPSHOTS_ALLOWED_DEFAULT', "TRUE", "If set to FALSE VM should have SNAPSHOTS_ALLOWED=TRUE to allow snapshots creation", 1, "bool"]
     ]
     required.each do | record |
-        $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
+        begin
+            $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
+        rescue Sequel::UniqueConstraintViolation
+        end
+    end
+end
+
 class IONe
     # IONe Settings table accessor class
     class Settings < Sequel::Model(:settings)
