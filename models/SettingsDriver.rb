@@ -24,9 +24,25 @@ begin
     ]
     required.each do | record |
         $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
+class IONe
+    # IONe Settings table accessor class
+    class Settings < Sequel::Model(:settings)
+        # Get Settings value with explicit type casting
+        def self.[] name
+            rec = first(name: name)
+            return nil if rec.nil?
+            case rec[:type]
+            when "num"
+                rec[:body].to_f
+            when "bool"
+                rec[:body] == "TRUE"
+            when "list"
+                rec[:body].split(',')
+            else
+                JSON.parse rec[:body]
+            end
+        end
     end
-rescue
-    puts "Table :settings already exists, skipping"
 end
 
 SETTINGS_TABLE = $db[:settings]
