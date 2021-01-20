@@ -164,7 +164,7 @@ class IONe
             Thread.new do
 
                 host =  if params['host'].nil? then
-                    JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
+                    IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
                 else
                     params['host']
                 end
@@ -433,7 +433,7 @@ class IONe
         raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid
         
         host =  if params['host'].nil? then
-                    JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
+                    IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
                 else
                     params['host']
                 end
