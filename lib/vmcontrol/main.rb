@@ -239,7 +239,8 @@ class IONe
         vm = onblock :vm, vmid
         r = vm.info!
         raise r if OpenNebula.is_error? r
-        vm.snapshot_create(name)
+        r = vm.snapshot_create(name)
+        raise r if OpenNebula.is_error? r
     rescue => e
         return e.message
     end
