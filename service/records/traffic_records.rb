@@ -52,7 +52,7 @@ class OpenNebula::TrafficRecords < RecordsSource
 
     def initialize id, nosync = false
         super(TrafficRecord, id)
-        @bill_freq = SETTINGS_TABLE.where(name: 'TRAFFIC_BILL_FREQ').to_a.last[:body].to_i
+        @bill_freq = IONe::Settings['TRAFFIC_BILL_FREQ']
         sync unless nosync
     end
 
