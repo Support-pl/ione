@@ -241,6 +241,7 @@ class IONe
         raise r if OpenNebula.is_error? r
         r = vm.snapshot_create(name)
         raise r if OpenNebula.is_error? r
+        r
     rescue => e
         return e.message
     end
