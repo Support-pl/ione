@@ -131,7 +131,7 @@ require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT = "http://localhost:#{aug.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
