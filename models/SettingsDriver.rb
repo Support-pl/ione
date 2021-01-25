@@ -59,43 +59,56 @@ SETTINGS_TABLE = $db[:settings]
 
 get '/settings' do
     begin
-        r response: SETTINGS_TABLE.to_a
+        begin
+            access_level = @one_user.is_admin? ? 1 : 0 
+        rescue => e
+            access_level = 0
+        end
+        json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).to_a
     rescue => e
-        r error: e.message, debug: e.class
+        json error: e.message, debug: e.class
     end
 end
 
 get '/settings/:key' do | key |
     begin
-        r response: SETTINGS_TABLE.where(name:key).to_a.last
+        begin
+            access_level = @one_user.is_admin? ? 1 : 0 
+        rescue => e
+            access_level = 0
+        end
+        json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).where(name:key).to_a.last
     rescue => e
-        r error: e.message
+        json error: e.message
     end
 end
 
 post '/settings' do
     begin
+        raise Exception.new("NoAccess") unless @one_user.is_admin?
         data = JSON.parse(@request_body)
-        r response: SETTINGS_TABLE.insert(**data.to_sym!)
+        json response: SETTINGS_TABLE.insert(**data.to_sym!)
     rescue => e
-        r error: e.message
+        json error: e.message
     end
 end
 
 post '/settings/:key' do | key |
     begin
+        raise Exception.new("NoAccess") unless @one_user.is_admin?
         data = JSON.parse(@request_body)
         data = data.to_sym!
-        r response: SETTINGS_TABLE.where(name: key).update(name: key, **data)
+        json response: SETTINGS_TABLE.where(name: key).update(name: key, **data)
     rescue => e
-        r error: e.message
+        json error: e.message
     end
 end
 
 delete '/settings/:key' do | key |
     begin
-        r response: SETTINGS_TABLE.where(name: key).delete
+        raise Exception.new("NoAccess") unless @one_user.is_admin?
+        json response: SETTINGS_TABLE.where(name: key).delete
     rescue => e
-        r error: e.message
+        json error: e.message
     end
 end
