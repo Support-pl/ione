@@ -124,7 +124,9 @@ class OpenNebula::User
     # @return [Boolean]
     def is_admin
         info!
-        return (groups << gid).include? 0
+        (groups << gid).include? 0
+    rescue => e
+        false
     end
 
     # User doesn't exist Exception object
