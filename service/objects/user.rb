@@ -128,6 +128,7 @@ class OpenNebula::User
     rescue => e
         false
     end
+    alias :is_admin? :is_admin
 
     # User doesn't exist Exception object
     class UserNotExistsError < StandardError
