@@ -88,15 +88,6 @@ puts 'Setting up Environment(OpenNebula API)'
 # Setting up Environment                   #
 ###########################################
 
-require "opennebula"
-include OpenNebula
-###########################################
-# OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
-# XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = $ione_conf['OpenNebula']['endpoint']
-$client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
-
 # Loading DB Credentials and connecting DB
 
 ONED_CONF = ETC_LOCATION + '/oned.conf'
@@ -135,6 +126,15 @@ $db = Sequel.connect(**ops)
 
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
+
+require "opennebula"
+include OpenNebula
+###########################################
+# OpenNebula credentials
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
+# XML_RPC endpoint where OpenNebula is listening
+ENDPOINT = "http://localhost:#{aug.get('PORT')}/RPC2"
+$client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
 require "SettingsDriver"
 
