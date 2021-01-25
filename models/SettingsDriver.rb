@@ -19,9 +19,9 @@ rescue
         ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
         ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
         ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
-        ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 1, "num"],
+        ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 0, "num"],
         ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "num"],
-        ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 1, "num"],
+        ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 0, "num"],
         ['SNAPSHOTS_ALLOWED_DEFAULT', "TRUE", "If set to FALSE VM should have SNAPSHOTS_ALLOWED=TRUE to allow snapshots creation", 1, "bool"]
     ]
     required.each do | record |
