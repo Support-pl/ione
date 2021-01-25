@@ -119,9 +119,9 @@ if aug.get('DB/BACKEND') != "\"mysql\"" then
 end
 
 ops = {}
-ops[:host]  = aug.get('DB/SERVER')
-ops[:user]    = aug.get('DB/USER')
-ops[:password]  = aug.get('DB/PASSWD')
+ops[:host]     = aug.get('DB/SERVER')
+ops[:user]     = aug.get('DB/USER')
+ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
