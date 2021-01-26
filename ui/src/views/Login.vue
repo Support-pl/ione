@@ -44,28 +44,35 @@ export default {
         url: "one.u.to_hash!",
         data: { oid: -1 },
         auth: this.auth,
-      }).then(async (res) => {
-        let is_admin = (
-          await this.$axios({
-            method: "post",
-            url: "one.u.is_admin",
-            data: {
-              oid: -1,
-            },
-            auth: this.auth,
-          })
-        ).data.response;
-        if (is_admin) {
-          this.$store.commit("login", {
-            ...res.data.response.USER,
-            loggedIn: true,
+      })
+        .then(async (res) => {
+          let is_admin = (
+            await this.$axios({
+              method: "post",
+              url: "one.u.is_admin",
+              data: {
+                oid: -1,
+              },
+              auth: this.auth,
+            })
+          ).data.response;
+          if (is_admin) {
+            this.$store.commit("login", {
+              ...res.data.response.USER,
+              loggedIn: true,
+            });
+            this.$store.commit("credentials", this.auth);
+            this.$router.push("/dashboard/settings");
+          } else {
+            this.$message.error(`User "${this.auth.username}" is not admin`);
+          }
+        })
+        .catch(() => {
+          this.$notification.error({
+            message: "Login Failed",
+            description: "Check your credentials and endpoint",
           });
-          this.$store.commit("credentials", this.auth);
-          this.$router.push("/dashboard/settings");
-        } else {
-          this.$message.error(`User "${this.auth.username}" is not admin`);
-        }
-      });
+        });
     },
   },
 };
