@@ -1,5 +1,5 @@
 <template>
-  <div @click='timerUpdate' class='frame' style="min-height: 100%" >
+  <div @click="timerUpdate" class="frame" style="min-height: 100%">
     <a-layout style="min-height: 100%">
       <a-layout-header class="header"><h1>IONe</h1></a-layout-header>
       <a-layout>
@@ -10,11 +10,14 @@
             :style="{ height: '100%', borderRight: 0 }"
           >
             <a-menu-item v-for="item in asideBtns" :key="item.name">
-              <router-link :to="{ path: item.route ? item.route : `/dashboard/${item.name}` }">
-                {{item.name | capitalize}}
+              <router-link
+                :to="{
+                  path: item.route ? item.route : `/dashboard/${item.name}`,
+                }"
+              >
+                {{ item.name | capitalize }}
               </router-link>
             </a-menu-item>
-
           </a-menu>
         </a-layout-sider>
         <a-layout-content>
@@ -34,7 +37,7 @@ const asideBtns = [
     name: "costs",
   },
   {
-    name: "hosts (Nodes)",
+    name: "Hosts (Nodes)",
     route: "hosts",
   },
   {
@@ -46,7 +49,7 @@ export default {
     return {
       route: [],
       asideBtns,
-      timeoutTimer: -1
+      timeoutTimer: -1,
     };
   },
   mounted() {
@@ -55,27 +58,27 @@ export default {
   },
   filters: {
     capitalize(value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    }
+      if (!value) return "";
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    },
   },
   methods: {
-    setTimer(){
+    setTimer() {
       const timeout = 30; // minutes
       const self = this;
       this.timeoutTimer = setTimeout(() => {
-        self.$message.warning('Session expired. Return to login page...');
+        self.$message.warning("Session expired. Return to login page...");
         setTimeout(() => {
           location.reload();
         }, 3000); //3 secs to read message
-      }, timeout * 60000 );
+      }, timeout * 60000);
     },
-    timerUpdate(){
+    timerUpdate() {
       clearTimeout(this.timeoutTimer);
       this.setTimer();
-    }
-  }
+    },
+  },
 };
 </script>
 
