@@ -15,7 +15,7 @@ task :install_gems => :before do
     puts
 
     puts "2. Installing required system libs and tools"
-    puts "Following packages are going to be installed:\n\t#{@sys_packages.join(' ')}\nProceed? (y/n) "
+    print "Following packages are going to be installed:\n\t#{@sys_packages.join(' ')}\nProceed? (y/n) "
     a = @silent
     until %w(y n).include? a do
         a = STDIN.gets.downcase.strip
