@@ -43,41 +43,41 @@ end
 
 desc "Check if IONe is configured"
 task :test_configured do
-    conf = YAML.load_file("/etc/one/ione.conf")
-
-    puts "Checking if DB is configured"
-    unless conf['DB'].class == Hash then
-        fail "DB config is empty"
-    end
-    passed
-
-    conf = conf['DB']
-
-    puts "Checking if DB connector is installed"
-    gem  = conf['gem']
-    begin
-        require gem
-    rescue => e
-        fail "Failed to load DB connect gem(#{gem}), got: #{e.message}"
-    end
-    passed
-
-    puts "Checking if DB config is not default"
-    if conf['user'] == 'user' || conf['pass'] == 'secret' then
-        warn "!!! WARNING !!! DB Credentials are probably unset"
-    end
-    if [conf['user'], conf['pass'], conf['host'], conf['database'], conf['gem'], conf['adapter']].include? nil then
-        fail "DB config has nil values"
-    end
-    passed
-
     puts "Checking if IONe can establish connection to database"
     begin
-        db = Sequel.connect({
-            adapter: conf['adapter'].to_sym,
-            user: conf['user'], password: conf['pass'],
-            database: conf['database'], host: conf['host'],
-            encoding: 'utf8mb4' })
+        ONED_CONF = ETC_LOCATION + '/oned.conf'
+        work_file_dir  = File.dirname(ONED_CONF)
+        work_file_name = File.basename(ONED_CONF)
+
+        aug = Augeas.create(:no_modl_autoload => true,
+                            :no_load          => true,
+                            :root             => work_file_dir,
+                            :loadpath         => ONED_CONF)
+
+        aug.clear_transforms
+        aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
+        aug.context = "/files/#{work_file_name}"
+        aug.load
+
+        if aug.get('DB/BACKEND') != "\"mysql\"" then
+            STDERR.puts "OneDB backend is not MySQL, exiting..."
+            exit 1
+        end
+
+        ops = {}
+        ops[:host]     = aug.get('DB/SERVER')
+        ops[:user]     = aug.get('DB/USER')
+        ops[:password] = aug.get('DB/PASSWD')
+        ops[:database] = aug.get('DB/DB_NAME')
+
+        ops.each do |k, v|
+            next if !v || !(v.is_a? String)
+            ops[k] = v.chomp('"').reverse.chomp('"').reverse
+        end
+
+        ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+
+        db = Sequel.connect(**ops)
     rescue => e
         fail "Can't connect to database, got: #{e.message}"
     end
