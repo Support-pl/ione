@@ -34,7 +34,7 @@ task :install_ione => [:before, :install_gems] do
     cp 'sys/ione.service', '/usr/lib/systemd/system' unless Pathname.new("/usr/lib/systemd/system/ione.service").exist?
 
     $messages << <<-EOF
-    Fill in DB credentials to /etc/one/ione.conf and start IONe
+    Fill /etc/one/ione.conf and start IONe
         systemctl enable ione
         systemctl start ione
     
