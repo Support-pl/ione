@@ -45,7 +45,7 @@ desc "Check if IONe is configured"
 task :test_configured do
     puts "Checking if IONe can establish connection to database"
     begin
-        ONED_CONF = ETC_LOCATION + '/oned.conf'
+        ONED_CONF = '/etc/one/oned.conf'
         work_file_dir  = File.dirname(ONED_CONF)
         work_file_name = File.basename(ONED_CONF)
 
