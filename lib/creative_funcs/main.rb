@@ -77,7 +77,6 @@ class IONe
                 LOG_DEBUG "No vCenter configuration found"
             end
             
-            params['username'] = params['username'] || 'Administrator'
             trace << "Checking template:#{__LINE__ + 1}"
             template = onblock(:t, params['templateid']) do | t |
                 result = t.info!
@@ -88,7 +87,6 @@ class IONe
                 params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
                 t
             end
-            win = template.win?
 
             LOG_DEBUG 'Initializing vm object'
             trace << "Initializing old VM object:#{__LINE__ + 1}"            
@@ -96,15 +94,17 @@ class IONe
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
             context = vm.to_hash!['VM']['TEMPLATE']
+
+            params['username'] = params['username'] || vm['//CONTEXT/USERNAME']
             
             LOG_DEBUG 'Generating new template'
             trace << "Generating credentials and network context:#{__LINE__ + 1}"
             context['CONTEXT'] = {
-                'PASSWORD' => params['passwd'],
+                'USERNAME' => params['username'],
+                'PASSWORD' => params['passwd'] || vm['//CONTEXT/PASSWORD'],
                 'NETWORK' => context['CONTEXT']['NETWORK'],
                 'SSH_PUBLIC_KEY' => context['CONTEXT']['SSH_PUBLIC_KEY']
             }
-            context['CONTEXT']['USERNAME'] = params['username'] if win
             context['NIC'] = [context['NIC']] if context['NIC'].class == Hash
             context['NIC'].map! do |nic| 
                 nic.without(
