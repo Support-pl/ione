@@ -286,10 +286,7 @@ set :port, 8009
 
 before do
     if request.request_method == 'OPTIONS' then
-        halt 200, {
-            'Allow' => "HEAD,GET,PUT,POST,DELETE,OPTIONS",
-            "Access-Control-Allow-Headers" => "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept"
-        }, ""
+        halt 200, {}, ""
     end
     begin
         unless request.request_method == 'GET' then
@@ -316,8 +313,8 @@ end
 puts "Allowing CORS"
 # Sinatra :after helper allowing Cors by adding needed headers
 after do
-    response.headers['Allow'] = "*" unless response.headers['Allow']
-    response.headers['Access-Control-Allow-Origin'] = "*" unless response.headers['Access-Control-Allow-Origin']
+    response.headers['Allow'] = "*"
+    response.headers['Access-Control-Allow-Origin'] = "*"
     response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
     response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
 end
