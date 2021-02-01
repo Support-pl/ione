@@ -6,6 +6,7 @@ task :test_install_gems do
     require 'net/http'
     require 'sequel'
     require 'json'
+    require 'augeas'
 end
 
 def passed
