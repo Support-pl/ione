@@ -360,9 +360,16 @@ puts "Registering ONe methods"
 #        200 - { "response": "one-vm-777-name" }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
-    json(response:
-        onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
-    )
+    begin
+        RPC_LOGGER.debug "ONeAPI calls proxy object method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
+    rescue => e
+        r = e.message
+        backtrace = e.backtrace
+    end
+    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+    json response: r
 end
 
 puts "Registering ONe Pool methods"
@@ -380,11 +387,19 @@ puts "Registering ONe Pool methods"
 #        200 - { "response": [...] }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
-    json(response:
-        (
-            @request_hash['uid'].nil? ? 
-                ON_INSTANCE_POOLS[object.to_sym].new(@client) :
-                ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
-        ).send(method.to_s << excl.to_s, *@request_hash['params'])
-    )
+    begin
+        RPC_LOGGER.debug "ONeAPI calls proxy pool method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = 
+            (
+                @request_hash['uid'].nil? ? 
+                    ON_INSTANCE_POOLS[object.to_sym].new(@client) :
+                    ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
+            ).send(method.to_s << excl.to_s, *@request_hash['params'])
+    rescue => e
+        r = e.message
+        backtrace = e.backtrace
+    end
+    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+    json response: r
 end
