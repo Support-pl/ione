@@ -340,6 +340,8 @@ post '/ione/:method' do | method |
     rescue => e
         r = e.message
         backtrace = e.backtrace
+    ensure
+        r = r.message if OpenNebula::Error.is_error? r
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
@@ -367,6 +369,8 @@ post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     rescue => e
         r = e.message
         backtrace = e.backtrace
+    ensure
+        r = r.message if OpenNebula::Error.is_error? r
     end
     RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
@@ -399,6 +403,8 @@ post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
     rescue => e
         r = e.message
         backtrace = e.backtrace
+    ensure
+        r = r.message if OpenNebula::Error.is_error? r
     end
     RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
