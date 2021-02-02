@@ -292,6 +292,7 @@ before do
         unless request.request_method == 'GET' then
             @request_body = request.body.read
             @request_hash = JSON.parse @request_body
+            @request_hash['params'] = [] if @request_hash['params'].nil?
         end
         if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
             halt 401, { 'Allow' => "*" }, "No Credentials given"
