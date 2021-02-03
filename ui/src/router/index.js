@@ -44,6 +44,10 @@ const routes = [
         path: "hosts",
         component: () => import("@/views/dashboard/hosts.vue"),
       },
+      {
+        path: "playbooks",
+        component: () => import("@/views/dashboard/playbooks.vue"),
+      },
     ],
   },
 ];
