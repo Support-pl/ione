@@ -54,6 +54,9 @@ export default {
       this.editable = {
         body:
           " - hosts: <%group%> # Don't delete or edit this line. Playbook won't be saved or executed without it\n",
+        extra_data: {
+          PERMISSIONS: "100000000",
+        },
       };
       this.edit_visible = true;
     },
