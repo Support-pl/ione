@@ -56,6 +56,31 @@
             <a-input v-model="editable.description" type="textarea"></a-input>
           </a-form-model-item>
         </a-col>
+        <a-col :span="8">
+          <a-form-model-item label="Supported OS">
+            <template v-for="tag of editable.tags">
+              <a-tag
+                :key="tag"
+                :closable="true"
+                @close="() => handleTagClose(tag)"
+                :color="randomColor()"
+              >
+                {{ tag }}
+              </a-tag>
+            </template>
+            <a-input
+              ref="input"
+              type="text"
+              size="small"
+              :style="{ width: '78px' }"
+              :value="tagInputValue"
+              @change="handleTagInputChange"
+              @blur="handleTagInputConfirm"
+              @keyup.enter="handleTagInputConfirm"
+              placeholder="New tag"
+            />
+          </a-form-model-item>
+        </a-col>
       </a-row>
       <a-form-model-item label="Body" prop="body">
         <yaml-editor v-model="editable.body" />
@@ -119,14 +144,22 @@ export default {
   },
   methods: {
     save() {
-      console.log("save");
-      console.log(this.editable);
-      this.$refs.editorForm.validate((valid, err) => {
-        console.log(valid, err);
+      let vm = this;
+      vm.$refs.editorForm.validate((valid) => {
         if (valid) {
-          console.log("aaalright");
+          vm.$axios({
+            method: "post",
+            auth: vm.credentials,
+            url: "/ansible",
+            data: vm.editable,
+          }).then((res) => {
+            vm.$notification.success({
+              message: "Successs",
+              description: `Ansible Playbook(ID:${res.data.response.ANSIBLE.ID}) successfuly created`,
+            });
+            vm.$emit("save");
+          });
         } else {
-          console.log("err");
           return false;
         }
       });

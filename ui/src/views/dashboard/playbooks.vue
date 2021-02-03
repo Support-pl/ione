@@ -13,6 +13,7 @@
           <playbook-editor
             :editable="editable"
             :visible="edit_visible"
+            @save="sync"
             @close="handleEditorClose"
           />
         </a-col>
