@@ -43,7 +43,11 @@ const asideBtns = [
   {
     name: "datastores",
   },
-]
+  {
+    name: "Ansible Playbooks",
+    route: "playbooks",
+  },
+];
 export default {
   data() {
     return {
