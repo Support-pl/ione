@@ -34,15 +34,6 @@ class String
     end
 end
 
-class Hash
-    def duplicate_with_case! to_case = :up # Duplicates each key and value with key up- or down- cased
-        self.clone.each do |key, value|
-            self[key.send(to_case.to_s + 'case')] = value
-        end
-        nil
-    end
-end
-
 class AnsiblePlaybookModel
 
     attr_reader    :method, :id
@@ -179,8 +170,6 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
                 'uname' => user.name, 'gname' => group.name,
                 'vars' => pb['vars'].nil? ? {} : pb['vars']  )
         end
-        pool.map{|playbook| playbook.duplicate_with_case! } # Duplicates every key with the same but upcase-d
-        # Returns in required format
         r(**{
             :ANSIBLE_POOL => {
                 :ANSIBLE => pool
@@ -224,7 +213,7 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
                             OpenNebula::Group.new_with_id( pb.body['gid'], @client)
         user.info!; group.info! # Retrieving information about this objects from ONe
         pb.body.merge!('uname' => user.name, 'gname' => group.name, 'vars' => pb.vars.nil? ? {} : pb.vars) # Adding user and group names to playbook body
-        pb.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
+
         r ANSIBLE: pb.body
     rescue => e
         r error: e.message, backtrace: e.backtrace
@@ -352,7 +341,6 @@ end
              user.info!
              apc.merge('id' => apc['proc_id'], 'uname' => user.name)
          end
-         pool.map{|playbook| playbook.duplicate_with_case! } # Duplicates every key with the same but upcase-d
  
          r(**{
              :ANSIBLE_PROCESS_POOL => {
@@ -383,7 +371,6 @@ end
          user =  OpenNebula::User.new_with_id( apc.body['uid'], @client)
          user.info!
          apc.body.merge!('id' => apc.body['proc_id'], 'uname' => user.name) # Retrieving information about this objects from ONe
-         apc.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
          r ANSIBLE_PROCESS: apc.body
      rescue => e
           r error: e.message, backtrace: e.backtrace
