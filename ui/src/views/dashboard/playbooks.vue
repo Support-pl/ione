@@ -61,6 +61,10 @@ export default {
       };
       this.edit_visible = true;
     },
+    edit(record) {
+      this.editable = record;
+      this.edit_visible = true;
+    },
     handleEditorClose() {
       this.edit_visible = false;
       this.editable = {};
