@@ -105,7 +105,6 @@ export default {
       }).then((res) => (this.pool = res.data.ANSIBLE_POOL.ANSIBLE));
     },
     create() {
-      console.log("create clicked");
       this.editable = {
         body:
           " - hosts: <%group%> # Don't delete or edit this line. Playbook won't be saved or executed without it\n",
