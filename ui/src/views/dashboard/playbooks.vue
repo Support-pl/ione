@@ -20,6 +20,9 @@
             @close="handleEditorClose"
           />
         </a-col>
+        <a-col :span="2">
+          <a-button type="primary" icon="redo" @click="sync"></a-button>
+        </a-col>
       </a-row>
     </a-col>
   </a-row>
