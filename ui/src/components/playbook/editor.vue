@@ -147,18 +147,39 @@ export default {
       let vm = this;
       vm.$refs.editorForm.validate((valid) => {
         if (valid) {
-          vm.$axios({
-            method: "post",
-            auth: vm.credentials,
-            url: "/ansible",
-            data: vm.editable,
-          }).then((res) => {
-            vm.$notification.success({
-              message: "Successs",
-              description: `Ansible Playbook(ID:${res.data.response.ANSIBLE.ID}) successfuly created`,
+          if (vm.editable.id) {
+            ["vars", "uname", "gname"].forEach((k) => delete vm.editable[k]);
+            vm.$axios({
+              method: "post",
+              auth: vm.credentials,
+              url: `/ansible/${vm.editable.id}/action`,
+              data: { action: { perform: "update", params: vm.editable } },
+            }).then((res) => {
+              if (!res.data.error) {
+                vm.$notification.success({
+                  message: "Successs",
+                  description: `Ansible Playbook(ID:${vm.editable.id}) successfuly updated`,
+                });
+                vm.$emit("save");
+              } else
+                vm.$notification.error({
+                  message: "Error",
+                  description: res.data.error,
+                });
             });
-            vm.$emit("save");
-          });
+          } else
+            vm.$axios({
+              method: "post",
+              auth: vm.credentials,
+              url: "/ansible",
+              data: vm.editable,
+            }).then((res) => {
+              vm.$notification.success({
+                message: "Successs",
+                description: `Ansible Playbook(ID:${res.data.response.ANSIBLE.ID}) successfuly created`,
+              });
+              vm.$emit("save");
+            });
         } else {
           return false;
         }
