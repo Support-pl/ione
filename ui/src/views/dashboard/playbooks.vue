@@ -65,6 +65,18 @@ export default {
       this.editable = record;
       this.edit_visible = true;
     },
+    remove(id) {
+      this.$axios({
+        method: "delete",
+        url: "/ansible/" + id,
+        auth: this.credentials,
+      }).then(() => {
+        this.$notification.success({
+          message: `Ansible Playbook(ID: ${id}) successfuly deleted`,
+        });
+        this.sync();
+      });
+    },
     handleEditorClose() {
       this.edit_visible = false;
       this.editable = {};
