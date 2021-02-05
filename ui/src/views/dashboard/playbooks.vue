@@ -35,6 +35,11 @@
                   @click="edit(record)"
                 ></a-button>
                 <a-button
+                  type="link"
+                  icon="unlock"
+                  @click="edit_access(record)"
+                ></a-button>
+                <a-button
                   type="danger"
                   icon="delete"
                   @click="remove(record.id)"
@@ -44,6 +49,86 @@
           </a-table>
         </a-col>
       </a-row>
+
+      <a-modal
+        :visible="access_editor_visible"
+        title="Edit permissions"
+        oktext="Submit"
+        @ok="save_access"
+        @cancel="handleAccessEditorClose"
+      >
+        <a-row type="flex" justify="space-between">
+          <a-col :span="9">
+            <a-row><span>---</span></a-row>
+            <a-row><span>Owner</span></a-row>
+            <a-row><span>Group</span></a-row>
+            <a-row><span>Others</span></a-row>
+          </a-col>
+          <a-col :span="5">
+            <a-row> <span>Use</span> </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[0]"
+                @change="(e) => updateChecked(e, 0)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[1]"
+                @change="(e) => updateChecked(e, 1)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[2]"
+                @change="(e) => updateChecked(e, 2)"
+              />
+            </a-row>
+          </a-col>
+          <a-col :span="5">
+            <a-row> <span>Manage</span> </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[3]"
+                @change="(e) => updateChecked(e, 3)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[4]"
+                @change="(e) => updateChecked(e, 4)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[5]"
+                @change="(e) => updateChecked(e, 5)"
+              />
+            </a-row>
+          </a-col>
+          <a-col :span="5">
+            <a-row> <span>Admin</span> </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[6]"
+                @change="(e) => updateChecked(e, 6)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[7]"
+                @change="(e) => updateChecked(e, 7)"
+              />
+            </a-row>
+            <a-row>
+              <a-checkbox
+                :checked="permissions[8]"
+                @change="(e) => updateChecked(e, 8)"
+              />
+            </a-row>
+          </a-col>
+        </a-row>
+      </a-modal>
     </a-col>
   </a-row>
 </template>
@@ -63,6 +148,9 @@ export default {
       edit_visible: false,
 
       pool: [],
+
+      access_editable: {},
+      access_editor_visible: false,
 
       columns: [
         {
@@ -94,6 +182,12 @@ export default {
     };
   },
   computed: {
+    permissions() {
+      if (!this.access_editable.permissions) return [];
+      return this.access_editable.permissions
+        .split("")
+        .map((e) => (e == "1" ? true : false));
+    },
     ...mapGetters(["credentials"]),
   },
   methods: {
@@ -133,6 +227,49 @@ export default {
     handleEditorClose() {
       this.edit_visible = false;
       this.editable = {};
+    },
+
+    save_access() {
+      this.$axios({
+        method: "post",
+        url: `/ansible/${this.access_editable.id}/action`,
+        auth: this.credentials,
+        data: {
+          action: {
+            perform: "update",
+            params: {
+              extra_data: { PERMISSIONS: this.access_editable.permissions },
+            },
+          },
+        },
+      }).then(() => {
+        this.$notification.success({
+          message: "Success",
+          description: "Permissions updated successfuly",
+        });
+        this.handleAccessEditorClose();
+        this.sync();
+      });
+    },
+    edit_access(record) {
+      this.access_editable = {
+        id: record.id,
+        permissions: record.extra_data.PERMISSIONS,
+      };
+      this.access_editor_visible = true;
+    },
+    updateChecked(e, num) {
+      let p = this.permissions;
+      p[num] = e.target.checked;
+      this.$set(
+        this.access_editable,
+        "permissions",
+        p.map((e) => (e ? "1" : "0")).join("")
+      );
+    },
+    handleAccessEditorClose() {
+      this.access_editor_visible = false;
+      this.access_editable = {};
     },
   },
   mounted() {
