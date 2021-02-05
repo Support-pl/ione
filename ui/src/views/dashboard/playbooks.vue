@@ -53,7 +53,7 @@
       <a-modal
         :visible="access_editor_visible"
         title="Edit permissions"
-        oktext="Submit"
+        okText="Submit"
         @ok="save_access"
         @cancel="handleAccessEditorClose"
       >
