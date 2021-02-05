@@ -182,8 +182,7 @@ end
 
 post '/ansible' do # Allocates new playbook
     begin
-        data = JSON.parse(@request_body)
-        r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:data, user:@one_user).id }}
+        r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:@request_hash, user:@one_user).id }}
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -231,8 +230,7 @@ end
 
 post '/ansible/:id/action' do | id | # Performs action
     begin
-        data = JSON.parse(@request_body)
-        pb = AnsiblePlaybookModel.new(id:id, data:data, user:@one_user)
+        pb = AnsiblePlaybookModel.new(id:id, data:@request_hash, user:@one_user)
 
         r response: pb.call
     rescue JSON::ParserError # If JSON.parse fails
@@ -243,11 +241,9 @@ post '/ansible/:id/action' do | id | # Performs action
 end
 
 post '/ansible/:action' do | action | # Performs actions, which are defined as def self.method for AnsiblePlaybookModel model
-    data = JSON.parse(@request_body)
-
     begin
         if action == 'check_syntax' then
-            r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax( data['body'])
+            r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax( @request_hash['body'])
         else
             r response: "Action is not defined"
         end
@@ -354,8 +350,7 @@ end
  
  post '/ansible_process' do
     begin
-        data = JSON.parse(@request_body)
-        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }}
+        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:@request_hash, user:@one_user).id }}
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -392,8 +387,7 @@ end
  
  post '/ansible_process/:id/action' do | id | # Performs action
      begin
-         data = JSON.parse(@request_body)
-         pb = AnsiblePlaybookProcessModel.new(id:id, data:data, user:@one_user)
+         pb = AnsiblePlaybookProcessModel.new(id:id, data:@request_hash, user:@one_user)
  
          r response: pb.call
      rescue JSON::ParserError # If JSON.parse fails
