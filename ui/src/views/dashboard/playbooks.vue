@@ -63,6 +63,34 @@ export default {
       edit_visible: false,
 
       pool: [],
+
+      columns: [
+        {
+          dataIndex: "id",
+          key: "id",
+          title: "ID",
+        },
+        {
+          dataIndex: "name",
+          key: "name",
+          title: "Name",
+        },
+        {
+          dataIndex: "uname",
+          key: "uname",
+          title: "Owner",
+        },
+        {
+          dataIndex: "gname",
+          key: "gname",
+          title: "Group",
+        },
+        {
+          title: "Actions",
+          key: "action",
+          scopedSlots: { customRender: "action" },
+        },
+      ],
     };
   },
   computed: {
