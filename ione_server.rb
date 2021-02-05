@@ -292,7 +292,7 @@ before do
         }, ""
     end
     begin
-        unless request.request_method == 'GET' then
+        unless ['GET', 'DELETE'].include? request.request_method then
             @request_body = request.body.read
             @request_hash = JSON.parse @request_body
         end
