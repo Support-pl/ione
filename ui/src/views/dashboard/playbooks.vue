@@ -109,7 +109,7 @@ export default {
         body:
           " - hosts: <%group%> # Don't delete or edit this line. Playbook won't be saved or executed without it\n",
         extra_data: {
-          PERMISSIONS: "100000000",
+          PERMISSIONS: "111000000",
         },
       };
       this.edit_visible = true;
