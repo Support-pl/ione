@@ -86,8 +86,8 @@ Creators:
 3. Run install script as root:
    `rake install`
 
-> Note:
-> Works only with CentOS for now.
+    > Note:
+    > Works only with CentOS for now.
 
 4. Wait for complection.
 
