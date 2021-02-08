@@ -76,6 +76,7 @@ class Hash
             end
         end
         result.chomp!
+        result.nil? ? "" : result
     end
     # @!endgroup
 end
