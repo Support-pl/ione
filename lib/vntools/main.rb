@@ -14,7 +14,7 @@ class IONe
         params.to_sym!
 
         conf = @db[:settings].as_hash(:name, :body)
-        vnet = onblock(:vn, JSON.parse(conf['PUBLIC_NETWORK_DEFAULTS'])['NETWORK_ID'], @client)
+        vnet = onblock(:vn, IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'], @client)
         vnet.info!
 
         u = onblock(:u, params[:u], @client)

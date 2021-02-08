@@ -10,12 +10,40 @@ require 'opennebula'
         "ARGUMENTS" => '$API'
     },
     {
+        "NAME" => 'check-balance-vm-allocate',
+        "TYPE" => 'api',
+        "CALL" => 'one.vm.allocate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb vm',
+        "ARGUMENTS" => '$API'
+    },
+    {
+        "NAME" => 'check-balance-tmpl-instantiate',
+        "TYPE" => 'api',
+        "CALL" => 'one.template.instantiate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb tmpl',
+        "ARGUMENTS" => '$API'
+    },
+    {
+        "NAME" => 'insert-zero-traffic-record-vm-allocate',
+        "TYPE" => 'api',
+        "CALL" => 'one.vm.allocate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb vm',
+        "ARGUMENTS" => '$API'
+    },
+    {
+        "NAME" => 'insert-zero-traffic-record-tmpl-instantiate',
+        "TYPE" => 'api',
+        "CALL" => 'one.template.instantiate',
+        "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb tmpl',
+        "ARGUMENTS" => '$API'
+    },
+    {
         "NAME" => 'pending',
         "ON" => "CUSTOM",
         "STATE" => "PENDING",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE pnd",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -25,7 +53,7 @@ require 'opennebula'
         "STATE" => "HOLD",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE pnd",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -35,7 +63,7 @@ require 'opennebula'
         "STATE" => "ACTIVE",
         "LCM_STATE" => "BOOT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE on",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -45,7 +73,7 @@ require 'opennebula'
         "STATE" => "ACTIVE",
         "LCM_STATE" => "RUNNING",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE on",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -55,7 +83,7 @@ require 'opennebula'
         "STATE" => "STOPPED",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -65,7 +93,7 @@ require 'opennebula'
         "STATE" => "SUSPENDED",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -75,7 +103,7 @@ require 'opennebula'
         "STATE" => "DONE",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -85,7 +113,7 @@ require 'opennebula'
         "STATE" => "POWEROFF",
         "LCM_STATE" => "LCM_INIT",
         "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
-        "ARGUMENTS" => "$ID",
+        "ARGUMENTS" => "\$TEMPLATE off",
         "TYPE" => "state",
         "RESOURCE" => "VM"
     },
@@ -127,17 +155,26 @@ require 'opennebula'
     }
 ]
 
+desc "Setting needed Hooks"
 task :hooks do
-    cd @src_dir
+    if defined? @src_dir then
+        cd @src_dir
 
-    puts 'Copying hooks scripts'
-    cp_r "hooks", "/usr/lib/one/ione/"
-    chmod_R "+x", "/usr/lib/one/ione/hooks/"
+        puts 'Copying hooks scripts'
+        cp_r "hooks", "/usr/lib/one/ione/"
+        chmod_R "+x", "/usr/lib/one/ione/hooks/"
+    end
 
+    require 'colorize'
     require '/usr/lib/one/ione/lib/std++/main.rb'
 
     puts 'Adding hooks to HookPool'
     for hook in @hooks do
-        OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
+        rc = OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
+        if OpenNebula.is_error? rc then
+            puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- X".red
+        else
+            puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- V".green
+        end
     end
 end

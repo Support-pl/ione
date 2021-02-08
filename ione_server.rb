@@ -1,30 +1,27 @@
 #!/usr/bin/env ruby
+
+STARTUP_TIME = Time.now().to_i # IONe server start time
+
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
     LOG_LOCATION = "/var/log/one"
     VAR_LOCATION = "/var/lib/one"
     ETC_LOCATION = "/etc/one"
-    SHARE_LOCATION = "/usr/share/one"
-    RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 else
     VAR_LOCATION = ONE_LOCATION + "/var"
     LOG_LOCATION = ONE_LOCATION + "/var"
     ETC_LOCATION = ONE_LOCATION + "/etc"
-    SHARE_LOCATION = ONE_LOCATION + "/share"
-    RUBY_LIB_LOCATION = ONE_LOCATION+"/lib/ruby"
 end
 
-SUNSTONE_AUTH             = VAR_LOCATION + "/.one/sunstone_auth"
-SUNSTONE_LOG              = LOG_LOCATION + "/sunstone.log"
 CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
 
 ROOT_DIR = File.dirname(__FILE__)
 
-$: << RUBY_LIB_LOCATION
-$: << RUBY_LIB_LOCATION+'/cloud'
-$: << ROOT_DIR
-$: << ROOT_DIR+'/models'
+$: << '/usr/lib/one/ruby'
+$: << '/usr/lib/one/ruby/cloud'
+$: << '/usr/lib/one/ione'
+$: << '/usr/lib/one/ione/models'
 
 ##############################################################################
 # Required libraries
@@ -34,6 +31,7 @@ require 'sinatra'
 require "sinatra/json"
 require 'erb'
 require 'yaml'
+require 'augeas'
 require 'securerandom'
 require 'tmpdir'
 require 'fileutils'
@@ -41,10 +39,6 @@ require 'base64'
 require 'rexml/document'
 require 'uri'
 require 'open3'
-
-require 'CloudAuth'
-require 'SunstoneServer'
-require 'SunstoneViews'
 
 ##############################################################################
 # Configuration
@@ -63,31 +57,10 @@ rescue Exception => e
     exit 1
 end
 
-##############################################################################
-# Enable logger
-##############################################################################
-include CloudLogger
-logger=enable_logging(SUNSTONE_LOG, $conf[:debug_level].to_i)
-
-begin
-    ENV["ONE_CIPHER_AUTH"] = SUNSTONE_AUTH
-    $cloud_auth = CloudAuth.new($conf, logger)
-rescue => e
-    logger.error {
-        "Error initializing authentication system" }
-    logger.error { e.message }
-    exit(-1)
-end
-
-set :cloud_auth, $cloud_auth
-
 use Rack::Deflater
 
 require 'ipaddr'
 require 'sequel'
-require 'logger'
-
-STARTUP_TIME = Time.now().to_i # IONe server start time
 
 puts 'Getting path to the server'
 ROOT = ROOT_DIR # IONe root path
@@ -115,24 +88,53 @@ puts 'Setting up Environment(OpenNebula API)'
 # Setting up Environment                   #
 ###########################################
 
+# Loading DB Credentials and connecting DB
+
+ONED_CONF = ETC_LOCATION + '/oned.conf'
+work_file_dir  = File.dirname(ONED_CONF)
+work_file_name = File.basename(ONED_CONF)
+
+aug = Augeas.create(:no_modl_autoload => true,
+                    :no_load          => true,
+                    :root             => work_file_dir,
+                    :loadpath         => ONED_CONF)
+
+aug.clear_transforms
+aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
+aug.context = "/files/#{work_file_name}"
+aug.load
+
+if aug.get('DB/BACKEND') != "\"mysql\"" then
+    STDERR.puts "OneDB backend is not MySQL, exiting..."
+    exit 1
+end
+
+ops = {}
+ops[:host]     = aug.get('DB/SERVER')
+ops[:user]     = aug.get('DB/USER')
+ops[:password] = aug.get('DB/PASSWD')
+ops[:database] = aug.get('DB/DB_NAME')
+
+ops.each do |k, v|
+    next if !v || !(v.is_a? String)
+    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+end
+
+ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+
+$db = Sequel.connect(**ops)
+
+$db.extension(:connection_validator)
+$db.pool.connection_validation_timeout = -1
+
 require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp #$ione_conf['OpenNebula']['credentials']
+CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = $ione_conf['OpenNebula']['endpoint']
+ENDPOINT = "http://localhost:#{aug.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
-
-require $ione_conf['DB']['adapter']
-$db = Sequel.connect({
-        adapter: $ione_conf['DB']['adapter'].to_sym,
-        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host'],
-        encoding: 'utf8mb4'   })
-
-$db.extension(:connection_validator)
-$db.pool.connection_validation_timeout = -1
 
 require "SettingsDriver"
 
@@ -143,6 +145,8 @@ class Settings < Sequel::Model(:settings); end
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
 include ONeHelper
+puts 'Including showback'
+require "#{ROOT}/service/showback.rb"
 puts 'Including Deferable module'
 require "#{ROOT}/service/defer.rb"
 
@@ -179,9 +183,19 @@ class IONe
         @db = db
         @version = VERSION
     end
+
+    # Will call object method if smth like vm_poweroff(1) called
+    def method_missing m, *args, &block
+        obj, method = m.to_s.split('_')
+        if ONeHelper::ON_INSTANCES.keys.include? obj.to_sym then
+            onblock(obj.to_sym, args[0]).send(method, self)
+        else
+            super
+        end
+    end
 end
 
-ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeCustomActions)
+ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver)
 ione_drivers.each do | driver |
     begin
         require driver
@@ -267,20 +281,18 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 # IONe API based on http
 #
 puts "Binding on localhost:8009"
-set :bind, '0.0.0.0'
+set :bind, 'localhost'
 set :port, 8009
 
 before do
     if request.request_method == 'OPTIONS' then
-        halt 200, {
-            'Allow' => "HEAD,GET,PUT,POST,DELETE,OPTIONS",
-            "Access-Control-Allow-Headers" => "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept"
-        }, ""
+        halt 200, {}, ""
     end
     begin
-        unless request.request_method == 'GET' then
+        unless ['GET', 'DELETE'].include? request.request_method then
             @request_body = request.body.read
             @request_hash = JSON.parse @request_body
+            @request_hash['params'] = [] if @request_hash['params'].nil?
         end
         if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
             halt 401, { 'Allow' => "*" }, "No Credentials given"
@@ -302,8 +314,8 @@ end
 puts "Allowing CORS"
 # Sinatra :after helper allowing Cors by adding needed headers
 after do
-    response.headers['Allow'] = "*" unless response.headers['Allow']
-    response.headers['Access-Control-Allow-Origin'] = "*" unless response.headers['Access-Control-Allow-Origin']
+    response.headers['Allow'] = "*"
+    response.headers['Access-Control-Allow-Origin'] = "*"
     response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
     response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
 end
@@ -328,6 +340,8 @@ post '/ione/:method' do | method |
     rescue => e
         r = e.message
         backtrace = e.backtrace
+    ensure
+        r = { error: r.message } if OpenNebula.is_error? r
     end
     RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
     RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
@@ -349,9 +363,18 @@ puts "Registering ONe methods"
 #        200 - { "response": "one-vm-777-name" }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
-    json(response:
-        onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
-    )
+    begin
+        RPC_LOGGER.debug "ONeAPI calls proxy object method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
+    rescue => e
+        r = e.message
+        backtrace = e.backtrace
+    ensure
+        r = { error: r.message } if OpenNebula.is_error? r
+    end
+    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+    json response: r
 end
 
 puts "Registering ONe Pool methods"
@@ -369,11 +392,21 @@ puts "Registering ONe Pool methods"
 #        200 - { "response": [...] }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
-    json(response:
-        (
-            @request_hash['uid'].nil? ? 
-                ON_INSTANCE_POOLS[object.to_sym].new(@client) :
-                ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
-        ).send(method.to_s << excl.to_s, *@request_hash['params'])
-    )
+    begin
+        RPC_LOGGER.debug "ONeAPI calls proxy pool method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        r = 
+            (
+                @request_hash['uid'].nil? ? 
+                    ON_INSTANCE_POOLS[object.to_sym].new(@client) :
+                    ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
+            ).send(method.to_s << excl.to_s, *@request_hash['params'])
+    rescue => e
+        r = e.message
+        backtrace = e.backtrace
+    ensure
+        r = { error: r.message } if OpenNebula.is_error? r
+    end
+    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+    json response: r
 end

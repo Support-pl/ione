@@ -36,7 +36,7 @@ class OpenNebula::User
     end
     # Returns true if user balance is less than user alert point
     def alert
-        alert_at = (info! || self['TEMPLATE/ALERT']) || $db[:settings].where(:name => 'ALERT').to_a.last[:body]
+        alert_at = (info! || self['TEMPLATE/ALERT']) || IONe::Settings['ALERT']
         return balance.to_f <= alert_at.to_f, alert_at.to_f
     end
     # Sets users alert point
@@ -79,11 +79,15 @@ class OpenNebula::User
                 etime = etime_req
             end
 
-            stime = Time.at(stime).to_datetime
-            first = Time.at(first).to_datetime
-            etime = Time.at(etime).to_datetime
-            current, periods = stime > first ? stime : first, 0
+            stime   = Time.at(stime).to_datetime
+            current = Time.at(first).to_datetime
+            etime   = Time.at(etime).to_datetime
 
+            while current < stime do
+                current = current >> 1
+            end
+            
+            periods = 0
             while current <= etime do
                 periods += 1
                 current = current >> 1
@@ -120,8 +124,11 @@ class OpenNebula::User
     # @return [Boolean]
     def is_admin
         info!
-        return (groups << gid).include? 0
+        (groups << gid).include? 0
+    rescue => e
+        false
     end
+    alias :is_admin? :is_admin
 
     # User doesn't exist Exception object
     class UserNotExistsError < StandardError

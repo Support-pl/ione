@@ -4,18 +4,6 @@
 
 puts 'Extending Handler class by VM and User info getters'
 class IONe
-    # Returns VM template XML
-    # @param [Integer] vmid - VM ID
-    # @return [String] XML
-    def VM_XML(vmid)
-        LOG_STAT()
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'VM_XML') }
-        vm = onblock(:vm, vmid)
-        vm.info! || vm.to_xml
-    end
     # @!group VirtualMachines Info
 
     # Returns VM's IP by ID
@@ -67,10 +55,6 @@ class IONe
     # @param [String] ip - IP address
     # @return [Integer | nil] - VM ID if found, nil if not
     def GetVMIDbyIP(ip)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'GetVMIDbyIP') }
         vm_pool = VirtualMachinePool.new(@client)
         vm_pool.info_all!
         vm_pool.each do |vm|
@@ -145,11 +129,6 @@ class IONe
     # @param [Integer] vmid - VM ID
     # @return [Array<Hash> | Hash]
     def GetSnapshotList(vmid)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'GetSnapshotList') }
-             
         onblock(:vm, vmid).list_snapshots
     end
 

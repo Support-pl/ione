@@ -1,5 +1,5 @@
 [Unit]
-Description=IONe API and UI Server Service
+Description=IONe API Service
 After=syslog.target network.target
 After=opennebula.service
 AssertFileNotEmpty=/var/lib/one/.one/sunstone_auth

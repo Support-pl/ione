@@ -33,8 +33,8 @@ task :install_ione => [:before, :install_gems] do
     puts 'Creating IONe service'
     cp 'sys/ione.service', '/usr/lib/systemd/system' unless Pathname.new("/usr/lib/systemd/system/ione.service").exist?
 
-    puts <<-EOF
-    Fill in DB credentials to /etc/one/ione.conf and start IONe
+    $messages << <<-EOF
+    Fill /etc/one/ione.conf and start IONe
         systemctl enable ione
         systemctl start ione
     

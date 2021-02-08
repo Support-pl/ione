@@ -5,12 +5,12 @@ task :generate_certificate => [ :useful_questions ] do
     sh %{openssl dhparam -out /etc/one/ssl/dhparam.pem 1024}
 end
 desc "Configure Nginx"
-task :configure_nginx => [ :useful_questions ] do
+task :configure_nginx => [ :before, :useful_questions ] do
     cd @src_dir
     
     puts
     print "Do you want installer to generate self-signed cert? (y/n) "
-    cert = nil
+    cert = @silent
     until ['y', 'n'].include? cert do
         cert = STDIN.gets.strip.downcase
     end
@@ -35,9 +35,10 @@ task :configure_nginx => [ :useful_questions ] do
     puts "Test nginx configuration:"
     sh %{nginx -t}
 
-    puts "If nginx conf is okay, restart nginx via:"
-    puts "  systemctl restart nginx"
-    puts
-    puts "We highly recommend to change sunstone-server.conf 'bind' from 0.0.0.0 to localhost"
-    puts
+    $messages << <<-EOF
+    If nginx conf is okay, restart nginx via:
+       systemctl restart nginx"
+    
+     We highly recommend to change sunstone-server.conf 'bind' from 0.0.0.0 to localhost
+    EOF
 end

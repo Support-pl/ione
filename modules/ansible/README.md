@@ -1,57 +1,70 @@
-ione-ansible
+# ione-ansible
 
 ## Admin side
 
 ### Playbooks
 
 #### Create
+
 Creates playbook(after form confirmed - writing to DB). Fields:
+
 * Name - String(<128 sym.)
 * Description - text, where you can write anything. For example describe playbook task by task.
 * Body - playbook body written in YAML. Additional syntax rules:
     * Object must be Array of playbooks(begins with e.g. " - hosts:")
     * hosts must contain only "<%group%>", to be processes runned correctly
     * If playbook contains vars field, every variable must have default value written.
+
 > You can check syntax by clicking on button "Check Syntax" while creating Playbook or calling method `check_syntax`
 
 When you writting playbook from interface, next fields will be filled automatically:
+
 * User ID and user Group ID will be used as Owner and Group of new playbook 
 * Rights bytes 700(**rwx\-\-\-\-\-\-**)
 * Create time
 
 #### Update
+
 By this action you can change data at playbook fields.
 > **MANAGE** access-level required
 
 #### Run
+
 Will open [AnsiblePlaybookProcess.create](#label-Create)
 > **USE** access-level required
 
 #### Rename
+
 You can edit Playbooks name by clicking on *edit-icon* near the playbooks name and entering new name in opened form.
 > **MANAGE** access-level required
 
 #### CHMOD
+
 You can change Playbooks access rights using the table of checkboxes which you can see at Playbook show page.
 Rights are separated by 3 levels:
+
 * Use
 * Manage
 * Admin
 
 And by 3 groups:
+
 * Owner
 * Group
 * Others
 
 #### CHOWN
+
 You can change playbooks owner, by clicking on *edit-icon* near the playbooks owner name and choosing needed from dropdown list.
 > **ADMIN** access-level required
 
 #### CHGRP
+
 You can change playbooks group, by clicking on *edit-icon* near the playbooks owner name and choosing needed from dropdown list.
 > **ADMIN** access-level required
 
 #### Delete
+
 This action will delete Playbook from DB
 > **ADMIN** access-level required
 
@@ -60,6 +73,7 @@ This action will delete Playbook from DB
 #### Create
 Creates Process instance and writes it to DB.
 Process has the following fields:
+
 * proc_id - Unical numeric identificator, key DB field
 * install_id - SecureRandom UUID, uses as group
 * playbook_id - Playbook ID, which is runned
@@ -76,9 +90,10 @@ Process has the following fields:
 * comment - comment attached to Process
 * codes - ansible tasks codes (ok, unreachable, changed, failed)
 
-
 #### Run
+
 Runs playbook at given hosts
 
-#### Удалить    | Delete
+#### Delete
+
 Sets Process status to **DONE**

@@ -1,0 +1,17 @@
+task :before_test do
+    require '/usr/lib/one/ione/ione_server.rb'
+end
+
+def passed
+    puts "--- " + "Passed".green
+end
+def fail msg
+    puts msg.red
+    exit
+end
+def warn msg
+    puts msg.yellow
+end
+
+load "rake/tests/showback.rake"
+

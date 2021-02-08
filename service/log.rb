@@ -31,11 +31,13 @@ module IONeLoggerKit
             destination = "#{LOG_ROOT}/debug.log"
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
+        when "TrafficRecorder"
+            destination = "#{LOG_ROOT}/traffic_recorder.log"
         else
             destination = "#{LOG_ROOT}/ione.log"
         end
         msg = msg.to_s
-        msg = "[ #{time()} ] " + msg if _time
+        msg = "[ #{Time.now.ctime} ] " + msg if _time
         msg += " [ #{method} ]" if method != 'none' && method != "" && method != nil
 
         File.open(destination, 'a'){ |log| log.write msg + "\n" }
@@ -49,8 +51,9 @@ module IONeLoggerKit
     def LOG_COLOR(msg, method = caller_locations(1,1)[0].label.dup, color = 'red', font = 'bold')
         destination = "#{LOG_ROOT}/ione.log"
         destination = "#{LOG_ROOT}/snapshot.log" if method == "SnapController"
+        destination = "#{LOG_ROOT}/traffic_recorder.log" if method == "TrafficRecorder"
         msg = msg.to_s.send(color).send(font)
-        msg = "[ #{time()} ] " + msg
+        msg = "[ #{Time.now.ctime} ] " + msg
         method.slice!('block in '.dup)
         msg += " [ #{method} ]" if method != 'none' && method != "" && method != nil
 
@@ -64,7 +67,7 @@ module IONeLoggerKit
     # Logging the message directly into LOG_LOCATION/debug.log
     def LOG_DEBUG(msg, method = 'DEBUG', _time = true)
         destination = "#{LOG_ROOT}/debug.log"
-        msg = "[ #{time()} ] #{msg}"
+        msg = "[ #{Time.now.ctime} ] #{msg}"
         File.open(destination, 'a'){ |log| log.write msg + "\n" }
         $log << "#{msg} | #{destination}"
         true
@@ -83,51 +86,19 @@ module IONeLoggerKit
             destination = "#{LOG_ROOT}/debug.log"
         when "SnapController"
             destination = "#{LOG_ROOT}/snapshot.log"
+        when "TrafficRecorder"
+            destination = "#{LOG_ROOT}/traffic_recorder.log"
         else
             destination = "#{LOG_ROOT}/ione.log"
         end
         msg = msg.to_s
-        msg = "[ #{time()} ] " + msg if _time
+        msg = "[ #{Time.now.ctime} ] " + msg if _time
         msg += " [ #{method} ]" if method != 'none' && method != "" && method != nil
 
         File.open(destination, 'a'){ |log| log.write msg + "\n" }
         File.open("#{LOG_ROOT}/suspend.log", 'a'){ |log| log.write msg + "\n" } if method == 'Suspend'
 
         $log << "#{msg} | #{destination}"
-        true
-    end
-
-    # Processes list are active now 
-    $PROC = []
-
-    # Puts processes to process list and deletes them out
-    # @param [Integer] id Process id, you should generate it using id_gen function
-    # @param [Boolean] called If true adds process to list, of false deletes
-    # @param [String | Object] method Method name or _method_ object. This function trying to get method-name automatically
-    # @return [Boolean] true
-    # @note You may check this log at $IONELOGROOT/sys.log
-    def LOG_CALL(id, called, method = caller_locations(1,1)[0].label)
-        level, method = 0, method.to_s
-        caller_locations.each do | loc |
-            loc = loc.label
-            if $methods.include? loc then
-                level += 1
-                next
-            end
-            $methods.each do | m |
-                if loc.include? m then
-                    level += 1 
-                    break
-                end
-            end
-        end
-        msg = "[ #{time()} ] Method #{called ? $PROC.push("#{method}:#{id}").last : $PROC.delete("#{method}:#{id}")} #{called ? 'called' : 'closed'}\n" if level < 2
-        if level > 1  || !called then
-            tabs = (0..(level - 3)).to_a.inject("                             "){|t, i| t +  "    "}
-            msg = "#{tabs}|-- Method #{method.to_s}:#{id} #{called ? 'called' : 'closed'}\n"
-        end
-
-        File.open(LOG_ROOT + '/sys.log', 'a'){ |log| log.write msg }
         true
     end
 
@@ -145,7 +116,6 @@ class IONe
     # Get log from ione.log file
     # @return [String] Log
     def activity_log()
-        LOG_STAT()        
         LOG "Log file content has been copied remotely", "activity_log"
         log = File.read("#{LOG_ROOT}/ione.log")
         log
@@ -154,7 +124,6 @@ class IONe
     # @param [String] msg - your message
     # @return [String] returns given message
     def log(msg)
-        LOG_STAT()        
         LOG(msg, "RemoteLOG")
         msg
     end

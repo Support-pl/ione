@@ -13,9 +13,6 @@ class IONe
     #   Error:                      "[one.user.allocation] Error ...", maybe caused if user with given name already exists
     #   Error:                      0
     def UserCreate(login, pass, groupid = nil, locale = nil, client:@client, object:false, type:'vcenter')
-        id = id_gen()
-        LOG_CALL(id, true)
-        defer { LOG_CALL(id, false, 'UserCreate') }
         user = User.new(User.build_xml(0), client) # Generates user template using oneadmin user object
         allocation_result =
             begin
@@ -57,7 +54,6 @@ class IONe
     #   Debug turn method off: nil
     #   Debug return fake data: { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0', 'ip_old' => '0.0.0.0' } 
     def Reinstall(params, trace = ["Reinstall method called:#{__LINE__}"])
-        LOG_STAT()
             params.to_s!
             LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
             return nil if params['debug'] == 'turn_method_off'
@@ -81,7 +77,6 @@ class IONe
                 LOG_DEBUG "No vCenter configuration found"
             end
             
-            params['username'] = params['username'] || 'Administrator'
             trace << "Checking template:#{__LINE__ + 1}"
             template = onblock(:t, params['templateid']) do | t |
                 result = t.info!
@@ -92,7 +87,6 @@ class IONe
                 params['extra'] = params['extra'] || {'type' => t['/VMTEMPLATE/TEMPLATE/HYPERVISOR']}
                 t
             end
-            win = template.win?
 
             LOG_DEBUG 'Initializing vm object'
             trace << "Initializing old VM object:#{__LINE__ + 1}"            
@@ -100,15 +94,17 @@ class IONe
             LOG_DEBUG 'Collecting data from old template'
             trace << "Collecting data from old template:#{__LINE__ + 1}"            
             context = vm.to_hash!['VM']['TEMPLATE']
+
+            params['username'] = params['username'] || vm['//CONTEXT/USERNAME']
             
             LOG_DEBUG 'Generating new template'
             trace << "Generating credentials and network context:#{__LINE__ + 1}"
             context['CONTEXT'] = {
-                'PASSWORD' => params['passwd'],
+                'USERNAME' => params['username'],
+                'PASSWORD' => params['passwd'] || vm['//CONTEXT/PASSWORD'],
                 'NETWORK' => context['CONTEXT']['NETWORK'],
                 'SSH_PUBLIC_KEY' => context['CONTEXT']['SSH_PUBLIC_KEY']
             }
-            context['CONTEXT']['USERNAME'] = params['username'] if win
             context['NIC'] = [context['NIC']] if context['NIC'].class == Hash
             context['NIC'].map! do |nic| 
                 nic.without(
@@ -168,7 +164,7 @@ class IONe
             Thread.new do
 
                 host =  if params['host'].nil? then
-                    JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
+                    IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
                 else
                     params['host']
                 end
@@ -321,13 +317,8 @@ class IONe
     #   User create Error: {'error' => "UserAllocateError", 'trace' => trace(Array<String>)}
     #   Unknown error: { 'error' => e.message, 'trace' => trace(Array<String>)} 
     def CreateVMwithSpecs(params, trace = ["#{__method__.to_s} method called:#{__LINE__}"])
-        LOG_STAT()
-        LOG_CALL(id = id_gen(), true, __method__)
-        defer { LOG_CALL(id, false, 'CreateVMwithSpecs') }
         LOG_DEBUG params.merge!(:method => __method__.to_s).debug_out
-        # return {'userid' => 6666, 'vmid' => 6666, 'ip' => '127.0.0.1'}
         trace << "Checking params types:#{__LINE__ + 1}"
-            
             
         params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
         params['user-template'] = {} if params['user-template'].nil?
@@ -442,7 +433,7 @@ class IONe
         raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid
         
         host =  if params['host'].nil? then
-                    JSON.parse(@db[:settings].as_hash(:name, :body)['NODES_DEFAULT'])[params['extra']['type'].upcase]
+                    IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
                 else
                     params['host']
                 end
@@ -544,7 +535,6 @@ class IONe
         include Deferable
         # Executes given playbooks at fresh-deployed vm
         def AnsibleController(params, vmid, host = nil)
-            LOG_CALL(id = id_gen(), true, __method__)
             onblock(:vm, vmid).wait_for_state
             sleep(60)
             unless params['ansible_local_id'].nil? then
@@ -575,13 +565,9 @@ class IONe
         rescue => e
             LOG_DEBUG e.message
             LOG_DEBUG e.backtrace
-        ensure
-            LOG_CALL(id, false, 'AnsibleController')
         end
         # If Cluster type is vCenter, sets up Limits at the node
         def LimitsController(params, vmid, host = nil)
-            LOG_CALL(id = id_gen(), true, __method__)
-            defer { LOG_CALL(id, false, 'LimitsController') }
             onblock(:vm, vmid) do | vm |
                 if host.nil? then
                     vcenter_host_conf = 'default'
@@ -600,7 +586,6 @@ class IONe
         end
         # If VM is trial, starts time and schedule suspend method
         def TrialController(params, vmid, host = nil)
-            LOG_CALL(id = id_gen(), true, __method__)        
             LOG "VM #{vmid} suspend action scheduled", 'TrialController'
             action_time = Time.now.to_i + ( params['trial-suspend-delay'].nil? ?
                                 TRIAL_SUSPEND_DELAY :
@@ -609,7 +594,6 @@ class IONe
             if !onblock(:vm, vmid).schedule('suspend', action_time).nil? then
                 LOG_ERROR 'Scheduler process error', 'TrialController'
             end
-            LOG_CALL(id, false, 'TrialController')
         end
     
         deferable :LimitsController

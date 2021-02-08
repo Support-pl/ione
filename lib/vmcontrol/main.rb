@@ -12,10 +12,6 @@ class IONe
     # @return [NilClass | Array] Returns message and trace if Exception
     def Suspend params, log = true, trace = ["Suspend method called:#{__LINE__}"]
         trace << "Generating sys objects:#{__LINE__ + 1}"
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Suspend') }
         begin
             trace << "Printing debug info:#{__LINE__ + 1}"
             LOG "Suspending VM#{params['vmid']}", "Suspend" if log
@@ -55,10 +51,6 @@ class IONe
     # @param [Array] vms - VMs filter
     # @return [NilClass]
     def SuspendUser uid, vms = []
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'SuspendUser') }
         LOG "Suspend Query for User##{uid} received", "Suspend"
 
         user = onblock :u, uid
@@ -87,10 +79,6 @@ class IONe
     # @param [Array<String>] trace
     # @return [nil | Array] Returns message and trace if Exception
     def Unsuspend(params, trace = ["Resume method called:#{__LINE__}"])
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Unsuspend') }
         result = 
             begin
                 LOG "Resuming VM ##{params['vmid']}", "Resume"
@@ -115,20 +103,15 @@ class IONe
     # @param [Array] vms - VMs filter
     # @return [NilClass]
     def UnsuspendUser uid, vms = []
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'UnsuspendUser') }
         LOG "Unsuspend Query for User##{uid} received", "Unsuspend"
 
         user = onblock :u, uid
         user.vms(@db).each do | vm |
             next if vms.include? vm.id
             begin
-                LOG "Unsuspending VM##{vm.id}", "Unsuspend"
-                trace << "Unlocking VM:#{__LINE__ + 1}"         
-                vm.unlock 
-                trace << "Resuming VM:#{__LINE__ + 1}"                
+                LOG "Unlocking VM##{vm.id}", "Unsuspend"
+                vm.unlock
+                LOG "Resuming VM##{vm.id}", "Unsuspend"
                 vm.resume
             rescue => e
                 LOG "Error occured while unsuspending VM##{vm.id}\nCheck Debug log for error-codes and backtrace", "Unsuspend"
@@ -146,11 +129,6 @@ class IONe
     # @param [Boolean] hard - uses reboot-hard if true
     # @return nil
     def Reboot(vmid, hard = false)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Reboot') }
-        
         return "VMID cannot be nil!" if vmid.nil?     
         LOG "Rebooting VM#{vmid}", "Reboot"
         LOG "Params: vmid = #{vmid}, hard = #{hard}", "DEBUG" #if DEBUG
@@ -166,11 +144,6 @@ class IONe
     # @param [Integer] vmid - VM to delete
     # @return [nil | OpenNebula::Error]    
     def Terminate(userid, vmid)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Terminate') }
-        
         LOG "Terminate query call params: {\"userid\" => #{userid}, \"vmid\" => #{vmid}}", "Terminate"
         # If userid will be nil oneadmin account can be broken
         if userid == nil || vmid == nil then
@@ -205,11 +178,6 @@ class IONe
     # @param [Integer] vmid - VM to shutdown
     # @return [nil | OpenNebula::Error]
     def Shutdown(vmid)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Shutdown') }
-                
         LOG "Shutting down VM#{vmid}", "Shutdown"
         vm = onblock :vm, vmid
         r = vm.info!
@@ -221,11 +189,6 @@ class IONe
     # @!visibility private
     # Releases hold-state VM
     def Release(vmid)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Release') }
-
         LOG "New Release Order Accepted!", "Release"
         vm = onblock :vm, vmid
         r = vm.info!
@@ -238,11 +201,6 @@ class IONe
     # @param [Integer] userid
     # @return [nil | OpenNebula::Error]
     def Delete(userid)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Delete') }
-
         if userid == 0 then
             LOG "Delete query rejected! Tryed to delete root-user(oneadmin)", "Delete"
         end
@@ -253,11 +211,6 @@ class IONe
     # @param [Integer] vmid
     # @return [nil | OpenNebula::Error]
     def Resume(vmid, trial = false)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Resume') }
-
         onblock(:vm, vmid.to_i) do | vm |
             r = vm.info!
             raise r if OpenNebula.is_error? r
@@ -273,11 +226,6 @@ class IONe
     # @param [Boolean] log - Making no logs if false
     # @return [nil | OpenNebula::Error]
     def RMSnapshot(vmid, snapid, log = true)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'RMSnapshot') }
-
         LOG "Deleting snapshot(ID: #{snapid.to_s}) for VM#{vmid.to_s}", "SnapController" if log
         onblock(:vm, vmid.to_i).snapshot_delete(snapid.to_i)
     end
@@ -287,16 +235,13 @@ class IONe
     # @param [Boolean] log - Making no logs if false
     # @return [Integer | OpenNebula::Error] New snapshot ID
     def MKSnapshot(vmid, name, log = true)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'MKSnapshot') }
-
         LOG "Snapshot create-query accepted", 'SnapController' if log
         vm = onblock :vm, vmid
         r = vm.info!
         raise r if OpenNebula.is_error? r
-        vm.snapshot_create(name)
+        r = vm.snapshot_create(name)
+        raise r if OpenNebula.is_error? r
+        r
     rescue => e
         return e.message
     end
@@ -306,11 +251,6 @@ class IONe
     # @param [Boolean] log - Making no logs if false
     # @return [nil | OpenNebula::Error]
     def RevSnapshot(vmid, snapid, log = true)
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'RevSnapshot') }
-        
         LOG "Snapshot revert-query accepted", 'SnapController' if log
         vm = onblock :vm, vmid
         r = vm.info!
@@ -321,11 +261,6 @@ class IONe
     end
         
     def Unlock vmid, log = true
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Unlock') }
-        
         LOG "VM Unlock query accepted" if log
         vm = onblock :vm, vmid
         r = vm.info!
@@ -335,11 +270,6 @@ class IONe
         return e.message
     end
     def Lock vmid, log = true
-        LOG_STAT()
-        id = id_gen()
-        LOG_CALL(id, true, __method__)
-        defer { LOG_CALL(id, false, 'Lock') }
-        
         LOG "VM Lock query accepted" if log
         vm = onblock :vm, vmid
         r = vm.info!

@@ -24,7 +24,7 @@
             @keyup.enter="save(record.name)"
             @keyup.escape="cancel(record.name)"
           />
-          <component :is="types[record.type]" v-else :value="record" />
+          <component :is="types[record.type]" v-else :value="record"/>
         </span>
         <span slot="actions" slot-scope="text, record">
           <a-space class="editable-row-operations">
@@ -96,7 +96,8 @@ export default {
         list,
         str,
         object,
-      },
+			},
+			selfEdit: ['object']
     };
   },
   async mounted() {
@@ -150,7 +151,7 @@ export default {
             if (res.data.response == 1) {
               this.$message.success("Success");
             } else {
-              this.$message.error("Error");
+              this.$message.error("Fail");
               this.cancel(key);
               return;
             }
@@ -160,7 +161,7 @@ export default {
           })
           .catch((err) => {
             console.error(err);
-            this.$message.error("Error");
+            this.$message.error("Fail");
             this.cancel(key);
           });
       }

@@ -34,15 +34,6 @@ class String
     end
 end
 
-class Hash
-    def duplicate_with_case! to_case = :up # Duplicates each key and value with key up- or down- cased
-        self.clone.each do |key, value|
-            self[key.send(to_case.to_s + 'case')] = value
-        end
-        nil
-    end
-end
-
 class AnsiblePlaybookModel
 
     attr_reader    :method, :id
@@ -166,30 +157,19 @@ class AnsiblePlaybookModel
     end
 end
 
-before do # This actions will be performed before any route 
-    begin
-        @one_client = $cloud_auth.client(session[:user]) # Saving OpenNebula client for user
-        @one_user = OpenNebula::User.new_with_id(session[:user_id], @one_client) # Saving user object
-    rescue => e
-        @before_exception = e.message
-    end
-end
-
 get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL format
     begin
         pool = IONe.new($client, $db).ListAnsiblePlaybooks # Array of playbooks
         pool.delete_if {|pb| !ansible_check_permissions(pb, @one_user, 0) } # Deletes playbooks, which aren't under user access
         pool.map! do | pb | # Adds user and group name to every object
-            user, group =  OpenNebula::User.new_with_id( pb['uid'], @one_client),
-                                OpenNebula::Group.new_with_id( pb['gid'], @one_client)
+            user, group =  OpenNebula::User.new_with_id( pb['uid'], @client),
+                                OpenNebula::Group.new_with_id( pb['gid'], @client)
             user.info!; group.info!
             pb['vars']  =  IONe.new($client, $db).GetAnsiblePlaybookVariables(pb['id'])
             pb.merge(
                 'uname' => user.name, 'gname' => group.name,
                 'vars' => pb['vars'].nil? ? {} : pb['vars']  )
         end
-        pool.map{|playbook| playbook.duplicate_with_case! } # Duplicates every key with the same but upcase-d
-        # Returns in required format
         r(**{
             :ANSIBLE_POOL => {
                 :ANSIBLE => pool
@@ -202,8 +182,7 @@ end
 
 post '/ansible' do # Allocates new playbook
     begin
-        data = JSON.parse(@request_body)
-        r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:data, user:@one_user).id }}
+        r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:@request_hash, user:@one_user).id }}
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -229,11 +208,11 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
     begin
         pb = AnsiblePlaybookModel.new(id:id, user:@one_user) # Getting playbook
         # Saving user and group to objects
-        user, group =  OpenNebula::User.new_with_id( pb.body['uid'], @one_client),
-                            OpenNebula::Group.new_with_id( pb.body['gid'], @one_client)
+        user, group =  OpenNebula::User.new_with_id( pb.body['uid'], @client),
+                            OpenNebula::Group.new_with_id( pb.body['gid'], @client)
         user.info!; group.info! # Retrieving information about this objects from ONe
         pb.body.merge!('uname' => user.name, 'gname' => group.name, 'vars' => pb.vars.nil? ? {} : pb.vars) # Adding user and group names to playbook body
-        pb.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
+
         r ANSIBLE: pb.body
     rescue => e
         r error: e.message, backtrace: e.backtrace
@@ -251,8 +230,7 @@ end
 
 post '/ansible/:id/action' do | id | # Performs action
     begin
-        data = JSON.parse(@request_body)
-        pb = AnsiblePlaybookModel.new(id:id, data:data, user:@one_user)
+        pb = AnsiblePlaybookModel.new(id:id, data:@request_hash, user:@one_user)
 
         r response: pb.call
     rescue JSON::ParserError # If JSON.parse fails
@@ -263,11 +241,9 @@ post '/ansible/:id/action' do | id | # Performs action
 end
 
 post '/ansible/:action' do | action | # Performs actions, which are defined as def self.method for AnsiblePlaybookModel model
-    data = JSON.parse(@request_body)
-
     begin
         if action == 'check_syntax' then
-            r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax( data['body'])
+            r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax( @request_hash['body'])
         else
             r response: "Action is not defined"
         end
@@ -351,25 +327,16 @@ class AnsiblePlaybookProcessModel
      end
 end
  
- before do # This actions will be performed before any route 
-     begin
-         @one_client = $cloud_auth.client(session[:user]) # Saving OpenNebula client for user
-         @one_user = OpenNebula::User.new_with_id(session[:user_id], @one_client) # Saving user object
-     rescue => e
-         @before_exception = e.message
-     end
- end
  
  get '/ansible_process' do
      begin
          pool = IONe.new($client, $db).ListAnsiblePlaybookProcesses
          pool.delete_if {|apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
          pool.map! do | apc | # Adds user name to every object
-             user =  OpenNebula::User.new_with_id( apc['uid'], @one_client)
+             user =  OpenNebula::User.new_with_id( apc['uid'], @client)
              user.info!
              apc.merge('id' => apc['proc_id'], 'uname' => user.name)
          end
-         pool.map{|playbook| playbook.duplicate_with_case! } # Duplicates every key with the same but upcase-d
  
          r(**{
              :ANSIBLE_PROCESS_POOL => {
@@ -383,8 +350,7 @@ end
  
  post '/ansible_process' do
     begin
-        data = JSON.parse(@request_body)
-        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:data, user:@one_user).id }}
+        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:@request_hash, user:@one_user).id }}
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -397,10 +363,9 @@ end
      begin
          apc = AnsiblePlaybookProcessModel.new(id:id, user:@one_user) # Getting playbook
          # Saving user and group to objects
-         user =  OpenNebula::User.new_with_id( apc.body['uid'], @one_client)
+         user =  OpenNebula::User.new_with_id( apc.body['uid'], @client)
          user.info!
          apc.body.merge!('id' => apc.body['proc_id'], 'uname' => user.name) # Retrieving information about this objects from ONe
-         apc.body.duplicate_with_case! # Duplicates every key with the same but upcase-d
          r ANSIBLE_PROCESS: apc.body
      rescue => e
           r error: e.message, backtrace: e.backtrace
@@ -422,8 +387,7 @@ end
  
  post '/ansible_process/:id/action' do | id | # Performs action
      begin
-         data = JSON.parse(@request_body)
-         pb = AnsiblePlaybookProcessModel.new(id:id, data:data, user:@one_user)
+         pb = AnsiblePlaybookProcessModel.new(id:id, data:@request_hash, user:@one_user)
  
          r response: pb.call
      rescue JSON::ParserError # If JSON.parse fails
