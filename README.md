@@ -12,7 +12,7 @@
     <a href="https://github.com/ione" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.0&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.1&color=success&style=flat" alt="version"/>
     <img src="https://github.com/ione-cloud/ione-sunstone/workflows/Generate%20and%20Deploy%20Docs/badge.svg" alt="Generate and Deploy Docs"/>
 </p>
 
@@ -38,7 +38,7 @@ Creators:
    </thead>
    <tbody>
       <tr>
-         <td align="left">CentOS</td><td align="center">6/7</td><td align="center">Tested on this plaform only</td>
+         <td align="left">CentOS</td><td align="center">8</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
          <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
@@ -86,8 +86,8 @@ Creators:
 3. Run install script as root:
    `rake install`
 
-> Note:
-> Works only with CentOS for now.
+    > Note:
+    > Works only with CentOS for now.
 
 4. Wait for complection.
 
@@ -98,6 +98,17 @@ Creators:
    6.1. Add oneadmin ssh-key to Ansible authorized_hosts list
 
 7. Fill all settings using IONe UI at ione-admin.your.domain._(Accessible only as oneadmin)_:
+
+8. Start the IONe up via `systemctl start ione`
+
+> Note:
+> If you're using RVM or other solution to control Ruby versions, you may need to update `ExecStart` section in `/usr/lib/systemd/system/ione.service` with relevant ruby executable and set `GEM_HOME` and `GEM_PATH` environment variables explicitly, example below:
+
+```ini
+ExecStart=/usr/local/rvm/rubies/ruby-2.5.8/bin/ruby /usr/lib/one/ione/ione_server.rb
+Environment=GEM_HOME=/usr/local/rvm/gems/ruby-2.5.8
+Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5.8@global
+```
 
 <table>
    <thead>

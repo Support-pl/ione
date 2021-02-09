@@ -32,22 +32,15 @@ $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
 
-def suppress_output
-    original_stderr = $stderr.clone
-    original_stdout = $stdout.clone
-    $stderr.reopen(File.new('/dev/null', 'w'))
-    $stdout.reopen(File.new('/dev/null', 'w'))
-    yield
-ensure
-    $stdout.reopen(original_stdout)
-    $stderr.reopen(original_stderr)
-end
+require "uri"
+require "net/http"
+require "yaml"
 
-suppress_output{ require '/usr/lib/one/sunstone/debug_lib.rb' }
-$ione = IONe.new($client, $db)
+client = Client.new
+one_auth = client.instance_variable_get("@one_auth").split(':')
 
 id = ARGV.first.to_i
-vm = VirtualMachine.new_with_id(id, Client.new)
+vm = VirtualMachine.new_with_id(id, client)
 vm.info!
 puts "States are: [#{ARGV[1]}, #{ARGV[2]}] -> [#{vm.state} -- #{vm.state_str}, #{vm.lcm_state} -- #{vm.lcm_state_str}]"
 if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
@@ -55,17 +48,35 @@ if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
     exit 0
 end
 
-host = Host.new_with_id $ione.get_vm_host(id, true).last.to_i, Client.new
+api = URI("http://localhost:8009/ione/get_vm_host")
+req = Net::HTTP::Post.new(api)
+req.body = JSON.generate params: [id, true]
+req.basic_auth *one_auth
+r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
+    http.request(req)
+end
+res = JSON.parse r.body
+host = res["response"].last.to_i
 
-$ione.SetVMResourcesLimits(
-    id,
-    host,
-    {
-        'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
-        'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-        'iops' => $ione.GetvCenterIOpsConf[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
-    }
-) if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter'
+if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
+
+    iops = YAML.load_file("#{ETC_LOCATION}/ione.conf")['vCenter']['default']['drives-iops']
+
+    api = URI("http://localhost:8009/ione/SetVMResourcesLimits")
+    req = Net::HTTP::Post.new(api)
+    req.body = JSON.generate params: [
+        id, host, 
+        {
+            'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
+            'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
+            'iops' => iops[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+        }
+    ]
+    req.basic_auth *one_auth
+    r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
+        http.request(req)
+    end
+end
 
 puts 'Successful set Limits up'
 exit 0

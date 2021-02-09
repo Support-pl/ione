@@ -38,13 +38,40 @@ require 'yaml'
 require 'json'
 require 'sequel'
 
-$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require $ione_conf['DB']['adapter']
-$db = Sequel.connect({
-        adapter: $ione_conf['DB']['adapter'].to_sym,
-        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']  })
+require 'augeas'
 
+work_file_dir  = File.dirname(ONED_CONF)
+work_file_name = File.basename(ONED_CONF)
+
+aug = Augeas.create(:no_modl_autoload => true,
+                    :no_load          => true,
+                    :root             => work_file_dir,
+                    :loadpath         => ONED_CONF)
+
+aug.clear_transforms
+aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
+aug.context = "/files/#{work_file_name}"
+aug.load
+
+if aug.get('DB/BACKEND') != "\"mysql\"" then
+    STDERR.puts "OneDB backend is not MySQL, exiting..."
+    exit 1
+end
+
+ops = {}
+ops[:host]     = aug.get('DB/SERVER')
+ops[:user]     = aug.get('DB/USER')
+ops[:password] = aug.get('DB/PASSWD')
+ops[:database] = aug.get('DB/DB_NAME')
+
+ops.each do |k, v|
+    next if !v || !(v.is_a? String)
+    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+end
+
+ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+
+$db = Sequel.connect(**ops)
 class AR < Sequel::Model(:ars); end
 
 AR.create do | r |
