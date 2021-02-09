@@ -322,11 +322,6 @@ class IONe
 
     # @!endgroup
 
-    # Returns current IOps conf from `/etc/one/ione.conf`
-    def GetvCenterIOpsConf
-        $ione_conf['vCenter']['drives-iops']
-    end
-
     # @!group VirtualMachines info
 
     # Returns all vms available with given credentials
