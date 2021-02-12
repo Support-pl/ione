@@ -279,12 +279,12 @@ class AnsiblePlaybookProcess
     # @option run_after [String] method - IONe method name to call after Ansible will end its work
     # @option run_after [Array] params - Params for this method, see example
     # @example Hosts example:
-    # hosts: { 'vmid' => [ip:port, credentials]}
+    #   hosts: { 'vmid' => [ip:port, credentials]}
     # @example Run After example:
-    # {
-    #     "method" => "Reboot",
-    #     "params" => 777 # vmid
-    # } # So VM will be rebooted after
+    #   {
+    #       "method" => "Reboot",
+    #       "params" => 777 # vmid
+    #   } # So VM will be rebooted after
     def initialize proc_id:nil, playbook_id:nil, uid:nil, hosts:{}, vars:{}, comment:'', auth:'default', run_after:{}
         if proc_id.nil? then
             @uid, @playbook_id = uid, playbook_id
