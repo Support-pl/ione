@@ -35,6 +35,7 @@ include OpenNebula
 require "uri"
 require "net/http"
 require "yaml"
+require "json"
 
 client = Client.new
 one_auth = client.instance_variable_get("@one_auth").split(':')
