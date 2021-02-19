@@ -364,7 +364,7 @@ puts "Registering ONe methods"
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     begin
-        RPC_LOGGER.debug "ONeAPI calls proxy object method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        RPC_LOGGER.debug "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
         r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
     rescue => e
         r = e.message

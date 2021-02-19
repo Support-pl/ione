@@ -38,6 +38,8 @@ require 'yaml'
 require 'sequel'
 require 'augeas'
 
+ONED_CONF         = "/etc/one/oned.conf"
+
 work_file_dir  = File.dirname(ONED_CONF)
 work_file_name = File.basename(ONED_CONF)
 

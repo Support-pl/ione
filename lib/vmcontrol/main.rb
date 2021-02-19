@@ -282,6 +282,6 @@ class IONe
     # temp
     # UPD: not really :)
     def SetVMResourcesLimits vmid, host, params
-        PostDeployActivities.new(@client).LimitsController(params, vmid, host)
+        PostDeployActivities.new(@client).LimitsController(params, vmid, onblock(:h, host))
     end
 end

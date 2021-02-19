@@ -20,6 +20,7 @@ STARTUP_TIME = Time.now.to_f
 
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
+ONED_CONF         = ETC_LOCATION + "oned.conf"
 
 $: << RUBY_LIB_LOCATION
 $: << RUBY_LIB_LOCATION+'/onedb'
