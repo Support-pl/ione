@@ -10,12 +10,17 @@ class Timeline
         Records, SnapshotRecords, TrafficRecords
     ]
 
+    # Initializes timeline - collects record sources(yet staticly) and stores entry vars
     def initialize vm, stime, etime, group_by_day = false
         @vm, @stime, @etime, @group_by_day = vm, stime, etime, group_by_day
         @sources = SOURCES
         @compiled = false
     end
 
+    # Compiles timeline: 
+    #   obtains events from sources and filters useless events
+    #   sorts events
+    #   filters again
     def compile
         records = @sources.inject([]) do | r, source |
             r.concat source.tl_filter( # Filtering useless events(e.g. unfinished TrafficRecord)
@@ -51,21 +56,26 @@ class Timeline
 
     # InitRecord class to put into the beginning of the Timeline to make it easier to work with deltas
     class InitRecord
+        # Just saves given time and state
         def initialize time, state
             @time, @state = time, state
         end
+        # Returns @time
         def ts
             @time
         end
+        # Merges init state into state
         def mod st
             st.merge! @state
         end
     end
     # Same as InitRecord but for the end of Timeline
     class FinalRecord
+        # Just saves given time
         def initialize time
             @time = time
         end
+        # Returns @time
         def ts
             @time
         end
@@ -81,6 +91,7 @@ class Billing
         CapacityBiller, DiskBiller, SnapshotsBiller, TrafficBiller
     ]
 
+    # Collects existing billers(yet static), filters them by Biller#check_biller and inits Timeline
     def initialize vm, stime, etime
         @vm = vm
         @billers = BILLERS.map { | bill | bill.new(@vm) }
@@ -116,6 +127,7 @@ class Billing
         end
     end
 
+    # Calculates total cost
     def total
         @bill.inject(0) { |r, el| r += el[:total] }
     end

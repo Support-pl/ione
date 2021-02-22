@@ -13,10 +13,13 @@ rescue
     puts "Table :traffic_records already exists, skipping"
 end
 
+# Traffic Record Model class
 class TrafficRecord < Sequel::Model(:traffic_records)
+    # TrafficRecord is sortable itself, so just returns itself
     def sortable
         self
     end
+    # Since Traffic Record is useful only as it has etime sorter is 'end time'
     def sorter
         etime
     end
@@ -39,17 +42,21 @@ class TrafficRecord < Sequel::Model(:traffic_records)
         self
     end
 
+    # Needed for serialization
     def to_json *a
         @values.without(:key).to_json(*a)
     end
 end
 
+# (Traffic)Records source class for fullfilling Timeline
 class OpenNebula::TrafficRecords < RecordsSource
 
+    # Overrides key for db queries
     def key
         :vm
     end
 
+    # inits RecordsSource class with SnapshotRecord class as base and syncronysing frequency and records(unless no nosync given)
     def initialize id, nosync = false
         super(TrafficRecord, id)
         @bill_freq = IONe::Settings['TRAFFIC_BILL_FREQ']
@@ -129,6 +136,7 @@ class OpenNebula::TrafficRecords < RecordsSource
         @records.exclude(etime: nil).exclude(Sequel.lit('etime - stime < ?', @bill_freq)).where(etime: st..et) # All Records between given time and elder than 24h
     end
 
+    # Gets last traffic record, if there's no, then returns 0,0 for in- and outbound. Otherwise gets data from last record
     def init_state stime
         state = { rx: 0, tx: 0 }
         rec = TrafficRecord.where(vm: @id).where(etime: stime).all.last

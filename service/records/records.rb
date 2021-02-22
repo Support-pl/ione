@@ -24,10 +24,12 @@ end
 # History Record Model class
 # @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/ione/server/service/objects/records.rb#L1-L10 History Model Defintion
 class Record < Sequel::Model(:records)
+    # Record is sortable itself, so just returns itself
     def sortable
         self
     end
 
+    # Returns sorter key needed for Timeline
     def sorter
         time
     end
@@ -39,10 +41,12 @@ class Record < Sequel::Model(:records)
     end
 end
 
+# Snapshot Record Model class
 class SnapshotRecord < Sequel::Model(:snapshot_records)
     
     # Snapshot Created Record class 
     class CreateSnapshotRecord < SnapshotRecord
+        # Since this is Create record sorter is 'create time'
         def sorter
             crt
         end
@@ -55,6 +59,7 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
     end
     # Snapshot Deleted Record class 
     class DeleteSnapshotRecord < SnapshotRecord
+        # Since this is Delete record sorter is 'delete time'
         def sorter
             del
         end
@@ -66,6 +71,7 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
         end
     end
     
+    # Record values withoud DB key
     def values
         @values.without(:key)
     end
@@ -80,10 +86,13 @@ class SnapshotRecord < Sequel::Model(:snapshot_records)
     end
 end
 
+# (History)Records source class for fullfilling Timeline
 class OpenNebula::Records < RecordsSource
+    # inits RecordsSource class with Record class as base
     def initialize id
         super(Record, id)
     end
+    # Calculates nitial state for timeline(such as VM was turn on before stime, state would be 'on')
     def init_state stime
         prev = @records.where{ time < stime }.order(Sequel.desc :time).limit(1).to_a.last
         if prev.nil? then
@@ -97,15 +106,19 @@ class OpenNebula::Records < RecordsSource
         end
     end
 end
+# (Snapshot)Records source class for fullfilling Timeline
 class OpenNebula::SnapshotRecords < RecordsSource
 
+    # Overrides key for db queries
     def key
         :vm
     end
 
+    # inits RecordsSource class with SnapshotRecord class as base
     def initialize id
         super(SnapshotRecord, id)
     end
+    # Returns all needed records for given timerange
     def find stime, etime
         @records.where(crt: stime..etime).or(del: stime..etime)
     end
