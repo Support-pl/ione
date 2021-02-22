@@ -16,6 +16,7 @@ class Biller
         true
     end
 
+    # Gets VM billing period
     def billing_period
         @vm['//BILLING_PERIOD']
     end
