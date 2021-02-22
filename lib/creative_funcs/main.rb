@@ -31,12 +31,12 @@ class IONe
         return user.id, user if object
         user.id
     end
-    # Creates VM for Old OpenNebula account and with old IP address
+    # Recreates VM with same NICs for same user
     # @param [Hash] params - all needed data for VM reinstall
-    # @option params [Integer] :vmid - VirtualMachine for Reinstall ID
-    # @option params [Integer] :userid - new Virtual Machine owner
-    # @option params [Integer] :groupid - new Virtual Machine group
-    # @option params [String] :username - Administrator username for Windows Machines
+    # @option params [Integer] :vmid VirtualMachine for Reinstall ID
+    # @option params [Integer] :userid new Virtual Machine owner
+    # @option params [Integer] :groupid new Virtual Machine group
+    # @option params [String] :username Administrator username for Windows Machines
     # @option params [String] :passwd Password for new Virtual Machine 
     # @option params [Integer] :templateid - templateid for Instantiate
     # @option params [Integer] :cpu vCPU cores amount for new VM
