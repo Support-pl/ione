@@ -114,7 +114,7 @@ module ONeHelper
         i:   Image,
         hk:  Hook
     }
-
+    # Used by api for translation of /one.X.pool.method to pool instance 
     ON_INSTANCE_POOLS = {
         vm:  VirtualMachinePool,
         t:   TemplatePool,

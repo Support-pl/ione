@@ -13,6 +13,7 @@ class RecordsSource
         @records = cls.where(Hash[key, @id])
     end
 
+    # Return all records for this VM(@id)
     def records
         @records.all
     end
@@ -22,6 +23,7 @@ class RecordsSource
         @records.where(time: stime..etime)
     end
 
+    # Initial timeline state
     def init_state stime
         {}
     end
@@ -37,7 +39,9 @@ class RecordsSource
     end
 end
 
+# Imitates empty query
 class EmptyQuery
+    # Returns empty Array since query is empty
     def all
         return []
     end
