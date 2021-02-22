@@ -259,25 +259,6 @@ class IONe
     rescue => e
         return e.message
     end
-        
-    def Unlock vmid, log = true
-        LOG "VM Unlock query accepted" if log
-        vm = onblock :vm, vmid
-        r = vm.info!
-        raise r if OpenNebula.is_error? r
-        vm.unlock
-    rescue => e
-        return e.message
-    end
-    def Lock vmid, log = true
-        LOG "VM Lock query accepted" if log
-        vm = onblock :vm, vmid
-        r = vm.info!
-        raise r if OpenNebula.is_error? r
-        vm.lock
-    rescue => e
-        return e.message
-    end
 
     # temp
     # UPD: not really :)
