@@ -1,17 +1,18 @@
 #!/usr/bin/env ruby
 
+# Server start-up time
 STARTUP_TIME = Time.now().to_i # IONe server start time
 
+# OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
+    # OpenNebula(and IONe) Logs location
     LOG_LOCATION = "/var/log/one"
+    # OpenNebula home
     VAR_LOCATION = "/var/lib/one"
+    # OpenNebula configs location
     ETC_LOCATION = "/etc/one"
-else
-    VAR_LOCATION = ONE_LOCATION + "/var"
-    LOG_LOCATION = ONE_LOCATION + "/var"
-    ETC_LOCATION = ONE_LOCATION + "/etc"
 end
 
 CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
