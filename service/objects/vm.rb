@@ -1,7 +1,7 @@
 require 'date'
 require 'time'
 
-# OpenNebula::VirtualMachine class
+# Extensions for OpenNebula::VirtualMachine class
 class OpenNebula::VirtualMachine
     # Actions supported by OpenNebula scheduler
     SCHEDULABLE_ACTIONS = %w(

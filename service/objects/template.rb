@@ -1,4 +1,4 @@
-# OpenNebula::Template class
+# Extensions for OpenNebula::Template class
 class OpenNebula::Template
     # Checks given template OS type by User Input
     # @return [Boolean]
