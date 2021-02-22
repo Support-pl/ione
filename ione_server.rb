@@ -15,6 +15,7 @@ if !ONE_LOCATION
     ETC_LOCATION = "/etc/one"
 end
 
+# IONe source location
 ROOT_DIR = File.dirname(__FILE__)
 
 $: << '/usr/lib/one/ruby'
