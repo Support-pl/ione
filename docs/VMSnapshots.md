@@ -2,11 +2,15 @@
 
 ## Snapshots restriction
 
-You can set `SNAPSHOTS_ALLOWED` VM attribute to `TRUE` or `FALSE` to allow or disallow user to create snapshots.
+`SNAPSHOTS_ALLOWED_DEFAULT` setting set to `FALSE`(defaults to `TRUE`) at IONe::Settings would disallow to create VM Snapshots without `SNAPSHOTS_ALLOWED` VM attribute set to `TRUE`.
 
 ## Snapshots quota
 
 You can set quota for snapshots by setting `SNAPSHOTS_QUOTA` attribute to amount allowed.
+
+## Billing
+
+Setting `SNAPSHOT_COST` setting would make showback engine bill VMs per snapshot.
 
 ## Hint
 
