@@ -76,8 +76,6 @@ Creators:
 
 ## Install
 
-> If you are using a RedHat based distribution install redhat-lsb
-
 1. Download this repo using:
    `git clone https://github.com/ione-cloud/ione`
 
