@@ -1,3 +1,4 @@
+# Bills VM Capacity costs(CPU and RAM)
 class CapacityBiller < Biller
     # Checking if Capacity costs are given, otherwise there is no point to calculate it
     def check_biller
@@ -20,6 +21,7 @@ class CapacityBiller < Biller
         return false
     end
 
+    # @see Biller#bill
     def bill bill:, state:, delta:, record: nil
         if state[:state] == 'on' || billing_period != 'PAYG' then
             bill[:capacity] = delta * @cost

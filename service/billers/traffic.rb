@@ -1,4 +1,6 @@
+# Biller for VM in- and outbound traffic costs
 class TrafficBiller < Biller
+    # Checking if Traffic costs are given, otherwise there is no point to calculate it
     def check_biller
         @cost = JSON.parse(costs['TRAFFIC_COST'])
         return false if @cost.nil?
@@ -15,6 +17,7 @@ class TrafficBiller < Biller
         return false
     end
 
+    # @see Biller#bill
     def bill bill:, state:, delta:, record: 
         if record.class == TrafficRecord then
             bill[:rx] = state[:rx] / 1e+9 * @costs[:rx]

@@ -1,3 +1,4 @@
+# VM Disk costs biller
 class DiskBiller < Biller
     # Checking if Capacity costs are given, otherwise there is no point to calculate it
     def check_biller
@@ -19,6 +20,7 @@ class DiskBiller < Biller
         return false
     end
 
+    # @see Biller#bill
     def bill bill:, state:, delta:, record: nil
         bill[:disk] = delta * @cost * @size
         bill
