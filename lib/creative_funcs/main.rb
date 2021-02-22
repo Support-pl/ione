@@ -37,6 +37,7 @@ class IONe
     # @option params [Integer] :userid new Virtual Machine owner
     # @option params [Integer] :groupid new Virtual Machine group
     # @option params [String] :username Administrator username for Windows Machines
+    # @option params [String] :vm_name New VM instance name(otherwise old name is going to be used)
     # @option params [String] :passwd Password for new Virtual Machine 
     # @option params [Integer] :templateid - templateid for Instantiate
     # @option params [Integer] :cpu vCPU cores amount for new VM
@@ -96,7 +97,8 @@ class IONe
             context = vm.to_hash!['VM']['TEMPLATE']
 
             params['username'] = params['username'] || vm['//CONTEXT/USERNAME']
-            
+            params['vm_name']  = params['vm_name']  || vm.name
+
             LOG_DEBUG 'Generating new template'
             trace << "Generating credentials and network context:#{__LINE__ + 1}"
             context['CONTEXT'] = {
@@ -140,8 +142,7 @@ class IONe
             LOG_COLOR "Terminate process is over, new VM is deploying now", 'Reinstall', 'green'
             LOG_DEBUG 'Creating new VM'
             trace << "Instantiating template:#{__LINE__ + 1}"
-            vmid = template.instantiate(
-                ( params['login'] || onblock(:u, params['userid']){ |u| u.info!; u.name }) + '_vm', false, context)
+            vmid = template.instantiate(params['vm_name'], false, context)
 
             LOG_DEBUG "New VM ID or an OpenNebula::Error: #{begin vmid.to_str rescue vmid.to_s end}"
             begin    
@@ -295,6 +296,7 @@ class IONe
     # @param [Hash] params - all needed data for new User and VM creation
     # @option params [String]  :login Username for new OpenNebula account
     # @option params [String]  :password Password for new OpenNebula account
+    # @option params [String]  :vm_name New VM instance name(otherwise old name is going to be used)
     # @option params [String]  :passwd Password for new Virtual Machine 
     # @option params [Integer] :templateid Template ID to instantiate
     # @option params [Integer] :cpu vCPU cores amount for new VM
@@ -330,6 +332,7 @@ class IONe
         end
 
         params['username'] = params['username'] || 'Administrator'
+        params['vm_name']  = params['vm_name']  || "#{params['login']}_vm"
         ###################### Doing some important system stuff ###############################################################
         
         LOG_AUTO "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
@@ -427,7 +430,7 @@ class IONe
 
             LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
             specs = specs.to_one_template
-            vmid = t.instantiate("#{params['login']}_vm", true, specs + "\n" + params['user-template'].to_one_template)
+            vmid = t.instantiate(params['vm_name'], true, specs + "\n" + params['user-template'].to_one_template)
         end
 
         raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid
