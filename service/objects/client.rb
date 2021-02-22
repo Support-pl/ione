@@ -1,4 +1,4 @@
-# Extensions for OpenNebula Client
+# Extensions for OpenNebula::Client
 class OpenNebula::Client
     # Returns user id for given credentials
     def user_id

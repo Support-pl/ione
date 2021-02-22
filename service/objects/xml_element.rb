@@ -9,6 +9,7 @@ class OpenNebula::XMLElement
         info!
         name
     end
+    # Serializer method
     def to_json opts = {}
         to_hash!.to_json opts
     end
