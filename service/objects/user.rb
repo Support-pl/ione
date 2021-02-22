@@ -1,4 +1,4 @@
-# OpenNebula::User class
+# Extensions for OpenNebula::User class
 class OpenNebula::User
     # Sets user quota by his existing VMs and/or appends new vm specs to it
     # @param [Hash] spec
@@ -19,11 +19,6 @@ class OpenNebula::User
                 SYSTEM_DISK_SIZE=\"#{spec['drive'].to_i + quota['SYSTEM_DISK_SIZE_USED'].to_i}\", 
                 VMS=\"#{spec['append'].nil? ? quota['VMS_USED'].to_s : (quota['VMS_USED'].to_i + 1).to_s}\" ]"
         )
-    end
-    # Returns users actual name
-    def name!
-        info!
-        name
     end
     # Returns users actual balance
     def balance
