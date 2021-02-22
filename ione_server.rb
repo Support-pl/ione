@@ -15,8 +15,6 @@ if !ONE_LOCATION
     ETC_LOCATION = "/etc/one"
 end
 
-CONFIGURATION_FILE        = ETC_LOCATION + "/sunstone-server.conf"
-
 ROOT_DIR = File.dirname(__FILE__)
 
 $: << '/usr/lib/one/ruby'
@@ -45,12 +43,6 @@ require 'open3'
 # Configuration
 ##############################################################################
 
-begin
-    $conf = YAML.load_file(CONFIGURATION_FILE)
-rescue Exception => e
-    STDERR.puts "Error parsing config file #{CONFIGURATION_FILE}: #{e.message}"
-    exit 1
-end
 begin
     $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 rescue Exception => e
