@@ -5,11 +5,12 @@ If you wish to automate you hosting buisness cloud, including billing, you may u
 ## PaaS Provisioning
 
 Check our [Cloud Automation Module for OpenNebula](https://marketplace.whmcs.com/product/4675) out, if you want to:
- * Automate VDSs creation - module will create vms and users in OpenNebula automatically, as soon as product has status paid
- * Suspend and Resume users and their VMs - module hooks will automatically suspend and unsuspend vms
- * Terminate VDS, if user Account profile in WHMCS is terminated
- * Automate software-installation with our Ansible inegration
- * Create your own hooks and addons with OpenNebula Control SDK
+
+* Automate VDSs creation - module will create vms and users in OpenNebula automatically, as soon as product has status paid
+* Suspend and Resume users and their VMs - module hooks will automatically suspend and unsuspend vms
+* Terminate VDS, if user Account profile in WHMCS is terminated
+* Automate software-installation with our Ansible inegration
+* Create your own hooks and addons with OpenNebula Control SDK
 
 ## IaaS & VDC Provisioning
 
