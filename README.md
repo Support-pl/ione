@@ -41,7 +41,7 @@ Creators:
          <td align="left">CentOS</td><td align="center">8</td><td align="center">Tested on this plaform only</td>
       </tr>
       <tr>
-         <td align="left">OpenNebula</td><td align="center">5.10(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
+         <td align="left">OpenNebula</td><td align="center">5.10+(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
          <td align="left">MySQL MariaDB Server</td><td align="center">~8.0</td><td align="center"></td>
@@ -102,7 +102,7 @@ Creators:
 8. Start the IONe up via `systemctl start ione`
 
 > Note:
-> If you're using RVM or other solution to control Ruby versions, you may need to update `ExecStart` section in `/usr/lib/systemd/system/ione.service` with relevant ruby executable and set `GEM_HOME` and `GEM_PATH` environment variables explicitly, example below:
+> If you're using RVM or other solution to control Ruby versions(as an example if you're using CentOS 7), you may need to update `ExecStart` section in `/usr/lib/systemd/system/ione.service` with relevant ruby executable and set `GEM_HOME` and `GEM_PATH` environment variables explicitly, example below:
 
 ```ini
 ExecStart=/usr/local/rvm/rubies/ruby-2.5.8/bin/ruby /usr/lib/one/ione/ione_server.rb
