@@ -189,7 +189,7 @@ class IONe
     end
 end
 
-ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver)
+ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeKernel)
 ione_drivers.each do | driver |
     begin
         require driver
@@ -288,10 +288,16 @@ before do
             @request_hash = JSON.parse @request_body
             @request_hash['params'] = [] if @request_hash['params'].nil?
         end
-        if request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty? then
+        if (request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty?) and request.params["ws"] != 'true' then
             halt 401, { 'Allow' => "*" }, "No Credentials given"
         end
-        @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
+
+        if request.params["ws"] == 'true' then
+            @auth = Base64.decode64 request.params["auth"]
+        else
+            @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
+        end
+
         @client = Client.new(@auth)
         @one_user = User.new_with_id(-1, @client)
         rc = @one_user.info!
