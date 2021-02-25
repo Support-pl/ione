@@ -387,7 +387,7 @@ puts "Registering ONe Pool methods"
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
     begin
-        RPC_LOGGER.debug "ONeAPI calls proxy pool method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
+        RPC_LOGGER.debug "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
         r = 
             (
                 @request_hash['uid'].nil? ? 
