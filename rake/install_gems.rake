@@ -12,6 +12,8 @@ task :install_gems => :before do
     sh %{gem install sinatra-contrib --no-document}
     sh %{gem install sequel --no-document}
     sh %{gem install mysql2 --no-document}
+    sh %{gem install sinatra-websocket --no-document}
+    sh %{gem install file-tail --no-document}
     puts
 
     puts "2. Installing required system libs and tools"
