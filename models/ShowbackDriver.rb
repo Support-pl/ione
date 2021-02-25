@@ -9,7 +9,7 @@
 # end
 
 post '/ione_showback' do
-    headers['Cache-Control']       = "no-transform" # Disbles Rack::Deflater
+    headers['Cache-Control']       = "no-transform" # Disables Rack::Deflater
 
     data = JSON.parse(@request_body)
     uid, stime, etime, group_by_day = data['uid'], data['stime'], data['etime'], data['group_by_day'] || false
@@ -19,7 +19,7 @@ post '/ione_showback' do
 end
 
 post '/ione_showback/v2' do
-    headers['Cache-Control']       = "no-transform" # Disbles Rack::Deflater
+    headers['Cache-Control']       = "no-transform" # Disables Rack::Deflater
 
     data = JSON.parse(@request_body)
     uid, stime, etime, group_by_day = data['uid'], data['stime'], data['etime'], data['group_by_day'] || false
