@@ -47,6 +47,9 @@ const asideBtns = [
     name: "Ansible Playbooks",
     route: "playbooks",
   },
+  {
+    name: "logs",
+  },
 ];
 export default {
   data() {

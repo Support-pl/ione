@@ -48,6 +48,10 @@ const routes = [
         path: "playbooks",
         component: () => import("@/views/dashboard/playbooks.vue"),
       },
+      {
+        path: "logs",
+        component: () => import("@/views/dashboard/logs.vue"),
+      },
     ],
   },
 ];
