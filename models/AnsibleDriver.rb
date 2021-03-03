@@ -326,7 +326,7 @@ end
  
  get '/ansible_process' do
      begin
-         pool = IONe.new($client, $db).ListAnsiblePlaybookProcesses
+         pool = IONe.new(@client, $db).ListAnsiblePlaybookProcesses
          pool.delete_if {|apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
          pool.map! do | apc | # Adds user name to every object
              user =  OpenNebula::User.new_with_id( apc['uid'], @client)
