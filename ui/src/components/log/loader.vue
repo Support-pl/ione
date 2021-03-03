@@ -49,7 +49,6 @@ export default {
       };
       ws.onmessage = function (m) {
         vm.lines.push(m.data);
-        // console.log("websocket message: " + m.data);
       };
     },
   },
