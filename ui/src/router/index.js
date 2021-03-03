@@ -49,6 +49,10 @@ const routes = [
         component: () => import("@/views/dashboard/playbooks.vue"),
       },
       {
+        path: "processes",
+        component: () => import("@/views/dashboard/processes.vue"),
+      },
+      {
         path: "logs",
         component: () => import("@/views/dashboard/logs.vue"),
       },
