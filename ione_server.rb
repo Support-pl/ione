@@ -298,8 +298,8 @@ before do
             @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
         end
 
-        @client = Client.new(@auth)
-        @one_user = User.new_with_id(-1, @client)
+        env[:one_client] = @client   = Client.new(@auth)
+        env[:one_user]   = @one_user = User.new_with_id(-1, @client)
         rc = @one_user.info!
         if OpenNebula.is_error?(rc)
             halt 401, { 'Allow' => "*" }, "False Credentials given"
