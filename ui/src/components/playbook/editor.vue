@@ -223,9 +223,7 @@ export default {
     },
   },
   mounted() {
-    console.dir(this.editable);
-    console.dir(this.editable.extra_data);
-    if (this.editable.extra_data.SUPPORTED_OS)
+    if (this.editable.extra_data && this.editable.extra_data.SUPPORTED_OS)
       this.supported_os = this.editable.extra_data.SUPPORTED_OS.split(", ");
   },
 };
