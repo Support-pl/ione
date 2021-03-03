@@ -178,7 +178,7 @@ export default {
             }).then((res) => {
               vm.$notification.success({
                 message: "Successs",
-                description: `Ansible Playbook(ID:${res.data.response.ANSIBLE.ID}) successfuly created`,
+                description: `Ansible Playbook(ID:${res.data.response}) successfuly created`,
               });
               vm.$emit("save");
             });

@@ -196,7 +196,7 @@ export default {
         method: "get",
         url: "/ansible",
         auth: this.credentials,
-      }).then((res) => (this.pool = res.data.ANSIBLE_POOL.ANSIBLE));
+      }).then((res) => (this.pool = res.data.response));
     },
     create() {
       this.editable = {

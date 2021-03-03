@@ -170,11 +170,7 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
                 'uname' => user.name, 'gname' => group.name,
                 'vars' => pb['vars'].nil? ? {} : pb['vars']  )
         end
-        r(**{
-            :ANSIBLE_POOL => {
-                :ANSIBLE => pool
-            }
-        })
+        r response: pool
     rescue => e
         r error: e.message, backtrace: e.backtrace
     end
@@ -182,7 +178,7 @@ end
 
 post '/ansible' do # Allocates new playbook
     begin
-        r response: { ANSIBLE: { ID: AnsiblePlaybookModel.new(id:nil, data:@request_hash, user:@one_user).id }}
+        r response: AnsiblePlaybookModel.new(id:nil, data:@request_hash, user:@one_user).id
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -213,7 +209,7 @@ get '/ansible/:id' do | id | # Returns playbook body in OpenNebula required form
         user.info!; group.info! # Retrieving information about this objects from ONe
         pb.body.merge!('uname' => user.name, 'gname' => group.name, 'vars' => pb.vars.nil? ? {} : pb.vars) # Adding user and group names to playbook body
 
-        r ANSIBLE: pb.body
+        r response: pb.body
     rescue => e
         r error: e.message, backtrace: e.backtrace
     end
@@ -338,11 +334,7 @@ end
              apc.merge('id' => apc['proc_id'], 'uname' => user.name)
          end
  
-         r(**{
-             :ANSIBLE_PROCESS_POOL => {
-                 :ANSIBLE_PROCESS => pool
-             }
-         })
+         r response: pool
      rescue => e
           r error: e.message, backtrace: e.backtrace
      end
@@ -350,7 +342,7 @@ end
  
  post '/ansible_process' do
     begin
-        r response: { ANSIBLE_PROCESS: { ID: AnsiblePlaybookProcessModel.new(id:nil, data:@request_hash, user:@one_user).id }}
+        r response: AnsiblePlaybookProcessModel.new(id:nil, data:@request_hash, user:@one_user).id
     rescue JSON::ParserError # If JSON.parse fails
         r error: "Broken data received, unable to parse."
     rescue => e
@@ -366,7 +358,7 @@ end
          user =  OpenNebula::User.new_with_id( apc.body['uid'], @client)
          user.info!
          apc.body.merge!('id' => apc.body['proc_id'], 'uname' => user.name) # Retrieving information about this objects from ONe
-         r ANSIBLE_PROCESS: apc.body
+         r response: apc.body
      rescue => e
           r error: e.message, backtrace: e.backtrace
      end
