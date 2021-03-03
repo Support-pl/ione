@@ -13,7 +13,9 @@
           }}</a-tag>
         </span>
         <span slot="description" slot-scope="text, record">
-          <a-tooltip :title="record.name">{{ record.description }}</a-tooltip>
+          <a-tooltip :title="record.name">{{
+            record.description ? record.description : record.name
+          }}</a-tooltip>
         </span>
         <span slot="body" slot-scope="text, record">
           <a-input
@@ -24,7 +26,7 @@
             @keyup.enter="save(record.name)"
             @keyup.escape="cancel(record.name)"
           />
-          <component :is="types[record.type]" v-else :value="record"/>
+          <component :is="types[record.type]" v-else :value="record" />
         </span>
         <span slot="actions" slot-scope="text, record">
           <a-space class="editable-row-operations">
@@ -96,8 +98,8 @@ export default {
         list,
         str,
         object,
-			},
-			selfEdit: ['object']
+      },
+      selfEdit: ["object"],
     };
   },
   async mounted() {
