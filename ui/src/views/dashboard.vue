@@ -48,6 +48,10 @@ const asideBtns = [
     route: "playbooks",
   },
   {
+    name: "Ansible Processes",
+    route: "processes",
+  },
+  {
     name: "logs",
   },
 ];
