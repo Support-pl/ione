@@ -60,7 +60,7 @@ SETTINGS_TABLE = $db[:settings]
 get '/settings' do
     begin
         begin
-            access_level = @one_user.is_admin? ? 1 : 0 
+            access_level = env[:one_user].is_admin? ? 1 : 0 
         rescue => e
             access_level = 0
         end
@@ -73,7 +73,7 @@ end
 get '/settings/:key' do | key |
     begin
         begin
-            access_level = @one_user.is_admin? ? 1 : 0 
+            access_level = env[:one_user].is_admin? ? 1 : 0 
         rescue => e
             access_level = 0
         end
@@ -85,7 +85,7 @@ end
 
 post '/settings' do
     begin
-        raise Exception.new("NoAccess") unless @one_user.is_admin?
+        raise Exception.new("NoAccess") unless env[:one_user].is_admin?
         data = JSON.parse(@request_body)
         json response: SETTINGS_TABLE.insert(**data.to_sym!)
     rescue => e
@@ -95,7 +95,7 @@ end
 
 post '/settings/:key' do | key |
     begin
-        raise Exception.new("NoAccess") unless @one_user.is_admin?
+        raise Exception.new("NoAccess") unless env[:one_user].is_admin?
         data = JSON.parse(@request_body)
         data = data.to_sym!
         json response: SETTINGS_TABLE.where(name: key).update(name: key, **data)
@@ -106,7 +106,7 @@ end
 
 delete '/settings/:key' do | key |
     begin
-        raise Exception.new("NoAccess") unless @one_user.is_admin?
+        raise Exception.new("NoAccess") unless env[:one_user].is_admin?
         json response: SETTINGS_TABLE.where(name: key).delete
     rescue => e
         json error: e.message
