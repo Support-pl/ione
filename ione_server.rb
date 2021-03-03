@@ -304,6 +304,7 @@ before do
         if OpenNebula.is_error?(rc)
             halt 401, { 'Allow' => "*" }, "False Credentials given"
         end
+        RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.is_admin? ? "" : "NOT "}Admin"
     rescue => e
         RPC_LOGGER.debug "Exception #{e.message}"
         RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
