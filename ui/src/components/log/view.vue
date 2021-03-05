@@ -24,7 +24,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .logs-view {
   margin: 10px 20px;
   border-radius: 15px;
