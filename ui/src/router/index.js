@@ -50,7 +50,11 @@ const routes = [
       },
       {
         path: "processes",
-        component: () => import("@/views/dashboard/processes.vue"),
+        component: () => import("@/views/dashboard/processes/index.vue"),
+      },
+      {
+        path: "processes/:id",
+        component: () => import("@/views/dashboard/processes/process.vue"),
       },
       {
         path: "logs",
