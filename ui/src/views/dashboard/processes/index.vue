@@ -13,7 +13,12 @@
       </a-row>
       <a-row style="margin-top: 15px">
         <a-col :span="24">
-          <a-table :columns="columns" :data-source="pool" row-key="proc_id">
+          <a-table
+            :columns="columns"
+            :data-source="pool"
+            row-key="proc_id"
+            :customRow="row_wrapper"
+          >
             <span slot="id" slot-scope="text, record">
               {{ record.id }}
             </span>
@@ -28,25 +33,6 @@
             <span slot="status" slot-scope="status">
               <a-tag :color="status_color(status)">{{ status }}</a-tag>
             </span>
-            <!-- <span slot="action" slot-scope="text, record">
-              <a-space>
-                <a-button
-                  type="link"
-                  icon="edit"
-                  @click="edit(record)"
-                ></a-button>
-                <a-button
-                  type="link"
-                  icon="unlock"
-                  @click="edit_access(record)"
-                ></a-button>
-                <a-button
-                  type="danger"
-                  icon="delete"
-                  @click="remove(record.id)"
-                ></a-button>
-              </a-space>
-            </span> -->
           </a-table>
         </a-col>
       </a-row>
@@ -103,6 +89,19 @@ export default {
           scopedSlots: { customRender: "status" },
         },
       ],
+
+      row_wrapper: (record) => {
+        return {
+          on: {
+            click: () => {
+              this.$router.push({
+                path: `processes/${record.proc_id}`,
+                query: { record: record },
+              });
+            },
+          },
+        };
+      },
     };
   },
   mounted() {
@@ -121,7 +120,9 @@ export default {
         url: "/ansible_process",
         auth: this.credentials,
       }).then((res) => {
-        this.pool = res.data.response;
+        this.pool = res.data.response.sort(function (a, b) {
+          return b.end_time - a.end_time;
+        });
       });
     },
     start() {},
