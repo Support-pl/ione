@@ -1,0 +1,11 @@
+Naming/FileName:
+  Enabled: false
+
+Style:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Enabled: false
