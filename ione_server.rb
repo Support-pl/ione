@@ -7,12 +7,12 @@ STARTUP_TIME = Time.now().to_i # IONe server start time
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
 if !ONE_LOCATION
-    # OpenNebula(and IONe) Logs location
-    LOG_LOCATION = "/var/log/one"
-    # OpenNebula home
-    VAR_LOCATION = "/var/lib/one"
-    # OpenNebula configs location
-    ETC_LOCATION = "/etc/one"
+  # OpenNebula(and IONe) Logs location
+  LOG_LOCATION = "/var/log/one"
+  # OpenNebula home
+  VAR_LOCATION = "/var/lib/one"
+  # OpenNebula configs location
+  ETC_LOCATION = "/etc/one"
 end
 
 # IONe source location
@@ -23,9 +23,9 @@ $: << '/usr/lib/one/ruby/cloud'
 $: << '/usr/lib/one/ione'
 $: << '/usr/lib/one/ione/models'
 
-##############################################################################
-# Required libraries
-##############################################################################
+######################
+# Required libraries #
+######################
 require 'rubygems'
 require 'sinatra'
 require "sinatra/json"
@@ -40,15 +40,15 @@ require 'rexml/document'
 require 'uri'
 require 'open3'
 
-##############################################################################
-# Configuration
-##############################################################################
+#################
+# Configuration #
+#################
 
 begin
-    $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-rescue Exception => e
-    STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
-    exit 1
+  $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+rescue => e
+  STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
+  exit 1
 end
 
 use Rack::Deflater
@@ -71,16 +71,19 @@ require "#{ROOT}/service/log.rb"
 include IONeLoggerKit
 
 puts 'Checking service version'
-VERSION = File.read("#{ROOT}/meta/version.txt") # IONe version
-USERS_GROUP = $ione_conf['OpenNebula']['users-group'] # OpenNebula users group
-TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay'] # Trial VMs suspend delay
-
-USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port'] # Default SSH port at OpenNebula Virtual Machines 
+# IONe version
+VERSION = File.read("#{ROOT}/meta/version.txt")
+# OpenNebula users group
+USERS_GROUP = $ione_conf['OpenNebula']['users-group']
+# Trial VMs suspend delay
+TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay']
+# Default SSH port at OpenNebula Virtual Machines
+USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port']
 
 puts 'Setting up Environment(OpenNebula API)'
-###########################################
-# Setting up Environment                   #
-###########################################
+###########################
+# Setting up Environment  #
+###########################
 
 # Loading DB Credentials and connecting DB
 
@@ -99,8 +102,8 @@ aug.context = "/files/#{work_file_name}"
 aug.load
 
 if aug.get('DB/BACKEND') != "\"mysql\"" then
-    STDERR.puts "OneDB backend is not MySQL, exiting..."
-    exit 1
+  STDERR.puts "OneDB backend is not MySQL, exiting..."
+  exit 1
 end
 
 ops = {}
@@ -110,11 +113,12 @@ ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
-    next if !v || !(v.is_a? String)
-    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  next if !v || !(v.is_a? String)
+
+  ops[k] = v.chomp('"').reverse.chomp('"').reverse
 end
 
-ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
 
 $db = Sequel.connect(**ops)
 
@@ -145,119 +149,118 @@ puts 'Including Deferable module'
 require "#{ROOT}/service/defer.rb"
 
 LOG(
-"\n" +
-"       ################################################################\n".light_green.bold +
-"       ##                                                            ##\n".light_green.bold +
-"       ##".light_green.bold + "       " + "I".red.bold + "ntegrated " + "O".red.bold + "pen" + "Ne".red.bold + "bula Cloud  " +
-                                    "v#{VERSION.chomp}".cyan.underline + "#{" " if VERSION.split(' ').last == 'stable'}        " + "##\n".light_green.bold +
-"       ##                                                            ##\n".light_green.bold +
-"       ################################################################\n".light_green.bold +
-"\n", 'none', false
+  "\n" +
+  "       ################################################################\n".light_green.bold +
+  "       ##                                                            ##\n".light_green.bold +
+  "       ##".light_green.bold + "       " + "I".red.bold + "ntegrated " + "O".red.bold + "pen" + "Ne".red.bold + "bula Cloud  " +
+              "v#{VERSION.chomp}".cyan.underline + "#{" " if VERSION.split(' ').last == 'stable'}        " + "##\n".light_green.bold +
+  "       ##                                                            ##\n".light_green.bold +
+  "       ################################################################\n".light_green.bold +
+  "\n", 'none', false
 )
-
 
 puts 'Generating "at_exit" directive'
 at_exit do
-    begin
-        LOG_COLOR("Server was stopped. Uptime: #{fmt_time(Time.now.to_i - STARTUP_TIME)}", "")
-        LOG "", "", false
-        LOG("       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", "", false)
-    rescue => e
-        LOG_DEBUG e.message
-    end
+  begin
+    LOG_COLOR("Server was stopped. Uptime: #{fmt_time(Time.now.to_i - STARTUP_TIME)}", "")
+    LOG "", "", false
+    LOG("       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", "", false)
+  rescue => e
+    LOG_DEBUG e.message
+  end
 end
 
 # Main App class. All methods, which must be available as JSON-RPC methods, should be defined in this class
 class IONe
-    include Deferable
-    # IONe initializer, stores auth-client and version
-    # @param [OpenNebula::Client] client 
-    def initialize(client, db)
-        @client = client
-        @db = db
-        @version = VERSION
-    end
+  include Deferable
+  # IONe initializer, stores auth-client and version
+  # @param [OpenNebula::Client] client
+  def initialize(client, db)
+    @client = client
+    @db = db
+    @version = VERSION
+  end
 
-    # Will call object method if smth like vm_poweroff(1) called
-    def method_missing m, *args, &block
-        obj, method = m.to_s.split('_')
-        if ONeHelper::ON_INSTANCES.keys.include? obj.to_sym then
-            onblock(obj.to_sym, args[0]).send(method, self)
-        else
-            super
-        end
+  # Will call object method if smth like vm_poweroff(1) called
+  def method_missing method, *args, &block
+    obj, method = method.to_s.split('_')
+    if ONeHelper::ON_INSTANCES.keys.include? obj.to_sym then
+      onblock(obj.to_sym, args[0]).send(method, self)
+    else
+      super
     end
+  end
 end
 
-ione_drivers = %w( AnsibleDriver AzureDriver ShowbackDriver IONeKernel)
+ione_drivers = %w(AnsibleDriver AzureDriver ShowbackDriver IONeKernel)
 ione_drivers.each do | driver |
-    begin
-        require driver
-    rescue LoadError => e
-        puts "Driver #{driver} was not included: #{e.message}"
-    end
+  begin
+    require driver
+  rescue LoadError => e
+    puts "Driver #{driver} was not included: #{e.message}"
+  end
 end
 
 puts 'Including Libs'
 LOG_COLOR 'Including Libs:', 'none', 'green', 'bold'
 begin
-    $ione_conf['Include'].each do | lib |
-        puts "\tIncluding #{lib}"    
-        begin
-            require "#{ROOT}/lib/#{lib}/main.rb"
-            LOG_COLOR "\t - #{lib} -- included", 'none', 'green', 'itself'
-        rescue => e
-            LOG_COLOR "Library \"#{lib}\" was not included | Error: #{e.message}", 'LibraryController'
-            puts "Library \"#{lib}\" was not included | Error: #{e.message}"
-        end
-    end if $ione_conf['Include'].class == Array
+  $ione_conf['Include'].each do | lib |
+    puts "\tIncluding #{lib}"
+    begin
+      require "#{ROOT}/lib/#{lib}/main.rb"
+      LOG_COLOR "\t - #{lib} -- included", 'none', 'green', 'itself'
+    rescue => e
+      LOG_COLOR "Library \"#{lib}\" was not included | Error: #{e.message}", 'LibraryController'
+      puts "Library \"#{lib}\" was not included | Error: #{e.message}"
+    end
+  end if $ione_conf['Include'].class == Array
 rescue => e
-    LOG_ERROR "LibraryController fatal error | #{e}", 'LibraryController', 'red', 'underline'
-    puts "\tLibraryController fatal error | #{e}"
+  LOG_ERROR "LibraryController fatal error | #{e}", 'LibraryController', 'red', 'underline'
+  puts "\tLibraryController fatal error | #{e}"
 end
 
 puts 'Including Modules'
 LOG_COLOR 'Including Modules:', 'none', 'green', 'bold'
 begin
-    $ione_conf['Modules'].each do | mod |
-        puts "\tIncluding #{mod}"    
-        begin
-            $ione_conf.merge!(YAML.load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
-            require "#{ROOT}/modules/#{mod}/main.rb"
-            LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
-        rescue => e
-            LOG_COLOR "Module \"#{mod}\" was not included | Error: #{e.message}", 'ModuleController'
-            puts "Module \"#{mod}\" was not included | Error: #{e.message}"
-        end
-    end if $ione_conf['Modules'].class == Array
+  $ione_conf['Modules'].each do | mod |
+    puts "\tIncluding #{mod}"
+    begin
+      $ione_conf.merge!(YAML.safe_load(File.read("#{ROOT}/modules/#{mod}/config.yml"))) if File.exist?("#{ROOT}/modules/#{mod}/config.yml")
+      require "#{ROOT}/modules/#{mod}/main.rb"
+      LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
+    rescue => e
+      LOG_COLOR "Module \"#{mod}\" was not included | Error: #{e.message}", 'ModuleController'
+      puts "Module \"#{mod}\" was not included | Error: #{e.message}"
+    end
+  end if $ione_conf['Modules'].class == Array
 rescue => e
-    LOG_ERROR "ModuleController fatal error | #{e}", 'ModuleController', 'red', 'underline'
-    puts "\tModuleController fatal error | #{e}"
+  LOG_ERROR "ModuleController fatal error | #{e}", 'ModuleController', 'red', 'underline'
+  puts "\tModuleController fatal error | #{e}"
 end
 
 puts 'Including Scripts'
 LOG_COLOR 'Starting scripts:', 'none', 'green', 'bold'
 begin
-    $ione_conf['Scripts'].each do | script |
-        puts "\tIncluding #{script}"
-        begin
-            Thread.new { require "#{ROOT}/scripts/#{script}/main.rb" }
-            LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
-        rescue => e
-            LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
-            puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
-        end
-    end if $ione_conf['Scripts'].class == Array
+  $ione_conf['Scripts'].each do | script |
+    puts "\tIncluding #{script}"
+    begin
+      Thread.new { require "#{ROOT}/scripts/#{script}/main.rb" }
+      LOG_COLOR "\t - #{script} -- initialized", 'none', 'green', 'itself'
+    rescue => e
+      LOG_COLOR "Script \"#{script}\" was not started | Error: #{e.message}", 'ScriptController', 'green', 'itself'
+      puts "\tScript \"#{script}\" was not started | Error: #{e.message}"
+    end
+  end if $ione_conf['Scripts'].class == Array
 rescue => e
-    LOG_ERROR "ScriptsController fatal error | #{e}", 'ScriptController', 'red', 'underline'
-    puts "ScriptsController fatal error | #{e}"
+  LOG_ERROR "ScriptsController fatal error | #{e}", 'ScriptController', 'red', 'underline'
+  puts "ScriptsController fatal error | #{e}"
 end if MAIN_IONE
 
 puts 'Making IONe methods deferable'
 class IONe
-    self.instance_methods(false).each do | method |
-        deferable method
-    end
+  self.instance_methods(false).each do | method |
+    deferable method
+  end
 end
 
 $methods = IONe.instance_methods(false).map { | method | method.to_s }
@@ -279,50 +282,50 @@ set :bind, 'localhost'
 set :port, 8009
 
 before do
-    if request.request_method == 'OPTIONS' then
-        halt 200, {}, ""
+  if request.request_method == 'OPTIONS' then
+    halt 200, {}, ""
+  end
+  begin
+    unless ['GET', 'DELETE'].include? request.request_method then
+      @request_body = request.body.read
+      if @request_body.empty? then
+        @request_hash = { 'params' => [] }
+      else
+        @request_hash = JSON.parse @request_body
+        @request_hash['params'] = [] if @request_hash['params'].nil?
+      end
     end
-    begin
-        unless ['GET', 'DELETE'].include? request.request_method then
-            @request_body = request.body.read
-            if @request_body.empty? then
-                @request_hash = { 'params' => [] }
-            else
-                @request_hash = JSON.parse @request_body
-                @request_hash['params'] = [] if @request_hash['params'].nil?
-            end
-        end
-        if (request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty?) and request.params["ws"] != 'true' then
-            halt 401, { 'Allow' => "*" }, "No Credentials given"
-        end
-
-        if request.params["ws"] == 'true' then
-            @auth = Base64.decode64 request.params["auth"]
-        else
-            @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
-        end
-
-        env[:one_client] = @client   = Client.new(@auth)
-        env[:one_user]   = @one_user = User.new_with_id(-1, @client)
-        rc = @one_user.info!
-        if OpenNebula.is_error?(rc)
-            halt 401, { 'Allow' => "*" }, "False Credentials given"
-        end
-        RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.is_admin? ? "" : "NOT "}Admin"
-    rescue => e
-        RPC_LOGGER.debug "Exception #{e.message}"
-        RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
-        halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
+    if (request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty?) and request.params["ws"] != 'true' then
+      halt 401, { 'Allow' => "*" }, "No Credentials given"
     end
+
+    if request.params["ws"] == 'true' then
+      @auth = Base64.decode64 request.params["auth"]
+    else
+      @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
+    end
+
+    env[:one_client] = @client   = Client.new(@auth)
+    env[:one_user]   = @one_user = User.new_with_id(-1, @client)
+    rc = @one_user.info!
+    if OpenNebula.is_error?(rc)
+      halt 401, { 'Allow' => "*" }, "False Credentials given"
+    end
+    RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.is_admin? ? "" : "NOT "}Admin"
+  rescue => e
+    RPC_LOGGER.debug "Exception #{e.message}"
+    RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
+    halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
+  end
 end
 
 puts "Allowing CORS"
 # Sinatra :after helper allowing Cors by adding needed headers
 after do
-    response.headers['Allow'] = "*"
-    response.headers['Access-Control-Allow-Origin'] = "*"
-    response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
-    response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
+  response.headers['Allow'] = "*"
+  response.headers['Access-Control-Allow-Origin'] = "*"
+  response.headers['Access-Control-Allow-Methods'] = "HEAD,GET,PUT,POST,DELETE,OPTIONS"
+  response.headers['Access-Control-Allow-Headers'] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, Authorization"
 end
 
 puts "Registering IONe methods"
@@ -339,18 +342,18 @@ puts "Registering IONe methods"
 #        200 - { "response": "PONG" }
 # @see IONe#Test
 post '/ione/:method' do | method |
-    begin
-        RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
-        r = IONe.new(@client, $db).send(method, *@request_hash['params'])
-    rescue => e
-        r = e.message
-        backtrace = e.backtrace
-    ensure
-        r = { error: r.message } if OpenNebula.is_error? r
-    end
-    RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
-    json response: r
+  begin
+    RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    r = IONe.new(@client, $db).send(method, *@request_hash['params'])
+  rescue => e
+    r = e.message
+    backtrace = e.backtrace
+  ensure
+    r = { error: r.message } if OpenNebula.is_error? r
+  end
+  RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  json response: r
 end
 
 puts "Registering ONe methods"
@@ -368,18 +371,18 @@ puts "Registering ONe methods"
 #        200 - { "response": "one-vm-777-name" }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
-    begin
-        RPC_LOGGER.debug "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
-        r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
-    rescue => e
-        r = e.message
-        backtrace = e.backtrace
-    ensure
-        r = { error: r.message } if OpenNebula.is_error? r
-    end
-    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
-    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
-    json response: r
+  begin
+    RPC_LOGGER.debug "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
+  rescue => e
+    r = e.message
+    backtrace = e.backtrace
+  ensure
+    r = { error: r.message } if OpenNebula.is_error? r
+  end
+  RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  json response: r
 end
 
 puts "Registering ONe Pool methods"
@@ -397,21 +400,21 @@ puts "Registering ONe Pool methods"
 #        200 - { "response": [...] }
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
-    begin
-        RPC_LOGGER.debug "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect {|p| p.inspect}.join(", ")})"
-        r = 
-            (
-                @request_hash['uid'].nil? ? 
-                    ON_INSTANCE_POOLS[object.to_sym].new(@client) :
-                    ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
-            ).send(method.to_s << excl.to_s, *@request_hash['params'])
-    rescue => e
-        r = e.message
-        backtrace = e.backtrace
-    ensure
-        r = { error: r.message } if OpenNebula.is_error? r
-    end
-    RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
-    RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
-    json response: r
+  begin
+    RPC_LOGGER.debug "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    r =
+      (
+        @request_hash['uid'].nil? ?
+          ON_INSTANCE_POOLS[object.to_sym].new(@client) :
+          ON_INSTANCE_POOLS[object.to_sym].new(@client, @request_hash['uid'])
+      ).send(method.to_s << excl.to_s, *@request_hash['params'])
+  rescue => e
+    r = e.message
+    backtrace = e.backtrace
+  ensure
+    r = { error: r.message } if OpenNebula.is_error? r
+  end
+  RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  json response: r
 end

@@ -41,11 +41,12 @@ class AnsiblePlaybookModel
     'delete' => 2,
     'vars'   => 0,
     'clone'  => 0,
-    'rename' => 1  }
+    'rename' => 1
+  }
 
   ACTIONS = ['USE', 'MANAGE', 'ADMIN']
 
-  def initialize id:nil, data:{'action' => {'params' => {}}}, user:nil
+  def initialize id: nil, data: { 'action' => { 'params' => {} } }, user: nil
     @user = user # Need this to check permissions later
     @user.info!
     if id.nil? then # If id is not given - new Playbook will be created
@@ -113,8 +114,8 @@ class AnsiblePlaybookModel
   def chown
     # if chown or chgrp method called OpenNebula always calling chown.
     # And if owner or group is not changing, it sets corresponding key to "-1".
-    # So if owner is set to "-1" chown will try to call chgrp 
-    IONe.new($client, $db).UpdateAnsiblePlaybook( "id" => @body['id'], "uid" => @params['owner_id'] ) unless @params['owner_id'] == '-1'
+    # So if owner is set to "-1" chown will try to call chgrp
+    IONe.new($client, $db).UpdateAnsiblePlaybook("id" => @body['id'], "uid" => @params['owner_id']) unless @params['owner_id'] == '-1'
     chgrp unless @params['group_id'] == '-1' # But if group is also set to "-1", nothing will be called if so
     nil
   end
@@ -177,8 +178,8 @@ get '/ansible' do # Returns full Ansible Playbooks pool in OpenNebula XML-POOL f
     pool = IONe.new($client, $db).ListAnsiblePlaybooks # Array of playbooks
     pool.delete_if { |pb| !ansible_check_permissions(pb, @one_user, 0) } # Deletes playbooks, which aren't under user access
     pool.map! do | pb | # Adds user and group name to every object
-      user, group = OpenNebula::User.new_with_id( pb['uid'], @client),
-                OpenNebula::Group.new_with_id( pb['gid'], @client)
+      user, group = OpenNebula::User.new_with_id(pb['uid'], @client),
+                OpenNebula::Group.new_with_id(pb['gid'], @client)
       user.info!; group.info!
       pb['vars'] = IONe.new($client, $db).GetAnsiblePlaybookVariables(pb['id'])
       pb.merge(
@@ -199,7 +200,7 @@ post '/ansible' do # Allocates new playbook
     r error: "Broken data received, unable to parse."
   rescue => e
     @one_user.info!
-    r error: e.message, backtrace: e.backtrace, data:data
+    r error: e.message, backtrace: e.backtrace, data: data
   end
 end
 
@@ -255,7 +256,7 @@ end
 post '/ansible/:action' do | action | # Performs actions, which are defined as def self.method for AnsiblePlaybookModel model
   begin
     if action == 'check_syntax' then
-      r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax( @request_hash['body'])
+      r response: IONe.new($client, $db).CheckAnsiblePlaybookSyntax(@request_hash['body'])
     else
       r response: "Action is not defined"
     end
@@ -281,7 +282,7 @@ class AnsiblePlaybookProcessModel
       @params = data
       begin
         # Check if mandatory params are not nil
-        check =  @params['playbook_id'].nil? || @params['hosts'].nil?
+        check = @params['playbook_id'].nil? || @params['hosts'].nil?
       rescue
         raise ParamsError.new @params # Custom error if extra_data is nil
       end
@@ -345,14 +346,14 @@ class AnsiblePlaybookProcessModel
       "Some arguments are missing or nil! Params:\n#{@params.inspect}"
     end
   end
-end 
+end
 
 get '/ansible_process' do
   begin
     pool = IONe.new(@client, $db).ListAnsiblePlaybookProcesses
-    pool.delete_if {|apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
+    pool.delete_if { |apc| !@one_user.groups.include?(0) && apc['uid'] != @one_user.id }
     pool.map! do | apc | # Adds user name to every object
-      user =  OpenNebula::User.new_with_id( apc['uid'], @client)
+      user =  OpenNebula::User.new_with_id(apc['uid'], @client)
       user.info!
       apc.merge('id' => apc['proc_id'], 'uname' => user.name)
     end
@@ -370,15 +371,15 @@ post '/ansible_process' do
     r error: "Broken data received, unable to parse."
   rescue => e
     @one_user.info!
-    r error: e.message, backtrace: e.backtrace, data:data
+    r error: e.message, backtrace: e.backtrace, data: data
   end
 end
 
 get '/ansible_process/:id' do |id|
   begin
-    apc = AnsiblePlaybookProcessModel.new(id:id, user:@one_user) # Getting playbook
+    apc = AnsiblePlaybookProcessModel.new(id: id, user: @one_user) # Getting playbook
     # Saving user and group to objects
-    user = OpenNebula::User.new_with_id( apc.body['uid'], @client)
+    user = OpenNebula::User.new_with_id(apc.body['uid'], @client)
     user.info!
     apc.body.merge!('id' => apc.body['proc_id'], 'uname' => user.name) # Retrieving information about this objects from ONe
     r response: apc.body
@@ -389,8 +390,8 @@ end
 
 delete '/ansible_process/:id' do |id| # Deletes given playbook process
   begin
-    data = {'action' => {'perform' => 'delete', 'params' => nil}}
-    pb = AnsiblePlaybookProcessModel.new(id:id, data:data, user:@one_user)
+    data = { 'action' => { 'perform' => 'delete', 'params' => nil } }
+    pb = AnsiblePlaybookProcessModel.new(id: id, data: data, user: @one_user)
 
     r response: pb.call
   rescue JSON::ParserError # If JSON.parse fails
@@ -399,15 +400,15 @@ delete '/ansible_process/:id' do |id| # Deletes given playbook process
     r error: e.message, backtrace: e.backtrace
   end
 end
- 
- post '/ansible_process/:id/action' do | id | # Performs action
-   begin
-     pb = AnsiblePlaybookProcessModel.new(id:id, data:@request_hash, user:@one_user)
- 
-     r response: pb.call
-   rescue JSON::ParserError # If JSON.parse fails
-     r error: "Broken data received, unable to parse."
-   rescue => e
-      r error: e.message, backtrace: e.backtrace
-   end
- end
+
+post '/ansible_process/:id/action' do | id | # Performs action
+  begin
+    pb = AnsiblePlaybookProcessModel.new(id: id, data: @request_hash, user: @one_user)
+
+    r response: pb.call
+  rescue JSON::ParserError # If JSON.parse fails
+    r error: "Broken data received, unable to parse."
+  rescue => e
+    r error: e.message, backtrace: e.backtrace
+  end
+end

@@ -1,1 +1,1 @@
-Dir["#{ROOT}/service/objects/*.rb"].each {|file| require file }
+Dir["#{ROOT}/service/objects/*.rb"].each { |file| require file }

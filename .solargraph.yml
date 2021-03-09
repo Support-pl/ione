@@ -6,11 +6,14 @@ exclude:
 - test/**/*
 - vendor/**/*
 - ".bundle/**/*"
-require: []
+require:
+  - file-tail
+  - sinatra/base
+  - json
+  - opennebula
 domains: []
 reporters:
 - rubocop
-- require_not_found
 formatter:
   rubocop:
     cops: safe

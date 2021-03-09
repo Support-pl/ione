@@ -63,8 +63,8 @@ SETTINGS_TABLE = $db[:settings]
 get '/settings' do
   begin
     begin
-      access_level = env[:one_user].is_admin? ? 1 : 0 
-    rescue => e
+      access_level = env[:one_user].is_admin? ? 1 : 0
+    rescue
       access_level = 0
     end
     json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).to_a
@@ -76,11 +76,11 @@ end
 get '/settings/:key' do | key |
   begin
     begin
-      access_level = env[:one_user].is_admin? ? 1 : 0 
+      access_level = env[:one_user].is_admin? ? 1 : 0
     rescue
       access_level = 0
     end
-    json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).where(name:key).to_a.last
+    json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).where(name: key).to_a.last
   rescue => e
     json error: e.message
   end
