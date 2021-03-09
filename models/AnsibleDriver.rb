@@ -9,10 +9,10 @@ def ansible_check_permissions pb, u, uma
   perm = pb['extra_data']['PERMISSIONS'].split('')
   mod = perm.values_at(*Array.new(3) { |i| uma + 3 * i }).map { | value | value == '1' ? true : false }
   return (
-    (  u.id == pb['uid'] && mod[0]      ) ||
-    (  u.groups.include?(pb['gid']) && mod[1] ) ||
-    (            mod[2]       ) ||
-    (       u.groups.include?(0)    )
+    (u.id == pb['uid'] && mod[0]) ||
+    (u.groups.include?(pb['gid']) && mod[1]) ||
+    (mod[2]) ||
+    (u.groups.include?(0))
   )
 end
 
@@ -89,8 +89,8 @@ class AnsiblePlaybookModel
     args.delete('id')
     IONe.new($client, $db).CreateAnsiblePlaybook(
       args.merge({
-        :name => @params["name"], :uid => @user.id, :gid => @user.gid
-      })
+                   :name => @params["name"], :uid => @user.id, :gid => @user.gid
+                 })
     )
   end
 
