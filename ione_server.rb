@@ -285,8 +285,12 @@ before do
     begin
         unless ['GET', 'DELETE'].include? request.request_method then
             @request_body = request.body.read
-            @request_hash = JSON.parse @request_body
-            @request_hash['params'] = [] if @request_hash['params'].nil?
+            if @request_body.empty? then
+                @request_hash = { 'params' => [] }
+            else
+                @request_hash = JSON.parse @request_body
+                @request_hash['params'] = [] if @request_hash['params'].nil?
+            end
         end
         if (request.env['HTTP_AUTHORIZATION'].nil? or request.env['HTTP_AUTHORIZATION'].empty?) and request.params["ws"] != 'true' then
             halt 401, { 'Allow' => "*" }, "No Credentials given"
