@@ -23,9 +23,9 @@ class OpenNebula::VirtualMachine
   # Generates template for OpenNebula scheduler record
   def generate_schedule_str id, action, time
     "\nSCHED_ACTION=[\n" +
-    "  ACTION=\"#{action}\",\n" +
-    "  ID=\"#{id}\",\n" +
-    "  TIME=\"#{time}\" ]"
+      "  ACTION=\"#{action}\",\n" +
+      "  ID=\"#{id}\",\n" +
+      "  TIME=\"#{time}\" ]"
   end
 
   # Returns allowed actions to schedule
@@ -33,6 +33,7 @@ class OpenNebula::VirtualMachine
   def schedule_actions
     SCHEDULABLE_ACTIONS
   end
+
   # Adds actions to OpenNebula internal scheduler, like --schedule in 'onevm' cli utility
   # @param [String] action - Action which should be scheduled
   # @param [Integer] time - Time when action schould be perfomed in secs
@@ -334,7 +335,7 @@ class OpenNebula::VirtualMachine
   # @return [Array<Hash>, Hash, nil]
   def list_snapshots
     out = self.to_hash!['VM']['TEMPLATE']['SNAPSHOT']
-    out.class == Array ? out : [ out ]
+    out.class == Array ? out : [out]
   end
 
   # Returns actual state without calling info! method
@@ -462,7 +463,7 @@ class OpenNebula::VirtualMachine
 
     if self['TEMPLATE/GRAPHICS/TYPE'].nil? ||
        !(["vnc", "spice"].include?(self['TEMPLATE/GRAPHICS/TYPE'].downcase))
-      return {error: "VM has no VNC configured"}
+      return { error: "VM has no VNC configured" }
     end
 
     # Proxy data
