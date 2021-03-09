@@ -23,7 +23,7 @@ ETC_LOCATION      = "/etc/one/"
 ONED_CONF         = ETC_LOCATION + "oned.conf"
 
 $: << RUBY_LIB_LOCATION
-$: << RUBY_LIB_LOCATION+'/onedb'
+$: << RUBY_LIB_LOCATION + '/onedb'
 
 require 'base64'
 require 'yaml'
@@ -51,8 +51,8 @@ aug.context = "/files/#{work_file_name}"
 aug.load
 
 if aug.get('DB/BACKEND') != "\"mysql\"" then
-    STDERR.puts "OneDB backend is not MySQL, exiting..."
-    exit 1
+  STDERR.puts "OneDB backend is not MySQL, exiting..."
+  exit 1
 end
 
 ops = {}
@@ -62,29 +62,30 @@ ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
-    next if !v || !(v.is_a? String)
-    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  next if !v || !(v.is_a? String)
+
+  ops[k] = v.chomp('"').reverse.chomp('"').reverse
 end
 
-ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
 
 $db = Sequel.connect(**ops)
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
-    puts "VM wasn't allocated, skipping"
-    exit 0
+  puts "VM wasn't allocated, skipping"
+  exit 0
 end
 
 vm = VirtualMachine.new xml.xpath('//EXTRA/VM'), Client.new
 vm.info!
 
 begin
-    if vm.to_hash['VM']['USER_TEMPLATE']['HOOK_VARS']['SET_COST'] != "TRUE" then
-        raise
-    end
+  if vm.to_hash['VM']['USER_TEMPLATE']['HOOK_VARS']['SET_COST'] != "TRUE" then
+    raise
+  end
 rescue
-    puts "Attribute HOOK_VARS/SET_COST is FALSE or not set. Skipping..."
-    exit 0
+  puts "Attribute HOOK_VARS/SET_COST is FALSE or not set. Skipping..."
+  exit 0
 end
 
 db = $db[:settings].as_hash(:name, :body)
@@ -92,34 +93,34 @@ db = $db[:settings].as_hash(:name, :body)
 costs = {}
 
 if %(vcenter kvm).include?(vm['USER_TEMPLATE/HYPERVISOR'].downcase) then
-    costs.merge!(
-        'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
-        'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f,
-        'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f,
-        'PUBLIC_IP_COST' => db['PUBLIC_IP_COST'].to_f
-    )
+  costs.merge!(
+    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
+      'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f,
+      'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f,
+      'PUBLIC_IP_COST' => db['PUBLIC_IP_COST'].to_f
+  )
 elsif vm['USER_TEMPLATE/HYPERVISOR'].downcase == 'azure' then
-    sku = JSON.parse(
-        JSON.parse( db['AZURE_SKUS'] )[ vm['USER_TEMPLATE/PUBLIC_CLOUD/INSTANCE_TYPE'] ]
-    )
+  sku = JSON.parse(
+    JSON.parse(db['AZURE_SKUS'])[ vm['USER_TEMPLATE/PUBLIC_CLOUD/INSTANCE_TYPE'] ]
+  )
 
-    costs.merge!(
-        'CPU_COST' => sku['PRICE'].to_f / 2,
-        'MEMORY_COST' => sku['PRICE'].to_f / 2,
-        'DISK_COST' => JSON.parse(db['AZURE_DISK_COSTS'])[vm['USER_TEMPLATE/DRIVE']].to_f
-    )
+  costs.merge!(
+    'CPU_COST' => sku['PRICE'].to_f / 2,
+    'MEMORY_COST' => sku['PRICE'].to_f / 2,
+    'DISK_COST' => JSON.parse(db['AZURE_DISK_COSTS'])[vm['USER_TEMPLATE/DRIVE']].to_f
+  )
 end
 
 template =
-    costs.inject("") do | result, el |
-        result += "#{el.first} = \"#{el.last}\"\n"
-    end
+  costs.inject("") do | result, el |
+    result += "#{el.first} = \"#{el.last}\"\n"
+  end
 
 vm.update(template, true)
 
 action = OneDBLive.new
 costs.each do | key, value |
-    action.change_body('vm', "/VM/TEMPLATE/#{key}", value.to_s, {:id => vm.id})
+  action.change_body('vm', "/VM/TEMPLATE/#{key}", value.to_s, { :id => vm.id })
 end
 
-puts "Work time: #{(Time.now.to_f - STARTUP_TIME).round(6).to_s} sec"
+puts "Work time: #{(Time.now.to_f - STARTUP_TIME).round(6)} sec"

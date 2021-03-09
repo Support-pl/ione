@@ -38,8 +38,8 @@ aug.context = "/files/#{work_file_name}"
 aug.load
 
 if aug.get('DB/BACKEND') != "\"mysql\"" then
-    STDERR.puts "OneDB backend is not MySQL, exiting..."
-    exit 1
+  STDERR.puts "OneDB backend is not MySQL, exiting..."
+  exit 1
 end
 
 ops = {}
@@ -49,11 +49,12 @@ ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
-    next if !v || !(v.is_a? String)
-    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  next if !v || !(v.is_a? String)
+
+  ops[k] = v.chomp('"').reverse.chomp('"').reverse
 end
 
-ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
 
 $db = Sequel.connect(**ops)
 

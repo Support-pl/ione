@@ -20,8 +20,8 @@ require 'nokogiri'
 
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
-    puts "User wasn't allocated, skipping"
-    exit 0
+  puts "User wasn't allocated, skipping"
+  exit 0
 end
 
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
@@ -54,8 +54,8 @@ aug.context = "/files/#{work_file_name}"
 aug.load
 
 if aug.get('DB/BACKEND') != "\"mysql\"" then
-    STDERR.puts "OneDB backend is not MySQL, exiting..."
-    exit 1
+  STDERR.puts "OneDB backend is not MySQL, exiting..."
+  exit 1
 end
 
 ops = {}
@@ -65,45 +65,46 @@ ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
-    next if !v || !(v.is_a? String)
-    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  next if !v || !(v.is_a? String)
+
+  ops[k] = v.chomp('"').reverse.chomp('"').reverse
 end
 
-ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
 
 $db = Sequel.connect(**ops)
 
 conf = $db[:settings].as_hash(:name, :body)
 
 unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
-    puts "Not IaaS User, skipping..."
-    exit 0
+  puts "Not IaaS User, skipping..."
+  exit 0
 end
 
 vnet = VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new)
 vnet.info!
 begin
-    ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
+  ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
 rescue
-    puts ar_pool.inspect
-    exit(-1)
+  puts ar_pool.inspect
+  exit(-1)
 end
 ar_pool.select! do | ar |
-    ar['USED_LEASES'] == "0"
+  ar['USED_LEASES'] == "0"
 end
 
 ar = ar_pool.sample
 
 bridge = vnet['//BRIDGE_PATTERN']
 if bridge.nil? then
-    bridge = "user-#{user.id}-vnet"
+  bridge = "user-#{user.id}-vnet"
 else
-    bridge = bridge.gsub('<%VLAN_ID%>', ar['VLAN_ID'])
+  bridge = bridge.gsub('<%VLAN_ID%>', ar['VLAN_ID'])
 end
 
 if vnet['VN_MAD'] == 'vcenter' then
-    user_vnet = vnet.clone
-    user_vnet.allocate("
+  user_vnet = vnet.clone
+  user_vnet.allocate("
         NAME = \"user-#{user.id}-vnet\"
         BRIDGE = \"#{bridge}\"
         VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
@@ -114,22 +115,22 @@ if vnet['VN_MAD'] == 'vcenter' then
         TYPE = \"PRIVATE\"
         VCENTER_ONE_HOST_ID = \"#{JSON.parse(conf['NODES_DEFAULT'])['VCENTER']}\"", conf['DEFAULT_CLUSTER'].to_i)
 
-    user_vnet.add_ar("AR = [
+  user_vnet.add_ar("AR = [
         IP = \"#{ar['IP']}\",
         SIZE = \"#{ar['SIZE']}\",
         TYPE = \"#{ar['TYPE']}\" ]")
 
-    vnet.rm_ar ar['AR_ID']
+  vnet.rm_ar ar['AR_ID']
 else
-    user_vnet = vnet.reserve("user-#{user.id}-vnet", ar['SIZE'], ar['AR_ID'], nil, nil)
-    user_vnet = VirtualNetwork.new_with_id(user_vnet, Client.new)
+  user_vnet = vnet.reserve("user-#{user.id}-vnet", ar['SIZE'], ar['AR_ID'], nil, nil)
+  user_vnet = VirtualNetwork.new_with_id(user_vnet, Client.new)
 end
 
 user_vnet.chown(user.id, conf['IAAS_GROUP_ID'].to_i)
 clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
-clusters = [ clusters ] if clusters.class != Array
+clusters = [clusters] if clusters.class != Array
 for c in clusters do
-    Cluster.new_with_id(c.to_i, Client.new).addvnet(user_vnet.id)
+  Cluster.new_with_id(c.to_i, Client.new).addvnet(user_vnet.id)
 end
 
 puts "Virtual Network for User##{user.id} successfuly created with id #{user_vnet.id}"

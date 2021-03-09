@@ -20,8 +20,8 @@ require 'nokogiri'
 
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
-    puts "VNet wasn't allocated/deleted, skipping"
-    exit 0
+  puts "VNet wasn't allocated/deleted, skipping"
+  exit 0
 end
 
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
@@ -54,8 +54,8 @@ aug.context = "/files/#{work_file_name}"
 aug.load
 
 if aug.get('DB/BACKEND') != "\"mysql\"" then
-    STDERR.puts "OneDB backend is not MySQL, exiting..."
-    exit 1
+  STDERR.puts "OneDB backend is not MySQL, exiting..."
+  exit 1
 end
 
 ops = {}
@@ -65,18 +65,19 @@ ops[:password] = aug.get('DB/PASSWD')
 ops[:database] = aug.get('DB/DB_NAME')
 
 ops.each do |k, v|
-    next if !v || !(v.is_a? String)
-    ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  next if !v || !(v.is_a? String)
+
+  ops[k] = v.chomp('"').reverse.chomp('"').reverse
 end
 
-ops.merge! adapter: :mysql2,  encoding: 'utf8mb4'
+ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
 
 $db = Sequel.connect(**ops)
 class AR < Sequel::Model(:ars); end
 
 AR.create do | r |
-    r.vnid  = vnet.id
-    r.arid  = ARGV.last == 'crt' ? 0 : -1
-    r.time  = Time.now.to_i
-    r.state = ARGV.last
+  r.vnid = vnet.id
+  r.arid  = ARGV.last == 'crt' ? 0 : -1
+  r.time  = Time.now.to_i
+  r.state = ARGV.last
 end
