@@ -34,6 +34,8 @@ jobs:
         run: npm install
 
       - name: Build
+        env:
+          VUE_APP_IONE_API_BASE_URL: ${{ secrets.IONE_API_BASE_URL }}
         run: npm run build
 
       - name: SFTP Deploy
