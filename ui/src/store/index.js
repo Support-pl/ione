@@ -3,8 +3,6 @@ import Vuex from "vuex";
 
 import axios from "axios";
 
-let config = require("@/config");
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -37,7 +35,7 @@ export default new Vuex.Store({
       let pool = (
         await axios({
           method: "post",
-          url: config.CLOUD_API_BASE_URL + "/one.u.pool.to_hash!",
+          url: process.env.VUE_APP_IONE_API_BASE_URL + "/one.u.pool.to_hash!",
           auth: state.credentials,
           data: {},
         })
