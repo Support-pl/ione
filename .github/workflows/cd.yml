@@ -44,6 +44,9 @@ jobs:
 #         run: npm run build
       - name: test
         run: mkdir dist && touch test.txt
+        
+      - name: test dir
+        run: pwd && ls
 
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@1.1
