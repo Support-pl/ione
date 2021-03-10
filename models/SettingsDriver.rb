@@ -29,7 +29,7 @@ rescue
     begin
       $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
     rescue Sequel::UniqueConstraintViolation
-      puts "#{record[0]} already exists, skipping"
+      nil # Key already exists
     end
   end
 end
