@@ -31,7 +31,6 @@ require 'sinatra'
 require "sinatra/json"
 require 'erb'
 require 'yaml'
-require 'augeas'
 require 'securerandom'
 require 'tmpdir'
 require 'fileutils'
@@ -54,7 +53,6 @@ end
 use Rack::Deflater
 
 require 'ipaddr'
-require 'sequel'
 
 puts 'Getting path to the server'
 ROOT = ROOT_DIR # IONe root path
@@ -88,39 +86,9 @@ puts 'Setting up Environment(OpenNebula API)'
 # Loading DB Credentials and connecting DB
 
 ONED_CONF = ETC_LOCATION + '/oned.conf'
-work_file_dir  = File.dirname(ONED_CONF)
-work_file_name = File.basename(ONED_CONF)
 
-aug = Augeas.create(:no_modl_autoload => true,
-                    :no_load          => true,
-                    :root             => work_file_dir,
-                    :loadpath         => ONED_CONF)
-
-aug.clear_transforms
-aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
-aug.context = "/files/#{work_file_name}"
-aug.load
-
-if aug.get('DB/BACKEND') != "\"mysql\"" then
-  STDERR.puts "OneDB backend is not MySQL, exiting..."
-  exit 1
-end
-
-ops = {}
-ops[:host]     = aug.get('DB/SERVER')
-ops[:user]     = aug.get('DB/USER')
-ops[:password] = aug.get('DB/PASSWD')
-ops[:database] = aug.get('DB/DB_NAME')
-
-ops.each do |k, v|
-  next if !v || !(v.is_a? String)
-
-  ops[k] = v.chomp('"').reverse.chomp('"').reverse
-end
-
-ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
-
-$db = Sequel.connect(**ops)
+require 'core/load_oned_conf.rb'
+require 'core/connect_db.rb'
 
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
@@ -131,7 +99,7 @@ include OpenNebula
 # OpenNebula credentials
 CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = "http://localhost:#{aug.get('PORT')}/RPC2"
+ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
 require "SettingsDriver"
