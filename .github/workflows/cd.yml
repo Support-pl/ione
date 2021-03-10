@@ -61,4 +61,4 @@ jobs:
           # will put all file under this path
           local_path: ui/dist
           # files will copy to under remote_path
-          remote_path: /usr/lib/one/ione/ui/dist
+          remote_path: /usr/lib/one/ione/ui
