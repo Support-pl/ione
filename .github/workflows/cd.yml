@@ -10,8 +10,6 @@ on:
       - 'ui/**'
   pull_request:
     branches: [ master ]
-    paths:
-      - 'ui/**'
   workflow_dispatch:
     inputs:
         deployEnvironment:
@@ -46,7 +44,7 @@ jobs:
         run: mkdir dist && touch test.txt
         
       - name: test dir
-        run: pwd && ls
+        run: pwd && ls && ls dist
 
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@1.1
@@ -59,6 +57,6 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
           # will put all file under this path
-          local_path: ui/dist
+          local_path: 'ui/dist/*'
           # files will copy to under remote_path
           remote_path: /usr/lib/one/ione/ui
