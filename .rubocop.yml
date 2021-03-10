@@ -1,0 +1,38 @@
+Naming/FileName:
+  Enabled: false
+
+Style:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+  
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Layout/SpaceAroundBlockParameters:
+  Enabled: false
+
+Layout/HashAlignment:
+  Enabled: false
+
+Naming/MethodParameterName:
+  MinNameLength: 2
+
+Naming/MethodName:
+  Enabled: false
+
+Lint/NonDeterministicRequireOrder:
+  Enabled: false
+
+AllCops:
+  TargetRubyVersion: 2.5

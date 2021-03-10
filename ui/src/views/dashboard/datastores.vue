@@ -135,7 +135,6 @@ export default {
         method: "post",
         url: "/one.ds.pool.to_hash!",
         auth: this.credentials,
-        data: { params: [] },
       }).then((res) => (this.ds_pool = res.data.response));
     },
   },

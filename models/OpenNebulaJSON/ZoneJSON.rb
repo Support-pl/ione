@@ -17,47 +17,47 @@
 require 'OpenNebulaJSON/JSONUtils'
 
 module OpenNebulaJSON
-    class ZoneJSON < OpenNebula::Zone
-        include JSONUtils
+  class ZoneJSON < OpenNebula::Zone
+    include JSONUtils
 
-        def create(template_json)
-            zone_hash = parse_json(template_json, 'zone')
+    def create(template_json)
+      zone_hash = parse_json(template_json, 'zone')
 
-            if OpenNebula.is_error?(zone_hash)
-                return zone_hash
-            end
+      if OpenNebula.is_error?(zone_hash)
+        return zone_hash
+      end
 
-            template = template_to_str(zone_hash)
+      template = template_to_str(zone_hash)
 
-            self.allocate(template)
-        end
-
-        def perform_action(template_json)
-            action_hash = parse_json(template_json, 'action')
-            if OpenNebula.is_error?(action_hash)
-                return action_hash
-            end
-
-            case action_hash['perform']
-                 when "update"  then self.update(action_hash['params'])
-                 when "rename"  then self.rename(action_hash['params'])
-                 else
-                     error_msg = "#{action_hash['perform']} action not " <<
-                         " available for this resource"
-                     OpenNebula::Error.new(error_msg)
-            end
-        end
-
-        def update params = Hash.new
-            if !params['append'].nil?
-                super(params['template_raw'], params['append'])
-            else
-                super(params['template_raw'])
-            end
-        end
-
-        def rename params = Hash.new
-            super(params['name'])
-        end
+      self.allocate(template)
     end
+
+    def perform_action(template_json)
+      action_hash = parse_json(template_json, 'action')
+      if OpenNebula.is_error?(action_hash)
+        return action_hash
+      end
+
+      case action_hash['perform']
+      when "update"  then self.update(action_hash['params'])
+      when "rename"  then self.rename(action_hash['params'])
+      else
+        error_msg = "#{action_hash['perform']} action not " <<
+                    " available for this resource"
+        OpenNebula::Error.new(error_msg)
+      end
+    end
+
+    def update params = Hash.new
+      if !params['append'].nil?
+        super(params['template_raw'], params['append'])
+      else
+        super(params['template_raw'])
+      end
+    end
+
+    def rename params = Hash.new
+      super(params['name'])
+    end
+  end
 end

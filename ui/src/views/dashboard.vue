@@ -12,7 +12,9 @@
             <a-menu-item v-for="item in asideBtns" :key="item.name">
               <router-link
                 :to="{
-                  path: item.route ? item.route : `/dashboard/${item.name}`,
+                  path: item.route
+                    ? `/dashboard/${item.route}`
+                    : `/dashboard/${item.name}`,
                 }"
               >
                 {{ item.name | capitalize }}
@@ -46,6 +48,13 @@ const asideBtns = [
   {
     name: "Ansible Playbooks",
     route: "playbooks",
+  },
+  {
+    name: "Ansible Processes",
+    route: "processes",
+  },
+  {
+    name: "logs",
   },
 ];
 export default {

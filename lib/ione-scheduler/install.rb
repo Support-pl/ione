@@ -6,44 +6,46 @@ $ione_conf = YAML.load(File.read("#{ROOT}/ione.conf")) # IONe configuration cons
 
 print 'Connecting to DB server...'
 begin
-client = Mysql2::Client.new(
-    :username => $ione_conf['DB']['user'], :password => $ione_conf['DB']['pass'], 
-    :host => $ione_conf['DB']['host'] )
-    puts ' [ OK ]'
+  client = Mysql2::Client.new(
+    :username => $ione_conf['DB']['user'], :password => $ione_conf['DB']['pass'],
+    :host => $ione_conf['DB']['host']
+  )
+  puts ' [ OK ]'
 rescue => e
-    puts " [ Error ] \n Error: #{e.message}"
-    Kernel.exit
+  puts " [ Error ] \n Error: #{e.message}"
+  Kernel.exit
 end
 
 print 'Creating DB ioneschedule...'
 begin
-    client.query('CREATE DATABASE ioneschedule')
-    puts ' [ OK ]'
+  client.query('CREATE DATABASE ioneschedule')
+  puts ' [ OK ]'
 rescue => e
-    puts " [ Error ] \n Error: #{e.message}"
+  puts " [ Error ] \n Error: #{e.message}"
 end
 
 print 'Connecting to ioneschedule DB...'
 begin
-    client = Mysql2::Client.new(
-        :username => $ione_conf['DB']['user'], :password => $ione_conf['DB']['pass'], 
-        :host => $ione_conf['DB']['host'], :database => 'ioneschedule' )
-        puts ' [ OK ]'
+  client = Mysql2::Client.new(
+    :username => $ione_conf['DB']['user'], :password => $ione_conf['DB']['pass'],
+      :host => $ione_conf['DB']['host'], :database => 'ioneschedule'
+  )
+  puts ' [ OK ]'
 rescue => e
-    puts " [ Error ] \n Error: #{e.message}"
+  puts " [ Error ] \n Error: #{e.message}"
 end
 
 print 'Creating actions table...'
 begin
-    client.query(
-        'CREATE TABLE action (
+  client.query(
+    'CREATE TABLE action (
             class VARCHAR(20), method VARCHAR(20),
             params VARCHAR(20), time INT,
             id INT NOT NULL AUTO_INCREMENT,
             PRIMARY KEY (id)
         )'
-    )
-    puts ' [ OK ]'
+  )
+  puts ' [ OK ]'
 rescue => e
-    puts " [ Error ] \n Error: #{e.message}"
+  puts " [ Error ] \n Error: #{e.message}"
 end

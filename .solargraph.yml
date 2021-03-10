@@ -1,0 +1,25 @@
+---
+include:
+- "**/*.rb"
+exclude:
+- spec/**/*
+- test/**/*
+- vendor/**/*
+- ".bundle/**/*"
+require:
+  - file-tail
+  - sinatra/base
+  - json
+  - opennebula
+domains: []
+reporters:
+- rubocop
+formatter:
+  rubocop:
+    cops: safe
+    except: []
+    only: []
+    extra_args: []
+require_paths: []
+plugins: []
+max_files: 5000

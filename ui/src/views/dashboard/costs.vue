@@ -593,7 +593,6 @@ export default {
         );
       }
       await Promise.all(promises);
-      console.log("syncing");
       await this.syncSettings();
       this.reset(resets);
     },

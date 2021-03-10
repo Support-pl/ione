@@ -38,18 +38,18 @@ require 'OpenNebulaJSON/MarketPlaceJSON'
 require 'OpenNebulaJSON/MarketPlaceAppJSON'
 
 module OpenNebula
-    class Error
-        def to_json defuq = nil
-            error_hash = self.to_hash
+  class Error
+    def to_json _defuq = nil
+      error_hash = self.to_hash
 
-            return JSON.pretty_generate error_hash
-        end
-
-        def to_hash
-            message = { :message => @message }
-            error_hash = { :error => message }
-
-            return error_hash
-        end
+      return JSON.pretty_generate error_hash
     end
+
+    def to_hash
+      message = { :message => @message }
+      error_hash = { :error => message }
+
+      return error_hash
+    end
+  end
 end

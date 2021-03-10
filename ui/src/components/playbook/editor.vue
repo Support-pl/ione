@@ -58,7 +58,7 @@
         </a-col>
         <a-col :span="8">
           <a-form-model-item label="Supported OS">
-            <template v-for="tag of editable.tags">
+            <template v-for="tag of supported_os">
               <a-tag
                 :key="tag"
                 :closable="true"
@@ -77,7 +77,7 @@
               @change="handleTagInputChange"
               @blur="handleTagInputConfirm"
               @keyup.enter="handleTagInputConfirm"
-              placeholder="New tag"
+              placeholder="New OS tag"
             />
           </a-form-model-item>
         </a-col>
@@ -140,11 +140,13 @@ export default {
         gid: [{ required: true, message: "Select Owner Group" }],
         body: [{ required: true }],
       },
+      supported_os: [],
     };
   },
   methods: {
     save() {
       let vm = this;
+      vm.editable.extra_data.SUPPORTED_OS = this.supported_os;
       vm.$refs.editorForm.validate((valid) => {
         if (valid) {
           if (vm.editable.id) {
@@ -176,7 +178,7 @@ export default {
             }).then((res) => {
               vm.$notification.success({
                 message: "Successs",
-                description: `Ansible Playbook(ID:${res.data.response.ANSIBLE.ID}) successfuly created`,
+                description: `Ansible Playbook(ID:${res.data.response}) successfuly created`,
               });
               vm.$emit("save");
             });
@@ -203,22 +205,26 @@ export default {
       return color;
     },
     handleTagClose(removedTag) {
-      const tags = this.editable.tags.filter((tag) => tag !== removedTag);
-      this.$set(this.editable, "tags", tags);
+      const tags = this.supported_os.filter((tag) => tag !== removedTag);
+      this.$set(this, "supported_os", tags);
     },
     handleTagInputChange(e) {
       this.tagInputValue = e.target.value;
     },
     handleTagInputConfirm() {
       const inputValue = this.tagInputValue;
-      let tags = this.editable.tags;
+      let tags = this.supported_os;
       if (inputValue && tags.indexOf(inputValue) === -1) {
         tags = [...tags, inputValue];
       }
 
-      this.$set(this.editable, "tags", tags);
+      this.$set(this, "supported_os", tags);
       this.tagInputValue = "";
     },
+  },
+  mounted() {
+    if (this.editable.extra_data && this.editable.extra_data.SUPPORTED_OS)
+      this.supported_os = this.editable.extra_data.SUPPORTED_OS.split(", ");
   },
 };
 </script>
