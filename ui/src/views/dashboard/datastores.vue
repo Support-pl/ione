@@ -40,6 +40,18 @@
         </a-tooltip>
       </span>
 
+      <span slot="backup" slot-scope="text, record">
+        <a-select
+          :default-value="backup_image_conf[record.ID]"
+          style="width: 200px"
+          @change="(r) => updateBICSetting(record.ID, r)"
+        >
+          <a-select-option :key="img.ID" v-for="img in img_pool">
+            {{ img.ID }}: {{ img.NAME }}
+          </a-select-option>
+        </a-select>
+      </span>
+
       <span slot="deploy" slot-scope="text, record">
         <a-switch
           :checked="record.TEMPLATE.DEPLOY == 'TRUE'"
@@ -77,6 +89,11 @@ const datastoreColumns = [
     scopedSlots: { customRender: "hypervisor" },
   },
   {
+    key: "BACKUP_DRIVE_IMAGE",
+    title: "Backup Drive Image",
+    scopedSlots: { customRender: "backup" },
+  },
+  {
     key: "DEPLOY",
     title: "DEPLOY",
     scopedSlots: { customRender: "deploy" },
@@ -89,10 +106,20 @@ export default {
     return {
       datastoreColumns,
       ds_pool: {},
+      img_pool: [],
       settings: [],
     };
   },
   computed: {
+    backup_image_conf() {
+      return JSON.parse(
+        (
+          this.settings.find((el) => el.name == "BACKUP_IMAGE_CONF") ?? {
+            body: {},
+          }
+        ).body
+      );
+    },
     disktypes() {
       let types = (
         this.settings.find((el) => el.name == "DISK_TYPES") ?? { body: "" }
@@ -100,19 +127,31 @@ export default {
       return types;
     },
     datastores() {
-			const isType1 = (el) => el.TYPE == 1
-      if (Object.keys(this.ds_pool).length !== 0){
-				if(Array.isArray(this.ds_pool.DATASTORE_POOL.DATASTORE)){
-					return this.ds_pool.DATASTORE_POOL.DATASTORE.filter(isType1);
-				}
-				return [this.ds_pool.DATASTORE_POOL.DATASTORE].filter(isType1);
-			}
+      const isType1 = (el) => el.TYPE == 1;
+      if (Object.keys(this.ds_pool).length !== 0) {
+        if (Array.isArray(this.ds_pool.DATASTORE_POOL.DATASTORE)) {
+          return this.ds_pool.DATASTORE_POOL.DATASTORE.filter(isType1);
+        }
+        return [this.ds_pool.DATASTORE_POOL.DATASTORE].filter(isType1);
+      }
       return [];
     },
 
     ...mapGetters(["credentials"]),
   },
   methods: {
+    async updateBICSetting(id, val) {
+      console.log(id, val);
+      let data = this.backup_image_conf;
+      data[id] = val;
+      await this.$axios({
+        method: "post",
+        url: `/settings/BACKUP_IMAGE_CONF`,
+        auth: this.credentials,
+        data: { body: JSON.stringify(data) },
+      });
+      this.sync();
+    },
     async updateAttribute(id, key, val) {
       await this.$axios({
         method: "post",
@@ -136,6 +175,19 @@ export default {
         url: "/one.ds.pool.to_hash!",
         auth: this.credentials,
       }).then((res) => (this.ds_pool = res.data.response));
+      this.$axios({
+        method: "post",
+        url: "/one.i.pool.to_hash!",
+        auth: this.credentials,
+      }).then((res) => {
+        let img_pool = res.data.response.IMAGE_POOL;
+        if (Array.isArray(img_pool.IMAGE)) {
+          img_pool = img_pool.IMAGE;
+        } else {
+          img_pool = [img_pool.IMAGE];
+        }
+        this.img_pool = img_pool.filter((i) => i.TYPE === "2");
+      });
     },
   },
   mounted() {
