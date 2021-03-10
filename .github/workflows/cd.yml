@@ -37,11 +37,13 @@ jobs:
       - name: Check Env
         run: echo "Deploy Environment - ${{ github.event.inputs.deployEnvironment }}"
       
-      - name: Dependencies
-        run: npm install
+#       - name: Dependencies
+#         run: npm install
 
-      - name: Test Build
-        run: npm run build
+#       - name: Build
+#         run: npm run build
+      - name: test
+        run: mkdir dist && touch test.txt
 
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@1.1
