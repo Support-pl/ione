@@ -10,7 +10,6 @@
 </template>
 
 <script>
-const config = require("@/config");
 import { mapGetters } from "vuex";
 import LogView from "./view";
 
@@ -38,9 +37,10 @@ export default {
     load() {
       let vm = this;
       let ws = new WebSocket(
-        `${config.CLOUD_API_BASE_URL.replace("https", "wss")}/wss/ione/log/${
-          this.log.key
-        }?ws=true&auth=${btoa(
+        `${process.env.VUE_APP_IONE_API_BASE_URL.replace(
+          "https",
+          "wss"
+        )}/wss/ione/log/${this.log.key}?ws=true&auth=${btoa(
           this.credentials.username + ":" + this.credentials.password
         )}`
       );
