@@ -13,39 +13,47 @@ on:
     paths:
       - 'ui/**'
   workflow_dispatch:
+    inputs:
+        deployEnvironment:
+          description: 'Deployment Environment'     
+          required: true
+          default: 'demo'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build_ui:
-   runs-on: ubuntu-latest
-   defaults:
-    run:
-      working-directory: ./ui
-   
-   steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2.1.5
-    
-    - name: Dependencies
-      run: npm install
-    
-    - name: Test Build
-      run: npm run build
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.deployEnvironment }}
+    defaults:
+      run:
+        working-directory: ./ui
 
-    - name: SFTP Deploy
-      # You may pin to the exact commit or the version.
-      # uses: wlixcc/SFTP-Deploy-Action@cf8d9e5b504ce4aab358e6231495c72a7dc18dcd
-      uses: wlixcc/SFTP-Deploy-Action@1.1
-      with:
-        # username
-        username: ${{ secrets.SFTP_USER }}
-        # your sftp server
-        server: ${{ secrets.SFTP_HOST }}
-        # your sftp server port, default to 22
-        port: ${{ secrets.SFTP_PORT }}
-        ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
-        # will put all file under this path
-        local_path: ./dist
-        # files will copy to under remote_path
-        remote_path: /usr/lib/one/ione/dist
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.1.5
+      
+      - name: Check Env
+        run: echo "Deploy Environment - ${{ github.event.inputs.deployEnvironment }}"
+      
+      - name: Dependencies
+        run: npm install
+
+      - name: Test Build
+        run: npm run build
+
+      - name: SFTP Deploy
+        uses: wlixcc/SFTP-Deploy-Action@1.1
+        with:
+          # username
+          username: ${{ secrets.SFTP_USER }}
+          # your sftp server
+          server: ${{ secrets.SFTP_HOST }}
+          # your sftp server port, default to 22
+          port: ${{ secrets.SFTP_PORT }}
+          ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
+          # will put all file under this path
+          local_path: ./dist
+          # files will copy to under remote_path
+          remote_path: /usr/lib/one/ione/dist
