@@ -98,7 +98,7 @@ class OpenNebula::Records < RecordsSource
     prev = @records.where { time < stime }.order(Sequel.desc :time).limit(1).to_a.last
     if prev.nil? then
       {
-        'state': @records.where { time >= stime }.limit(1).to_a.first.state
+        state: @records.where { time >= stime }.limit(1).to_a.first.state
       }
     else
       {
