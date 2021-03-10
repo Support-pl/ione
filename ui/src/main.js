@@ -4,10 +4,8 @@ import store from "@/store";
 import router from "@/router";
 import axios from "axios";
 
-let config = require("@/config");
-
 Vue.prototype.$axios = axios.create({
-  baseURL: `${config.CLOUD_API_BASE_URL}`,
+  baseURL: `${process.env.VUE_APP_IONE_API_BASE_URL}`,
 });
 
 Vue.config.productionTip = false;
