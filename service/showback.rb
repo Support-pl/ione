@@ -6,7 +6,7 @@ class Timeline
   attr_reader :vm, :stime, :etime, :group_by_day, :timeline, :sources, :compiled, :state
 
   SOURCES = [ # Should be generated automaticaly in the future
-    Records, SnapshotRecords, TrafficRecords
+    Records, SnapshotRecords, TrafficRecords, DiskRecords
   ]
 
   # Initializes timeline - collects record sources(yet staticly) and stores entry vars
