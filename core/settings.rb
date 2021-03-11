@@ -26,7 +26,7 @@ rescue
     ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 0, "num"],
     ['SNAPSHOTS_ALLOWED_DEFAULT', "TRUE", "If set to FALSE VM should have SNAPSHOTS_ALLOWED=TRUE to allow snapshots creation", 1, "bool"],
     ['BACKUP_IMAGE_CONF', "{}", "DataStore IDs to Images(backup drives) mapping", 0, "object"],
-    ['BACKUP_IMAGE_PRICE', "{}", "Backup Drives Images prices", 1, "object"]
+    ['BACKUP_IMAGE_COSTS', "{}", "Backup Drives Images prices GB/sec", 1, "object"]
   ]
   required.each do | record |
     begin
