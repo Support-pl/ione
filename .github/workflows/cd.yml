@@ -4,12 +4,6 @@ name: CD
 
 # Controls when the action will run. 
 on:
-  push:
-    branches: [ master ]
-    paths:
-      - 'ui/**'
-  pull_request:
-    branches: [ master ]
   workflow_dispatch:
     inputs:
         deployEnvironment:
