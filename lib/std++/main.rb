@@ -1,6 +1,6 @@
 require 'json'
 
-puts 'Extending Hash class by out method'
+puts 'Extending Hash class'
 # Ruby default Hash class
 class Hash
   # @!group Debug Tools
@@ -81,8 +81,42 @@ class Hash
     result.chomp!
     result.nil? ? "" : result
   end
+
+  # Generate Hash from ONe template string
+  def self.from_one_template tmpl
+    lines = tmpl.split("\n")
+    res, i = {}, 0
+    while i < lines.length do
+      raise StandardError.new("Template Syntax Error: Bracket isn't paired") if lines[i].nil?
+
+      puts i, lines[i]
+      line = lines[i]
+      key, value = line.split("=").map { | el | el.strip }
+      if value != '[' then
+        res[key] = value[1...(value.length - 1)]
+      else
+        res[key] = {}
+        i += 1
+        until lines[i].strip == ']' do
+          raise StandardError.new("Template Syntax Error: Bracket isn't paired") if lines[i].nil?
+
+          puts i, lines[i]
+          line = lines[i]
+          sub_key, value = line.split("=").map { | el | el.strip }
+          value.delete_suffix! ','
+          puts value, value.length
+          res[key][sub_key] = value[1...(value.length - 1)]
+          i += 1
+        end
+      end
+      i += 1
+    end
+    res
+  end
   # @!endgroup
 end
+
+puts 'Extending Array class'
 
 # Standard Ruby class extensions
 class Array
