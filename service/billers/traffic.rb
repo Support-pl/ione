@@ -18,7 +18,7 @@ class TrafficBiller < Biller
   end
 
   # @see Biller#bill
-  def bill bill:, state:, _delta:, record:
+  def bill bill:, state:, delta:, record:
     if record.class == TrafficRecord then
       bill[:rx] = state[:rx] / 1e+9 * @costs[:rx]
       bill[:tx] = state[:tx] / 1e+9 * @costs[:tx]

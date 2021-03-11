@@ -12,7 +12,7 @@ class SnapshotsBiller < Biller
   end
 
   # @see Biller#bill
-  def bill bill:, state:, delta:, _record: nil
+  def bill bill:, state:, delta:, record: nil
     bill[:snapshots] = delta * @cost * state[:snaps]
     bill
   end
