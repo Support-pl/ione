@@ -30,7 +30,9 @@ class DiskRecord < Sequel::Model(:disk_records)
 
     # Increments :snaps
     def mod st
-      st[type_sym] += size
+      st[type_sym] = [] if st[type_sym].nil?
+      st[type_sym] << { id: -hash, size: size, img: img }
+      st
     end
   end
 
@@ -44,7 +46,8 @@ class DiskRecord < Sequel::Model(:disk_records)
 
     # Decrements :snaps
     def mod st
-      st[type_sym] -= size
+      st[type_sym].delete id: -hash, size: size, img: img
+      st
     end
   end
 
@@ -63,28 +66,31 @@ class DiskRecord < Sequel::Model(:disk_records)
   end
 end
 
-# # (Disk)Records source class for fullfilling Timeline
-# class OpenNebula::DiskRecords < RecordsSource
-#   # Overrides key for db queries
-#   def key
-#     :vm
-#   end
+# (Disk)Records source class for fullfilling Timeline
+class OpenNebula::DiskRecords < RecordsSource
+  # Overrides key for db queries
+  def key
+    :vm
+  end
 
-#   # inits RecordsSource class with DiskRecord class as base
-#   def initialize id
-#     super(DiskRecord, id)
-#   end
+  # inits RecordsSource class with DiskRecord class as base
+  def initialize id
+    super(DiskRecord, id)
+  end
 
-#   # Returns all needed records for given timerange
-#   def find stime, etime
-#     @records.where(crt: stime..etime).or(del: stime..etime)
-#   end
+  # Returns all needed records for given timerange
+  def find stime, etime
+    @records.where(crt: stime..etime).or(del: stime..etime)
+  end
 
-#   # Gets All of the DiskRecords before stime and with deletion time greater than stime or nil and counts(which is initial quantity of disks)
-#   def init_state stime
-#     # SELECT * FROM `disk_records` WHERE ((`crt` < 0) AND ((`del` >= 0) OR NOT `del`))
-#     {
-#       snaps: @records.where { crt < stime }.where { (del >= stime) | ~del }.count
-#     }
-#   end
-# end
+  # Gets All of the DiskRecords before stime and with deletion time greater than stime or nil and counts(which is initial quantity of disks)
+  def init_state stime
+    state = {}
+    @records.where { crt < stime }.where(del: nil).all.each do | rec |
+      key = rec.type_sym
+      state[key] = [] if state[key].nil?
+      state[key] << { size: rec.size, img: rec.img }
+    end
+    state
+  end
+end
