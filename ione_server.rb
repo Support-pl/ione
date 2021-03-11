@@ -87,8 +87,7 @@ puts 'Setting up Environment(OpenNebula API)'
 
 ONED_CONF = ETC_LOCATION + '/oned.conf'
 
-require 'core/load_oned_conf.rb'
-require 'core/connect_db.rb'
+require 'core/*'
 
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
