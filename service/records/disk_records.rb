@@ -7,6 +7,7 @@ begin
     Integer   :del, null: true
     Integer   :size, null: false
     String    :type, size: 10, null: true
+    Integer   :img, null: true
   end
 rescue
   puts "Table :disk_records already exists, skipping"

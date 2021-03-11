@@ -41,9 +41,12 @@ vm.info!
 ONED_CONF = ETC_LOCATION + '/oned.conf'
 
 require 'core/*'
+require 'json'
 
 disk = vm.to_hash['VM']['TEMPLATE']['DISK'].sort_by { | d | d['DISK_ID'].to_i }.last
 
 if IONe::Settings['BACKUP_IMAGE_CONF'].values.include? disk['IMAGE_ID'] then
-  $db[:disk_records].insert vm: vm.id, id: disk['DISK_ID'], crt: Time.now.to_i, type: 'backup', size: disk['SIZE']
+  $db[:disk_records].insert vm: vm.id, id: disk['DISK_ID'], crt: Time.now.to_i, type: "backup", size: disk['SIZE'], img: disk['IMAGE_ID']
+else
+  $db[:disk_records].insert vm: vm.id, id: disk['DISK_ID'], crt: Time.now.to_i, type: "system", size: disk['SIZE']
 end
