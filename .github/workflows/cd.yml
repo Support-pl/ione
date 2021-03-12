@@ -18,27 +18,55 @@ on:
           default: 'demo'
 
 jobs:
-  build_ui:
+  # build_ione_admin_ui:
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: ${{ github.event.inputs.deployEnvironment }}
+  #   defaults:
+  #     run:
+  #       working-directory: ./ui
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2.1.5
+      
+  #     - name: Dependencies
+  #       run: npm install
+
+  #     - name: Build
+  #       env:
+  #         VUE_APP_IONE_API_BASE_URL: ${{ secrets.IONE_API_BASE_URL }}
+  #       run: npm run build
+
+  #     - name: SFTP Deploy
+  #       uses: wlixcc/SFTP-Deploy-Action@1.1
+  #       with:
+  #         # username
+  #         username: ${{ secrets.SFTP_USER }}
+  #         # your sftp server
+  #         server: ${{ secrets.SFTP_HOST }}
+  #         # your sftp server port, default to 22
+  #         port: ${{ secrets.SFTP_PORT }}
+  #         ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
+  #         # will put all file under this path
+  #         local_path: ui/dist
+  #         # files will copy to under remote_path
+  #         remote_path: /usr/lib/one/ione/ui
+  upgrade_ione:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.deployEnvironment }}
-    defaults:
-      run:
-        working-directory: ./ui
-
+    
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2.1.5
-      
-      - name: Dependencies
-        run: npm install
 
-      - name: Build
-        env:
-          VUE_APP_IONE_API_BASE_URL: ${{ secrets.IONE_API_BASE_URL }}
-        run: npm run build
+      - name: Remove unwanted dirs and files
+        run: rm -rf docs modules ui .* *.md LICENSE
 
-      - name: SFTP Deploy
+      - name: Test
+        run: ls -l
+
+      - name: Upload
         uses: wlixcc/SFTP-Deploy-Action@1.1
         with:
           # username
@@ -49,6 +77,6 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
           # will put all file under this path
-          local_path: ui/dist
+          local_path: ./*
           # files will copy to under remote_path
-          remote_path: /usr/lib/one/ione/ui
+          remote_path: /usr/lib/one/ione/tmp/
