@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Remove unwanted dirs and files
-        run: rm -rf docs modules ui .* *.md LICENSE
+        run: rm -rf docs modules ui ./.* *.md LICENSE
 
       - name: Test
         run: ls -l
