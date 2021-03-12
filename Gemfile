@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+gem 'colorize'
+gem 'file-tail'
+gem 'mysql2'
+gem 'net-sftp', '3.0.0'
+gem 'net-ssh', '6.1.0'
+gem 'nori'
+gem 'sequel'
+gem 'sinatra-contrib'
+gem 'sinatra-websocket'
