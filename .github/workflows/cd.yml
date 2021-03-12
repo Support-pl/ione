@@ -60,7 +60,7 @@ jobs:
       - name: Test
         run: ls -l
 
-      - name: Upload
+      - name: Upload codebase
         uses: appleboy/scp-action@master
         with:
           username: ${{ secrets.SFTP_USER }}
@@ -68,4 +68,23 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           key: ${{ secrets.SFTP_PRIVATE_KEY }}
           source: "./*"
-          target: /usr/lib/one/ione/tmp/
+          target: /usr/lib/one/ione
+      
+      - name: Install gems
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.SFTP_USER }}
+          host: ${{ secrets.SFTP_HOST }}
+          port: ${{ secrets.SFTP_PORT }}
+          key: ${{ secrets.SFTP_PRIVATE_KEY }}
+          script: |
+            cd /usr/lib/one/ione
+            chmod +x ione_server.rb
+            chmod +x -R hooks/*
+            rake install_gems[y]
+            \cp -f sys/ione.service /usr/lib/systemd/system/ione.service
+            systemctl daemon-reload
+            systemctl restart ione
+            sleep 10
+            systemctl is-active ione
+    
