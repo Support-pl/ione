@@ -1,7 +1,7 @@
 @sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel)
 
 desc "Install Gems"
-task :install_gems => :before do
+task :install_gems, [:silent] => :before do | _task, args |
   puts "Installing Gems:\n"
 
   puts "1. Installing gems..."
@@ -10,7 +10,10 @@ task :install_gems => :before do
 
   puts "2. Installing required system libs and tools"
   puts "Following packages are going to be installed:\n\t#{@sys_packages.join(' ')}"
-  a = @silent
+
+  a = nil
+  a = 'y' if @silent == 'y' || args[:silent] == 'y'
+
   until %w(y n).include? a do
     print "Proceed? (y/n) "
     a = STDIN.gets.downcase.strip
@@ -28,6 +31,7 @@ task :install_gems => :before do
           rake --tasks
       Thanks, for installation and choosing us!
     EOF
+    exit 1
   end
   puts
 
