@@ -76,7 +76,5 @@ jobs:
           # your sftp server port, default to 22
           port: ${{ secrets.SFTP_PORT }}
           ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
-          # will put all file under this path
-          local_path: ./*
           # files will copy to under remote_path
           remote_path: /usr/lib/one/ione/tmp/
