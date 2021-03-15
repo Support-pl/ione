@@ -338,6 +338,18 @@ class OpenNebula::VirtualMachine
     out.class == Array ? out : [out]
   end
 
+  # Returns all available snapshots in Hash form(DISK_ID => Array<Hash<Snapshot>>)
+  # @return [Hash]
+  def list_disk_snapshots
+    snaps = to_hash!['VM']['SNAPSHOTS']
+    return {} if snaps.nil?
+
+    (snaps.class == Array ? snaps : [snaps]).inject({}) do | r, snap |
+      r[snap['DISK_ID']] = snap['SNAPSHOT'].class == Array ? snap['SNAPSHOT'] : [snap['SNAPSHOT']]
+      r
+    end
+  end
+
   # Returns actual state without calling info! method
   def state!
     self.info! || self.state
