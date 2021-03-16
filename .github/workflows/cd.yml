@@ -59,7 +59,7 @@ jobs:
           source: "./*"
           target: /usr/lib/one/ione
       
-      - name: Install gems
+      - name: Install gems, set hooks, upgrade service file and restart
         uses: appleboy/ssh-action@master
         with:
           username: ${{ secrets.SFTP_USER }}
