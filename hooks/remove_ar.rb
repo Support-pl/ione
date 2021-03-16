@@ -28,6 +28,7 @@ RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
 ONED_CONF         = ETC_LOCATION + "oned.conf"
 
+$: << '/usr/lib/one/ione'
 $: << RUBY_LIB_LOCATION
 
 require 'opennebula'
@@ -37,15 +38,8 @@ user.info!
 
 require 'yaml'
 require 'json'
-require 'sequel'
+require 'core/*'
 
-$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require $ione_conf['DB']['adapter']
-$db = Sequel.connect({
-                       adapter: $ione_conf['DB']['adapter'].to_sym,
-        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']
-                     })
 conf = $db[:settings].as_hash(:name, :body)
 
 id = user.id

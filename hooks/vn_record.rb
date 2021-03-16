@@ -26,7 +26,9 @@ end
 
 RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
+ONED_CONF         = ETC_LOCATION + '/oned.conf'
 
+$: << '/usr/lib/one/ione'
 $: << RUBY_LIB_LOCATION
 require 'opennebula'
 include OpenNebula
@@ -36,43 +38,9 @@ vnet.info!
 
 require 'yaml'
 require 'json'
-require 'sequel'
 
-require 'augeas'
+require 'core/*'
 
-work_file_dir  = File.dirname(ONED_CONF)
-work_file_name = File.basename(ONED_CONF)
-
-aug = Augeas.create(:no_modl_autoload => true,
-                    :no_load          => true,
-                    :root             => work_file_dir,
-                    :loadpath         => ONED_CONF)
-
-aug.clear_transforms
-aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
-aug.context = "/files/#{work_file_name}"
-aug.load
-
-if aug.get('DB/BACKEND') != "\"mysql\"" then
-  STDERR.puts "OneDB backend is not MySQL, exiting..."
-  exit 1
-end
-
-ops = {}
-ops[:host]     = aug.get('DB/SERVER')
-ops[:user]     = aug.get('DB/USER')
-ops[:password] = aug.get('DB/PASSWD')
-ops[:database] = aug.get('DB/DB_NAME')
-
-ops.each do |k, v|
-  next if !v || !(v.is_a? String)
-
-  ops[k] = v.chomp('"').reverse.chomp('"').reverse
-end
-
-ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
-
-$db = Sequel.connect(**ops)
 class AR < Sequel::Model(:ars); end
 
 AR.create do | r |
