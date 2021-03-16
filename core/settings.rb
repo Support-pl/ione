@@ -32,7 +32,7 @@ rescue
     begin
       $db[:settings].insert(name: record[0], body: record[1], description: record[2], access_level: record[3], type: record[4])
     rescue Sequel::UniqueConstraintViolation
-      nil # Key already exists
+      $db[:settings].where(name: record[0]).update(description: record[2], access_level: record[3], type: record[4])
     end
   end
 end if defined?(INIT_IONE) && INIT_IONE
