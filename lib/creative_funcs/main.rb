@@ -26,7 +26,7 @@ class IONe
     end
     attributes = "SUNSTONE=[ LANG=\"#{locale || $ione_conf['OpenNebula']['users-default-lang']}\" ]"
     attributes += "AZURE_TOKEN=\"#{login}\"" if type == 'azure'
-    attributes += "BALANCE=\"0\"\nLABELS=\"IaaS\"" if groupid.to_i == $db[:settings].where(:name => 'IAAS_GROUP_ID').to_a.last[:body].to_i
+    attributes += "BALANCE=\"0\"\nLABELS=\"IaaS\"" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
     user.update(attributes, true)
     return user.id, user if object
 

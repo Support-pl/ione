@@ -41,14 +41,12 @@ require 'json'
 
 require 'core/*'
 
-conf = $db[:settings].as_hash(:name, :body)
-
-unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
+unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'].to_i then
   puts "Not IaaS User, skipping..."
   exit 0
 end
 
-vnet = VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new)
+vnet = VirtualNetwork.new_with_id(IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'], Client.new)
 vnet.info!
 begin
   ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
@@ -80,7 +78,7 @@ if vnet['VN_MAD'] == 'vcenter' then
         VLAN_ID = \"#{ar['VLAN_ID']}\"
         VN_MAD = \"vcenter\"
         TYPE = \"PRIVATE\"
-        VCENTER_ONE_HOST_ID = \"#{JSON.parse(conf['NODES_DEFAULT'])['VCENTER']}\"", conf['DEFAULT_CLUSTER'].to_i)
+        VCENTER_ONE_HOST_ID = \"#{IONe::Settings['NODES_DEFAULT']['VCENTER']}\"", IONe::Settings['DEFAULT_CLUSTER'].to_i)
 
   user_vnet.add_ar("AR = [
         IP = \"#{ar['IP']}\",
@@ -93,7 +91,7 @@ else
   user_vnet = VirtualNetwork.new_with_id(user_vnet, Client.new)
 end
 
-user_vnet.chown(user.id, conf['IAAS_GROUP_ID'].to_i)
+user_vnet.chown(user.id, IONe::Settings['IAAS_GROUP_ID'])
 clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
 clusters = [clusters] if clusters.class != Array
 for c in clusters do

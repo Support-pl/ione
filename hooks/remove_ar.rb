@@ -37,14 +37,11 @@ user = User.new xml.xpath('//EXTRA/USER'), Client.new
 user.info!
 
 require 'yaml'
-require 'json'
 require 'core/*'
-
-conf = $db[:settings].as_hash(:name, :body)
 
 id = user.id
 
-unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
+unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
   exit 0
 end
@@ -68,7 +65,7 @@ vn_pool(id).each do | vnet |
   vnet.info!
 
   if vnet['/VNET/TEMPLATE/TYPE'] == 'PRIVATE' then
-    VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
+    VirtualNetwork.new_with_id(IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'], Client.new).add_ar(
       "AR = [\n" \
         "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
         "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
@@ -77,7 +74,7 @@ vn_pool(id).each do | vnet |
     ) if vnet['VN_MAD'] == 'vcenter'
   end
 
-  vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'].to_i
+  vnet.delete unless vnet.id == IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'].to_i
 end
 
 puts "User##{id} Virtual Networks successfully cleaned up"

@@ -55,26 +55,24 @@ rescue
   exit 0
 end
 
-db = $db[:settings].as_hash(:name, :body)
-
 costs = {}
 
 if %(vcenter kvm).include?(vm['USER_TEMPLATE/HYPERVISOR'].downcase) then
   costs.merge!(
-    'CPU_COST' => JSON.parse(db['CAPACITY_COST'])['CPU_COST'].to_f,
-      'MEMORY_COST' => JSON.parse(db['CAPACITY_COST'])['MEMORY_COST'].to_f,
-      'DISK_COST' => JSON.parse(db['DISK_COSTS'])[vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f,
-      'PUBLIC_IP_COST' => db['PUBLIC_IP_COST'].to_f
+    'CPU_COST' => IONe::Settings['CAPACITY_COST']['CPU_COST'].to_f,
+      'MEMORY_COST' => IONe::Settings['CAPACITY_COST']['MEMORY_COST'].to_f,
+      'DISK_COST' => IONe::Settings['DISK_COSTS'][vm['/VM/TEMPLATE/CONTEXT/DRIVE']].to_f,
+      'PUBLIC_IP_COST' => IONe::Settings['PUBLIC_IP_COST']
   )
 elsif vm['USER_TEMPLATE/HYPERVISOR'].downcase == 'azure' then
   sku = JSON.parse(
-    JSON.parse(db['AZURE_SKUS'])[ vm['USER_TEMPLATE/PUBLIC_CLOUD/INSTANCE_TYPE'] ]
+    JSON.parse(IONe::Settings['AZURE_SKUS'])[ vm['USER_TEMPLATE/PUBLIC_CLOUD/INSTANCE_TYPE'] ]
   )
 
   costs.merge!(
     'CPU_COST' => sku['PRICE'].to_f / 2,
     'MEMORY_COST' => sku['PRICE'].to_f / 2,
-    'DISK_COST' => JSON.parse(db['AZURE_DISK_COSTS'])[vm['USER_TEMPLATE/DRIVE']].to_f
+    'DISK_COST' => IONe::Settings['AZURE_DISK_COSTS'][vm['USER_TEMPLATE/DRIVE']].to_f
   )
 end
 
