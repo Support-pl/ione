@@ -58,11 +58,9 @@ require 'json'
 
 require 'core/*'
 
-conf = $db[:settings].as_hash(:name, :body)
+vm.recover 3 if balance == 0 && u.groups.include?(IONe::Settings['IAAS_GROUP_ID'])
 
-vm.recover 3 if balance == 0 && u.groups.include?(conf['IAAS_GROUP_ID'].to_i)
-
-capacity = JSON.parse(conf['CAPACITY_COST'])
+capacity = IONe::Settings['CAPACITY_COST']
 vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i / 1000
 
 if balance < vm_price * 86400 then
