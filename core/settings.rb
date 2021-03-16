@@ -38,6 +38,9 @@ if defined?(INIT_IONE) && INIT_IONE then
       $db[:settings].where(name: record[0]).update(description: record[2], access_level: record[3], type: record[4])
     end
   end
+
+  # In case there any custom settings created before splitting num into int and float
+  $db[:settings].where(type: 'num').update(type: 'float')
 end
 
 class IONe
