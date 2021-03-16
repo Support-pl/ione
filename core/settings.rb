@@ -1,15 +1,18 @@
 require 'json'
 
-begin
-  $db.create_table :settings do
-    String  :name, size: 128, primary_key: true
-    String  :body, text: true, null: false
-    String  :description, text: true, null: true
-    Integer :access_level, null: false, default: 1
-    String  :type, null: false
+if defined?(INIT_IONE) && INIT_IONE then
+  begin
+    $db.create_table :settings do
+      String  :name, size: 128, primary_key: true
+      String  :body, text: true, null: false
+      String  :description, text: true, null: true
+      Integer :access_level, null: false, default: 1
+      String  :type, null: false
+    end
+  rescue
+    puts "Table :settings already exists, skipping"
   end
-rescue
-  puts "Table :settings already exists, skipping"
+
   required = [
     ['ALERT', "0.0", "Balance, when user will be alerted", 0, "float"],
     ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs per sec", 1, "object"],
@@ -35,7 +38,7 @@ rescue
       $db[:settings].where(name: record[0]).update(description: record[2], access_level: record[3], type: record[4])
     end
   end
-end if defined?(INIT_IONE) && INIT_IONE
+end
 
 class IONe
   # IONe Settings table accessor class
