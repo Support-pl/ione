@@ -35,7 +35,7 @@ rescue
       nil # Key already exists
     end
   end
-end
+end if defined?(INIT_IONE) && INIT_IONE
 
 class IONe
   # IONe Settings table accessor class

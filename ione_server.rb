@@ -2,6 +2,7 @@
 
 # Server start-up time
 STARTUP_TIME = Time.now().to_i # IONe server start time
+INIT_IONE = true
 
 # OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
