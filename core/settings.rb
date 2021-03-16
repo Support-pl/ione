@@ -66,6 +66,32 @@ class IONe
         JSON.parse rec[:body]
       end
     end
+
+    def self.[]= name, value
+      rec = first(name: name)
+      return nil if rec.nil?
+
+      to_write =
+        case rec[:type]
+        when "int"
+          value.to_i
+        when "float"
+          value.to_f
+        when "bool"
+          value ? 'TRUE' : 'FALSE'
+        when "list"
+          raise TypeError.new "Record has type 'list', so :value should be Array" if value.class != Array
+
+          value.join(',')
+        when "str"
+          value.to_s
+        else
+          JSON.generate value
+        end
+
+      where(name: name).update(body: to_write)
+      return to_write
+    end
   end
 end
 
