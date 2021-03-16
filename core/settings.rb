@@ -11,19 +11,19 @@ begin
 rescue
   puts "Table :settings already exists, skipping"
   required = [
-    ['ALERT', "0.0", "Balance, when user will be alerted", 0, "num"],
+    ['ALERT', "0.0", "Balance, when user will be alerted", 0, "float"],
     ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs per sec", 1, "object"],
     ['DISK_TYPES', "HDD,SSD,NVMe", "Comma-separated list of existing disk types", 1, "list"],
     ['DISK_COSTS', "{\"disk_type\":\"price\"}", "Costs of different disk types GB/sec", 1, "object"],
-    ['IAAS_GROUP_ID', 'iaas_group_id', "IaaS(VDC) Users group ID", 1, "num"],
+    ['IAAS_GROUP_ID', 'iaas_group_id', "IaaS(VDC) Users group ID", 1, "int"],
     ['NODES_DEFAULT', "{\"hypervisor_name\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
-    ['PUBLIC_IP_COST', "0.0", "Public IP Address cost per sec", 0, "num"],
+    ['PUBLIC_IP_COST', "0.0", "Public IP Address cost per sec", 0, "float"],
     ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
     ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
     ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
-    ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 0, "num"],
-    ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "num"],
-    ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 0, "num"],
+    ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 0, "float"],
+    ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "int"],
+    ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 0, "float"],
     ['SNAPSHOTS_ALLOWED_DEFAULT', "TRUE", "If set to FALSE VM should have SNAPSHOTS_ALLOWED=TRUE to allow snapshots creation", 1, "bool"],
     ['BACKUP_IMAGE_CONF', "{}", "DataStore IDs to Images(backup drives) mapping", 0, "object"],
     ['BACKUP_IMAGE_COSTS', "{}", "Backup Drives Images prices GB/sec", 1, "object"]
@@ -46,7 +46,9 @@ class IONe
       return nil if rec.nil?
 
       case rec[:type]
-      when "num"
+      when "int"
+        rec[:body].to_i
+      when "float"
         rec[:body].to_f
       when "bool"
         rec[:body] == "TRUE"
