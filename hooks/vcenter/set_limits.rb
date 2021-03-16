@@ -74,7 +74,7 @@ if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
     }
   ]
   req.basic_auth(*one_auth)
-  r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
+  Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
     http.request(req)
   end
 end
