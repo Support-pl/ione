@@ -141,7 +141,6 @@ export default {
   },
   methods: {
     async updateBICSetting(id, val) {
-      console.log(id, val);
       let data = this.backup_image_conf;
       data[id] = val;
       await this.$axios({
