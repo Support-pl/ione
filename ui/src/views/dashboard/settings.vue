@@ -94,7 +94,8 @@ export default {
       editingKey: "",
       cacheData: [],
       types: {
-        num,
+        int: num,
+        float: num,
         list,
         str,
         object,
