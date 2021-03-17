@@ -54,6 +54,9 @@ const asideBtns = [
     route: "processes",
   },
   {
+    name: "hooks",
+  },
+  {
     name: "logs",
   },
 ];
