@@ -16,7 +16,7 @@ class IONe
     user = User.new(User.build_xml(0), client) # Generates user template using oneadmin user object
     allocation_result =
       begin
-        user.allocate(login, pass, "core", groupid.nil? ? [USERS_GROUP] : [groupid]) # Allocating new user with login:pass
+        user.allocate(login, pass, "core", groupid.nil? ? [IONe::Settings['USERS_GROUP']] : [groupid]) # Allocating new user with login:pass
       rescue => e
         e.message
       end
@@ -165,7 +165,7 @@ class IONe
     return vmid.message if vmid.class != Integer
 
     trace << "Changing VM owner:#{__LINE__ + 1}"
-    onblock(:vm, vmid).chown(params['userid'], USERS_GROUP)
+    onblock(:vm, vmid).chown(params['userid'], IONe::Settings['USERS_GROUP'])
 
     #####   PostDeploy Activity define   #####
     Thread.new do
@@ -312,7 +312,7 @@ class IONe
   # @option params [Integer] :drive Drive size for new VM
   # @option params [String]  :ds_type VM deploy target datastore drives type, 'SSD' or 'HDD'
   # @option params [Integer] :groupid Additional group, in which user should be
-  # @option params [Boolean] :trial (false) VM will be suspended after TRIAL_SUSPEND_DELAY
+  # @option params [Boolean] :trial (false) VM will be suspended after IONe::Settings['TRIAL_SUSPEND_DELAY']
   # @option params [Boolean] :release (false) VM will be started on HOLD if false
   # @option params [Hash]    :user-template Addon template, you may append to default template
   # @option params [Boolean] :allow_snapshots Allow user to create snapshots
@@ -367,7 +367,7 @@ class IONe
       trace << "Creating new user:#{__LINE__ + 1}"
       userid, user =
         UserCreate(
-          params['login'], params['password'], USERS_GROUP, object: true,
+          params['login'], params['password'], IONe::Settings['USERS_GROUP'], object: true,
               type: params['extra']['type']
         ) if params['test'].nil?
       LOG_ERROR "Error: UserAllocateError" if userid == 0
@@ -452,7 +452,7 @@ class IONe
     onblock(:vm, vmid) do | vm |
       trace << "Changing VM owner:#{__LINE__ + 1}"
       begin
-        r = vm.chown(userid, USERS_GROUP)
+        r = vm.chown(userid, IONe::Settings['USERS_GROUP'])
         raise r.message unless r.nil?
       rescue
         LOG_DEBUG "CHOWN error, params: #{userid}, #{vm}"
@@ -473,7 +473,7 @@ class IONe
         trace << "Setting VM VNC settings:#{__LINE__ + 2}"
         begin
           vm.updateconf(
-            "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{($ione_conf['OpenNebula']['base-vnc-port'] + vmid)}\", TYPE=\"VNC\" ]"
+            "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{(IONe::Settings['BASE_VNC_PORT'] + vmid)}\", TYPE=\"VNC\" ]"
           ) # Configuring VNC
         rescue => e
           LOG_DEBUG "VNC configuring error: #{e.message}"
@@ -599,7 +599,7 @@ class IONe
     def TrialController(params, vmid, _host = nil)
       LOG "VM #{vmid} suspend action scheduled", 'TrialController'
       action_time = Time.now.to_i + (params['trial-suspend-delay'].nil? ?
-                          TRIAL_SUSPEND_DELAY :
+                          IONe::Settings['TRIAL_SUSPEND_DELAY'] :
                           params['trial-suspend-delay'])
       onblock(:vm, vmid).wait_for_state
       if !onblock(:vm, vmid).schedule('suspend', action_time).nil? then

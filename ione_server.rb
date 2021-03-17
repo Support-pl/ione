@@ -69,16 +69,6 @@ puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
 include IONeLoggerKit
 
-puts 'Checking service version'
-# IONe version
-VERSION = File.read("#{ROOT}/meta/version.txt")
-# OpenNebula users group
-USERS_GROUP = $ione_conf['OpenNebula']['users-group']
-# Trial VMs suspend delay
-TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay']
-# Default SSH port at OpenNebula Virtual Machines
-USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port']
-
 puts 'Setting up Environment(OpenNebula API)'
 ###########################
 # Setting up Environment  #
@@ -92,6 +82,10 @@ require 'core/*'
 
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
+
+puts 'Checking service version'
+# IONe version
+VERSION = File.read("#{ROOT}/meta/version.txt")
 
 require "opennebula"
 include OpenNebula

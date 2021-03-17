@@ -14,22 +14,27 @@ if defined?(INIT_IONE) && INIT_IONE then
   end
 
   required = [
-    ['ALERT', "0.0", "Balance, when user will be alerted", 0, "float"],
+    ['ALERT', 0.0, "Balance, when user will be alerted", 0, "float"],
     ['CAPACITY_COST', "{\"CPU_COST\":\"0.0\",\"MEMORY_COST\":\"0.0\"}", "VM Capacity resources costs per sec", 1, "object"],
     ['DISK_TYPES', "HDD,SSD,NVMe", "Comma-separated list of existing disk types", 1, "list"],
     ['DISK_COSTS', "{\"disk_type\":\"price\"}", "Costs of different disk types GB/sec", 1, "object"],
-    ['IAAS_GROUP_ID', 'iaas_group_id', "IaaS(VDC) Users group ID", 1, "int"],
+    ['IAAS_GROUP_ID', 100, "IaaS(VDC) Users group ID", 1, "int"],
     ['NODES_DEFAULT', "{\"hypervisor_name\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
-    ['PUBLIC_IP_COST', "0.0", "Public IP Address cost per sec", 0, "float"],
+    ['PUBLIC_IP_COST', 0.0, "Public IP Address cost per sec", 0, "float"],
     ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
     ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
     ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
-    ['TRAFFIC_COST', "0.0", "Cost of 1 kByte VM traffic", 0, "float"],
-    ['TRAFFIC_BILL_FREQ', "86400", "Frequency of debits for Traffic usage in seconds", 1, "int"],
-    ['SNAPSHOT_COST', "0.0", "Cost of 1 Snapshot per sec", 0, "float"],
+    ['TRAFFIC_COST', 0.0, "Cost of 1 kByte VM traffic", 0, "float"],
+    ['TRAFFIC_BILL_FREQ', 86400, "Frequency of debits for Traffic usage in seconds", 1, "int"],
+    ['SNAPSHOT_COST', 0.0, "Cost of 1 Snapshot per sec", 0, "float"],
     ['SNAPSHOTS_ALLOWED_DEFAULT', "TRUE", "If set to FALSE VM should have SNAPSHOTS_ALLOWED=TRUE to allow snapshots creation", 1, "bool"],
     ['BACKUP_IMAGE_CONF', "{}", "DataStore IDs to Images(backup drives) mapping", 0, "object"],
-    ['BACKUP_IMAGE_COSTS', "{}", "Backup Drives Images prices GB/sec", 1, "object"]
+    ['BACKUP_IMAGE_COSTS', "{}", "Backup Drives Images prices GB/sec", 1, "object"],
+    ['USERS_GROUP', 1, "Main group for PaaS Users", 1, "int"],
+    ['TRIAL_SUSPEND_DELAY', 86400, "Delay value for trial VMs in seconds", 1, "int"],
+    ['USERS_VMS_SSH_PORT', 22, "Default SSH port at OpenNebula Virtual Machines", 1, "int"],
+    ['BASE_VNC_PORT', 5900, "Base VNC-port number", 1, "int"],
+    ['USERS_DEFAULT_LANG', "en_US", "Default locale for new users", 1, "str"]
   ]
   required.each do | record |
     begin
