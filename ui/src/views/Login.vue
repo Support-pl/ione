@@ -100,6 +100,6 @@ export default {
   background: rgb(225, 133, 133);
   border: 1px solid red;
   border-radius: 10px;
-  padding: 5px 2px;
+  padding: 2px 5px;
 }
 </style>
