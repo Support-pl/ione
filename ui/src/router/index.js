@@ -57,6 +57,14 @@ const routes = [
         component: () => import("@/views/dashboard/processes/process.vue"),
       },
       {
+        path: "hooks",
+        component: () => import("@/views/dashboard/hooks/index.vue"),
+      },
+      {
+        path: "hooks/:id",
+        component: () => import("@/views/dashboard/hooks/hook.vue"),
+      },
+      {
         path: "logs",
         component: () => import("@/views/dashboard/logs.vue"),
       },
