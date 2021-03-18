@@ -53,7 +53,7 @@ export default new Vuex.Store({
       let pool = (
         await axios({
           method: "post",
-          url: config.CLOUD_API_BASE_URL + "/one.g.pool.to_hash!",
+          url: process.env.VUE_APP_IONE_API_BASE_URL + "/one.g.pool.to_hash!",
           auth: state.credentials,
           data: {},
         })
