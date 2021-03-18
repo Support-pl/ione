@@ -9,7 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "ant-design-vue": "^1.7.2",
+    "ant-design-vue": "^1.7.4",
     "codemirror": "^5.59.4",
     "core-js": "^3.9.1",
     "js-yaml": "^4.0.0",
