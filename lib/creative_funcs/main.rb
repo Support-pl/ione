@@ -24,7 +24,7 @@ class IONe
       LOG_DEBUG allocation_result.message # If allocation was successful, allocate method returned nil
       return 0
     end
-    attributes = "SUNSTONE=[ LANG=\"#{locale || $ione_conf['OpenNebula']['users-default-lang']}\" ]"
+    attributes = "SUNSTONE=[ LANG=\"#{locale || IONe::Settings['USERS_DEFAULT_LANG']}\" ]"
     attributes += "AZURE_TOKEN=\"#{login}\"" if type == 'azure'
     attributes += "BALANCE=\"0\"\nLABELS=\"IaaS\"" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
     user.update(attributes, true)
