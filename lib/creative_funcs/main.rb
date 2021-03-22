@@ -162,7 +162,7 @@ class IONe
         sleep(3)
         vmid = template.instantiate(params['login'] + '_vm', false, context)
       end
-    rescue => e
+    rescue
       return vmid.class, vmid.message if vmid.class != Integer
 
       return vmid.class
@@ -526,7 +526,7 @@ class IONe
     ##### PostDeploy Activity define END #####
 
     LOG_AUTO 'Post-Deploy joblist defined, basic installation job ended'
-    return out = { 'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid) }
+    return { 'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid) }
   rescue => e
     begin
       out = { :exception => e.message, :trace => trace << 'END_TRACE' }
