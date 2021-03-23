@@ -154,7 +154,6 @@ class IONe
               :login => vm.uname(false, true), :ip => GetIP(vm), :state => (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
           }
         rescue
-          binding.pry
           break
         end
       end
