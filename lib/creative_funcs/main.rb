@@ -318,6 +318,7 @@ class IONe
   # @option params [Integer] :drive Drive size for new VM
   # @option params [String]  :ds_type VM deploy target datastore drives type, 'SSD' or 'HDD'
   # @option params [Integer] :groupid Additional group, in which user should be
+  # @option params [Integer] :ips Public IPs amount(default: 1)
   # @option params [Boolean] :trial (false) VM will be suspended after IONe::Settings['TRIAL_SUSPEND_DELAY']
   # @option params [Boolean] :release (false) VM will be started on HOLD if false
   # @option params [Hash]    :user-template Addon template, you may append to default template
@@ -335,6 +336,7 @@ class IONe
     trace << "Checking params types:#{__LINE__ + 1}"
 
     params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
+    params['ips'] = params['ips'].nil? ? 1 : params['ips'].to_i
     params['user-template'] = {} if params['user-template'].nil?
 
     begin
@@ -438,6 +440,11 @@ class IONe
 
       unless params['allow_snapshots'].nil? then
         params['user-template']['SNAPSHOTS_ALLOWED'] = params['allow_snapshots'].to_s.upcase
+      end
+
+      specs['NIC'] = []
+      params['ips'].times do
+        specs << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'] }
       end
 
       LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
