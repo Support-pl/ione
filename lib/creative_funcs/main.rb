@@ -187,19 +187,19 @@ class IONe
       LOG_DEBUG 'Waiting until VM will be deployed'
       vm.wait_for_state
 
-      postDeploy = PostDeployActivities.new @client
+      post_deploy = PostDeployActivities.new @client
 
       # TrialController
       if params['trial'] then
         trace << "Creating trial counter thread:#{__LINE__ + 1}"
-        postDeploy.TrialController(params, vmid, host)
+        post_deploy.TrialController(params, vmid, host)
       end
       # endTrialController
       # AnsibleController
 
       if params['ansible'] && params['release'] then
         trace << "Creating Ansible Installer thread:#{__LINE__ + 1}"
-        postDeploy.AnsibleController(params, vmid, host)
+        post_deploy.AnsibleController(params, vmid, host)
       end
 
       # endAnsibleController
@@ -432,8 +432,8 @@ class IONe
       trace << "Updating user quota:#{__LINE__ + 1}"
       user.update_quota_by_vm(
         'append' => true, 'cpu' => params['cpu'],
-          'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-          'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
+        'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+        'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
       ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
 
       unless params['allow_snapshots'].nil? then
@@ -504,13 +504,13 @@ class IONe
 
       LOG_DEBUG "VM is active now, let it go"
 
-      postDeploy = PostDeployActivities.new @client
+      post_deploy = PostDeployActivities.new @client
 
       # TrialController
 
       if params['trial'] then
         trace << "Creating trial counter thread:#{__LINE__ + 1}"
-        postDeploy.TrialController(params, vmid, host)
+        post_deploy.TrialController(params, vmid, host)
       end
 
       # endTrialController
@@ -518,7 +518,7 @@ class IONe
 
       if params['ansible'] && params['release'] then
         trace << "Creating Ansible Installer thread:#{__LINE__ + 1}"
-        postDeploy.AnsibleController(params, vmid, host)
+        post_deploy.AnsibleController(params, vmid, host)
       end
 
       # endAnsibleController
@@ -570,9 +570,14 @@ class IONe
       else
         LOG_DEBUG "Starting not local playbook"
         Thread.new do
-          @ione.AnsibleController(params.merge({
-                                                 'super' => '', 'host' => "#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}", 'vmid' => vmid
-                                               }))
+          @ione.AnsibleController(
+            params.merge(
+              {
+                'super' => '', 'vmid' => vmid,
+                'host' => "#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}"
+              }
+            )
+          )
         end
       end
       LOG_COLOR "Install-thread started, you should wait until the #{params['ansible-service']} will be installed", 'AnsibleController',
@@ -591,7 +596,8 @@ class IONe
           vcenter_host_conf = $ione_conf['vCenter'][host.name!].nil? ? 'default' : host.name!
         end
         lim_res = vm.setResourcesAllocationLimits(
-          cpu: params['cpu'] * $ione_conf['vCenter'][vcenter_host_conf]['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
+          cpu: params['cpu'] * $ione_conf['vCenter'][vcenter_host_conf]['cpu-limits-koef'],
+          ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
         )
         unless lim_res.nil? then
           err, back = lim_res.split("<|>")
