@@ -58,7 +58,7 @@ class IONe
       stream_data << JSON.generate(networking) << ', '
     end
 
-    showback['computing']['TOTAL'] = showback['computing'].inject(0) { | result, (_id, vm) | result += vm[:TOTAL] }
+    showback['computing']['TOTAL'] = showback['computing'].inject(0) { | result, (_id, vm) | result + vm[:TOTAL] }
     showback['TOTAL'] =     showback['computing']['TOTAL']
     showback['TOTAL'] +=    showback['networking']['TOTAL']
     showback['time_period_requested'] = etime - stime
