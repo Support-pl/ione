@@ -3,8 +3,12 @@ class IONe
   # @param [String] msg - message to log
   # @return [String('DONE') | String('PONG')]
   # @example
-  #   ZmqJsonRpc::Client.new(uri, 50).Test('PING') => 'PONG' -> Service available
-  #                                                => Exception -> Service down
+  #       api = 'http://localhost:8009/ione/Test'
+  #       req = Net::HTTP::Post.new(api)
+  #       req.basic_auth('oneadmin:password')
+  #       r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
+  #         http.request(req)
+  #       end
   def Test(msg, log = "Test")
     LOG "Test message received, text: #{msg}", log if msg != 'PING'
     if msg == "PING" then
