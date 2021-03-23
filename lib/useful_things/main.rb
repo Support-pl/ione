@@ -150,8 +150,9 @@ class IONe
       vm_pool.each do |vm| # Creating VM list from VirtualMachine Pool Object
         begin
           info << {
-            :vmid => vm.id, :userid => vm.uid(false), :host => get_vm_host(vm.id),
-              :login => vm.uname(false, true), :ip => GetIP(vm), :state => (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
+            vmid: vm.id, userid: vm.uid(false), host: get_vm_host(vm.id),
+            login: vm.uname(false, true), ip: GetIP(vm),
+            state: (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
           }
         rescue
           break
