@@ -181,6 +181,7 @@ class IONe
           end
           free.push pool
         rescue
+          nil
         end
       end
     end
