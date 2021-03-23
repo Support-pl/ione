@@ -477,7 +477,14 @@ class IONe
         trace << "Setting VM context:#{__LINE__ + 2}"
         begin
           vm.updateconf(
-            "CONTEXT = [ NETWORK=\"YES\", PASSWORD = \"#{params['passwd']}\", SSH_PUBLIC_KEY = \"$USER[SSH_PUBLIC_KEY]\"#{win ? ", USERNAME = \"#{params['username']}\"" : nil} ]"
+            {
+              CONTEXT: {
+                NETWORK: "YES",
+                PASSWORD: params['passwd'],
+                SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
+                USERNAME: win ? params['username'] : nil
+              }
+            }.to_one_template
           )
         rescue => e
           LOG_DEBUG "Context configuring error: #{e.message}"
@@ -486,7 +493,13 @@ class IONe
         trace << "Setting VM VNC settings:#{__LINE__ + 2}"
         begin
           vm.updateconf(
-            "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{(IONe::Settings['BASE_VNC_PORT'] + vmid)}\", TYPE=\"VNC\" ]"
+            {
+              GRAPHICS: {
+                LISTEN: "0.0.0.0",
+                PORT: (IONe::Settings['BASE_VNC_PORT'] + vmid),
+                TYPE: "VNC"
+              }
+            }.to_one_template
           ) # Configuring VNC
         rescue => e
           LOG_DEBUG "VNC configuring error: #{e.message}"
