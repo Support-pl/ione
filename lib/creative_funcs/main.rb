@@ -24,10 +24,16 @@ class IONe
       LOG_DEBUG allocation_result.message # If allocation was successful, allocate method returned nil
       return 0
     end
-    attributes = "SUNSTONE=[ LANG=\"#{locale || $ione_conf['OpenNebula']['users-default-lang']}\" ]"
-    attributes += "AZURE_TOKEN=\"#{login}\"" if type == 'azure'
-    attributes += "BALANCE=\"0\"\nLABELS=\"IaaS\"" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
-    user.update(attributes, true)
+
+    attrs = {
+      SUNSTONE: {
+        LANG: locale || IONe::Settings['USERS_DEFAULT_LANG'] || 'en_US'
+      }
+    }
+    attrs['AZURE_TOKEN'] = login if type == 'azure'
+    attrs.merge! BALANCE: 0, LABELS: "IaaS" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
+
+    user.update(attrs.to_one_template, true)
     return user.id, user if object
 
     user.id
@@ -156,7 +162,7 @@ class IONe
         sleep(3)
         vmid = template.instantiate(params['login'] + '_vm', false, context)
       end
-    rescue => e
+    rescue
       return vmid.class, vmid.message if vmid.class != Integer
 
       return vmid.class
@@ -181,19 +187,19 @@ class IONe
       LOG_DEBUG 'Waiting until VM will be deployed'
       vm.wait_for_state
 
-      postDeploy = PostDeployActivities.new @client
+      post_deploy = PostDeployActivities.new @client
 
       # TrialController
       if params['trial'] then
         trace << "Creating trial counter thread:#{__LINE__ + 1}"
-        postDeploy.TrialController(params, vmid, host)
+        post_deploy.TrialController(params, vmid, host)
       end
       # endTrialController
       # AnsibleController
 
       if params['ansible'] && params['release'] then
         trace << "Creating Ansible Installer thread:#{__LINE__ + 1}"
-        postDeploy.AnsibleController(params, vmid, host)
+        post_deploy.AnsibleController(params, vmid, host)
       end
 
       # endAnsibleController
@@ -204,98 +210,6 @@ class IONe
   rescue => e
     LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
     return e.message, trace
-  end
-
-  # Reinstall method based on vm.recover(recreate)
-  # @param [Hash] params
-  # @option params [Integer] vmid
-  # @option params [Integer] templateid
-  # @option params [Integer] cpu - CPU cores
-  # @option params [Integer] ram - RAM in MB or GB depending on 'units'
-  # @option params [String] units - GB or MB
-  # @option params [String] ds_type - Datastore type to choose from, e.g. SSD/HDD
-  # @param [Array] trace
-  def ReinstallTest params, _trace = []
-    vmid = params['vmid']
-
-    vm = onblock :vm, vmid
-
-    vm.info!
-    raise "Multi-disk VMs aren't supported" if vm.to_hash['VM']['TEMPLATE']['DISK'].class != Hash
-
-    # Deleting old VM
-    vm.recover 4
-    vm.wait_for_state 1, 0
-    vm.info!
-
-    # Getting VM template
-    body = @db[:vm_pool].where(oid: vmid).select(:body).to_a.last[:body]
-    body = Nokogiri::XML(body)
-    body_old = body.clone
-
-    # Collecting data
-    host = get_vm_host vm, true
-    template = onblock :t, params['templateid']
-    template.info!
-    img = onblock :i, template['/VMTEMPLATE/TEMPLATE/DISK/IMAGE_ID']
-    img.info!
-    ds = onblock :ds, img['/IMAGE/DATASTORE_ID']
-    ds.info!
-
-    modify = {
-      '//DEPLOY_ID' => '',
-        '//TEMPLATE/VCPU' => params['cpu'],
-        '//TEMPLATE/MEMORY' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-        '//TEMPLATE/TEMPLATE_ID' => params['templateid'],
-        '//TEMPLATE/DISK/CLUSTER_ID' => ds.to_hash['DATASTORE']['CLUSTERS']['ID'].join(','),
-        '//TEMPLATE/DISK/DATASTORE' => ds.name,
-        '//TEMPLATE/DISK/DATASTORE_ID' => ds.id,
-        '//TEMPLATE/DISK/IMAGE' => img.name,
-        '//TEMPLATE/DISK/IMAGE_ID' => img.id,
-        '//TEMPLATE/DISK/SOURCE' => img['/IMAGE/SOURCE']
-    }
-    remove = [
-      # '//TEMPLATE/DISK'
-    ]
-
-    modify.each do | at, to |
-      body.at(at).content = to
-    end
-    remove.each do | at |
-      body.at(at).remove unless body.at(at).nil?
-    end
-
-    # disk_node = Nokogiri::XML::Node.new("DISK", body)
-    # disk_attrs = {
-    #     'IMAGE_ID' => img.id,
-    #     'SIZE' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
-    #     'OPENNEBULA_MANAGED' => 'NO',
-    #     'VCENTER_DS_REF' => ds['/DATASTORE/TEMPLATE/VCENTER_DS_REF'],
-    #     'VCENTER_INSTANCE_ID' => ds['/DATASTORE/TEMPLATE/VCENTER_INSTANCE_ID'],
-    #     'SOURCE' => img['/IMAGE/SOURCE'],
-    #     'DATASTORE_ID' => ds.id,
-
-    # }
-    # disk_attrs.each do | attr, val |
-    #     node = Nokogiri::XML::Node.new(attr, body)
-    #     node.content = val
-    #     disk_node.add_child node
-    # end
-
-    # body.at('//TEMPLATE').add_child(disk_node)
-
-    puts body = body.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION | Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS).strip
-
-    unless Nokogiri::XML(body).errors.empty?
-      puts body
-      raise "XML-build failed"
-    end
-
-    @db[:vm_pool].where(oid: vmid).update(body: body)
-
-    vm.deploy(host.last, false, ChooseDS(params['ds_type']))
-
-    return { 'vmid' => vmid, 'ip' => GetIP(vmid, true), 'old_body' => body_old }
   end
 
   # Creates new virtual machine from the given OS template and resize it to given specs, and new user account, which becomes owner of this VM
@@ -312,6 +226,7 @@ class IONe
   # @option params [Integer] :drive Drive size for new VM
   # @option params [String]  :ds_type VM deploy target datastore drives type, 'SSD' or 'HDD'
   # @option params [Integer] :groupid Additional group, in which user should be
+  # @option params [Integer] :ips Public IPs amount(default: 1)
   # @option params [Boolean] :trial (false) VM will be suspended after IONe::Settings['TRIAL_SUSPEND_DELAY']
   # @option params [Boolean] :release (false) VM will be started on HOLD if false
   # @option params [Hash]    :user-template Addon template, you may append to default template
@@ -329,6 +244,7 @@ class IONe
     trace << "Checking params types:#{__LINE__ + 1}"
 
     params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
+    params['ips'] = params['ips'].nil? ? 1 : params['ips'].to_i
     params['user-template'] = {} if params['user-template'].nil?
 
     begin
@@ -426,12 +342,18 @@ class IONe
       trace << "Updating user quota:#{__LINE__ + 1}"
       user.update_quota_by_vm(
         'append' => true, 'cpu' => params['cpu'],
-          'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-          'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
+        'ram' => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+        'drive' => params['drive'] * (params['units'] == 'GB' ? 1024 : 1)
       ) unless t['/VMTEMPLATE/TEMPLATE/CAPACITY'] == 'FIXED'
 
       unless params['allow_snapshots'].nil? then
         params['user-template']['SNAPSHOTS_ALLOWED'] = params['allow_snapshots'].to_s.upcase
+      end
+
+      trace << "Setting up NICs:#{__LINE__ + 1}"
+      specs['NIC'] = []
+      params['ips'].times do
+        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'] }
       end
 
       LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
@@ -464,7 +386,14 @@ class IONe
         trace << "Setting VM context:#{__LINE__ + 2}"
         begin
           vm.updateconf(
-            "CONTEXT = [ NETWORK=\"YES\", PASSWORD = \"#{params['passwd']}\", SSH_PUBLIC_KEY = \"$USER[SSH_PUBLIC_KEY]\"#{win ? ", USERNAME = \"#{params['username']}\"" : nil} ]"
+            {
+              CONTEXT: {
+                NETWORK: "YES",
+                PASSWORD: params['passwd'],
+                SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
+                USERNAME: win ? params['username'] : nil
+              }
+            }.to_one_template
           )
         rescue => e
           LOG_DEBUG "Context configuring error: #{e.message}"
@@ -473,7 +402,13 @@ class IONe
         trace << "Setting VM VNC settings:#{__LINE__ + 2}"
         begin
           vm.updateconf(
-            "GRAPHICS = [ LISTEN=\"0.0.0.0\", PORT=\"#{(IONe::Settings['BASE_VNC_PORT'] + vmid)}\", TYPE=\"VNC\" ]"
+            {
+              GRAPHICS: {
+                LISTEN: "0.0.0.0",
+                PORT: (IONe::Settings['BASE_VNC_PORT'] + vmid),
+                TYPE: "VNC"
+              }
+            }.to_one_template
           ) # Configuring VNC
         rescue => e
           LOG_DEBUG "VNC configuring error: #{e.message}"
@@ -498,13 +433,13 @@ class IONe
 
       LOG_DEBUG "VM is active now, let it go"
 
-      postDeploy = PostDeployActivities.new @client
+      post_deploy = PostDeployActivities.new @client
 
       # TrialController
 
       if params['trial'] then
         trace << "Creating trial counter thread:#{__LINE__ + 1}"
-        postDeploy.TrialController(params, vmid, host)
+        post_deploy.TrialController(params, vmid, host)
       end
 
       # endTrialController
@@ -512,7 +447,7 @@ class IONe
 
       if params['ansible'] && params['release'] then
         trace << "Creating Ansible Installer thread:#{__LINE__ + 1}"
-        postDeploy.AnsibleController(params, vmid, host)
+        post_deploy.AnsibleController(params, vmid, host)
       end
 
       # endAnsibleController
@@ -520,7 +455,7 @@ class IONe
     ##### PostDeploy Activity define END #####
 
     LOG_AUTO 'Post-Deploy joblist defined, basic installation job ended'
-    return out = { 'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid) }
+    return { 'userid' => userid, 'vmid' => vmid, 'ip' => GetIP(vmid) }
   rescue => e
     begin
       out = { :exception => e.message, :trace => trace << 'END_TRACE' }
@@ -564,9 +499,14 @@ class IONe
       else
         LOG_DEBUG "Starting not local playbook"
         Thread.new do
-          @ione.AnsibleController(params.merge({
-                                                 'super' => '', 'host' => "#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}", 'vmid' => vmid
-                                               }))
+          @ione.AnsibleController(
+            params.merge(
+              {
+                'super' => '', 'vmid' => vmid,
+                'host' => "#{@ione.GetIP(vmid)}:#{$ione_conf['OpenNebula']['users-vms-ssh-port']}"
+              }
+            )
+          )
         end
       end
       LOG_COLOR "Install-thread started, you should wait until the #{params['ansible-service']} will be installed", 'AnsibleController',
@@ -585,7 +525,8 @@ class IONe
           vcenter_host_conf = $ione_conf['vCenter'][host.name!].nil? ? 'default' : host.name!
         end
         lim_res = vm.setResourcesAllocationLimits(
-          cpu: params['cpu'] * $ione_conf['vCenter'][vcenter_host_conf]['cpu-limits-koef'], ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
+          cpu: params['cpu'] * $ione_conf['vCenter'][vcenter_host_conf]['cpu-limits-koef'],
+          ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
         )
         unless lim_res.nil? then
           err, back = lim_res.split("<|>")

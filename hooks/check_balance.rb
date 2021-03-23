@@ -63,7 +63,7 @@ vm.recover 3 if balance == 0 && u.groups.include?(IONe::Settings['IAAS_GROUP_ID'
 capacity = IONe::Settings['CAPACITY_COST']
 vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i / 1000
 
-if balance < vm_price * 86400 then
+if balance < vm_price * 86400 && u.groups.include?(IONe::Settings['IAAS_GROUP_ID']) then
   puts "User balance isn't enough to deploy this VM, deleting..."
   vm.recover 3
 else
