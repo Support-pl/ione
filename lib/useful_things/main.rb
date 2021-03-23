@@ -6,7 +6,6 @@ class IONe
   #   ZmqJsonRpc::Client.new(uri, 50).Test('PING') => 'PONG' -> Service available
   #                                                => Exception -> Service down
   def Test(msg, log = "Test")
-    id = id_gen()
     LOG "Test message received, text: #{msg}", log if msg != 'PING'
     if msg == "PING" then
       return "PONG"
@@ -24,7 +23,6 @@ class IONe
   #   => Integer => user and vm found
   #   => 'none'  => no user or now vm exists
   def get_vm_by_uid(uid)
-    id = id_gen()
     vmp = VirtualMachinePool.new(@client)
     vmp.info_all!
     vmp.each do | vm |
@@ -39,7 +37,6 @@ class IONe
   # @example
   #   => [{:id => ..., :name => ...}, {:id => ..., :name => ...}, ...]
   def get_vms_by_uid(uid)
-    id = id_gen()
     vmp, vms = VirtualMachinePool.new(@client), []
     vmp.info_all!
     vmp.each do | vm |
@@ -59,7 +56,6 @@ class IONe
   #   => Integer => user found
   #   => 'none'  => no user exists
   def get_uid_by_name(name)
-    id = id_gen()
     up = UserPool.new(@client)
     up.info_all!
     up.each do | u |
@@ -79,7 +75,6 @@ class IONe
   #   => {:vmid => Integer, :userid => Integer, :ip => String} => User and VM found
   #   => {:vmid => 'none', :userid => 'none', :ip => String}
   def get_vm_by_uname name
-    id = id_gen()
     userid = get_uid_by_name(name)
     vmid = get_vm_by_uid(userid)
     unless vmid.nil? then
