@@ -32,12 +32,14 @@ class IONe
 
       return nic.size == 1 ? nic.last : nic
     rescue # If not, this action will raise HashRead exception
+      nil
     end
     begin
       # Also IP can be stored at the another place in monitoring, but here all IP's are stored
       ips = vm['MONITORING']['GUEST_IP_ADDRESSES'].split(',').map! { |ip| IPAddr.new ip }
       return ips.detect { |ip| ip.ipv4? && (!ip.local? || private_allowed) }.to_s
     rescue
+      nil
     end
     begin
       # If VM was imported correctly, IP address will be readed by the monitoring system
@@ -45,6 +47,7 @@ class IONe
       # Monitoring can read IPv6 address, so let us make the check
       return ip.to_s if ip.ipv4? && (!ip.local? || private_allowed)
     rescue
+      nil
     end
     return ""
   end
@@ -58,11 +61,10 @@ class IONe
     vm_pool = VirtualMachinePool.new(@client)
     vm_pool.info_all!
     vm_pool.each do |vm|
-      break if nil
-
       begin
         return vm.id if ip.chomp == GetIP(vm.id).chomp
       rescue
+        nil
       end
     end
     nil
@@ -112,21 +114,21 @@ class IONe
     return {
       # "Name, owner, owner id, group id"
       'NAME' => vm_hash['NAME'], 'OWNER' => vm_hash['UNAME'], 'OWNERID' => vm_hash['UID'], 'GROUPID' => vm_hash['GID'],
-        # IP, host and vm state
-        'IP' => GetIP(vmid), 'HOST_ID' => host_id, 'HOST' => hostname, 'STATE' => vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str,
-        # VM specs
-        'CPU' => vm_hash['TEMPLATE']['VCPU'], 'RAM' => vm_hash['TEMPLATE']['MEMORY'],
-        'DS_TYPE' => begin DatastoresMonitoring('sys').detect { |el| el['id'] == get_vm_ds(vmid).to_i }['type'] rescue nil end,
-        'DRIVE' =>
-        begin
-          vm_hash['TEMPLATE']['DISK']['SIZE']
-        rescue TypeError
-          vm_hash['TEMPLATE']['DISK'].inject(0) { |summ, disk| summ += disk['SIZE'].to_i }
-        rescue
-          nil
-        end,
-        # VM creation hist
-        'IMPORTED' => vm_hash['TEMPLATE']['IMPORTED'].nil? ? 'NO' : 'YES'
+      # IP, host and vm state
+      'IP' => GetIP(vmid), 'HOST_ID' => host_id, 'HOST' => hostname, 'STATE' => vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str,
+      # VM specs
+      'CPU' => vm_hash['TEMPLATE']['VCPU'], 'RAM' => vm_hash['TEMPLATE']['MEMORY'],
+      'DS_TYPE' => begin DatastoresMonitoring('sys').detect { |el| el['id'] == get_vm_ds(vmid).to_i }['type'] rescue nil end,
+      'DRIVE' =>
+      begin
+        vm_hash['TEMPLATE']['DISK']['SIZE']
+      rescue TypeError
+        vm_hash['TEMPLATE']['DISK'].inject(0) { |summ, disk| summ + disk['SIZE'].to_i }
+      rescue
+        nil
+      end,
+      # VM creation hist
+      'IMPORTED' => vm_hash['TEMPLATE']['IMPORTED'].nil? ? 'NO' : 'YES'
     }
   rescue => e
     return e.message
