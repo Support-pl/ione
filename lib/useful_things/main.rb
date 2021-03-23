@@ -225,7 +225,7 @@ class IONe
 
     # @!visibility private
     # Converts MB to GB
-    def sizeConvert(mb)
+    size_convert = lambda do | mb |
       if mb.to_f / 1024 > 768 then
         return "#{(mb.to_f / 1048576.0).round(2)}TB"
       else
@@ -237,8 +237,8 @@ class IONe
     img_pool.info_all!
     img_pool.each do | img |
       mon << {
-        'id' => img.id, 'name' => img.name.split('(').first, :full_size => sizeConvert(img.to_hash['DATASTORE']['TOTAL_MB']),
-          'used' => sizeConvert(img.to_hash['DATASTORE']['USED_MB']),
+        'id' => img.id, 'name' => img.name.split('(').first, :full_size => size_convert[img.to_hash['DATASTORE']['TOTAL_MB']],
+          'used' => size_convert[img.to_hash['DATASTORE']['USED_MB']],
           'type' => img.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
           'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
           'hypervisor' => img.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
@@ -254,7 +254,7 @@ class IONe
   def HostsMonitoring()
     # @!visibility private
     # Converts MB to GB
-    def sizeConvert(mb)
+    size_convert = lambda do | mb |
       if mb.to_f / 1048576 > 768 then
         return "#{(mb.to_f / 1073741824.0).round(2)}TB"
       else
@@ -267,8 +267,8 @@ class IONe
     host_pool.each do | host |
       host = host.to_hash['HOST']
       mon << {
-        :id => host['ID'].to_i, :name => host['NAME'], :full_size => sizeConvert(host.to_hash['HOST_SHARE']['TOTAL_MEM']),
-          :reserved => sizeConvert(host.to_hash['HOST_SHARE']['MEM_USAGE']),
+        :id => host['ID'].to_i, :name => host['NAME'], :full_size => size_convert[host.to_hash['HOST_SHARE']['TOTAL_MEM']],
+          :reserved => size_convert[host.to_hash['HOST_SHARE']['MEM_USAGE']],
           :running_vms => host.to_hash['HOST_SHARE']['RUNNING_VMS'].to_i,
           :cpu => "#{(host.to_hash['HOST_SHARE']['USED_CPU'].to_f / host.to_hash['HOST_SHARE']['TOTAL_CPU'].to_f * 100).round(2)}%"
       }
