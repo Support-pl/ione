@@ -11,7 +11,6 @@ class IONe
   def reserve_public_ip params
     params.to_sym!
 
-    conf = @db[:settings].as_hash(:name, :body)
     vnet = onblock(:vn, IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'], @client)
     vnet.info!
 
