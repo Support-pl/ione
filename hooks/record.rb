@@ -22,6 +22,7 @@ require 'yaml'
 require 'base64'
 require 'nokogiri'
 
+$: << '/usr/lib/one/ione'
 require 'core/*'
 
 $db = Sequel.connect(**ops)
