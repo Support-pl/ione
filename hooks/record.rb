@@ -25,8 +25,6 @@ require 'nokogiri'
 $: << '/usr/lib/one/ione'
 require 'core/*'
 
-$db = Sequel.connect(**ops)
-
 vm_template = Nokogiri::XML(Base64::decode64(ARGV.first))
 id = vm_template.xpath("//ID").text.to_i
 
@@ -37,4 +35,3 @@ state = ARGV[1]
 $db[:records].insert(id: id, state: state, time: Time.now.to_i)
 
 puts "Success. State: #{state}"
-# create table records(id int not null, state varchar(10) not null, time int)
