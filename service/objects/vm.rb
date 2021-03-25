@@ -170,8 +170,13 @@ class OpenNebula::VirtualMachine
     return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
   end
 
-  def powerState spec
+  def vcenter_get_vm
+    info!
 
+    host = onblock(:h, IONe.new(@client, $db).get_vm_host(id, true).last, @client)
+    vim = host.vim
+
+    VIM::VirtualMachine.new(vim, deploy_id)
   end
 
   # Checks if vm is on given vCenter Datastore
