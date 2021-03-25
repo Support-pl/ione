@@ -170,6 +170,13 @@ class OpenNebula::VirtualMachine
     return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
   end
 
+  def vcenter_powerState
+    vm = vcenter_get_vm
+    vm.summary.runtime.powerState
+  rescue => e
+    "Unexpected error, cannot handle it: #{e.message}"
+  end
+
   def vcenter_get_vm
     info!
 
@@ -181,7 +188,7 @@ class OpenNebula::VirtualMachine
 
   # Checks if vm is on given vCenter Datastore
   def is_at_ds? ds_name
-    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id))
+    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
     datacenter = get_vcenter_dc(host)
     begin
       datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
