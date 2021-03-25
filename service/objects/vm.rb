@@ -170,6 +170,10 @@ class OpenNebula::VirtualMachine
     return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
   end
 
+  # Returns VM power state on vCenter
+  # @example
+  #   => "poweredOn"
+  # @return [String]
   def vcenter_powerState
     vm = vcenter_get_vm
     vm.summary.runtime.powerState
@@ -177,6 +181,8 @@ class OpenNebula::VirtualMachine
     "Unexpected error, cannot handle it: #{e.message}"
   end
 
+  # Generates RbVmomi::VIM::VirtualMachine object with inited connection and ref
+  # @return [RbVmomi::VIM::VirtualMachine]
   def vcenter_get_vm
     info!
 
