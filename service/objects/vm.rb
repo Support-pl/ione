@@ -129,9 +129,9 @@ class OpenNebula::VirtualMachine
   #     => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
   def setResourcesAllocationLimits spec
     LOG_DEBUG spec.debug_out
-    return 'Unsupported query' if IONe.new($client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'
+    return 'Unsupported query' if IONe.new(@client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'
 
-    query, host = {}, onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+    query, host = {}, onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
     datacenter = get_vcenter_dc(host)
 
     vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
@@ -170,9 +170,31 @@ class OpenNebula::VirtualMachine
     return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
   end
 
+  # Returns VM power state on vCenter
+  # @example
+  #   => "poweredOn"
+  # @return [String]
+  def vcenter_powerState
+    vm = vcenter_get_vm
+    vm.summary.runtime.powerState
+  rescue => e
+    "Unexpected error, cannot handle it: #{e.message}"
+  end
+
+  # Generates RbVmomi::VIM::VirtualMachine object with inited connection and ref
+  # @return [RbVmomi::VIM::VirtualMachine]
+  def vcenter_get_vm
+    info!
+
+    host = onblock(:h, IONe.new(@client, $db).get_vm_host(id, true).last, @client)
+    vim = host.vim
+
+    VIM::VirtualMachine.new(vim, deploy_id)
+  end
+
   # Checks if vm is on given vCenter Datastore
   def is_at_ds? ds_name
-    host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
     datacenter = get_vcenter_dc(host)
     begin
       datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
@@ -190,7 +212,7 @@ class OpenNebula::VirtualMachine
   # Gets the datastore, where VM allocated is
   # @return [String] DS name
   def get_vms_vcenter_ds
-    host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
     datastores = get_vcenter_dc(host).datastoreFolder.children
 
     self.info!
@@ -213,7 +235,7 @@ class OpenNebula::VirtualMachine
     return false if !self.hotAddEnabled?
 
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
       datacenter = get_vcenter_dc(host)
 
       vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
@@ -235,7 +257,7 @@ class OpenNebula::VirtualMachine
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def hotAddEnabled? name = nil
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
       datacenter = get_vcenter_dc(host)
 
       vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
@@ -255,7 +277,7 @@ class OpenNebula::VirtualMachine
   # @return [true | String]
   def hotResourcesControlConf spec = { :cpu => true, :ram => true, :name => nil }
     begin
-      host, name = onblock(:h, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
+      host, name = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id)), spec[:name]
       datacenter = get_vcenter_dc(host)
 
       vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
@@ -292,7 +314,7 @@ class OpenNebula::VirtualMachine
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def getResourcesAllocationLimits name = nil
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
+      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
       datacenter = get_vcenter_dc(host)
 
       vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first

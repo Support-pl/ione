@@ -16,8 +16,6 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-# ROOT = ENV['IONEROOT'] # IONe root path
-# require "#{ROOT}/debug_lib.rb"
 ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
 
 if !ONE_LOCATION
@@ -40,11 +38,15 @@ require "json"
 client = Client.new
 one_auth = client.instance_variable_get("@one_auth").split(':')
 
-id = ARGV.first.to_i
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+id = xml.xpath('//ID').text.to_i
 vm = VirtualMachine.new_with_id(id, client)
 vm.info!
-puts "States are: [#{ARGV[1]}, #{ARGV[2]}] -> [#{vm.state} -- #{vm.state_str}, #{vm.lcm_state} -- #{vm.lcm_state_str}]"
-if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
+
+pstate, plcmstate = vm['//PREV_STATE'].to_i, vm['//PREV_LCM_STATE'].to_i
+
+puts "States are: [#{pstate}, #{plcmstate}] -> [#{vm.state}, #{vm.lcm_state}]"
+if [pstate, plcmstate] != [3, 2] then
   puts "VM started not from PENDING state, skipping..."
   exit 0
 end
@@ -69,8 +71,8 @@ if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
     id, host,
     {
       'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
-          'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-          'iops' => iops[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+      'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
+      'iops' => iops[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
     }
   ]
   req.basic_auth(*one_auth)
