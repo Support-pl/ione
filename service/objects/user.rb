@@ -27,7 +27,7 @@ class OpenNebula::User
   end
 
   # Sets users balance
-  # @param [Fixnum] num
+  # @param [Integer] num
   def balance= num
     update("BALANCE = #{num}", true)
   end

@@ -2,7 +2,7 @@ class IONe
   # @!group Templates Info
 
   # Obtains the list of all available Templates(and filters by groupd_id if given)
-  # @param [Fixnum] group_id - group if to filter by(optional)
+  # @param [Integer] group_id - group if to filter by(optional)
   # @return [Array]
   def get_templates_list group_id = nil
     tp_pool = TemplatePool.new(@client)
