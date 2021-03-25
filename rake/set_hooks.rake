@@ -121,6 +121,10 @@ require 'opennebula'
     "NAME" => 'set-limits',
     "ON" => "RUNNING",
     "COMMAND" => "/usr/lib/one/ione/hooks/vcenter/set_limits.rb",
+    "ARGUMENTS" => "$TEMPLATE",
+    "TYPE" => "state",
+    "RESOURCE" => "VM"
+  },
   {
     "NAME" => 'check-running-state',
     "ON" => "CUSTOM",
