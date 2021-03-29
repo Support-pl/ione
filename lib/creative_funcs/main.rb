@@ -306,35 +306,35 @@ class IONe
       if !t['/VMTEMPLATE/TEMPLATE/CAPACITY'] && t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == "VCENTER" then
         specs = {
           "VCPU" => params['cpu'],
-                    "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-                    "DRIVE" => params['ds_type'],
-                    "DISK" => {
-                      "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
-                        "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
-                        "OPENNEBULA_MANAGED" => "NO"
-                    }
+          "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+          "DRIVE" => params['ds_type'],
+          "DISK" => {
+            "IMAGE_ID" => t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+              "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+              "OPENNEBULA_MANAGED" => "NO"
+          }
         }
       elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'AZURE' then
         specs = {
           "OS_DISK_SIZE" => params['drive'],
-                    "SIZE" => params['extra']['instance_size'],
-                    "VM_USER_NAME" => params['username'],
-                    "PASSWORD" => params['passwd'],
-                    "VCPU" => params['cpu'],
-                    "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1)
+          "SIZE" => params['extra']['instance_size'],
+          "VM_USER_NAME" => params['username'],
+          "PASSWORD" => params['passwd'],
+          "VCPU" => params['cpu'],
+          "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1)
         }
       elsif t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == 'KVM' then
         specs = {
           "CPU" => 1,
-                    "VCPU" => params['cpu'],
-                    "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-                    "DRIVE" => params['ds_type'],
-                    "DISK" => {
-                      "DEV_PREFIX" => "vd",
-                        "DRIVER" => "qcow2",
-                        "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
-                        "OPENNEBULA_MANAGED" => "NO"
-                    }
+          "VCPU" => params['cpu'],
+          "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+          "DRIVE" => params['ds_type'],
+          "DISK" => {
+            "DEV_PREFIX" => "vd",
+              "DRIVER" => "qcow2",
+              "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+              "OPENNEBULA_MANAGED" => "NO"
+          }
         }
         key = t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'].nil? ? 'IMAGE' : 'IMAGE_ID'
         specs['DISK'][key] = t.to_hash['VMTEMPLATE']['TEMPLATE']['DISK'][key]
