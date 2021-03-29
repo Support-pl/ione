@@ -47,8 +47,11 @@ require 'onedb'
 require 'onedb_live'
 include OpenNebula
 
+require 'service/objects/xml_element'
+require 'service/objects/host'
+require 'service/objects/vm'
+
 client = Client.new
-one_auth = client.instance_variable_get("@one_auth").split(':')
 
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 id = xml.xpath('//ID').text.to_i
@@ -78,15 +81,7 @@ elsif vm.state == 0 then
   end
 end
 
-api = URI("http://localhost:8009/one.vm.vcenter_powerState")
-req = Net::HTTP::Post.new(api)
-req.body = JSON.generate oid: id
-req.basic_auth(*one_auth)
-r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
-  http.request(req)
-end
-res = JSON.parse r.body
-state = res["response"]
+state = vm.vcenter_powerState
 
 if state != 'poweredOff' then
   puts "State isn't poweredOff, but #{state}, skipping..."
