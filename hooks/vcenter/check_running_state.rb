@@ -88,10 +88,19 @@ if state != 'poweredOff' then
   exit 0
 end
 
-puts "Force changing state to POWEROFF"
+puts "Force starting VM"
+begin
+  vm.vim_vm.PowerOnVM_Task.wait_for_completion
+rescue => e
+  STDERR.puts "Can't start VM, error: #{e.message}"
+  exit 0
+end
+
+puts "Ensuring RUNNING state"
+
 OneDBLive::NOKOGIRI_ENCODING = 'UTF-8'
 action = OneDBLive.new
-action.change_body('vm', "/VM/STATE", 8, { :id => vm.id })
-action.change_body('vm', "/VM/LCM_STATE", 0, { :id => vm.id })
+action.change_body('vm', "/VM/STATE", 3, { :id => vm.id })
+action.change_body('vm', "/VM/LCM_STATE", 3, { :id => vm.id })
 
 puts "Done."
