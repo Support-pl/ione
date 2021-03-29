@@ -16,69 +16,53 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
+ONED_CONF         = ETC_LOCATION + "oned.conf"
 
-if !ONE_LOCATION
-  RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-  ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-  RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-  ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
-end
-
+$: << '/usr/lib/one/ione'
 $: << RUBY_LIB_LOCATION
-require 'opennebula'
-include OpenNebula
+$: << RUBY_LIB_LOCATION + '/onedb'
 
 require "uri"
 require "net/http"
 require "yaml"
 require "json"
 
+require 'opennebula'
+include OpenNebula
+
+require 'core/*'
+require 'service/objects/xml_element'
+require 'service/objects/host'
+require 'service/objects/vm'
+
 client = Client.new
-one_auth = client.instance_variable_get("@one_auth").split(':')
 
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 id = xml.xpath('//ID').text.to_i
 vm = VirtualMachine.new_with_id(id, client)
 vm.info!
 
-pstate, plcmstate = vm['//PREV_STATE'].to_i, vm['//PREV_LCM_STATE'].to_i
-
-puts "States are: [#{pstate}, #{plcmstate}] -> [#{vm.state}, #{vm.lcm_state}]"
-if [pstate, plcmstate] != [3, 2] then
-  puts "VM started not from PENDING state, skipping..."
-  exit 0
-end
-
-api = URI("http://localhost:8009/ione/get_vm_host")
-req = Net::HTTP::Post.new(api)
-req.body = JSON.generate params: [id, true]
-req.basic_auth(*one_auth)
-r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
-  http.request(req)
-end
-res = JSON.parse r.body
-host = res["response"].last.to_i
-
 if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
+  limits, specs = vm.getResourcesAllocationLimits, {}
 
-  iops = YAML.load_file("#{ETC_LOCATION}/ione.conf")['vCenter']['default']['drives-iops']
-
-  api = URI("http://localhost:8009/ione/SetVMResourcesLimits")
-  req = Net::HTTP::Post.new(api)
-  req.body = JSON.generate params: [
-    id, host,
-    {
-      'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
-      'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-      'iops' => iops[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
-    }
-  ]
-  req.basic_auth(*one_auth)
-  Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
-    http.request(req)
+  if limits[:cpu] == -1 then
+    host = vm.host.last
+    key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host].nil? ? 'default' : host
+    specs[:cpu] = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
   end
+
+  if limits[:ram] == -1 then
+    specs[:ram] = vm['/VM/TEMPLATE/MEMORY'].to_i
+  end
+
+  if limits[:iops] == -1 then
+    specs[:iops] = IONe::Settings['VCENTER_DRIVES_IOPS'][vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+    specs[:iops] = -1 if specs[:iops].nil? || specs[:iops] == 0
+  end
+
+  vm.setResourcesAllocationLimits specs
 end
 
 puts 'Successful set Limits up'
