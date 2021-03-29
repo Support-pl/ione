@@ -17,7 +17,7 @@
                     : `/dashboard/${item.name}`,
                 }"
               >
-                {{ item.name | capitalize }}
+                {{ item.name }}
               </router-link>
             </a-menu-item>
           </a-menu>
@@ -33,17 +33,20 @@
 <script>
 const asideBtns = [
   {
-    name: "settings",
+    name: "Settings",
+    route: "settings",
   },
   {
-    name: "costs",
+    name: "Costs",
+    route: "costs",
   },
   {
     name: "Hosts (Nodes)",
     route: "hosts",
   },
   {
-    name: "datastores",
+    name: "Datastores",
+    route: "datastores",
   },
   {
     name: "Ansible Playbooks",
@@ -57,7 +60,12 @@ const asideBtns = [
     name: "hooks",
   },
   {
-    name: "logs",
+    name: "Hooks",
+    route: "hooks",
+  },
+  {
+    name: "Logs",
+    route: "logs",
   },
 ];
 export default {
