@@ -484,7 +484,7 @@ class OpenNebula::VirtualMachine
     # Proxy data
     host     = self['/VM/HISTORY_RECORDS/HISTORY[last()]/HOSTNAME']
     vnc_port = self['TEMPLATE/GRAPHICS/PORT']
-    vnc_pw   = self['TEMPLATE/GRAPHICS/PASSWD']
+    # vnc_pw   = self['TEMPLATE/GRAPHICS/PASSWD']
 
     # If it is a vCenter VM
     if self['USER_TEMPLATE/HYPERVISOR'] == "vcenter"
