@@ -3,6 +3,8 @@ require 'time'
 
 # Extensions for OpenNebula::VirtualMachine class
 class OpenNebula::VirtualMachine
+  attr_reader :vim_vm
+
   # Actions supported by OpenNebula scheduler
   SCHEDULABLE_ACTIONS = %w(
     terminate
@@ -20,6 +22,12 @@ class OpenNebula::VirtualMachine
     undeploy-hard
     snapshot-create
   )
+
+  def initialize(xml, client)
+    @vim_vm = nil
+    super(xml, client)
+  end
+
   # Generates template for OpenNebula scheduler record
   def generate_schedule_str id, action, time
     "\nSCHED_ACTION=[\n" +
@@ -184,10 +192,13 @@ class OpenNebula::VirtualMachine
   # Generates RbVmomi::VIM::VirtualMachine object with inited connection and ref
   # @return [RbVmomi::VIM::VirtualMachine]
   def vcenter_get_vm
-    info!
+    return @vim_vm if @vim_vm
 
-    host = onblock(:h, IONe.new(@client, $db).get_vm_host(id, true).last, @client)
-    vim = host.vim
+    info!
+    h = Host.new_with_id(host.first, @client)
+
+    @vim_vm = RbVmomi::VIM::VirtualMachine.new(h.vim, deploy_id)
+  end
 
     VIM::VirtualMachine.new(vim, deploy_id)
   end
