@@ -200,7 +200,17 @@ class OpenNebula::VirtualMachine
     @vim_vm = RbVmomi::VIM::VirtualMachine.new(h.vim, deploy_id)
   end
 
-    VIM::VirtualMachine.new(vim, deploy_id)
+  # Returns host id and name, where VM has been deployed
+  # @return [Array<String> | nil]
+  # @example
+  #   => ['0', 'example-node-vcenter'] => Host was found
+  #   => nil => Host wasn't found
+  def host
+    history = to_hash!['VM']["HISTORY_RECORDS"]['HISTORY'] # Searching hostname at VM allocation history
+    history = history.last if history.class == Array # If history consists of 2 or more lines - returns last
+    return history['HID'], history['HOSTNAME']
+  rescue
+    return nil
   end
 
   # Checks if vm is on given vCenter Datastore
