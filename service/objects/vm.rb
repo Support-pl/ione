@@ -129,15 +129,14 @@ class OpenNebula::VirtualMachine
   # @option spec [Integer] :ram  MBytes limit for VMs RAM space usage
   # @option spec [Integer] :iops IOPS limit for VMs disk
   # @option spec [String]  :name VM name on vCenter node
-  # @return [String]
+  # @return [NilClass | String, Array]
   # @example Return messages decode
   #   vm.setResourcesAllocationLimits(spec)
   #     => 'Reconfigure Success' -- Task finished with success code, all specs are equal to given
   #     => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
   #     => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
   def setResourcesAllocationLimits spec
-    LOG_DEBUG spec.debug_out
-    return 'Unsupported query' if IONe.new(@client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'
+    return 'Unsupported query' if self['//IMPORTED'] == 'YES'
 
     query, vm = {}, vcenter_get_vm
     disk = vm.disks.first
@@ -155,24 +154,21 @@ class OpenNebula::VirtualMachine
 
     state = true
     begin
-      LOG_DEBUG 'Powering VM Off'
-      LOG_DEBUG vm.PowerOffVM_Task.wait_for_completion
+      vm.PowerOffVM_Task.wait_for_completion
     rescue
       state = false
     end
 
-    LOG_DEBUG 'Reconfiguring VM'
-    LOG_DEBUG vm.ReconfigVM_Task(:spec => query).wait_for_completion
+    vm.ReconfigVM_Task(:spec => query).wait_for_completion
 
     begin
-      LOG_DEBUG 'Powering VM On'
-      LOG_DEBUG vm.PowerOnVM_Task.wait_for_completion
+      vm.PowerOnVM_Task.wait_for_completion
     rescue
       nil
     end if state
     return nil
   rescue => e
-    return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
+    return "Reconfigure Error:#{e.message}", e.backtrace
   end
 
   # Returns VM power state on vCenter
