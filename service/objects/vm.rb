@@ -139,10 +139,7 @@ class OpenNebula::VirtualMachine
     LOG_DEBUG spec.debug_out
     return 'Unsupported query' if IONe.new(@client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'
 
-    query, host = {}, onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-    datacenter = get_vcenter_dc(host)
-
-    vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
+    query, vm = {}, vcenter_get_vm
     disk = vm.disks.first
 
     query[:cpuAllocation] = { :limit => spec[:cpu].to_i, :reservation => 0 } if !spec[:cpu].nil?
@@ -214,52 +211,27 @@ class OpenNebula::VirtualMachine
   end
 
   # Checks if vm is on given vCenter Datastore
-  def is_at_ds? ds_name
-    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-    datacenter = get_vcenter_dc(host)
-    begin
-      datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
-    rescue
-      return 'Invalid DS name.'
-    end
-    self.info!
-    search_template = "VirtualMachine(\"#{self.deploy_id}\")"
-    datastore.vm.each do | vm |
-      return true if vm.to_s == search_template
-    end
-    false
+  def at_vcenter_ds? ds_name
+    vcenter_datastore_name == ds_name
   end
 
   # Gets the datastore, where VM allocated is
   # @return [String] DS name
-  def get_vms_vcenter_ds
-    host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-    datastores = get_vcenter_dc(host).datastoreFolder.children
-
-    self.info!
-    search_template = "VirtualMachine(\"#{self.deploy_id}\")"
-    datastores.each do | ds |
-      ds.vm.each do | vm |
-        return ds.name if vm.to_s == search_template
-      end
-    end
+  def vcenter_datastore_name
+    vcenter_get_vm.datastore.first.name
   end
 
   # Resizes VM without powering off the VM
   # @param [Hash] spec
   # @option spec [Integer] :cpu CPU amount to set
   # @option spec [Integer] :ram RAM amount in MB to set
-  # @option spec [String] :name VM name on vCenter node
   # @return [Boolean | String]
   # @note Method returns true if resize action ended correct, false if VM not support hot reconfiguring
-  def hot_resize spec = { :name => nil }
+  def hot_resize spec = {}
     return false if !self.hotAddEnabled?
 
     begin
-      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
+      vm = vcenter_get_vm
       query = {
         :numCPUs => spec[:cpu],
         :memoryMB => spec[:ram]
@@ -272,16 +244,12 @@ class OpenNebula::VirtualMachine
   end
 
   # Checks if resources hot add enabled
-  # @param [String] name VM name on vCenter node
   # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
-  def hotAddEnabled? name = nil
+  def hotAddEnabled?
     begin
-      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm
       return {
         :cpu => vm.config.cpuHotAddEnabled, :ram => vm.config.memoryHotAddEnabled
       }
@@ -294,14 +262,10 @@ class OpenNebula::VirtualMachine
   # @param [Hash] spec
   # @option spec [Boolean] :cpu
   # @option spec [Boolean] :ram
-  # @option spec [String]  :name VM name on vCenter node
   # @return [true | String]
-  def hotResourcesControlConf spec = { :cpu => true, :ram => true, :name => nil }
+  def hotResourcesControlConf spec = { :cpu => true, :ram => true }
     begin
-      host, name = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id)), spec[:name]
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm
       query = {
         :cpuHotAddEnabled => spec[:cpu],
         :memoryHotAddEnabled => spec[:ram]
@@ -329,16 +293,12 @@ class OpenNebula::VirtualMachine
   end
 
   # Gets resources allocation limits from vCenter node
-  # @param [String] name VM name on vCenter node
   # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
-  def getResourcesAllocationLimits name = nil
+  def getResourcesAllocationLimits
     begin
-      host = onblock(:h, IONe.new(@client, $db).get_vm_host(self.id, true).last)
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm
       vm_disk = vm.disks.first
       { cpu: vm.config.cpuAllocation.limit, ram: vm.config.cpuAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
     rescue => e
