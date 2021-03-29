@@ -47,6 +47,8 @@ class OpenNebula::VirtualNetwork
   end
 
   # Calculate amount of Public Addresses and bill them with `PUBLIC_IP_COST`
+  # @param [Integer] ar - AddressRange ID
+  # @param [Integer] per - Billing periods amount
   def ar_record(ar, per)
     info!
     ar = ar_pool.select { |o| o['AR_ID'].to_i == ar.to_i }.first
