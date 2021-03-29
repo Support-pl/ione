@@ -140,7 +140,7 @@ class IONe
     infot = Thread.new do
       unless vms.empty? then
         vm_pool = vms.map! do |vmid|
-          onblock(:vm, vmid) { | vm | vm.info! || vm }
+          onblock(:vm, vmid, @client) { | vm | vm.info! || vm }
         end
       else
         vm_pool = VirtualMachinePool.new(@client)
