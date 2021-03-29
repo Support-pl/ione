@@ -519,13 +519,10 @@ class IONe
     # If Cluster type is vCenter, sets up Limits at the node
     def LimitsController(params, vmid, host = nil)
       onblock(:vm, vmid) do | vm |
-        if host.nil? then
-          vcenter_host_conf = 'default'
-        else
-          vcenter_host_conf = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host.name!].nil? ? 'default' : host.name!
-        end
+        key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host.name!].nil? ? 'default' : host.name!
+
         lim_res = vm.setResourcesAllocationLimits(
-          cpu: params['cpu'] * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][vcenter_host_conf],
+          cpu: params['cpu'] * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key],
           ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
         )
         unless lim_res.nil? then
