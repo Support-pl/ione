@@ -84,7 +84,7 @@ class IONe
     params['cpu'], params['ram'], params['drive'], params['iops'] = params.get('cpu', 'ram', 'drive', 'iops').map { |el| el.to_i }
 
     begin
-      params['iops'] = $ione_conf['vCenter']['drives-iops'][params['ds_type']]
+      params['iops'] = IONe::Settings['VCENTER_DRIVES_IOPS'][params['ds_type']]
       LOG_DEBUG "IOps: #{params['iops'].class}(#{params['iops']})"
     rescue
       LOG_DEBUG "No vCenter configuration found"
@@ -130,15 +130,15 @@ class IONe
     context['NIC'] = context['NIC'].last if context['NIC'].size == 1
     trace << "Generating specs configuration:#{__LINE__ + 1}"
     context.merge!({
-                     "VCPU" => params['cpu'],
-        "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
-        "DRIVE" => params['ds_type'],
-        "DISK" => {
-          "IMAGE_ID" => template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
-            "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
-            "OPENNEBULA_MANAGED" => "NO"
-        }
-                   })
+      "VCPU" => params['cpu'],
+      "MEMORY" => params['ram'] * (params['units'] == 'GB' ? 1024 : 1),
+      "DRIVE" => params['ds_type'],
+      "DISK" => {
+        "IMAGE_ID" => template.to_hash['VMTEMPLATE']['TEMPLATE']['DISK']['IMAGE_ID'],
+          "SIZE" => params['drive'] * (params['units'] == 'GB' ? 1024 : 1),
+          "OPENNEBULA_MANAGED" => "NO"
+      }
+    })
     context['TEMPLATE_ID'] = params['templateid']
 
     context = context.without('GRAPHICS').to_one_template
@@ -248,7 +248,7 @@ class IONe
     params['user-template'] = {} if params['user-template'].nil?
 
     begin
-      params['iops'] = params['iops'] == 0 ? $ione_conf['vCenter']['drives-iops'][params['ds-type']] : params['iops']
+      params['iops'] = params['iops'] == 0 ? IONe::Settings['VCENTER_DRIVES_IOPS'][params['ds-type']] : params['iops']
     rescue
       LOG_DEBUG "No vCenter configuration found"
     end
@@ -522,10 +522,10 @@ class IONe
         if host.nil? then
           vcenter_host_conf = 'default'
         else
-          vcenter_host_conf = $ione_conf['vCenter'][host.name!].nil? ? 'default' : host.name!
+          vcenter_host_conf = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host.name!].nil? ? 'default' : host.name!
         end
         lim_res = vm.setResourcesAllocationLimits(
-          cpu: params['cpu'] * $ione_conf['vCenter'][vcenter_host_conf]['cpu-limits-koef'],
+          cpu: params['cpu'] * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][vcenter_host_conf],
           ram: params['ram'] * (params['units'] == 'GB' ? 1024 : 1), iops: params['iops']
         )
         unless lim_res.nil? then

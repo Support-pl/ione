@@ -34,7 +34,9 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['TRIAL_SUSPEND_DELAY', 86400, "Delay value for trial VMs in seconds", 1, "int"],
     ['USERS_VMS_SSH_PORT', 22, "Default SSH port at OpenNebula Virtual Machines", 1, "int"],
     ['BASE_VNC_PORT', 5900, "Base VNC-port number", 1, "int"],
-    ['USERS_DEFAULT_LANG', "en_US", "Default locale for new users", 1, "str"]
+    ['USERS_DEFAULT_LANG', "en_US", "Default locale for new users", 1, "str"],
+    ['VCENTER_CPU_LIMIT_FREQ_PER_CORE', "{\"default\":2000}", "Frequency per Core limit for different Nodes(don't remove default)", 1, "object"],
+    ['VCENTER_DRIVES_IOPS', "{\"HDD\":350,\"SSD\":1000}", "IOPs limits for Drive types", 1, "object"]
   ]
   required.each do | record |
     begin
