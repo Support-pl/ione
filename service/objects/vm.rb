@@ -136,7 +136,7 @@ class OpenNebula::VirtualMachine
   #     => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
   #     => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
   def setResourcesAllocationLimits spec
-    return 'Unsupported query' if self['//IMPORTED'] == 'YES'
+    return nil, 'Unsupported query' if self['//IMPORTED'] == 'YES'
 
     query, vm = {}, vcenter_get_vm
     disk = vm.disks.first
@@ -166,7 +166,7 @@ class OpenNebula::VirtualMachine
     rescue
       nil
     end if state
-    return nil
+    return nil, 'Success'
   rescue => e
     return "Reconfigure Error:#{e.message}", e.backtrace
   end
