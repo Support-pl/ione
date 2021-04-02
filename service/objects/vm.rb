@@ -128,13 +128,12 @@ class OpenNebula::VirtualMachine
   # @option spec [Integer] :cpu  MHz limit for VMs CPU usage
   # @option spec [Integer] :ram  MBytes limit for VMs RAM space usage
   # @option spec [Integer] :iops IOPS limit for VMs disk
-  # @option spec [String]  :name VM name on vCenter node
-  # @return [NilClass | String, Array]
+  # @return [NilClass | String, String | Array(backtrace)] - If success, return nil and message
   # @example Return messages decode
   #   vm.setResourcesAllocationLimits(spec)
-  #     => 'Reconfigure Success' -- Task finished with success code, all specs are equal to given
+  #     => nil, 'Success' -- Task finished with success code, all specs are equal to given
   #     => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
-  #     => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
+  #     => 'Reconfigure Error:{error message}', [...] -- Exception has been generated while proceed, check your configuration
   def setResourcesAllocationLimits spec
     return nil, 'Unsupported query' if self['//IMPORTED'] == 'YES'
 
