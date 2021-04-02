@@ -138,6 +138,8 @@ class OpenNebula::VirtualMachine
   def setResourcesAllocationLimits spec
     return nil, 'Unsupported query' if self['//IMPORTED'] == 'YES'
 
+    return nil, 'Nothing to do' if spec.empty?
+
     query, vm = {}, vcenter_get_vm
     disk = vm.disks.first
 
