@@ -153,12 +153,14 @@ class OpenNebula::VirtualMachine
       }]
     end
 
+    return nil, 'Nothing to do' if query.empty?
+
     state = true
     begin
       vm.PowerOffVM_Task.wait_for_completion
     rescue
       state = false
-    end
+    end unless query.keys == [:deviceChange]
 
     vm.ReconfigVM_Task(:spec => query).wait_for_completion
 
@@ -166,7 +168,7 @@ class OpenNebula::VirtualMachine
       vm.PowerOnVM_Task.wait_for_completion
     rescue
       nil
-    end if state
+    end if state && query.keys != [:deviceChange]
     return nil, 'Success'
   rescue => e
     return "Reconfigure Error:#{e.message}", e.backtrace
