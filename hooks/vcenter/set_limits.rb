@@ -45,24 +45,28 @@ vm = VirtualMachine.new_with_id(id, client)
 vm.info!
 
 if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
-  limits, specs = vm.getResourcesAllocationLimits, {}
+  limits, spec = vm.getResourcesAllocationLimits, {}
+  puts "Limits are configured as: #{limits}"
+  p "debug, iops: #{vm.vim_vm.disks.first.storageIOAllocation.limit}"
 
   if limits[:cpu] == -1 then
     host = vm.host.last
     key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host].nil? ? 'default' : host
-    specs[:cpu] = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
+    spec[:cpu] = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
   end
 
   if limits[:ram] == -1 then
-    specs[:ram] = vm['/VM/TEMPLATE/MEMORY'].to_i
+    spec[:ram] = vm['/VM/TEMPLATE/MEMORY'].to_i
   end
 
   if limits[:iops] == -1 then
-    specs[:iops] = IONe::Settings['VCENTER_DRIVES_IOPS'][vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
-    specs[:iops] = -1 if specs[:iops].nil? || specs[:iops] == 0
+    spec[:iops] = IONe::Settings['VCENTER_DRIVES_IOPS'][vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+    spec[:iops] = -1 if spec[:iops].nil? || spec[:iops] == 0
   end
 
-  vm.setResourcesAllocationLimits specs
+  puts "Generated following spec: #{spec}"
+  _, e = vm.setResourcesAllocationLimits spec
+  puts "Result: #{e}"
 end
 
 puts 'Successful set Limits up'
