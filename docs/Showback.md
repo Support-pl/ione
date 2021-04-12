@@ -24,14 +24,40 @@ Traffic is being biller in 24h periods. Which means that you won't get bill imme
 
 ## Costs units
 
-|  Field   |      Units      |
-|----------|-----------------|
-|   CPU    |   Core / sec    |
-|   RAM    |    GB / sec     |
-|  DRIVE   |    GB / sec     |
-|    IP    |    Addr / month |
-| Traffic  |     GB / sec    |
-| Snapshot |    Snap / sec   |
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CPU</td>
+      <td>Core / sec</td>
+    </tr>
+    <tr>
+      <td>RAM</td>
+      <td>GB / sec</td>
+    </tr>
+    <tr>
+      <td>DRIVE</td>
+      <td>GB / sec</td>
+    </tr>
+    <tr>
+      <td>IP</td>
+      <td>Addr / month</td>
+    </tr>
+    <tr>
+      <td>Traffic</td>
+      <td>GB / sec</td>
+    </tr>
+    <tr>
+      <td>Snapshot</td>
+      <td>Snap / sec</td>
+    </tr>
+  </tbody>
+</table>
 
 ## How does this work? (PAYG)
 
@@ -41,11 +67,32 @@ IONe brings multiple VM state hooks and `:records` DB table in order to build co
 
 `service/records/records.rb` creates `:records` table as:
 
-|   Field   |   Type  | Description                           |
-|-----------|---------|---------------------------------------|
-|  `:id`    | Integer | VM ID                                 |
-|  `:time`  | Integer | Timestamp                             |
-|  `:state` | String  | VM State, either `on`, `off` or `pnd` |
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>:id</code></td>
+      <td>Integer</td>
+      <td>VM ID</td>
+    </tr>
+    <tr>
+      <td><code>:time</code></td>
+      <td>Integer</td>
+      <td>Timestamp</td>
+    </tr>
+    <tr>
+      <td><code>:state</code></td>
+      <td>String</td>
+      <td>VM State, either <code>on</code>, <code>off</code> or <code>pnd</code></td>
+    </tr>
+  </tbody>
+</table>
 
 For example, as VM `#100`:
 
