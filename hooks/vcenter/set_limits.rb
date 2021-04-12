@@ -47,7 +47,6 @@ vm.info!
 if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
   limits, spec = vm.getResourcesAllocationLimits, {}
   puts "Limits are configured as: #{limits}"
-  p "debug, iops: #{vm.vim_vm.disks.first.storageIOAllocation.limit}"
 
   if limits[:cpu] == -1 then
     host = vm.host.last
