@@ -97,8 +97,11 @@ class OpenNebula::Records < RecordsSource
   def init_state stime
     prev = @records.where { time < stime }.order(Sequel.desc :time).limit(1).to_a.last
     if prev.nil? then
+      curr = @records.where { time >= stime }.limit(1).to_a.first
+      raise NoRecordsFound.new('No Records in given time range found, quiting') if curr.nil?
+
       {
-        state: @records.where { time >= stime }.limit(1).to_a.first.state
+        state: curr.state
       }
     else
       {
@@ -106,6 +109,8 @@ class OpenNebula::Records < RecordsSource
       }
     end
   end
+
+  class NoRecordsFound < StandardError; end
 end
 
 # (Snapshot)Records source class for fullfilling Timeline
