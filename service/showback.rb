@@ -53,8 +53,6 @@ class Timeline
   def init
     @state = @sources.inject({}) do | r, source |
       r.merge source.new(@vm.id).init_state(@stime)
-    rescue Records::NoRecordsFound
-      r
     end
   end
 
