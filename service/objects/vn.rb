@@ -49,11 +49,17 @@ class OpenNebula::VirtualNetwork
   # Calculate amount of Public Addresses and bill them with `PUBLIC_IP_COST`
   # @param [Integer] ar - AddressRange ID
   # @param [Integer] per - Billing periods amount
-  def ar_record(ar, per)
+  def ar_record(ar_id, per)
     info!
-    ar = ar_pool.select { |o| o['AR_ID'].to_i == ar.to_i }.first
-    return {
-      ar['IP'] => per * IONe::Settings['PUBLIC_IP_COST']
-    }
+    ar = ar_pool.select { |o| o['AR_ID'].to_i == ar_id.to_i }.first
+    if ar.nil? && per > 0 then
+      return { deleted_ip: per * IONe::Settings['PUBLIC_IP_COST'] }
+    elsif ar.nil? then
+      return { trash: 0 }
+    else
+      return {
+        ar['IP'] => per * IONe::Settings['PUBLIC_IP_COST']
+      }
+    end
   end
 end
