@@ -80,6 +80,8 @@ class OpenNebula::User
       stime = rec.time if rec.time > stime
       if (etime = AR.where(rec.values.without(:key, :time, :state)).where(state: 'del').all.first).nil? then
         etime = etime_req
+      else
+        etime = etime.time
       end
 
       stime   = Time.at(stime).to_datetime
