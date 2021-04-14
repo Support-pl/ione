@@ -285,7 +285,7 @@ class OpenNebula::VirtualMachine
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def getResourcesAllocationLimits
     begin
-      vm = vcenter_get_vm
+      vm = vcenter_get_vm true
       vm_disk = vm.disks.first
       { cpu: vm.config.cpuAllocation.limit, ram: vm.config.memoryAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
     rescue => e
