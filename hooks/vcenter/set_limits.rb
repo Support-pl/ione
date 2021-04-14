@@ -48,13 +48,12 @@ if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
   limits, spec = vm.getResourcesAllocationLimits, {}
   puts "Limits are configured as: #{limits}"
 
-  if limits[:cpu] == -1 then
-    host = vm.host.last
-    key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host].nil? ? 'default' : host
-    spec[:cpu] = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
-  end
+  host = vm.host.last
+  key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host].nil? ? 'default' : host
+  cpu_lim = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
+  spec[:cpu] = cpu_lim if cpu_lim != limits[:cpu]
 
-  if limits[:ram] == -1 then
+  if limits[:ram] != vm['/VM/TEMPLATE/MEMORY'].to_i then
     spec[:ram] = vm['/VM/TEMPLATE/MEMORY'].to_i
   end
 
