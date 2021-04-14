@@ -53,7 +53,7 @@ class OpenNebula::VirtualNetwork
     info!
     ar = ar_pool.select { |o| o['AR_ID'].to_i == ar.to_i }.first
     return {
-      ar['IP'] => per * IONe::Settings['PUBLIC_IP_COST'].body.to_f
+      ar['IP'] => per * IONe::Settings['PUBLIC_IP_COST']
     }
   end
 end
