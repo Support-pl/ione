@@ -287,7 +287,7 @@ class OpenNebula::VirtualMachine
     begin
       vm = vcenter_get_vm
       vm_disk = vm.disks.first
-      { cpu: vm.config.cpuAllocation.limit, ram: vm.config.cpuAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
+      { cpu: vm.config.cpuAllocation.limit, ram: vm.config.memoryAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
     rescue => e
       "Unexpected error, cannot handle it: #{e.message}"
     end
