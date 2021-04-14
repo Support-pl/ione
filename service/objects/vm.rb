@@ -175,8 +175,8 @@ class OpenNebula::VirtualMachine
 
   # Generates RbVmomi::VIM::VirtualMachine object with inited connection and ref
   # @return [RbVmomi::VIM::VirtualMachine]
-  def vcenter_get_vm
-    return @vim_vm if @vim_vm
+  def vcenter_get_vm force = false
+    return @vim_vm if @vim_vm && !force
 
     info!
     h = Host.new_with_id(host.first, @client)
