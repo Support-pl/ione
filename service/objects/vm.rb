@@ -197,6 +197,12 @@ class OpenNebula::VirtualMachine
     return nil
   end
 
+  # Gets the datastore, where VM allocated is
+  # @return [String] DS name
+  def vcenter_get_vm_ds
+    return vcenter_get_vm.datastore.first
+  end
+
   # Checks if vm is on given vCenter Datastore
   def at_vcenter_ds? ds_name
     vcenter_datastore_name == ds_name
