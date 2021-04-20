@@ -62,7 +62,6 @@ LOG_ROOT = LOG_LOCATION # IONe logs path
 # Shows if current IONe Sunstone process was started by systemd(first time so). True or False
 MAIN_IONE = Process.ppid == 1
 
-$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
 CONF = $ione_conf # for sure
 
 puts 'Including log-library'
