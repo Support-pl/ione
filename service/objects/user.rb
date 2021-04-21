@@ -59,7 +59,7 @@ class OpenNebula::User
 
   # Returns users VNets being billed
   def billable_vns
-    AR.where(owner: @pe_id, state: "crt").all
+    AR.where(owner: @pe_id).all
   end
 
   # Calculates VNs Showback
