@@ -3,9 +3,9 @@ begin
     primary_key :key
     Integer   :vnid,  null: false
     Integer   :arid,  null: false
-    Integer   :time,  null: false
+    Integer   :stime, null: false
+    Integer   :etime, null: true
     Integer   :owner, null: true
-    String    :state, size: 10, null: false
   end
 rescue
   puts "Table :ars already exists, skipping"
