@@ -40,19 +40,18 @@ class IONe
       if OpenNebula.is_error?(uvnet) && uvnet.errno == 2048 then
         return { error: "No free addresses left" }
       end
+
+      ar = onblock(:vn, uvnet, @client).ar_pool.last
+      AR.create do | r |
+        r.vnid  = uvnet
+        r.arid  = ar['AR_ID']
+        r.stime = Time.now.to_i
+        r.owner = params[:u]
+      end
     end
 
     vn = onblock(:vn, uvnet, @client)
     vn.chown(u.id, u.groups.first)
-    ar = vn.ar_pool.sort_by { |o| o['AR_ID'] }.last
-
-    AR.create do | r |
-      r.vnid  = vn.id
-      r.arid  = ar['AR_ID']
-      r.stime = Time.now.to_i
-      r.owner = params[:u]
-    end
-
     return vn.id
   end
 
