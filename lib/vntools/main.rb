@@ -69,7 +69,7 @@ class IONe
   def release_public_ip params
     params.to_sym!
 
-    vn = onblock(:vn, params[:vn])
+    vn = onblock(:vn, params[:vn], @client)
     vn.info!
 
     if vn.rm_ar(params[:ar]).nil? then
