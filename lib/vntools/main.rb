@@ -47,10 +47,9 @@ class IONe
     ar = vn.ar_pool.sort_by { |o| o['AR_ID'] }.last
 
     AR.create do | r |
-      r.vnid = vn.id
+      r.vnid  = vn.id
       r.arid  = ar['AR_ID']
-      r.time  = Time.now.to_i
-      r.state = 'crt'
+      r.stime = Time.now.to_i
       r.owner = params[:u]
     end
 
@@ -73,13 +72,7 @@ class IONe
     vn.info!
 
     if vn.rm_ar(params[:ar]).nil? then
-      AR.create do | r |
-        r.vnid  = params[:vn]
-        r.arid  = params[:ar]
-        r.time  = Time.now.to_i
-        r.state = 'del'
-        r.owner = vn['//UID']
-      end
+      AR.where(vnid: params[:vn], arid: params[:ar], owner: vn['//UID']).update(etime: Time.now.to_i)
       true
     else
       false
