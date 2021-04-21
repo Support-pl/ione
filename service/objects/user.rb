@@ -129,13 +129,14 @@ class OpenNebula::User
   # Checks if user is admin
   # @note Admin means user is a part of oneadmin group
   # @return [Boolean]
-  def is_admin
+  def admin?
     info!
     (groups << gid).include? 0
   rescue
     false
   end
-  alias :is_admin? :is_admin
+  alias :is_admin? :admin?
+  alias :is_admin  :admin?
 
   # User doesn't exist Exception object
   class UserNotExistsError < StandardError

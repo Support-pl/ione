@@ -1,7 +1,7 @@
 get '/settings' do
   begin
     begin
-      access_level = env[:one_user].is_admin? ? 1 : 0
+      access_level = env[:one_user].admin? ? 1 : 0
     rescue
       access_level = 0
     end
@@ -14,7 +14,7 @@ end
 get '/settings/:key' do | key |
   begin
     begin
-      access_level = env[:one_user].is_admin? ? 1 : 0
+      access_level = env[:one_user].admin? ? 1 : 0
     rescue
       access_level = 0
     end
@@ -26,7 +26,7 @@ end
 
 post '/settings' do
   begin
-    raise StandardError.new("NoAccess") unless env[:one_user].is_admin?
+    raise StandardError.new("NoAccess") unless env[:one_user].admin?
 
     data = JSON.parse(@request_body)
     json response: SETTINGS_TABLE.insert(**data.to_sym!)
@@ -37,7 +37,7 @@ end
 
 post '/settings/:key' do | key |
   begin
-    raise StandardError.new("NoAccess") unless env[:one_user].is_admin?
+    raise StandardError.new("NoAccess") unless env[:one_user].admin?
 
     data = JSON.parse(@request_body)
     data = data.to_sym!
@@ -49,7 +49,7 @@ end
 
 delete '/settings/:key' do | key |
   begin
-    raise StandardError.new("NoAccess") unless env[:one_user].is_admin?
+    raise StandardError.new("NoAccess") unless env[:one_user].admin?
 
     json response: SETTINGS_TABLE.where(name: key).delete
   rescue => e
