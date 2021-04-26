@@ -30,5 +30,15 @@ class VLAN < Sequel::Model(:vlans)
     VLANLease.where(pool_id: id).all
   end
 
+  def next_id
+    @next_id = ((start...(start + size)).to_a - leases.map { |l| l.id }).first
+  end
+
+  def check_free_vlans
+    raise "No free VLANs left" if next_id.nil?
+
+    true
+  end
+
 end
 
