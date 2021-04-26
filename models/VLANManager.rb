@@ -64,7 +64,7 @@ class VLAN < Sequel::Model(:vlans)
     if template.nil? then
       raise StandardError.new("No Template for VN_MAD #{type} configured")
     else
-      template = onblock(:vnt, template.to_i)
+      template = OpenNebula::VNTemplate.new_with_id(template.to_i, $client)
     end
 
     rc = template.info!
@@ -81,7 +81,7 @@ class VLAN < Sequel::Model(:vlans)
 
     VLANLease.insert(vn: rc, id: @next_id, pool_id: id)
 
-    vnet = onblock(:vn, rc)
+    vnet = OpenNebula::VirtualNetwork.new_with_id(rc, $client)
     vnet.chown(owner, group)
     vnet.id
   end
