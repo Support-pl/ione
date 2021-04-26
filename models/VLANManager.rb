@@ -40,5 +40,30 @@ class VLAN < Sequel::Model(:vlans)
     true
   end
 
-end
+  def lease name, owner = 0, group = 0
+    template = IONe::Settings['VNETS_TEMPLATES'][type]
+    if template.nil? then
+      raise StandardError.new("No Template for VN_MAD #{type} configured")
+    else
+      template = onblock(:vnt, template.to_i)
+    end
 
+    rc = template.info!
+    if OpenNebula.is_error? rc then
+      raise rc
+    end
+
+    check_free_vlans
+
+    rc = template.instantiate(name, "VLAN_ID=#{@next_id}")
+    if OpenNebula.is_error? rc then
+      raise rc
+    end
+
+    VLANLease.insert(vn: rc, id: @next_id, pool_id: id)
+
+    vnet = onblock(:vn, rc)
+    vnet.chown(owner, group)
+    vnet.id
+  end
+end
