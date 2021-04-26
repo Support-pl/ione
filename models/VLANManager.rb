@@ -32,6 +32,7 @@ end
 
 # Table of VLAN IDs ranges Model Class
 class VLAN < Sequel::Model(:vlans)
+
   # Returns all existing lease records
   # @return [Array<VLANLease>]
   def leases
