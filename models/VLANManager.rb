@@ -25,6 +25,8 @@ end
 
 class VLANLease < Sequel::Model(:vlan_leases)
   many_to_one :vlan_key
+
+  alias :release :delete
 end
 
 class VLAN < Sequel::Model(:vlans)

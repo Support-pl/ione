@@ -84,3 +84,8 @@ Example:
 ### {VLAN} class
 
 Best approach is to use this class to manage VLANs. So if you create VNs and reserve VLANs with {VLAN#lease} and {VLAN#reserve} respectively, these methods will handle or recording operations.
+
+### {VLANLease} class
+
+Just delete lease record with {VLANLease#release} method.(It is basically just an alias)
+
