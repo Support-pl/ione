@@ -12,7 +12,9 @@ end
 begin
   $db.create_table :vlan_leases do
     primary_key :key
-    foreign_key :vn, :network_pool, null: true, on_delete: :cascade # Network Instantiated with this VLAN ID
+    # Network Instantiated with this VLAN ID
+    # Note: In order to delete lease record just delete VNet
+    foreign_key :vn, :network_pool, null: true, on_delete: :cascade
     Integer     :id, null: false               # VLAN ID
     foreign_key :pool_id, :vlans, null: false  # VLAN Pool ID
     unique      [:vn, :id]
