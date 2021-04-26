@@ -89,3 +89,7 @@ Best approach is to use this class to manage VLANs. So if you create VNs and res
 
 Just delete lease record with {VLANLease#release} method.(It is basically just an alias)
 
+### DB Hooks(cascade)
+
+In order to delete lease record, you should just delete VNet.
+
