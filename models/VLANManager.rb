@@ -49,7 +49,7 @@ class VLAN < Sequel::Model(:vlans)
   # Will raise StandardError if no left
   # @return [ TrueClass ]
   def check_free_vlans
-    raise StandardError.new("No free VLANs left") if next_id.nil?
+    raise VLAN::NoFreeVLANsLeftException.new(id) if next_id.nil?
 
     true
   end
