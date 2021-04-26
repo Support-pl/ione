@@ -32,6 +32,8 @@ end
 
 # Table of VLAN IDs ranges Model Class
 class VLAN < Sequel::Model(:vlans)
+  # Returns first VLANs pool with available VLAN or raises VLAN::NoAvailavleVLANsPoolsLeftException
+  # @return [ VLAN ]
   def self.available_pool
     VLAN.all.each do | vlan |
       return vlan if vlan.check_free_vlans
