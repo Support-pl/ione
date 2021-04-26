@@ -68,4 +68,29 @@ class VLAN < Sequel::Model(:vlans)
     vnet.chown(owner, group)
     vnet.id
   end
+
+  def reserve vlan_id, vn = nil
+    unless (start...(start + size)).include? vlan_id then
+      raise StandardError.new("Requested VLAN ID isn't a part of this Pool(#{id})")
+    end
+
+    lease =
+      if vn.nil? then
+        VLANLease.where(id: vlan_id, pool_id: id).first
+      else
+        VLANLease.where(vn: vn, id: vlan_id, pool_id: id).first
+      end
+
+    unless lease.nil? then
+      raise StandardError.new("Requested VLAN ID is already leased")
+    end
+
+    unless vn.nil? then
+      VLANLease.insert(vn: vn, id: vlan_id, pool_id: id)
+    else
+      VLANLease.insert(id: vlan_id, pool_id: id)
+    end
+    true
+  end
 end
+
