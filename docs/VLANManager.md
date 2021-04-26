@@ -35,17 +35,17 @@ Table of VLAN IDs leases. All of the used VLAN IDs are supposed to be in this ta
 Structure:
 
 ```markdown
-+---------+------+------+-----+---------------------------+
-| Field   | Type | Null | Key | Description               |
-+---------+------+------+-----+---------------------------+
-| key     | int  | NO   | PRI | Key                       |
-| vn      | int  | YES  | MUL | OpenNebula VirtualNetwork |
-| id      | int  | NO   |     | VLAN ID                   |
-| vlan_id | int  | NO   | MUL | VLAN IDs Pool             |
-+---------+------+------+-----+---------------------------+
++---------+------+------+---------------------------+
+| Field   | Type | Null | Description               |
++---------+------+------+---------------------------+
+| key     | int  | NO   | Key                       |
+| vn      | int  | YES  | OpenNebula VirtualNetwork |
+| id      | int  | NO   | VLAN ID                   |
+| pool_id | int  | NO   | VLAN IDs Pool             |
++---------+------+------+---------------------------+
 ```
 
-This table has validator: pairs of `vn` and `id` should be unique.
+This table has validator: all three fields together gotta be unique.
 
 ## Configuration
 

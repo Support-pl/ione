@@ -17,7 +17,7 @@ begin
     foreign_key :vn, :network_pool, null: true, on_delete: :cascade
     Integer     :id, null: false               # VLAN ID
     foreign_key :pool_id, :vlans, null: false  # VLAN Pool ID
-    unique      [:vn, :id]
+    unique      [:vn, :id, :pool_id]
   end
 rescue
   puts "Table :vlan_leases already exists, skipping"
