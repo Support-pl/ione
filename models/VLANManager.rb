@@ -95,4 +95,3 @@ class VLAN < Sequel::Model(:vlans)
     true
   end
 end
-
