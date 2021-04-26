@@ -32,6 +32,14 @@ end
 
 # Table of VLAN IDs ranges Model Class
 class VLAN < Sequel::Model(:vlans)
+  def self.available_pool
+    VLAN.all.each do | vlan |
+      return vlan if vlan.check_free_vlans
+    rescue VLAN::NoFreeVLANsLeftException
+      next
+    end
+    raise VLAN::NoAvailavleVLANsPoolsLeftException.new
+  end
 
   # Returns all existing lease records
   # @return [Array<VLANLease>]
