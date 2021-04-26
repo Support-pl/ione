@@ -23,27 +23,42 @@ rescue
   puts "Table :vlan_leases already exists, skipping"
 end
 
+# Table of VLAN IDs leases Model Class
 class VLANLease < Sequel::Model(:vlan_leases)
   many_to_one :vlan_key
 
   alias :release :delete
 end
 
+# Table of VLAN IDs ranges Model Class
 class VLAN < Sequel::Model(:vlans)
+  # Returns all existing lease records
+  # @return [Array<VLANLease>]
   def leases
     VLANLease.where(pool_id: id).all
   end
 
+  # Returns VLAN ID would be assigned with next lease
+  # Also saves it to local variable to reduce transactions
+  # @return [Integer | NilClass] - either ID or nil if no free VLANs left
   def next_id
     @next_id = ((start...(start + size)).to_a - leases.map { |l| l.id }).first
   end
 
+  # Checking if any free VLANs left in Pool
+  # Will raise StandardError if no left
+  # @return [ TrueClass ]
   def check_free_vlans
     raise StandardError.new("No free VLANs left") if next_id.nil?
 
     true
   end
 
+  # Create new VNet and lease record with VLAN ID from this Pool
+  # @param [String] name - New VNet Name
+  # @param [Integer] owner - OpenNebula::User ID. New VNet would be bind to that user
+  # @param [Integer] group - OpenNebula::Group ID. New VNet would be bind to that group
+  # @return [Integer] - New OpenNebula::VirtualNetwork ID
   def lease name, owner = 0, group = 0
     template = IONe::Settings['VNETS_TEMPLATES'][type]
     if template.nil? then
@@ -71,6 +86,10 @@ class VLAN < Sequel::Model(:vlans)
     vnet.id
   end
 
+  # Reserve VLAN ID(so it won't be used for new VNets)
+  # @param [Integer] vlan_id - VLAN ID to reserve
+  # @param [Integer] vn - Made for manual record creation, vn to lease to
+  # @return [TrueClass] - returns true if it worked out, or raises Exception if not
   def reserve vlan_id, vn = nil
     unless (start...(start + size)).include? vlan_id then
       raise StandardError.new("Requested VLAN ID isn't a part of this Pool(#{id})")
