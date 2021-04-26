@@ -18,15 +18,8 @@
           }}</a-tooltip>
         </span>
         <span slot="body" slot-scope="text, record">
-          <object-editor
-            v-if="record.editable && record.type == 'object'"
-            :value="text"
-            @change="(value) => handleChange(value, record.name, 'body')"
-            @keyup.enter="save(record.name)"
-            @keyup.escape="cancel(record.name)"
-          />
           <a-input
-            v-else-if="record.editable"
+            v-if="record.editable"
             style="margin: -5px 0"
             :value="text"
             @change="(e) => handleChange(e.target.value, record.name, 'body')"
@@ -65,7 +58,6 @@ import bool from "@/components/types/bool.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
 import object from "@/components/types/object.vue";
-import ObjectEditor from "@/components/types/object-editor.vue";
 
 const columns = [
   {
@@ -96,9 +88,6 @@ const columns = [
 
 export default {
   name: "Settings",
-  components: {
-    ObjectEditor,
-  },
   data() {
     return {
       settings: [],
