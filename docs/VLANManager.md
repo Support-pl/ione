@@ -78,3 +78,9 @@ Example:
   "802.1Q": 10
 }
 ```
+
+## How do you manage records {VLANLeases}
+
+### {VLAN} class
+
+Best approach is to use this class to manage VLANs. So if you create VNs and reserve VLANs with {VLAN#lease} and {VLAN#reserve} respectively, these methods will handle or recording operations.
