@@ -120,4 +120,9 @@ class VLAN < Sequel::Model(:vlans)
     end
   end
 
+  class NoAvailavleVLANsPoolsLeftException < StandardError
+    def initialize
+      super("No Availavle VLANs Pools Left")
+    end
+  end
 end
