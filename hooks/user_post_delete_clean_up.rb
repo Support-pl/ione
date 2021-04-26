@@ -63,18 +63,6 @@ end
 vn_pool(id).each do | vnet |
   vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
   vnet.info!
-
-  if vnet['/VNET/TEMPLATE/TYPE'] == 'PRIVATE' then
-    VirtualNetwork.new_with_id(IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'], Client.new).add_ar(
-      "AR = [\n" \
-        "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
-        "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
-        "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
-        "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
-    ) if vnet['VN_MAD'] == 'vcenter'
-  end
-
-  vnet.delete unless vnet.id == IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'].to_i
 end
 
-puts "User##{id} Virtual Networks successfully cleaned up"
+puts "User##{id} Resources are successfully cleaned up"

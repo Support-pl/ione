@@ -41,61 +41,14 @@ require 'json'
 
 require 'core/*'
 
-unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'].to_i then
+unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
   exit 0
 end
 
-vnet = VirtualNetwork.new_with_id(IONe::Settings['PRIVATE_NETWORK_DEFAULTS']['NETWORK_ID'], Client.new)
-vnet.info!
-begin
-  ar_pool = vnet.to_hash['VNET']['AR_POOL']['AR']
-rescue
-  puts ar_pool.inspect
-  exit(-1)
-end
-ar_pool.select! do | ar |
-  ar['USED_LEASES'] == "0"
-end
+require 'models/VLANManager.rb'
 
-ar = ar_pool.sample
+vlan = VLAN.available_pool
+vnet = vlan.lease "user-#{user.id}-vnet", user.id, IONe::Settings['IAAS_GROUP_ID']
 
-bridge = vnet['//BRIDGE_PATTERN']
-if bridge.nil? then
-  bridge = "user-#{user.id}-vnet"
-else
-  bridge = bridge.gsub('<%VLAN_ID%>', ar['VLAN_ID'])
-end
-
-if vnet['VN_MAD'] == 'vcenter' then
-  user_vnet = vnet.clone
-  user_vnet.allocate("
-        NAME = \"user-#{user.id}-vnet\"
-        BRIDGE = \"#{bridge}\"
-        VCENTER_PORTGROUP_TYPE = \"Distributed Port Group\"
-        VCENTER_SWITCH_NAME = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NAME']}\"
-        VCENTER_SWITCH_NPORTS = \"#{vnet['/VNET/TEMPLATE/VCENTER_SWITCH_NPORTS']}\"
-        VLAN_ID = \"#{ar['VLAN_ID']}\"
-        VN_MAD = \"vcenter\"
-        TYPE = \"PRIVATE\"
-        VCENTER_ONE_HOST_ID = \"#{IONe::Settings['NODES_DEFAULT']['VCENTER']}\"", IONe::Settings['DEFAULT_CLUSTER'].to_i)
-
-  user_vnet.add_ar("AR = [
-        IP = \"#{ar['IP']}\",
-        SIZE = \"#{ar['SIZE']}\",
-        TYPE = \"#{ar['TYPE']}\" ]")
-
-  vnet.rm_ar ar['AR_ID']
-else
-  user_vnet = vnet.reserve("user-#{user.id}-vnet", ar['SIZE'], ar['AR_ID'], nil, nil)
-  user_vnet = VirtualNetwork.new_with_id(user_vnet, Client.new)
-end
-
-user_vnet.chown(user.id, IONe::Settings['IAAS_GROUP_ID'])
-clusters = vnet.to_hash['VNET']['CLUSTERS']['ID']
-clusters = [clusters] if clusters.class != Array
-for c in clusters do
-  Cluster.new_with_id(c.to_i, Client.new).addvnet(user_vnet.id)
-end
-
-puts "Virtual Network for User##{user.id} successfuly created with id #{user_vnet.id}"
+puts "Virtual Network for User##{user.id} successfuly created with id #{vnet}"
