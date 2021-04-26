@@ -21,3 +21,14 @@ rescue
   puts "Table :vlan_leases already exists, skipping"
 end
 
+class VLANLease < Sequel::Model(:vlan_leases)
+  many_to_one :vlan_key
+end
+
+class VLAN < Sequel::Model(:vlans)
+  def leases
+    VLANLease.where(pool_id: id).all
+  end
+
+end
+
