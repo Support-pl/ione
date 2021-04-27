@@ -1,7 +1,10 @@
 <template>
   <a-row type="flex" justify="space-around" style="margin-top: 1rem">
     <a-col :span="23">
-      <a-row type="flex" justify="end">
+      <a-row type="flex" justify="space-between">
+        <a-col :span="6">
+          <a-button type="primary" icon="reload" @click="sync"></a-button>
+        </a-col>
         <a-col :span="6">
           <a-button type="primary" @click="create_drawer_visible = true"
             >Create VLAN Range</a-button
