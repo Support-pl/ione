@@ -50,6 +50,10 @@ class VLANLease < Sequel::Model(:vlan_leases)
   def to_json *args
     @values.without(:key).to_json(*args)
   end
+
+  def hash_with_meta
+    to_hash.without(:key).merge(vn_name: $db[:network_pool].where(oid: vn).select(:name).first[:name])
+  end
 end
 
 # Table of VLAN IDs ranges Model Class
