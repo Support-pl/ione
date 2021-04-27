@@ -36,7 +36,6 @@ include OpenNebula
 
 $client = Client.new
 user = User.new xml.xpath('//EXTRA/USER'), $client
-user.info!
 
 require 'yaml'
 require 'core/*'
@@ -64,7 +63,7 @@ end
 
 vn_pool(id).each do | vnet |
   vnet = VirtualNetwork.new_with_id(vnet[:oid], $client)
-  vnet.info!
+  vnet.delete
 end
 
 puts "User##{id} Resources are successfully cleaned up"
