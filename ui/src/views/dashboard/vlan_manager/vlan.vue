@@ -30,56 +30,54 @@
       <a-divider />
       <a-row :gutter="10" type="flex" justify="space-around">
         <a-col :span="lease_active ? 24 : 12" style="margin-top: 15px">
-          <template v-if="lease_active">
-            <a-row :gutter="10">
-              <a-col :span="5">
-                <a-select
-                  placeholder="Owner"
-                  style="width: 100%"
-                  :showSearch="true"
-                  v-model="lease_tmpl[1]"
+          <a-row v-if="lease_active" :gutter="10">
+            <a-col :span="5">
+              <a-select
+                placeholder="Owner"
+                style="width: 100%"
+                :showSearch="true"
+                v-model="lease_tmpl[1]"
+              >
+                <a-select-option
+                  :key="user.ID"
+                  :value="parseInt(user.ID)"
+                  v-for="user in users"
+                  >{{ user.ID }}: {{ user.NAME }}</a-select-option
                 >
-                  <a-select-option
-                    :key="user.ID"
-                    :value="parseInt(user.ID)"
-                    v-for="user in users"
-                    >{{ user.ID }}: {{ user.NAME }}</a-select-option
-                  >
-                </a-select>
-              </a-col>
-              <a-col :span="5">
-                <a-select
-                  placeholder="Group"
-                  style="width: 100%"
-                  :showSearch="true"
-                  v-model="lease_tmpl[2]"
+              </a-select>
+            </a-col>
+            <a-col :span="5">
+              <a-select
+                placeholder="Group"
+                style="width: 100%"
+                :showSearch="true"
+                v-model="lease_tmpl[2]"
+              >
+                <a-select-option
+                  :key="group.ID"
+                  :value="parseInt(group.ID)"
+                  v-for="group in groups"
+                  >{{ group.ID }}: {{ group.NAME }}</a-select-option
                 >
-                  <a-select-option
-                    :key="group.ID"
-                    :value="parseInt(group.ID)"
-                    v-for="group in groups"
-                    >{{ group.ID }}: {{ group.NAME }}</a-select-option
-                  >
-                </a-select>
-              </a-col>
-              <a-col :span="8">
-                <a-input
-                  placeholder="VNet Name"
-                  v-model="lease_tmpl[0]"
-                ></a-input>
-              </a-col>
-              <a-col :span="6">
-                <a-row :gutter="5">
-                  <a-button type="link" icon="save" @click="createLease"
-                    >Create</a-button
-                  >
-                  <a-button type="link" icon="close" @click="cancelLease"
-                    >Cancel</a-button
-                  >
-                </a-row>
-              </a-col>
-            </a-row>
-          </template>
+              </a-select>
+            </a-col>
+            <a-col :span="8">
+              <a-input
+                placeholder="VNet Name"
+                v-model="lease_tmpl[0]"
+              ></a-input>
+            </a-col>
+            <a-col :span="6">
+              <a-row :gutter="5">
+                <a-button type="link" icon="save" @click="createLease"
+                  >Create</a-button
+                >
+                <a-button type="link" icon="close" @click="cancelLease"
+                  >Cancel</a-button
+                >
+              </a-row>
+            </a-col>
+          </a-row>
           <a-button type="primary" icon="plus" @click="startLease" v-else
             >Lease VLAN(Create Network)</a-button
           >
