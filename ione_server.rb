@@ -301,7 +301,7 @@ puts "Registering IONe methods"
 #        }
 #    Response:
 #        200 - { "response": "PONG" }
-# @see {IONe#Test}
+# @see IONe#Test
 post '/ione/:method' do | method |
   begin
     RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
@@ -330,7 +330,7 @@ puts "Registering ONe methods"
 #        }
 #    Response:
 #        200 - { "response": "one-vm-777-name" }
-# @see {ONeHelper#onblock-instance_method}
+# @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
   begin
     RPC_LOGGER.debug "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
@@ -359,7 +359,7 @@ puts "Registering ONe Pool methods"
 #        }
 #    Response:
 #        200 - { "response": [...] }
-# @see {ONeHelper#onblock-instance_method}
+# @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
   begin
     RPC_LOGGER.debug "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"

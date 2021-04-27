@@ -21,7 +21,7 @@ class CapacityBiller < Biller
     return false
   end
 
-  # @see {Biller#bill}
+  # @see Biller#bill
   def bill bill:, state:, delta:, record: nil
     if state[:state] == 'on' || billing_period != 'PAYG' then
       bill[:capacity] = delta * @cost
