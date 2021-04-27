@@ -174,6 +174,9 @@ get '/vlan' do
 
     json response: VLAN.all_with_meta
   rescue => e
-    json error: e.message, debug: e.class
+    json error: e.message
+  end
+end
+
   end
 end
