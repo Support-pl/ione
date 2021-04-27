@@ -33,7 +33,9 @@ $: << RUBY_LIB_LOCATION
 
 require 'opennebula'
 include OpenNebula
-user = User.new xml.xpath('//EXTRA/USER'), Client.new
+
+$client = Client.new
+user = User.new xml.xpath('//EXTRA/USER'), $client
 user.info!
 
 require 'yaml'
