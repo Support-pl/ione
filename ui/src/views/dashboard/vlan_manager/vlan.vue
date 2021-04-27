@@ -131,6 +131,26 @@
           >
         </a-col>
       </a-row>
+      <a-row style="margin-top: 20px">
+        <a-col :span="24">
+          <a-table :columns="columns" :data-source="vlan.leases">
+            <span slot="leased" slot-scope="text, record">
+              <template v-if="record.vn !== null">
+                Leased to {{ record.vn_name }}({{ record.vn }})
+              </template>
+              <template v-else> Hold </template>
+            </span>
+            <span slot="actions" slot-scope="text, record">
+              <a-button
+                type="danger"
+                icon="delete"
+                v-if="!record.vn"
+                @click="release(record.id)"
+                >Release</a-button
+              >
+            </span>
+          </a-table>
+        </a-col>
       </a-row>
     </a-col>
   </a-row>
@@ -154,6 +174,31 @@ export default {
       groups: [],
       vns: [],
 
+      columns: [
+        {
+          dataIndex: "key",
+          key: "key",
+          title: "ID",
+          width: "10%",
+        },
+        {
+          dataIndex: "id",
+          key: "id",
+          title: "VLAN ID",
+          width: "20%",
+        },
+        {
+          key: "vn",
+          title: "VNet",
+          scopedSlots: { customRender: "leased" },
+        },
+        {
+          key: "actions",
+          title: "Actions",
+          scopedSlots: { customRender: "actions" },
+          width: "20%",
+        },
+      ],
     };
   },
   computed: {
@@ -269,6 +314,26 @@ export default {
     cancelReserve() {
       this.reserve_tmpl = {};
       this.reserve_active = false;
+    },
+    release(id) {
+      this.$axios({
+        method: "delete",
+        url: `/vlan/${this.id}/lease/${id}`,
+        auth: this.credentials,
+      }).then((res) => {
+        if (res.data.error) {
+          this.$notification.error({
+            message: `Error releasing VLAN(${id})`,
+            description: res.data.error,
+          });
+        } else {
+          this.$notification.success({
+            message: `VLAN(${id}) successfuly released`,
+          });
+
+          this.sync();
+        }
+      });
     },
   },
 };
