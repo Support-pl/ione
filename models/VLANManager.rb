@@ -142,12 +142,14 @@ class VLAN < Sequel::Model(:vlans)
     true
   end
 
+  # No Free VLANs Left Exception
   class NoFreeVLANsLeftException < StandardError
     def initialize id
       super("No free VLANs left at VLANs Pool(#{id})")
     end
   end
 
+  # No VLANs Pools with free VLANs Left Exception
   class NoAvailavleVLANsPoolsLeftException < StandardError
     def initialize
       super("No Availavle VLANs Pools Left")
