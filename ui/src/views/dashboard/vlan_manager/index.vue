@@ -38,6 +38,7 @@
             :data-source="group"
             rowKey="id"
             :pagination="false"
+            :customRow="row_wrapper"
           >
             <a-row slot="leased" slot-scope="text, record">
               <a-col :span="4">
@@ -56,6 +57,11 @@
                 type="danger"
                 icon="delete"
                 @click="handleDelete(record.id)"
+              ></a-button>
+              <a-button
+                type="primary"
+                icon="bars"
+                @click="handleNavigate(record.id)"
               ></a-button>
             </a-space>
           </a-table>
@@ -107,6 +113,15 @@ export default {
           width: "20%",
         },
       ],
+      row_wrapper: (record) => {
+        return {
+          on: {
+            click: () => {
+              this.handleNavigate(record.id);
+            },
+          },
+        };
+      },
     };
   },
   mounted() {
@@ -169,6 +184,12 @@ export default {
           this.$notification.success({ message: `VLAN Range #${id} deleted` });
           this.sync();
         }
+      });
+    },
+    handleNavigate(id) {
+      this.$router.push({
+        path: "/dashboard/vlan-manager/vlan/",
+        query: { id },
       });
     },
   },
