@@ -178,5 +178,14 @@ get '/vlan' do
   end
 end
 
+post '/vlan' do
+  begin
+    raise StandardError.new("NoAccess") unless @one_user.admin?
+
+    data = JSON.parse(@request_body)
+    id = VLAN.insert(**data.to_sym!)
+    json response: id
+  rescue => e
+    json error: e.message
   end
 end
