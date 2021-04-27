@@ -53,14 +53,12 @@
               </a-col>
             </a-row>
             <a-space slot="actions" slot-scope="text, record">
-              <a-button
-                type="danger"
-                icon="delete"
-                @click="handleDelete(record.id)"
-              ></a-button>
-              <a-button
-                type="primary"
-                icon="bars"
+              <a-popconfirm
+                title="Sure to delete?"
+                @confirm="(e) => handleDelete(record.id)"
+              >
+                <a-button type="danger" icon="delete"></a-button>
+              </a-popconfirm>
                 @click="handleNavigate(record.id)"
               ></a-button>
             </a-space>
