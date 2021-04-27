@@ -58,9 +58,11 @@ class VLANLease < Sequel::Model(:vlan_leases)
   end
 
   def hash_with_meta
-    r = to_hash.without(:key)
-    r.merge(vn_name: $db[:network_pool].where(oid: vn).select(:name).first[:name]) if vn
-    r
+    if vn then
+      to_hash.merge(vn_name: $db[:network_pool].where(oid: vn).select(:name).first[:name])
+    else
+      to_hash
+    end
   end
 end
 
