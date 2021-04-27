@@ -80,7 +80,6 @@ export default {
         auth: this.credentials,
       }).then((res) => {
         this.record = res.data.response.HOOK;
-        console.log(JSON.stringify(this.record));
       });
     },
   },
