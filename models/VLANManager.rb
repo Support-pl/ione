@@ -259,6 +259,12 @@ post '/vlan/:id/reserve' do | pool_id |
     json error: e.message
   end
 end
+
+post '/vlan/:id/lease/:lid/relase' do | id, vlan_id |
+  begin
+    raise StandardError.new("NoAccess") unless @one_user.admin?
+
+    json response: VLANLease.where(pool_id: id, id: vlan_id).destroy
   rescue => e
     json error: e.message
   end
