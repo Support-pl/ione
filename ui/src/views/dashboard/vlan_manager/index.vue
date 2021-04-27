@@ -59,8 +59,13 @@
               >
                 <a-button type="danger" icon="delete"></a-button>
               </a-popconfirm>
-                @click="handleNavigate(record.id)"
-              ></a-button>
+              <a-tooltip title="Navigate to">
+                <a-button
+                  type="primary"
+                  icon="bars"
+                  @click="(e) => handleNavigate(record.id)"
+                ></a-button>
+              </a-tooltip>
             </a-space>
           </a-table>
         </a-collapse-panel>
