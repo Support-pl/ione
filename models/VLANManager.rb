@@ -45,6 +45,11 @@ class VLANLease < Sequel::Model(:vlan_leases)
   many_to_one :vlan_key
 
   alias :release :delete
+
+  # Needed for serialization
+  def to_json *args
+    @values.without(:key).to_json(*args)
+  end
 end
 
 # Table of VLAN IDs ranges Model Class
