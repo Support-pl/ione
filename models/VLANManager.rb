@@ -44,7 +44,7 @@ end
 class VLANLease < Sequel::Model(:vlan_leases)
   many_to_one :vlan_key
 
-  alias :release :delete
+  alias :release :destroy
 
   # Needed for serialization
   def to_json *args
@@ -264,7 +264,7 @@ delete '/vlan/:id/lease/:lid' do | id, vlan_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
-    json response: VLANLease.where(pool_id: id, id: vlan_id).destroy
+    json response: VLANLease.where(pool_id: id, id: vlan_id).release
   rescue => e
     json error: e.message
   end
