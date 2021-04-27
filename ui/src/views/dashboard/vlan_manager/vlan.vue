@@ -82,6 +82,55 @@
             >Lease VLAN(Create Network)</a-button
           >
         </a-col>
+        <a-col :span="reserve_active ? 24 : 12" style="margin-top: 15px">
+          <a-row v-if="reserve_active" :gutter="10">
+            <a-col :span="5">
+              <a-select
+                placeholder="Virtual Network"
+                style="width: 100%"
+                :showSearch="true"
+                v-model="reserve_tmpl.vn"
+                v-show="!reserve_tmpl.reserve"
+              >
+                <a-select-option
+                  :key="vn.ID"
+                  :value="parseInt(vn.ID)"
+                  v-for="vn in vns"
+                  >{{ vn.ID }}: {{ vn.NAME }}</a-select-option
+                >
+              </a-select>
+            </a-col>
+            <a-col :span="5">
+              <a-button
+                type="primary"
+                @click="reserve_tmpl.reserve = !reserve_tmpl.reserve"
+                >{{
+                  reserve_tmpl.reserve ? "Bind to VNet" : "Reserve VLAN"
+                }}</a-button
+              >
+            </a-col>
+            <a-col :span="8">
+              <a-input-number
+                placeholder="VLAN ID"
+                v-model="reserve_tmpl.vlan"
+              ></a-input-number>
+            </a-col>
+            <a-col :span="6">
+              <a-row :gutter="5">
+                <a-button type="link" icon="save" @click="createReserve"
+                  >Reserve</a-button
+                >
+                <a-button type="link" icon="close" @click="cancelReserve"
+                  >Cancel</a-button
+                >
+              </a-row>
+            </a-col>
+          </a-row>
+          <a-button type="primary" icon="border" @click="startReserve" v-else
+            >Reserve VLAN(or bind to Network)</a-button
+          >
+        </a-col>
+      </a-row>
       </a-row>
     </a-col>
   </a-row>
@@ -97,8 +146,14 @@ export default {
       vlan: {},
       lease_active: false,
       lease_tmpl: [],
+
+      reserve_active: false,
+      reserve_tmpl: {},
+
       users: [],
       groups: [],
+      vns: [],
+
     };
   },
   computed: {
@@ -174,7 +229,47 @@ export default {
       this.lease_tmpl = [];
       this.lease_active = false;
     },
+    startReserve() {
+      this.$axios({
+        method: "post",
+        url: "/one.vn.pool.to_hash!",
+        auth: this.credentials,
+      }).then((res) => {
+        this.vns = res.data.response.VNET_POOL.VNET;
       });
+      this.reserve_tmpl = { reserve: true };
+      this.reserve_active = true;
+    },
+    createReserve() {
+      let params = [this.reserve_tmpl.vlan];
+      if (!this.reserve_tmpl.reserve) params.push(this.reserve_tmpl.vn);
+      console.log(params);
+      this.$axios({
+        method: "post",
+        url: `/vlan/${this.id}/reserve`,
+        auth: this.credentials,
+        data: {
+          params: params,
+        },
+      }).then((res) => {
+        if (res.data.error) {
+          this.$notification.error({
+            message: "Error creating Lease",
+            description: res.data.error,
+          });
+        } else {
+          this.$notification.success({
+            message: `New Lease successfuly created`,
+          });
+
+          this.cancelReserve();
+          this.sync();
+        }
+      });
+    },
+    cancelReserve() {
+      this.reserve_tmpl = {};
+      this.reserve_active = false;
     },
   },
 };
