@@ -44,6 +44,7 @@ end
 class VLANLease < Sequel::Model(:vlan_leases)
   many_to_one :vlan_key
 
+  # Simple alias to Sequel::Model#destroy
   alias :release :destroy
 
   # Needed for serialization
@@ -51,12 +52,18 @@ class VLANLease < Sequel::Model(:vlan_leases)
     @values.without(:key).to_json(*args)
   end
 
+  # Returns all VLANLease or all VLANLease for given VLAN pool if id is given
+  # @param [Integer] id - VLAN pool ID
+  # @return [Array<Hash>]
   def self.all_with_meta id = nil
     (id ? VLANLease.where(pool_id: id) : VLANLease).all.map do | vl |
       vl.hash_with_meta
     end
   end
 
+  # Returns VLANLease as Hash with additional data
+  # If VLAN ID is provisioned to VNet, :vn_name key will be added
+  # @return [Hash]
   def hash_with_meta
     if vn then
       to_hash.merge(vn_name: $db[:network_pool].where(oid: vn).select(:name).first[:name])
@@ -79,16 +86,25 @@ class VLAN < Sequel::Model(:vlans)
     raise VLAN::NoAvailavleVLANsPoolsLeftException.new
   end
 
+  # Returns all VLAN pools as Hash
+  # @see VLAN#hash_with_meta
+  # @return [Array<Hash>]
   def self.all_with_meta
     VLAN.all.map do | v |
       v.hash_with_meta
     end
   end
 
+  # Returns VLAN as hash and adds some meta data
+  # Adds :leased key with amount of leased IDs
+  # @return [Hash]
   def hash_with_meta
     to_hash.merge(leased: VLANLease.where(pool_id: id).count)
   end
 
+  # Returns VLAN#hash_with_meta with leases objects
+  # @see VLAN#hash_with_meta
+  # @return [Hash]
   def hash_with_meta_and_leases
     hash_with_meta.merge(leases: VLANLease.all_with_meta(id))
   end
@@ -195,6 +211,8 @@ class VLAN < Sequel::Model(:vlans)
   end
 end
 
+# Endpoint returns all VLAN pools
+# @see VLAN#all_with_meta
 get '/vlan' do
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -205,6 +223,13 @@ get '/vlan' do
   end
 end
 
+# Endpoint for VLAN pool creation
+#   Required body with following scheme:
+#   {
+#     "start": Integer
+#     "size" : Integer
+#     "type" : String
+#   }
 post '/vlan' do
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -217,6 +242,8 @@ post '/vlan' do
   end
 end
 
+# Get particular VLAN pool object
+# @see VLAN#hash_with_meta_and_leases
 get '/vlan/:id' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -227,6 +254,8 @@ get '/vlan/:id' do | pool_id |
   end
 end
 
+# Deletes VLAN pool
+# @note All Leases gotta be deleted
 delete '/vlan/:id/delete' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -238,6 +267,8 @@ delete '/vlan/:id/delete' do | pool_id |
   end
 end
 
+# Create Lease and VNet with VLAN ID from given VLAN pool
+# @see VLAN#lease
 post '/vlan/:id/lease' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -249,6 +280,8 @@ post '/vlan/:id/lease' do | pool_id |
   end
 end
 
+# Create Lease without VNet or bind to existing VNet
+# @see VLAN@reserve
 post '/vlan/:id/reserve' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
@@ -260,6 +293,8 @@ post '/vlan/:id/reserve' do | pool_id |
   end
 end
 
+# Delete VLANLease
+# @see VLANLease#release
 delete '/vlan/:id/lease/:lid' do | id, vlan_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
