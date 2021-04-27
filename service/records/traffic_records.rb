@@ -78,7 +78,7 @@ class OpenNebula::TrafficRecords < RecordsSource
       )
       last = TrafficRecord.where(vm: vm.id).order(Sequel.asc(:stime)).last # Get last Trafficrecord
     end
-    last = last.to_i # @see TrafficRecord#to_i
+    last = last.to_i # @see {TrafficRecord#to_i}
 
     def next? ts, last # Filter expression
       return !last[:etime].nil? && ts <= last[:etime] # If TrafficRecord is already finished or new record is elder then last update

@@ -159,7 +159,7 @@ class IONe
   end
 
   # Checks AnsiblePlaybook Syntax
-  # @see AnsiblePlaybook.check_syntax Check this method source to learn syntax special rules
+  # @see {AnsiblePlaybook.check_syntax Check this method} source to learn syntax special rules
   # @return [Boolean]
   def CheckAnsiblePlaybookSyntax body
     AnsiblePlaybook.check_syntax body
