@@ -82,7 +82,7 @@ class VLAN < Sequel::Model(:vlans)
   end
 
   def hash_with_meta
-    to_hash.without(:key).merge(leased: VLANLease.where(pool_id: id).count)
+    to_hash.merge(leased: VLANLease.where(pool_id: id).count)
   end
 
   def hash_with_meta_and_leases
