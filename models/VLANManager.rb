@@ -75,6 +75,8 @@ class VLAN < Sequel::Model(:vlans)
     to_hash.without(:key).merge(leased: VLANLease.where(pool_id: id).count)
   end
 
+  def hash_with_meta_and_leases
+    hash_with_meta.merge(leases: VLANLease.where(pool_id: id).all)
   end
 
   # Returns all existing lease records
