@@ -1,7 +1,18 @@
 <template>
   <a-row type="flex" justify="space-around" style="margin-top: 1rem">
     <a-col :span="23">
-      {{ vlan }}
+      <a-row>
+        <a-col :span="6">
+          ID: <b>{{ id }}</b>
+        </a-col>
+        <a-col :span="8">
+          Type: <b>{{ vlan.type }}</b>
+        </a-col>
+        <a-col :span="4" :offset="6">
+          <a-button type="primary" icon="reload" @click="sync"></a-button>
+        </a-col>
+      </a-row>
+      <a-divider />
     </a-col>
   </a-row>
 </template>
