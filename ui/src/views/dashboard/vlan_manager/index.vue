@@ -47,6 +47,7 @@
               </a-col>
               <a-col :span="20">
                 <a-progress
+                  :showInfo="false"
                   :percent="(100 * record.leased) / record.size"
                 ></a-progress>
               </a-col>
