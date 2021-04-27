@@ -155,4 +155,10 @@ class VLAN < Sequel::Model(:vlans)
       super("No Availavle VLANs Pools Left")
     end
   end
+
+  # Needed for serialization
+  def to_json *args
+    @values.without(:key).to_json(*args)
+  end
+end
 end
