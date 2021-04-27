@@ -167,4 +167,13 @@ class VLAN < Sequel::Model(:vlans)
     @values.without(:key).to_json(*args)
   end
 end
+
+get '/vlan' do
+  begin
+    raise StandardError.new("NoAccess") unless @one_user.admin?
+
+    json response: VLAN.all_with_meta
+  rescue => e
+    json error: e.message, debug: e.class
+  end
 end
