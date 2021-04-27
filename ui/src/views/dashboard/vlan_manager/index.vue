@@ -29,9 +29,6 @@
           </a-table>
         </a-collapse-panel>
       </a-collapse>
-      <a-row>
-        <a-button type="primary" @click="sync">SYNC</a-button>
-      </a-row>
     </a-col>
   </a-row>
 </template>
