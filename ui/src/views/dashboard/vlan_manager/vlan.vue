@@ -2,13 +2,28 @@
   <a-row type="flex" justify="space-around" style="margin-top: 1rem">
     <a-col :span="23">
       <a-row>
-        <a-col :span="6">
+        <a-col :span="4">
           ID: <b>{{ id }}</b>
         </a-col>
-        <a-col :span="8">
+        <a-col :span="4">
           Type: <b>{{ vlan.type }}</b>
         </a-col>
-        <a-col :span="4" :offset="6">
+        <a-col :span="12">
+          <a-row>
+            <a-col :span="4">
+              <h4>
+                {{ vlan.leased }} <b>/ {{ vlan.size }}</b>
+              </h4>
+            </a-col>
+            <a-col :span="20">
+              <a-progress
+                :showInfo="false"
+                :percent="(100 * vlan.leased) / vlan.size"
+              ></a-progress>
+            </a-col>
+          </a-row>
+        </a-col>
+        <a-col :span="4">
           <a-button type="primary" icon="reload" @click="sync"></a-button>
         </a-col>
       </a-row>
