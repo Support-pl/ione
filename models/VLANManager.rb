@@ -203,6 +203,16 @@ post '/vlan' do
   end
 end
 
+get '/vlan/:id' do | vlan_id |
+  begin
+    raise StandardError.new("NoAccess") unless @one_user.admin?
+
+    json response: VLAN.where(id: vlan_id).first.hash_with_meta_and_leases
+  rescue => e
+    json error: e.message
+  end
+end
+
 delete '/vlan/:id/delete' do | vlan_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
