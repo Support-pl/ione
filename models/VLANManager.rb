@@ -60,6 +60,12 @@ class VLAN < Sequel::Model(:vlans)
     raise VLAN::NoAvailavleVLANsPoolsLeftException.new
   end
 
+  def self.all_with_meta
+    VLAN.all.map do | v |
+      v.to_hash.without(:key).merge(leased: VLANLease.where(pool_id: v.id).count)
+    end
+  end
+
   # Returns all existing lease records
   # @return [Array<VLANLease>]
   def leases
