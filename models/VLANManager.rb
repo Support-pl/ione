@@ -224,11 +224,12 @@ delete '/vlan/:id/delete' do | vlan_id |
   end
 end
 
-get '/vlan/:id' do | vlan_id |
+post '/vlan/:id/lease' do | vlan_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
-    json response: VLAN.where(id: vlan_id).first.hash_with_meta_and_leases
+    data = JSON.parse(@request_body)
+    json response: VLAN.where(id: vlan_id).first.lease(*data['params'])
   rescue => e
     json error: e.message
   end
