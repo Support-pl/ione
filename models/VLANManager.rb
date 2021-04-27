@@ -51,6 +51,12 @@ class VLANLease < Sequel::Model(:vlan_leases)
     @values.without(:key).to_json(*args)
   end
 
+  def self.all_with_meta id = nil
+    (id ? VLANLease.where(pool_id: id) : VLANLease).all.map do | vl |
+      vl.hash_with_meta
+    end
+  end
+
   def hash_with_meta
     to_hash.without(:key).merge(vn_name: $db[:network_pool].where(oid: vn).select(:name).first[:name])
   end
