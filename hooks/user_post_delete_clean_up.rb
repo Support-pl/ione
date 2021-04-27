@@ -33,7 +33,9 @@ $: << RUBY_LIB_LOCATION
 
 require 'opennebula'
 include OpenNebula
-user = User.new xml.xpath('//EXTRA/USER'), Client.new
+
+$client = Client.new
+user = User.new xml.xpath('//EXTRA/USER'), $client
 user.info!
 
 require 'yaml'
@@ -56,12 +58,12 @@ end
 
 until pool(id) == []
   pool(id).each do | vm |
-    VirtualMachine.new_with_id(vm[:oid], Client.new).terminate(true)
+    VirtualMachine.new_with_id(vm[:oid], $client).terminate(true)
   end
 end
 
 vn_pool(id).each do | vnet |
-  vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
+  vnet = VirtualNetwork.new_with_id(vnet[:oid], $client)
   vnet.info!
 end
 
