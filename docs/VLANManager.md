@@ -27,7 +27,7 @@ Table of VLAN IDs ranges. Structure:
 +-------+--------------+------+------------------------------------------------------+
 ```
 
-See {VLAN} class for available methods.
+See {render:VLAN} class for available methods.
 
 ### VLANLease(:vlan_leases)
 
@@ -54,7 +54,7 @@ This table has validator: all three fields together gotta be unique.
 
 ### VN Templates
 
-You would need the VN Template(s) to let {VLAN#lease} lease VLANs.
+You would need the VN Template(s) to let {render:VLAN#lease} lease VLANs.
 
 Example:
 
@@ -69,7 +69,7 @@ TYPE = "PRIVATE"
 
 ### IONe Settings
 
-You would need to fill only one {IONe::Settings} field - `VNETS_TEMPLATES`.
+You would need to fill only one {render:IONe::Settings} field - `VNETS_TEMPLATES`.
 
 Example:
 
@@ -79,15 +79,15 @@ Example:
 }
 ```
 
-## How do you manage records {VLANLeases}
+## How do you manage records {render:VLANLeases}
 
-### {VLAN} class
+### {render:VLAN} class
 
-Best approach is to use this class to manage VLANs. So if you create VNs and reserve VLANs with {VLAN#lease} and {VLAN#reserve} respectively, these methods will handle or recording operations.
+Best approach is to use this class to manage VLANs. So if you create VNs and reserve VLANs with {render:VLAN#lease} and {render:VLAN#reserve} respectively, these methods will handle or recording operations.
 
-### {VLANLease} class
+### {render:VLANLease} class
 
-Just delete lease record with {VLANLease#release} method.(It is basically just an alias)
+Just delete lease record with {render:VLANLease#release} method.(It is basically just an alias)
 
 ### DB Hooks(cascade)
 
