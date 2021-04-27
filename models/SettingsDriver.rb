@@ -7,7 +7,7 @@ get '/settings' do
     end
     json response: SETTINGS_TABLE.where(Sequel.lit('access_level <= ?', access_level)).to_a
   rescue => e
-    json error: e.message, debug: e.class
+    json error: e.message
   end
 end
 
