@@ -141,10 +141,26 @@
               <template v-else> Hold </template>
             </span>
             <span slot="actions" slot-scope="text, record">
+              <a-tooltip
+                v-if="record.vn"
+                :title="`Caution! This VLAN ID could be used by ${record.vn_name}!`"
+              >
+                <a-button
+                  type="danger"
+                  icon="delete"
+                  @click="release(record.id)"
+                  >Force Release</a-button
+                >
+              </a-tooltip>
               <a-button
-                type="danger"
-                icon="delete"
-                v-if="!record.vn"
+                type="primary"
+                icon="play-circle"
+                style="
+                  background-color: yellow;
+                  color: black;
+                  border-color: yellow;
+                "
+                v-else
                 @click="release(record.id)"
                 >Release</a-button
               >
