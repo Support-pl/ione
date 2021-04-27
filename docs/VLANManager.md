@@ -93,3 +93,14 @@ Just delete lease record with {VLANLease#release} method.(It is basically just a
 
 In order to delete lease record, you should just delete VNet.
 
+### Hooks
+
+IONe brings two hooks affecting this section.
+
+1. user-create-networking-setup
+  
+    Leases VLAN to VDC user on allocation(creates a VNet)
+
+2. user-post-delete-clean-up
+
+    Cleans up VDC User resources on delete. VNets are part of it, so VLAN lease is going to be released as VNet created by first hook will be deleted.
