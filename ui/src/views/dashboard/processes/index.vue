@@ -54,7 +54,7 @@ export default {
       pool: [],
       columns: [
         {
-          dataindex: "id",
+          dataIndex: "id",
           key: "id",
           title: "ID",
           scopedSlots: { customRender: "id" },
