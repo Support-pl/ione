@@ -48,6 +48,13 @@
                 ></a-progress>
               </a-col>
             </a-row>
+            <a-space slot="actions" slot-scope="text, record">
+              <a-button
+                type="danger"
+                icon="delete"
+                @click="handleDelete(record.id)"
+              ></a-button>
+            </a-space>
           </a-table>
         </a-collapse-panel>
       </a-collapse>
@@ -143,6 +150,23 @@ export default {
             message: "Server Exception, check logs",
           });
         });
+    },
+    handleDelete(id) {
+      this.$axios({
+        method: "delete",
+        url: `/vlan/${id}/delete`,
+        auth: this.credentials,
+      }).then((res) => {
+        if (res.data.error) {
+          this.$notification.error({
+            message: "Error deleting VLAN Range",
+            description: res.data.error,
+          });
+        } else {
+          this.$notification.success({ message: `VLAN Range #${id} deleted` });
+          this.sync();
+        }
+      });
     },
   },
 };
