@@ -26,9 +26,6 @@
             </a-col>
           </a-row>
         </a-col>
-        <a-col :span="4">
-          <a-button type="primary" icon="reload" @click="sync"></a-button>
-        </a-col>
       </a-row>
       <a-divider />
       <a-row :gutter="10" type="flex" justify="space-around">
