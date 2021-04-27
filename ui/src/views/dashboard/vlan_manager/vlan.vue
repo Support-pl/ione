@@ -160,7 +160,6 @@ export default {
     ...mapGetters(["credentials"]),
   },
   mounted() {
-    console.log(this.$route);
     if (this.$route.query.id) {
       this.id = this.$route.query.id;
       this.sync();
