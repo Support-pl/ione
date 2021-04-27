@@ -82,6 +82,10 @@ export default {
     return {
       id: undefined,
       vlan: {},
+      lease_active: false,
+      lease_tmpl: [],
+      users: [],
+      groups: [],
     };
   },
   computed: {
@@ -103,7 +107,60 @@ export default {
         url: `/vlan/${this.id}`,
         auth: this.credentials,
       }).then((res) => {
-        this.vlan = res.data;
+        this.vlan = res.data.response;
+      });
+    },
+    startLease() {
+      this.$axios({
+        method: "post",
+        url: "/one.u.pool.to_hash!",
+        auth: this.credentials,
+      }).then((res) => {
+        let users = res.data.response.USER_POOL.USER;
+        if (Array.isArray(users)) this.users = users;
+        else this.users = [users];
+      });
+      this.$axios({
+        method: "post",
+        url: "/one.g.pool.to_hash!",
+        auth: this.credentials,
+      }).then((res) => {
+        let groups = res.data.response.GROUP_POOL.GROUP;
+        if (Array.isArray(groups)) this.groups = groups;
+        else this.groups = [groups];
+      });
+      this.lease_tmpl = [];
+      this.lease_active = true;
+    },
+    createLease() {
+      console.log(this.lease_tmpl);
+      this.$axios({
+        method: "post",
+        url: `/vlan/${this.id}/lease`,
+        auth: this.credentials,
+        data: {
+          params: this.lease_tmpl,
+        },
+      }).then((res) => {
+        if (res.data.error) {
+          this.$notification.error({
+            message: "Error creating VN/Lease",
+            description: res.data.error,
+          });
+        } else {
+          this.$notification.success({
+            message: `New VN with ID ${res.data.response} successfuly created`,
+          });
+
+          this.cancelLease();
+          this.sync();
+        }
+      });
+    },
+    cancelLease() {
+      this.lease_tmpl = [];
+      this.lease_active = false;
+    },
       });
     },
   },
