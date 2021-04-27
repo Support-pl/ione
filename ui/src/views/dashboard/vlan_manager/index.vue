@@ -38,7 +38,6 @@
             :data-source="group"
             rowKey="id"
             :pagination="false"
-            :customRow="row_wrapper"
           >
             <a-row slot="leased" slot-scope="text, record">
               <a-col :span="4">
@@ -116,15 +115,6 @@ export default {
           width: "20%",
         },
       ],
-      row_wrapper: (record) => {
-        return {
-          on: {
-            click: () => {
-              this.handleNavigate(record.id);
-            },
-          },
-        };
-      },
     };
   },
   mounted() {
