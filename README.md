@@ -159,9 +159,9 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
          <td align="right"><code>Public IPs pool network ID</code></td>
       </tr>
       <tr>
-         <td align="left"><strong>PRIVATE_NETWORK_DEFAULTS</strong></td>
-         <td align="left">NETWORK_ID</td>
-         <td align="right"><code>Private Networks pool network ID</code></td>
+         <td align="left"><strong>VNETS_TEMPLATES</strong></td>
+         <td align="left">VN_MAD(e.g. 802.1Q)</td>
+         <td align="right"><code>VNs Types to VNs Templates mapping(types must be upper case)</code></td>
       </tr>
       <tr>
          <td align="left"><strong>NODES_DEFAULT</strong></td>
