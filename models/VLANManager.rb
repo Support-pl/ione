@@ -217,44 +217,48 @@ post '/vlan' do
   end
 end
 
-get '/vlan/:id' do | vlan_id |
+get '/vlan/:id' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
-    json response: VLAN.where(id: vlan_id).first.hash_with_meta_and_leases
+    json response: VLAN.where(id: pool_id).first.hash_with_meta_and_leases
   rescue => e
     json error: e.message
   end
 end
 
-delete '/vlan/:id/delete' do | vlan_id |
+delete '/vlan/:id/delete' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
-    VLAN.where(id: vlan_id).delete
+    VLAN.where(id: pool_id).delete
     json response: true
   rescue => e
     json error: e.message
   end
 end
 
-post '/vlan/:id/lease' do | vlan_id |
+post '/vlan/:id/lease' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
     data = JSON.parse(@request_body)
-    json response: VLAN.where(id: vlan_id).first.lease(*data['params'])
+    json response: VLAN.where(id: pool_id).first.lease(*data['params'])
   rescue => e
     json error: e.message
   end
 end
 
-post '/vlan/:id/reserve' do | vlan_id |
+post '/vlan/:id/reserve' do | pool_id |
   begin
     raise StandardError.new("NoAccess") unless @one_user.admin?
 
     data = JSON.parse(@request_body)
-    json response: VLAN.where(id: vlan_id).first.reserve(*data['params'])
+    json response: VLAN.where(id: pool_id).first.reserve(*data['params'])
+  rescue => e
+    json error: e.message
+  end
+end
   rescue => e
     json error: e.message
   end
