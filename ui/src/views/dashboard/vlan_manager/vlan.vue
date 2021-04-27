@@ -3,6 +3,9 @@
     <a-col :span="23">
       <a-row>
         <a-col :span="4">
+          <a-button type="primary" icon="reload" @click="sync"></a-button>
+        </a-col>
+        <a-col :span="4">
           ID: <b>{{ id }}</b>
         </a-col>
         <a-col :span="4">
