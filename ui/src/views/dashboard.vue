@@ -49,6 +49,10 @@ const asideBtns = [
     route: "datastores",
   },
   {
+    name: "VLAN Manager",
+    route: "vlan-manager",
+  },
+  {
     name: "Ansible Playbooks",
     route: "playbooks",
   },

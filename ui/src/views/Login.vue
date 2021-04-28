@@ -61,7 +61,7 @@ export default {
           let is_admin = (
             await this.$axios({
               method: "post",
-              url: "one.u.admin?",
+              url: "one.u.is_admin",
               data: {
                 oid: -1,
               },

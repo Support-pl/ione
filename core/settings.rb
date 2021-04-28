@@ -22,7 +22,6 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['NODES_DEFAULT', "{\"VCENTER\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
     ['PUBLIC_IP_COST', 0.0, "Public IP Address cost per sec", 0, "float"],
     ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
-    ['PRIVATE_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Private Network Pool ID", 1, "object"],
     ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
     ['TRAFFIC_COST', 0.0, "Cost of 1 kByte VM traffic", 0, "float"],
     ['TRAFFIC_BILL_FREQ', 86400, "Frequency of debits for Traffic usage in seconds", 1, "int"],
@@ -36,7 +35,8 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['BASE_VNC_PORT', 5900, "Base VNC-port number", 1, "int"],
     ['USERS_DEFAULT_LANG', "en_US", "Default locale for new users", 1, "str"],
     ['VCENTER_CPU_LIMIT_FREQ_PER_CORE', "{\"default\":2000}", "Frequency per Core limit for different Nodes(don't remove default)", 1, "object"],
-    ['VCENTER_DRIVES_IOPS', "{\"HDD\":350,\"SSD\":1000}", "IOPs limits for Drive types", 1, "object"]
+    ['VCENTER_DRIVES_IOPS', "{\"HDD\":350,\"SSD\":1000}", "IOPs limits for Drive types", 1, "object"],
+    ['VNETS_TEMPLATES', "{}", "VNs Types to VNs Templates mapping(types must be upper case)", 1, "object"]
   ]
   required.each do | record |
     begin

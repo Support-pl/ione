@@ -136,17 +136,17 @@ require 'opennebula'
     "RESOURCE" => "VM"
   },
   {
-    "NAME" => 'reserve-ar-on-create',
+    "NAME" => 'user-create-networking-setup',
     "TYPE" => 'api',
     "CALL" => 'one.user.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/set_ar.rb',
+    "COMMAND" => '/usr/lib/one/ione/hooks/user_create_networking_setup.rb',
     "ARGUMENTS" => '$API'
   },
   {
-    "NAME" => 'release-ar-on-remove',
+    "NAME" => 'user-post-delete-clean-up',
     "TYPE" => 'api',
     "CALL" => 'one.user.delete',
-    "COMMAND" => '/usr/lib/one/ione/hooks/remove_ar.rb',
+    "COMMAND" => '/usr/lib/one/ione/hooks/user_post_delete_clean_up.rb',
     "ARGUMENTS" => '$API'
   },
   {
