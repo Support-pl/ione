@@ -379,3 +379,15 @@ post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
   RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
   json response: r
 end
+
+puts 'Including extra endpoints'
+LOG_COLOR 'Including extra endpoints:', 'none', 'green', 'bold'
+Dir["#{ROOT}/routes/*.rb"].each do |file|
+  mod = file.split('/').last.split('.').first
+  puts "\tIncluding #{mod}"
+  require file
+  LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
+end
+
+puts 'Enpoints are registered, starting up done'
+RPC_LOGGER.debug "Endpoints are registered, starting up done"
