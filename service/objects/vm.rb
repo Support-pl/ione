@@ -414,7 +414,8 @@ class OpenNebula::VirtualMachine
 
       return {
         id: id, name: name,
-        TOTAL: total
+        total_billed: total, reduce_factor: reduce_factor,
+        TOTAL: total * reduce_factor
       }
     end
   end
