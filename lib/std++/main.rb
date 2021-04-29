@@ -37,6 +37,15 @@ class Hash
     self
   end
 
+  # Converts all keys to Integer
+  # @return [Hash]
+  def keys_to_i!
+    self.keys.each do |key|
+      self[key.to_i] = self.delete key if key.class != Integer
+    end
+    self
+  end
+
   # Returns array of values with given keys
   # @param [Array] keys - Array of values
   # @return [Array]
