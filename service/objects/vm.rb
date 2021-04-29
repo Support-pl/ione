@@ -417,6 +417,8 @@ class OpenNebula::VirtualMachine
         total_billed: total, reduce_factor: reduce_factor,
         TOTAL: total * reduce_factor
       }
+    else
+      raise ShowbackError, ["Unknown BILLING_PERIOD!", bp]
     end
   end
 
