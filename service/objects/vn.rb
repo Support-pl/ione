@@ -41,6 +41,8 @@ class OpenNebula::VirtualNetwork
     pool = to_hash['VNET']['AR_POOL']['AR']
     if pool.class == Hash then
       return [pool]
+    elsif pool.nil? then
+      return []
     else
       return pool
     end
