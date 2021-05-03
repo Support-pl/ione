@@ -11,7 +11,6 @@ class IONe
   def reserve_public_ip params
     params.to_sym!
 
-    conf = @db[:settings].as_hash(:name, :body)
     vnet = onblock(:vn, IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'], @client)
     vnet.info!
 
@@ -41,20 +40,18 @@ class IONe
       if OpenNebula.is_error?(uvnet) && uvnet.errno == 2048 then
         return { error: "No free addresses left" }
       end
+
+      ar = onblock(:vn, uvnet, @client).ar_pool.last
+      AR.create do | r |
+        r.vnid  = uvnet
+        r.arid  = ar['AR_ID']
+        r.stime = Time.now.to_i
+        r.owner = params[:u]
+      end
     end
 
     vn = onblock(:vn, uvnet, @client)
     vn.chown(u.id, u.groups.first)
-    ar = vn.ar_pool.sort_by { |o| o['AR_ID'] }.last
-
-    AR.create do | r |
-      r.vnid = vn.id
-      r.arid  = ar['AR_ID']
-      r.time  = Time.now.to_i
-      r.state = 'crt'
-      r.owner = params[:u]
-    end
-
     return vn.id
   end
 
@@ -70,17 +67,11 @@ class IONe
   def release_public_ip params
     params.to_sym!
 
-    vn = onblock(:vn, params[:vn])
+    vn = onblock(:vn, params[:vn], @client)
     vn.info!
 
     if vn.rm_ar(params[:ar]).nil? then
-      AR.create do | r |
-        r.vnid  = params[:vn]
-        r.arid  = params[:ar]
-        r.time  = Time.now.to_i
-        r.state = 'del'
-        r.owner = vn['//UID']
-      end
+      AR.where(vnid: params[:vn], arid: params[:ar], owner: vn['//UID']).update(etime: Time.now.to_i)
       true
     else
       false

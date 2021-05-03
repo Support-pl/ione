@@ -3,10 +3,13 @@ class IONe
   # @param [String] msg - message to log
   # @return [String('DONE') | String('PONG')]
   # @example
-  #   ZmqJsonRpc::Client.new(uri, 50).Test('PING') => 'PONG' -> Service available
-  #                                                => Exception -> Service down
+  #       api = 'http://localhost:8009/ione/Test'
+  #       req = Net::HTTP::Post.new(api)
+  #       req.basic_auth('oneadmin:password')
+  #       r = Net::HTTP.start(api.hostname, api.port, use_ssl: api.scheme == 'https', verify_mode: OpenSSL::SSL::VERIFY_NONE) do | http |
+  #         http.request(req)
+  #       end
   def Test(msg, log = "Test")
-    id = id_gen()
     LOG "Test message received, text: #{msg}", log if msg != 'PING'
     if msg == "PING" then
       return "PONG"
@@ -24,7 +27,6 @@ class IONe
   #   => Integer => user and vm found
   #   => 'none'  => no user or now vm exists
   def get_vm_by_uid(uid)
-    id = id_gen()
     vmp = VirtualMachinePool.new(@client)
     vmp.info_all!
     vmp.each do | vm |
@@ -39,7 +41,6 @@ class IONe
   # @example
   #   => [{:id => ..., :name => ...}, {:id => ..., :name => ...}, ...]
   def get_vms_by_uid(uid)
-    id = id_gen()
     vmp, vms = VirtualMachinePool.new(@client), []
     vmp.info_all!
     vmp.each do | vm |
@@ -59,7 +60,6 @@ class IONe
   #   => Integer => user found
   #   => 'none'  => no user exists
   def get_uid_by_name(name)
-    id = id_gen()
     up = UserPool.new(@client)
     up.info_all!
     up.each do | u |
@@ -79,7 +79,6 @@ class IONe
   #   => {:vmid => Integer, :userid => Integer, :ip => String} => User and VM found
   #   => {:vmid => 'none', :userid => 'none', :ip => String}
   def get_vm_by_uname name
-    id = id_gen()
     userid = get_uid_by_name(name)
     vmid = get_vm_by_uid(userid)
     unless vmid.nil? then
@@ -141,7 +140,7 @@ class IONe
     infot = Thread.new do
       unless vms.empty? then
         vm_pool = vms.map! do |vmid|
-          onblock(:vm, vmid) { | vm | vm.info! || vm }
+          onblock(:vm, vmid, @client) { | vm | vm.info! || vm }
         end
       else
         vm_pool = VirtualMachinePool.new(@client)
@@ -150,11 +149,11 @@ class IONe
       vm_pool.each do |vm| # Creating VM list from VirtualMachine Pool Object
         begin
           info << {
-            :vmid => vm.id, :userid => vm.uid(false), :host => get_vm_host(vm.id),
-              :login => vm.uname(false, true), :ip => GetIP(vm), :state => (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
+            vmid: vm.id, userid: vm.uid(false), host: get_vm_host(vm.id),
+            login: vm.uname(false, true), ip: GetIP(vm),
+            state: (vm.lcm_state != 0 ? vm.lcm_state_str : vm.state_str)
           }
         rescue
-          binding.pry
           break
         end
       end
@@ -182,6 +181,7 @@ class IONe
           end
           free.push pool
         rescue
+          nil
         end
       end
     end
@@ -225,7 +225,7 @@ class IONe
 
     # @!visibility private
     # Converts MB to GB
-    def sizeConvert(mb)
+    size_convert = lambda do | mb |
       if mb.to_f / 1024 > 768 then
         return "#{(mb.to_f / 1048576.0).round(2)}TB"
       else
@@ -237,8 +237,8 @@ class IONe
     img_pool.info_all!
     img_pool.each do | img |
       mon << {
-        'id' => img.id, 'name' => img.name.split('(').first, :full_size => sizeConvert(img.to_hash['DATASTORE']['TOTAL_MB']),
-          'used' => sizeConvert(img.to_hash['DATASTORE']['USED_MB']),
+        'id' => img.id, 'name' => img.name.split('(').first, :full_size => size_convert[img.to_hash['DATASTORE']['TOTAL_MB']],
+          'used' => size_convert[img.to_hash['DATASTORE']['USED_MB']],
           'type' => img.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
           'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
           'hypervisor' => img.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
@@ -254,7 +254,7 @@ class IONe
   def HostsMonitoring()
     # @!visibility private
     # Converts MB to GB
-    def sizeConvert(mb)
+    size_convert = lambda do | mb |
       if mb.to_f / 1048576 > 768 then
         return "#{(mb.to_f / 1073741824.0).round(2)}TB"
       else
@@ -267,8 +267,8 @@ class IONe
     host_pool.each do | host |
       host = host.to_hash['HOST']
       mon << {
-        :id => host['ID'].to_i, :name => host['NAME'], :full_size => sizeConvert(host.to_hash['HOST_SHARE']['TOTAL_MEM']),
-          :reserved => sizeConvert(host.to_hash['HOST_SHARE']['MEM_USAGE']),
+        :id => host['ID'].to_i, :name => host['NAME'], :full_size => size_convert[host.to_hash['HOST_SHARE']['TOTAL_MEM']],
+          :reserved => size_convert[host.to_hash['HOST_SHARE']['MEM_USAGE']],
           :running_vms => host.to_hash['HOST_SHARE']['RUNNING_VMS'].to_i,
           :cpu => "#{(host.to_hash['HOST_SHARE']['USED_CPU'].to_f / host.to_hash['HOST_SHARE']['TOTAL_CPU'].to_f * 100).round(2)}%"
       }

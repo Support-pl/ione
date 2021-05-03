@@ -29,8 +29,8 @@ class AnsiblePlaybook
   attr_accessor :name, :uid, :gid, :description, :body, :extra_data, :create_time
 
   # @param [Hash] args
-  # @option args [Fixnum] uid - Playbooks owner user ID
-  # @option args [Fixnum] gid - Playbooks group ID
+  # @option args [Integer] uid - Playbooks owner user ID
+  # @option args [Integer] gid - Playbooks group ID
   # @option args [String] name - Playbooks name
   # @option args [String] description - Playbooks description(only latin supported)
   # @option args [String] body - Playbooks YAML written body
@@ -62,7 +62,7 @@ class AnsiblePlaybook
   #
   # OpenNebula::PoolElement-like initializer
   #
-  # @param [Fixnum] id - Playbook ID
+  # @param [Integer] id - Playbook ID
   # @param [OpenNebula::Client] client - not required
   #
   # @return [AnsiblePlaybook]
@@ -278,9 +278,9 @@ class AnsiblePlaybookProcess
 
   attr_reader :id, :install_id, :hosts, :start_time, :end_time
 
-  # @param [Fixnum] proc_id - Process will be loaded from DB if given
-  # @param [Fixnum] playbook_id - Playbook object ID to use
-  # @param [Fixnum] uid - User ID who initiates the process
+  # @param [Integer] proc_id - Process will be loaded from DB if given
+  # @param [Integer] playbook_id - Playbook object ID to use
+  # @param [Integer] uid - User ID who initiates the process
   # @param [Hash] hosts - see example
   # @param [Hash] vars - Variables that should be inserted in PB
   # @param [String] comment - Anything you want to tell another users or admins about this Process
@@ -323,7 +323,7 @@ class AnsiblePlaybookProcess
   #
   # OpenNebula::PoolElement-like initializer
   #
-  # @param [Fixnum] proc_id - Process ID
+  # @param [Integer] proc_id - Process ID
   # @param [OpenNebula::Client] client - not required
   #
   # @return [AnsiblePlaybookProcess]

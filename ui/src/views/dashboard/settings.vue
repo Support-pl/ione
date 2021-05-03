@@ -54,6 +54,7 @@
 <script>
 import { mapGetters } from "vuex";
 import num from "@/components/types/num.vue";
+import bool from "@/components/types/bool.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
 import object from "@/components/types/object.vue";
@@ -94,12 +95,13 @@ export default {
       editingKey: "",
       cacheData: [],
       types: {
-        num,
+        int: num,
+        float: num,
         list,
         str,
+        bool,
         object,
       },
-      selfEdit: ["object"],
     };
   },
   async mounted() {

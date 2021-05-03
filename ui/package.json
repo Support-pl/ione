@@ -46,16 +46,20 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {},
-    "overrides": [{
-      "files": [
-        "**/__tests__/*.{j,t}s?(x)",
-        "**/tests/unit/**/*.spec.{j,t}s?(x)"
-      ],
-      "env": {
-        "jest": true
+    "rules": {
+      "vue/no-mutating-props": "off"
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/__tests__/*.{j,t}s?(x)",
+          "**/tests/unit/**/*.spec.{j,t}s?(x)"
+        ],
+        "env": {
+          "jest": true
+        }
       }
-    }]
+    ]
   },
   "browserslist": [
     "> 1%",

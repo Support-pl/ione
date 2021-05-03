@@ -27,7 +27,7 @@ class OpenNebula::User
   end
 
   # Sets users balance
-  # @param [Fixnum] num
+  # @param [Integer] num
   def balance= num
     update("BALANCE = #{num}", true)
   end
@@ -59,7 +59,7 @@ class OpenNebula::User
 
   # Returns users VNets being billed
   def billable_vns
-    AR.where(owner: @pe_id, state: "crt").all
+    AR.where(owner: @pe_id, etime: nil).all
   end
 
   # Calculates VNs Showback
@@ -71,16 +71,15 @@ class OpenNebula::User
 
     info!
 
-    vnp = billable_vns
+    vnp = AR.where(owner: @pe_id).where { (etime == nil) | (etime >= etime_req) }.all
+
     vnp.inject({ 'TOTAL' => 0 }) do | showback, rec |
-      first = rec.time
+      first = rec.stime
 
-      stime = stime_req
+      stime, etime = stime_req, etime_req
 
-      stime = rec.time if rec.time > stime
-      if (etime = AR.where(rec.values.without(:key, :time, :state)).where(state: 'del').all.first).nil? then
-        etime = etime_req
-      end
+      stime = rec.stime if rec.stime > stime
+      etime = rec.etime if !rec.etime.nil? && rec.etime < etime
 
       stime   = Time.at(stime).to_datetime
       current = Time.at(first).to_datetime
@@ -96,12 +95,16 @@ class OpenNebula::User
         current = current >> 1
       end
 
-      r = onblock(:vn, rec.vnid).ar_record(rec.arid, periods)
+      ip, r = onblock(:vn, rec.vnid).ar_record(rec.arid, periods)
 
-      showback['TOTAL'] += r.values[0]
-      showback.merge(
-        r
-      )
+      if showback[ip].nil? then
+        showback[ip] = r
+      else
+        showback[ip] += r
+      end
+
+      showback['TOTAL'] += r
+      showback
     end
   end
 
@@ -127,13 +130,14 @@ class OpenNebula::User
   # Checks if user is admin
   # @note Admin means user is a part of oneadmin group
   # @return [Boolean]
-  def is_admin
+  def admin?
     info!
     (groups << gid).include? 0
   rescue
     false
   end
-  alias :is_admin? :is_admin
+  alias :is_admin? :admin?
+  alias :is_admin  :admin?
 
   # User doesn't exist Exception object
   class UserNotExistsError < StandardError

@@ -3,9 +3,9 @@ begin
     primary_key :key
     Integer   :vnid,  null: false
     Integer   :arid,  null: false
-    Integer   :time,  null: false
+    Integer   :stime, null: false
+    Integer   :etime, null: true
     Integer   :owner, null: true
-    String    :state, size: 10, null: false
   end
 rescue
   puts "Table :ars already exists, skipping"
@@ -41,17 +41,26 @@ class OpenNebula::VirtualNetwork
     pool = to_hash['VNET']['AR_POOL']['AR']
     if pool.class == Hash then
       return [pool]
+    elsif pool.nil? then
+      return []
     else
       return pool
     end
   end
 
   # Calculate amount of Public Addresses and bill them with `PUBLIC_IP_COST`
-  def ar_record(ar, per)
+  # @param [Integer] ar - AddressRange ID
+  # @param [Integer] per - Billing periods amount
+  # @return [String|Symbol, Float] - IP address or note and its cost
+  def ar_record(ar_id, per)
     info!
-    ar = ar_pool.select { |o| o['AR_ID'].to_i == ar.to_i }.first
-    return {
-      ar['IP'] => per * Settings['PUBLIC_IP_COST'].body.to_f
-    }
+    ar = ar_pool.select { |o| o['AR_ID'].to_i == ar_id.to_i }.first
+    if ar.nil? && per > 0 then
+      return :deleted_ip, per * IONe::Settings['PUBLIC_IP_COST']
+    elsif ar.nil? then
+      return :trash, 0
+    else
+      return ar['IP'], per * IONe::Settings['PUBLIC_IP_COST']
+    end
   end
 end

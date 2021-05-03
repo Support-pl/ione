@@ -57,6 +57,22 @@ const routes = [
         component: () => import("@/views/dashboard/processes/process.vue"),
       },
       {
+        path: "vlan-manager",
+        component: () => import("@/views/dashboard/vlan_manager/index.vue"),
+      },
+      {
+        path: "vlan-manager/vlan",
+        component: () => import("@/views/dashboard/vlan_manager/vlan.vue"),
+      },
+      {
+        path: "hooks",
+        component: () => import("@/views/dashboard/hooks/index.vue"),
+      },
+      {
+        path: "hooks/:id",
+        component: () => import("@/views/dashboard/hooks/hook.vue"),
+      },
+      {
         path: "logs",
         component: () => import("@/views/dashboard/logs.vue"),
       },

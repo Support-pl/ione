@@ -17,7 +17,7 @@ class IONe
 
     showback = {
       'computing' => {},
-        'networking' => {}
+      'networking' => {}
     }
     stream = !stream_data.nil?
 
@@ -58,7 +58,7 @@ class IONe
       stream_data << JSON.generate(networking) << ', '
     end
 
-    showback['computing']['TOTAL'] = showback['computing'].inject(0) { | result, (_id, vm) | result += vm[:TOTAL] }
+    showback['computing']['TOTAL'] = showback['computing'].inject(0) { | result, (_id, vm) | result + vm[:TOTAL] }
     showback['TOTAL'] =     showback['computing']['TOTAL']
     showback['TOTAL'] +=    showback['networking']['TOTAL']
     showback['time_period_requested'] = etime - stime
@@ -90,21 +90,21 @@ class IONe
 
     return {
       'showback' => showback,
-        'balance'  => balance,
-        'alert'    => alert,
-        'alert_at' => alert_at
+      'balance'  => balance,
+      'alert'    => alert,
+      'alert_at' => alert_at
     }
   rescue OpenNebula::VirtualMachine::ShowbackError => e
     return {
       'error'    => e.message,
-        'time'     => e.params,
-        'type'     => e.class
+      'time'     => e.params,
+      'type'     => e.class
     }
   rescue OpenNebula::User::UserNotExistsError => e
     return {
       'error'    => e.message,
-        'uid'      => params['uid'],
-        'type'     => e.class
+      'uid'      => params['uid'],
+      'type'     => e.class
     }
   end
 
@@ -113,8 +113,8 @@ class IONe
     LOG_DEBUG params
     response = []
 
-    u = onblock :u, 0, @client
-    e = u.info!
+    one_user = onblock :u, 0, @client
+    e = one_user.info!
     return 401 unless e.nil?
 
     params["users"].each do | u |
@@ -128,9 +128,9 @@ class IONe
 
       response << {
         'showback' => showback,
-          'balance'  => balance,
-          'alert'    => alert,
-          'alert_at' => alert_at
+        'balance'  => balance,
+        'alert'    => alert,
+        'alert_at' => alert_at
       }
     end
 
@@ -138,14 +138,14 @@ class IONe
   rescue OpenNebula::VirtualMachine::ShowbackError => e
     return {
       'error'    => e.message,
-        'time'     => e.params,
-        'type'     => e.class
+      'time'     => e.params,
+      'type'     => e.class
     }
   rescue OpenNebula::User::UserNotExistsError => e
     return {
       'error'    => e.message,
-        'uid'      => params['uid'],
-        'type'     => e.class
+      'uid'      => params['uid'],
+      'type'     => e.class
     }
   end
 

@@ -4,7 +4,7 @@ class OpenNebula::History
 
   attr_reader :id, :records
 
-  # @param [Fixnum] id - VM ID
+  # @param [Integer] id - VM ID
   # @param [OpenNebula::Client] client
   def initialize id, client
     @client = client

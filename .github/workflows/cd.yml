@@ -1,15 +1,6 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CD
 
-# Controls when the action will run. 
 on:
-  push:
-    branches: [ master ]
-    paths:
-      - 'ui/**'
-  pull_request:
-    branches: [ master ]
   workflow_dispatch:
     inputs:
         deployEnvironment:
@@ -41,16 +32,11 @@ jobs:
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
         with:
-          # username
           username: ${{ secrets.SFTP_USER }}
-          # your sftp server
           server: ${{ secrets.SFTP_HOST }}
-          # your sftp server port, default to 22
           port: ${{ secrets.SFTP_PORT }}
           ssh_private_key: ${{ secrets.SFTP_PRIVATE_KEY }}
-          # will put all file under this path
           local_path: ui/dist
-          # files will copy to under remote_path
           remote_path: /usr/lib/one/ione/ui
   upgrade_ione:
     runs-on: ubuntu-latest
@@ -63,9 +49,6 @@ jobs:
       - name: Remove unwanted dirs and files
         run: rm -rf docs modules ui
 
-      - name: Test
-        run: ls -l
-
       - name: Upload codebase
         uses: appleboy/scp-action@master
         with:
@@ -76,7 +59,7 @@ jobs:
           source: "./*"
           target: /usr/lib/one/ione
       
-      - name: Install gems
+      - name: Install gems, set hooks, upgrade service file and restart
         uses: appleboy/ssh-action@master
         with:
           username: ${{ secrets.SFTP_USER }}

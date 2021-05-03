@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # -------------------------------------------------------------------------- #
-# Copyright 2018, IONe Cloud Project, Support.by                             #
+# Copyright 2017-2021, IONe Cloud Project, Support.by                        #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -16,67 +16,55 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-# ROOT = ENV['IONEROOT'] # IONe root path
-# require "#{ROOT}/debug_lib.rb"
-ONE_LOCATION = ENV["ONE_LOCATION"] if !defined?(ONE_LOCATION)
+RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
+ETC_LOCATION      = "/etc/one/"
+ONED_CONF         = ETC_LOCATION + "oned.conf"
 
-if !ONE_LOCATION
-  RUBY_LIB_LOCATION = "/usr/lib/one/ruby" if !defined?(RUBY_LIB_LOCATION)
-  ETC_LOCATION      = "/etc/one/" if !defined?(ETC_LOCATION)
-else
-  RUBY_LIB_LOCATION = ONE_LOCATION + "/lib/ruby" if !defined?(RUBY_LIB_LOCATION)
-  ETC_LOCATION      = ONE_LOCATION + "/etc/" if !defined?(ETC_LOCATION)
-end
-
+$: << '/usr/lib/one/ione'
 $: << RUBY_LIB_LOCATION
-require 'opennebula'
-include OpenNebula
+$: << RUBY_LIB_LOCATION + '/onedb'
 
 require "uri"
 require "net/http"
 require "yaml"
 require "json"
 
-client = Client.new
-one_auth = client.instance_variable_get("@one_auth").split(':')
+require 'opennebula'
+include OpenNebula
 
-id = ARGV.first.to_i
+require 'core/*'
+require 'service/objects/xml_element'
+require 'service/objects/host'
+require 'service/objects/vm'
+
+client = Client.new
+
+xml = Nokogiri::XML(Base64::decode64(ARGV.first))
+id = xml.xpath('//ID').text.to_i
 vm = VirtualMachine.new_with_id(id, client)
 vm.info!
-puts "States are: [#{ARGV[1]}, #{ARGV[2]}] -> [#{vm.state} -- #{vm.state_str}, #{vm.lcm_state} -- #{vm.lcm_state_str}]"
-if ARGV[1, 2] != ["ACTIVE", "BOOT"] then
-  puts "VM started not from PENDING state, skipping..."
-  exit 0
-end
-
-api = URI("http://localhost:8009/ione/get_vm_host")
-req = Net::HTTP::Post.new(api)
-req.body = JSON.generate params: [id, true]
-req.basic_auth(*one_auth)
-r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
-  http.request(req)
-end
-res = JSON.parse r.body
-host = res["response"].last.to_i
 
 if vm['/VM/USER_TEMPLATE/HYPERVISOR'].downcase == 'vcenter' then
+  limits, spec = vm.getResourcesAllocationLimits, {}
+  puts "Limits are configured as: #{limits}"
 
-  iops = YAML.load_file("#{ETC_LOCATION}/ione.conf")['vCenter']['default']['drives-iops']
+  host = vm.host.last
+  key = IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][host].nil? ? 'default' : host
+  cpu_lim = vm['/VM/TEMPLATE/VCPU'].to_i * IONe::Settings['VCENTER_CPU_LIMIT_FREQ_PER_CORE'][key]
+  spec[:cpu] = cpu_lim if cpu_lim != limits[:cpu]
 
-  api = URI("http://localhost:8009/ione/SetVMResourcesLimits")
-  req = Net::HTTP::Post.new(api)
-  req.body = JSON.generate params: [
-    id, host,
-    {
-      'cpu' => vm['/VM/TEMPLATE/VCPU'].to_i,
-          'ram' => vm['/VM/TEMPLATE/MEMORY'].to_i,
-          'iops' => iops[vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
-    }
-  ]
-  req.basic_auth(*one_auth)
-  r = Net::HTTP.start(api.hostname, api.port, use_ssl: false) do | http |
-    http.request(req)
+  if limits[:ram] != vm['/VM/TEMPLATE/MEMORY'].to_i then
+    spec[:ram] = vm['/VM/TEMPLATE/MEMORY'].to_i
   end
+
+  if limits[:iops] == -1 then
+    spec[:iops] = IONe::Settings['VCENTER_DRIVES_IOPS'][vm['/VM/USER_TEMPLATE/DRIVE'] || 'default']
+    spec[:iops] = -1 if spec[:iops].nil? || spec[:iops] == 0
+  end
+
+  puts "Generated following spec: #{spec}"
+  _, e = vm.setResourcesAllocationLimits spec
+  puts "Result: #{e}"
 end
 
 puts 'Successful set Limits up'
