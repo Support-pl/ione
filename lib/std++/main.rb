@@ -19,7 +19,7 @@ class Hash
 
   # @!group Dev Tools
 
-  # Replaces string keys with symbol keys
+  # Replaces string keys with Symbol keys
   # @return [Hash]
   def to_sym!
     self.keys.each do |key|
@@ -28,11 +28,20 @@ class Hash
     self
   end
 
-  # Replaces all keys with string keys
+  # Replaces all keys with String keys
   # @return [Hash]
   def to_s!
     self.keys.each do |key|
       self[key.to_s] = self.delete key if key.class != String
+    end
+    self
+  end
+
+  # Converts all keys to Integer
+  # @return [Hash]
+  def keys_to_i!
+    self.keys.each do |key|
+      self[key.to_i] = self.delete key if key.class != Integer
     end
     self
   end

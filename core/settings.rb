@@ -36,7 +36,8 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['USERS_DEFAULT_LANG', "en_US", "Default locale for new users", 1, "str"],
     ['VCENTER_CPU_LIMIT_FREQ_PER_CORE', "{\"default\":2000}", "Frequency per Core limit for different Nodes(don't remove default)", 1, "object"],
     ['VCENTER_DRIVES_IOPS', "{\"HDD\":350,\"SSD\":1000}", "IOPs limits for Drive types", 1, "object"],
-    ['VNETS_TEMPLATES', "{}", "VNs Types to VNs Templates mapping(types must be upper case)", 1, "object"]
+    ['VNETS_TEMPLATES', "{}", "VNs Types to VNs Templates mapping(types must be upper case)", 1, "object"],
+    ['PRE_PAID_REDUCE_FACTOR', "{\"0\": 1}", "Reduce factor for Pre-Paid VMs depending on billing period", 1, "object"]
   ]
   required.each do | record |
     begin

@@ -397,7 +397,8 @@ class OpenNebula::VirtualMachine
       }
     elsif bp.include? 'PRE' then
       curr = self['/VM/STIME'].to_i
-      delta = bp.split('_')[1].to_i * 86400
+      period = bp.split('_')[1].to_i
+      delta = period * 86400
 
       total = 0
 
@@ -412,10 +413,25 @@ class OpenNebula::VirtualMachine
         curr += delta
       end
 
+      reduce_factor = 1
+      reduce_factors = IONe::Settings['PRE_PAID_REDUCE_FACTOR'].keys_to_i!.sort.to_h
+
+      reduce_factors.each do | period_key, factor |
+        if period >= period_key then
+          reduce_factor = factor
+        else
+          break
+        end
+      end
+      reduce_factor = reduce_factor.to_f
+
       return {
         id: id, name: name,
-        TOTAL: total
+        total_billed: total, reduce_factor: reduce_factor,
+        TOTAL: total * reduce_factor
       }
+    else
+      raise ShowbackError, ["Unknown BILLING_PERIOD!", bp]
     end
   end
 
