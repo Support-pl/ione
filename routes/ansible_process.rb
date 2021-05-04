@@ -1,3 +1,6 @@
+# !@group Ansible Playbook Process Endpoints
+
+# Returns full Ansible Playbooks Processes pool
 get '/ansible_process' do
   begin
     pool = IONe.new(@client, $db).ListAnsiblePlaybookProcesses
@@ -14,6 +17,7 @@ get '/ansible_process' do
   end
 end
 
+# Allocates new process
 post '/ansible_process' do
   begin
     r response: AnsiblePlaybookProcessModel.new(id: nil, data: @request_hash, user: @one_user).id
@@ -25,6 +29,7 @@ post '/ansible_process' do
   end
 end
 
+# Returns playbook process data
 get '/ansible_process/:id' do |id|
   begin
     apc = AnsiblePlaybookProcessModel.new(id: id, user: @one_user) # Getting playbook
@@ -64,3 +69,4 @@ post '/ansible_process/:id/action' do | id |
     r error: e.message, backtrace: e.backtrace
   end
 end
+# !@endgroup

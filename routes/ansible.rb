@@ -1,4 +1,6 @@
-# Returns full Ansible Playbooks pool in OpenNebula XML-POOL format
+# !@group Ansible Playbook Endpoints
+
+# Returns full Ansible Playbooks pool
 get '/ansible' do
   begin
     pool = IONe.new($client, $db).ListAnsiblePlaybooks # Array of playbooks
@@ -45,7 +47,7 @@ delete '/ansible/:id' do |id|
   end
 end
 
-# Returns playbook body in OpenNebula required format
+# Returns playbook
 get '/ansible/:id' do | id |
   begin
     pb = AnsiblePlaybookModel.new(id: id, user: @one_user) # Getting playbook
@@ -98,3 +100,4 @@ post '/ansible/:action' do | action |
     r error: e.message, backtrace: e.backtrace
   end
 end
+# !@endgroup
