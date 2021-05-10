@@ -150,7 +150,14 @@ class VLAN < Sequel::Model(:vlans)
 
     check_free_vlans
 
-    rc = template.instantiate(name, "VLAN_ID=#{@next_id}")
+    rc = template.instantiate(
+      name,
+      {
+        VLAN_ID: @next_id,
+        PHYDEV: "vlan#{@next_id}pd",
+        BRIDGE: "vlan#{@next_id}pd"
+      }.to_one_template
+    )
     if OpenNebula.is_error? rc then
       raise rc
     end
