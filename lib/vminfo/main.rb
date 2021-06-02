@@ -110,7 +110,7 @@ class IONe
 
     vmid = vm.id
     vm_hash = vm.to_hash!['VM']
-    host_id, hostname = host
+    host_id, hostname = vm.host
     return {
       # "Name, owner, owner id, group id"
       'NAME' => vm_hash['NAME'], 'OWNER' => vm_hash['UNAME'], 'OWNERID' => vm_hash['UID'], 'GROUPID' => vm_hash['GID'],
