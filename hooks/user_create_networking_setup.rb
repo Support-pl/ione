@@ -42,6 +42,7 @@ require 'yaml'
 require 'json'
 
 require 'core/*'
+require 'lib/std++/main.rb'
 
 unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
