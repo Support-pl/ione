@@ -82,10 +82,14 @@ export default {
     },
     hosts() {
       if (Object.keys(this.h_pool).length !== 0) {
-        if (Array.isArray(this.h_pool.HOST_POOL.HOST)) {
-          return this.h_pool.HOST_POOL.HOST;
+        let pool = this.h_pool.HOST_POOL.HOST;
+        if (!Array.isArray(pool)) {
+          pool = [pool];
         }
-        return [this.h_pool.HOST_POOL.HOST];
+        return pool.map((el) => {
+          el.VM_MAD = el.VM_MAD.toUpperCase();
+          return el;
+        });
       }
       return [];
     },
