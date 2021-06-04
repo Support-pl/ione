@@ -155,8 +155,13 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
       </tr>
       <tr>
          <td align="left"><strong>PUBLIC_NETWORK_DEFAULTS</strong></td>
-         <td align="left">NETWORK_ID</td>
-         <td align="right"><code>Public IPs pool network ID</code></td>
+         <td align="left">PAAS</td>
+         <td align="right"><code>Public IPs pool network ID for PaaS</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong></strong></td>
+         <td align="left">IAAS</td>
+         <td align="right"><code>Public IPs pool network ID for IaaS</code></td>
       </tr>
       <tr>
          <td align="left"><strong>VNETS_TEMPLATES</strong></td>

@@ -353,7 +353,7 @@ class IONe
       trace << "Setting up NICs:#{__LINE__ + 1}"
       specs['NIC'] = []
       params['ips'].times do
-        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'] }
+        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['PAAS'] }
       end
 
       LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out

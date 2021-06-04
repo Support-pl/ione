@@ -21,7 +21,7 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['IAAS_GROUP_ID', 100, "IaaS(VDC) Users group ID", 1, "int"],
     ['NODES_DEFAULT', "{\"VCENTER\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
     ['PUBLIC_IP_COST', 0.0, "Public IP Address cost per sec", 0, "float"],
-    ['PUBLIC_NETWORK_DEFAULTS', "{\"NETWORK_ID\":\"network_id\"}", "Default Public Network Pool ID", 1, "object"],
+    ['PUBLIC_NETWORK_DEFAULTS', "{\"IAAS\":\"0\", \"PAAS\": \"0\"}", "Default Public Network Pool IDs for IaaS and PaaS", 1, "object"],
     ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
     ['TRAFFIC_COST', 0.0, "Cost of 1 kByte VM traffic", 0, "float"],
     ['TRAFFIC_BILL_FREQ', 86400, "Frequency of debits for Traffic usage in seconds", 1, "int"],
