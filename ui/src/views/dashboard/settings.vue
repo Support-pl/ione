@@ -1,54 +1,63 @@
 <template>
-  <a-row type="flex" justify="space-around">
-    <a-col :span="22">
-      <a-table
-        :columns="columns"
-        :data-source="settings"
-        rowKey="name"
-        :scroll="{ x: true }"
-      >
-        <span slot="access_level" slot-scope="access_level">
-          <a-tag :color="access_level == 0 ? 'red' : 'blue'">{{
-            access_level == 0 ? "User" : "Admin"
-          }}</a-tag>
-        </span>
-        <span slot="description" slot-scope="text, record">
-          <a-tooltip :title="record.name">{{
-            record.description ? record.description : record.name
-          }}</a-tooltip>
-        </span>
-        <span slot="body" slot-scope="text, record">
-          <a-input
-            v-if="record.editable"
-            style="margin: -5px 0"
-            :value="text"
-            @change="(e) => handleChange(e.target.value, record.name, 'body')"
-            @keyup.enter="save(record.name)"
-            @keyup.escape="cancel(record.name)"
-          />
-          <component :is="types[record.type]" v-else :value="record" />
-        </span>
-        <span slot="actions" slot-scope="text, record">
-          <a-space class="editable-row-operations">
-            <template v-if="record.editable">
-              <a-popconfirm
-                title="Sure to save?"
-                @confirm="() => save(record.name)"
-              >
-                <a>Save</a>
-              </a-popconfirm>
-              <a @click="() => cancel(record.name)">Cancel</a>
-            </template>
-            <span v-else>
-              <a :disabled="editingKey !== ''" @click="() => edit(record.name)"
-                >Edit</a
-              >
-            </span>
-          </a-space>
-        </span>
-      </a-table>
-    </a-col>
-  </a-row>
+	<div class="view__container view__container--settings">
+		<a-row class="view__buttons" type="flex" justify="start">
+			<a-col :span="2">
+				<a-button icon="plus" type="primary">
+					Add setting
+				</a-button>
+			</a-col>
+		</a-row>
+		<a-row type="flex" justify="space-around">
+			<a-col :span="24">
+				<a-table
+					:columns="columns"
+					:data-source="settings"
+					rowKey="name"
+					:scroll="{ x: true }"
+				>
+					<span slot="access_level" slot-scope="access_level">
+						<a-tag :color="access_level == 0 ? 'red' : 'blue'">{{
+							access_level == 0 ? "User" : "Admin"
+						}}</a-tag>
+					</span>
+					<span slot="description" slot-scope="text, record">
+						<a-tooltip :title="record.name">{{
+							record.description ? record.description : record.name
+						}}</a-tooltip>
+					</span>
+					<span slot="body" slot-scope="text, record">
+						<a-input
+							v-if="record.editable"
+							style="margin: -5px 0"
+							:value="text"
+							@change="(e) => handleChange(e.target.value, record.name, 'body')"
+							@keyup.enter="save(record.name)"
+							@keyup.escape="cancel(record.name)"
+						/>
+						<component :is="types[record.type]" v-else :value="record" />
+					</span>
+					<span slot="actions" slot-scope="text, record">
+						<a-space class="editable-row-operations">
+							<template v-if="record.editable">
+								<a-popconfirm
+									title="Sure to save?"
+									@confirm="() => save(record.name)"
+								>
+									<a>Save</a>
+								</a-popconfirm>
+								<a @click="() => cancel(record.name)">Cancel</a>
+							</template>
+							<span v-else>
+								<a :disabled="editingKey !== ''" @click="() => edit(record.name)"
+									>Edit</a
+								>
+							</span>
+						</a-space>
+					</span>
+				</a-table>
+			</a-col>
+		</a-row>
+	</div>
 </template>
 
 <script>
@@ -185,3 +194,14 @@ export default {
   },
 };
 </script>
+
+
+<style >
+.view__container{
+	padding: 10px 20px;
+}
+
+.view__buttons{
+	margin-bottom: 10px;
+}
+</style>
