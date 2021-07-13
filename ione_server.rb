@@ -2,6 +2,7 @@
 
 # Server start-up time
 STARTUP_TIME = Time.now().to_i # IONe server start time
+INIT_IONE = true
 
 # OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
@@ -31,7 +32,6 @@ require 'sinatra'
 require "sinatra/json"
 require 'erb'
 require 'yaml'
-require 'augeas'
 require 'securerandom'
 require 'tmpdir'
 require 'fileutils'
@@ -54,7 +54,6 @@ end
 use Rack::Deflater
 
 require 'ipaddr'
-require 'sequel'
 
 puts 'Getting path to the server'
 ROOT = ROOT_DIR # IONe root path
@@ -63,22 +62,11 @@ LOG_ROOT = LOG_LOCATION # IONe logs path
 # Shows if current IONe Sunstone process was started by systemd(first time so). True or False
 MAIN_IONE = Process.ppid == 1
 
-$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") if !defined?($ione_conf)
 CONF = $ione_conf # for sure
 
 puts 'Including log-library'
 require "#{ROOT}/service/log.rb"
 include IONeLoggerKit
-
-puts 'Checking service version'
-# IONe version
-VERSION = File.read("#{ROOT}/meta/version.txt")
-# OpenNebula users group
-USERS_GROUP = $ione_conf['OpenNebula']['users-group']
-# Trial VMs suspend delay
-TRIAL_SUSPEND_DELAY = $ione_conf['Server']['trial-suspend-delay']
-# Default SSH port at OpenNebula Virtual Machines
-USERS_VMS_SSH_PORT = $ione_conf['OpenNebula']['users-vms-ssh-port']
 
 puts 'Setting up Environment(OpenNebula API)'
 ###########################
@@ -88,42 +76,15 @@ puts 'Setting up Environment(OpenNebula API)'
 # Loading DB Credentials and connecting DB
 
 ONED_CONF = ETC_LOCATION + '/oned.conf'
-work_file_dir  = File.dirname(ONED_CONF)
-work_file_name = File.basename(ONED_CONF)
 
-aug = Augeas.create(:no_modl_autoload => true,
-                    :no_load          => true,
-                    :root             => work_file_dir,
-                    :loadpath         => ONED_CONF)
-
-aug.clear_transforms
-aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
-aug.context = "/files/#{work_file_name}"
-aug.load
-
-if aug.get('DB/BACKEND') != "\"mysql\"" then
-  STDERR.puts "OneDB backend is not MySQL, exiting..."
-  exit 1
-end
-
-ops = {}
-ops[:host]     = aug.get('DB/SERVER')
-ops[:user]     = aug.get('DB/USER')
-ops[:password] = aug.get('DB/PASSWD')
-ops[:database] = aug.get('DB/DB_NAME')
-
-ops.each do |k, v|
-  next if !v || !(v.is_a? String)
-
-  ops[k] = v.chomp('"').reverse.chomp('"').reverse
-end
-
-ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
-
-$db = Sequel.connect(**ops)
+require 'core/*'
 
 $db.extension(:connection_validator)
 $db.pool.connection_validation_timeout = -1
+
+puts 'Checking service version'
+# IONe version
+VERSION = File.read("#{ROOT}/meta/version.txt")
 
 require "opennebula"
 include OpenNebula
@@ -131,7 +92,7 @@ include OpenNebula
 # OpenNebula credentials
 CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = "http://localhost:#{aug.get('PORT')}/RPC2"
+ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
 require "SettingsDriver"
@@ -192,7 +153,7 @@ class IONe
   end
 end
 
-ione_drivers = %w(AnsibleDriver AzureDriver ShowbackDriver IONeKernel)
+ione_drivers = %w(AnsibleDriver AzureDriver ShowbackDriver IONeKernel VLANManager)
 ione_drivers.each do | driver |
   begin
     require driver
@@ -311,7 +272,7 @@ before do
     if OpenNebula.is_error?(rc)
       halt 401, { 'Allow' => "*" }, "False Credentials given"
     end
-    RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.is_admin? ? "" : "NOT "}Admin"
+    RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.admin? ? "" : "NOT "}Admin"
   rescue => e
     RPC_LOGGER.debug "Exception #{e.message}"
     RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
@@ -418,3 +379,15 @@ post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
   RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
   json response: r
 end
+
+puts 'Including extra endpoints'
+LOG_COLOR 'Including extra endpoints:', 'none', 'green', 'bold'
+Dir["#{ROOT}/routes/*.rb"].each do |file|
+  mod = file.split('/').last.split('.').first
+  puts "\tIncluding #{mod}"
+  require file
+  LOG_COLOR "\t - #{mod} -- included", 'none', 'green', 'itself'
+end
+
+puts 'Enpoints are registered, starting up done'
+RPC_LOGGER.debug "Endpoints are registered, starting up done"

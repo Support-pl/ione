@@ -159,9 +159,9 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
          <td align="right"><code>Public IPs pool network ID</code></td>
       </tr>
       <tr>
-         <td align="left"><strong>PRIVATE_NETWORK_DEFAULTS</strong></td>
-         <td align="left">NETWORK_ID</td>
-         <td align="right"><code>Private Networks pool network ID</code></td>
+         <td align="left"><strong>VNETS_TEMPLATES</strong></td>
+         <td align="left">VN_MAD(e.g. 802.1Q)</td>
+         <td align="right"><code>VNs Types to VNs Templates mapping(types must be upper case)</code></td>
       </tr>
       <tr>
          <td align="left"><strong>NODES_DEFAULT</strong></td>
@@ -192,3 +192,10 @@ Most probably `gem install mysql2` will fail on building native extentions. The 
 
 1. Check if ruby-devel is installed correctly(`yum install ruby-devel` or `rvm install 2.5-devel`)
 2. Check if package MariaDB-shared is installed(`yum install MariaDB-shared`, it's case-sensistive)
+
+## Useful Doc-Pages
+
+- [WHMCS Module Overview and Installation guides](/file.WHMCS.html)
+- [Showback Configuration Reference](/file.Showback.html)
+- [Snapshots management features and billing reference](/file.VMSnapshots.html)
+- [VLAN Manager reference](/file.VLANManager.html)

@@ -7,7 +7,7 @@ class RecordsSource
     :id
   end
 
-  # @param [Fixnum] id - VM ID
+  # @param [Integer] id - VM ID
   def initialize cls, id
     @id = id
     @records = cls.where(Hash[key, @id])

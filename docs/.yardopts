@@ -3,8 +3,10 @@ lib/**/*.rb
 modules/**/*.rb
 service/*.rb
 service/**/*.rb
+models/VLANManager.rb
+routes/*.rb
 
 --readme README.md
---files docs/WHMCS.md,docs/WHMCS_module_installation.md,docs/ISPDriver.md,docs/VMSnapshots.md,docs/KVM.md
+--files docs/WHMCS.md,docs/WHMCS_module_installation.md,docs/ISPDriver.md,docs/VMSnapshots.md,docs/KVM.md,docs/Showback.md,docs/VLANManager.md
 
 -o doc

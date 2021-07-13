@@ -91,13 +91,13 @@ class IONe
   # @option args [String] description - (Optional)
   # @option args [String] body - (Mandatory)
   # @option args [String] extra_data - You may store here additional data, such as supported OS (Optional)
-  # @return [Fixnum] new playbook id
+  # @return [Integer] new playbook id
   def CreateAnsiblePlaybook args = {}
     AnsiblePlaybook.new(args.to_sym!).id
   end
 
   # Returns playbook from DB by id
-  # @param [Fixnum] id - Playbook id in DB
+  # @param [Integer] id - Playbook id in DB
   # @return [Hash] Playbook data
   def GetAnsiblePlaybook id
     AnsiblePlaybook.new(id: id).to_hash
@@ -105,7 +105,7 @@ class IONe
 
   # Updates playbook using given data by id
   # @param [Hash] args - id and keys for updates
-  # @option args [Fixnum] id - ID of playbook to update (Mandatory)
+  # @option args [Integer] id - ID of playbook to update (Mandatory)
   # @option args [String] name
   # @option args [Integer] uid - Owner id
   # @option args [Integer] gid - Group id
@@ -121,21 +121,21 @@ class IONe
   end
 
   # Deletes playbook from DB by id
-  # @param [Fixnum] id
+  # @param [Integer] id
   # @return [NilClass]
   def DeleteAnsiblePlaybook id
     AnsiblePlaybook.new(id: id).delete
   end
 
   # Returns variables from playbook(from vars section in playbook body)
-  # @param [Fixnum] id
+  # @param [Integer] id
   # @return [Hash] Variables with default values
   def GetAnsiblePlaybookVariables id
     AnsiblePlaybook.new(id: id).vars
   end
 
   # Returns playbook in AnsibleController acceptable form
-  # @param [Fixnum] id
+  # @param [Integer] id
   # @return [Hash]
   def GetAnsiblePlaybook_ControllerRunnable id, vars = {}
     AnsiblePlaybook.new(id: id).runnable vars
@@ -144,8 +144,8 @@ class IONe
   #
   # Returns Playbooks from DB
   #
-  # @param [Fixnum] chunks - number of playbooks per page(chunk)
-  # @param [Fixnum] page - page number(shift)
+  # @param [Integer] chunks - number of playbooks per page(chunk)
+  # @param [Integer] page - page number(shift)
   #
   # @return [Array<Hash>]
   #
@@ -166,8 +166,8 @@ class IONe
   end
 
   # Creates Process instance with given playbook, host and variables
-  # @param [Fixnum] playbook_id - Playbook ID
-  # @param [Fixnum] uid - User ID who initialized playbook
+  # @param [Integer] playbook_id - Playbook ID
+  # @param [Integer] uid - User ID who initialized playbook
   # @param [Array<String>] hosts - Array of hosts where to run playbook
   # @param [Hash] vars - Hash with playbook variables values
   # @param [String] comment
@@ -184,35 +184,35 @@ class IONe
   end
 
   # Returns AnsblePlaybook run Process by id as Hash with humanreadable state
-  # @param [Fixnum] id - Process id
+  # @param [Integer] id - Process id
   # @return [Hash]
   def GetAnsiblePlaybookProcess id
     AnsiblePlaybookProcess.new(proc_id: id).human
   end
 
   # Deletes given AnsiblePlaybookProcess
-  # @param [Fixnum] id - Process id
+  # @param [Integer] id - Process id
   # @return [NilClass]
   def DeleteAnsiblePlaybookProcess id
     AnsiblePlaybookProcess.new(proc_id: id).delete
   end
 
   # Runs given AnsiblePlaybookProcess in PENDING state
-  # @param [Fixnum] id - Process id
+  # @param [Integer] id - Process id
   # @return [NilClass | Thread] - returns Thread if everything's fine, nil if wrong state
   def RunAnsiblePlaybookProcess id
     AnsiblePlaybookProcess.new(proc_id: id).run
   end
 
   # Returns given AnsiblePlaybookProcess state
-  # @param [Fixnum] id - Process id
+  # @param [Integer] id - Process id
   # @return [String]
   def AnsiblePlaybookProcessStatus id
     AnsiblePlaybookProcess.new(proc_id: id).status
   end
 
   # Returns AnsblePlaybook run Process by id as Hash
-  # @param [Fixnum] id - Process id
+  # @param [Integer] id - Process id
   # @return [Hash]
   def AnsiblePlaybookProcessInfo id
     AnsiblePlaybookProcess.new(proc_id: id).to_hash

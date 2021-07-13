@@ -157,6 +157,7 @@
 import { mapGetters } from "vuex";
 import raw from "@/components/types/raw.vue";
 import num from "@/components/types/num.vue";
+import bool from "@/components/types/bool.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
 import object from "@/components/types/object.vue";
@@ -206,6 +207,7 @@ export default {
         num,
         list,
         str,
+        bool,
         object,
 				bool,
 				raw,

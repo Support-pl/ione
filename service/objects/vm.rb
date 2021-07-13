@@ -3,6 +3,8 @@ require 'time'
 
 # Extensions for OpenNebula::VirtualMachine class
 class OpenNebula::VirtualMachine
+  attr_reader :vim_vm
+
   # Actions supported by OpenNebula scheduler
   SCHEDULABLE_ACTIONS = %w(
     terminate
@@ -20,6 +22,12 @@ class OpenNebula::VirtualMachine
     undeploy-hard
     snapshot-create
   )
+
+  def initialize(xml, client)
+    @vim_vm = nil
+    super(xml, client)
+  end
+
   # Generates template for OpenNebula scheduler record
   def generate_schedule_str id, action, time
     "\nSCHED_ACTION=[\n" +
@@ -98,9 +106,9 @@ class OpenNebula::VirtualMachine
   # @param [Integer] s - VM state to wait for
   # @param [Integer] lcm_s - VM LCM state to wait for
   # @return [Boolean]
-  def wait_for_state s = 3, lcm_s = 3
+  def wait_for_state st = 3, lcm_s = 3
     i = 0
-    until state!() == s && lcm_state!() == lcm_s do
+    until state!() == st && lcm_state!() == lcm_s do
       return false if i >= 3600
 
       sleep(1)
@@ -120,21 +128,18 @@ class OpenNebula::VirtualMachine
   # @option spec [Integer] :cpu  MHz limit for VMs CPU usage
   # @option spec [Integer] :ram  MBytes limit for VMs RAM space usage
   # @option spec [Integer] :iops IOPS limit for VMs disk
-  # @option spec [String]  :name VM name on vCenter node
-  # @return [String]
+  # @return [NilClass | String, String | Array(backtrace)] - If success, return nil and message
   # @example Return messages decode
   #   vm.setResourcesAllocationLimits(spec)
-  #     => 'Reconfigure Success' -- Task finished with success code, all specs are equal to given
+  #     => nil, 'Success' -- Task finished with success code, all specs are equal to given
   #     => 'Reconfigure Unsuccessed' -- Some of specs didn't changed
-  #     => 'Reconfigure Error:{error message}' -- Exception has been generated while proceed, check your configuration
+  #     => 'Reconfigure Error:{error message}', [...] -- Exception has been generated while proceed, check your configuration
   def setResourcesAllocationLimits spec
-    LOG_DEBUG spec.debug_out
-    return 'Unsupported query' if IONe.new($client, $db).get_vm_data(self.id)['IMPORTED'] == 'YES'
+    return nil, 'Unsupported query' if self['//IMPORTED'] == 'YES'
 
-    query, host = {}, onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-    datacenter = get_vcenter_dc(host)
+    return nil, 'Nothing to do' if spec.empty?
 
-    vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
+    query, vm = {}, vcenter_get_vm
     disk = vm.disks.first
 
     query[:cpuAllocation] = { :limit => spec[:cpu].to_i, :reservation => 0 } if !spec[:cpu].nil?
@@ -148,75 +153,78 @@ class OpenNebula::VirtualMachine
       }]
     end
 
-    state = true
-    begin
-      LOG_DEBUG 'Powering VM Off'
-      LOG_DEBUG vm.PowerOffVM_Task.wait_for_completion
-    rescue
-      state = false
-    end
+    return nil, 'Nothing to do' if query.empty?
 
-    LOG_DEBUG 'Reconfiguring VM'
-    LOG_DEBUG vm.ReconfigVM_Task(:spec => query).wait_for_completion
+    vm.ReconfigVM_Task(:spec => query).wait_for_completion
 
-    begin
-      LOG_DEBUG 'Powering VM On'
-      LOG_DEBUG vm.PowerOnVM_Task.wait_for_completion
-    rescue
-      nil
-    end if state
-    return nil
+    return nil, 'Success'
   rescue => e
-    return "Reconfigure Error:#{e.message}<|>Backtrace:#{e.backtrace}"
+    return "Reconfigure Error:#{e.message}", e.backtrace
   end
 
-  # Checks if vm is on given vCenter Datastore
-  def is_at_ds? ds_name
-    host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-    datacenter = get_vcenter_dc(host)
-    begin
-      datastore = recursive_find_ds(datacenter.datastoreFolder, ds_name, true).first
-    rescue
-      return 'Invalid DS name.'
-    end
-    self.info!
-    search_template = "VirtualMachine(\"#{self.deploy_id}\")"
-    datastore.vm.each do | vm |
-      return true if vm.to_s == search_template
-    end
-    false
+  # Returns VM power state on vCenter
+  # @example
+  #   => "poweredOn"
+  # @return [String]
+  def vcenter_powerState
+    vm = vcenter_get_vm
+    vm.summary.runtime.powerState
+  rescue => e
+    "Unexpected error, cannot handle it: #{e.message}"
+  end
+
+  # Generates RbVmomi::VIM::VirtualMachine object with inited connection and ref
+  # @return [RbVmomi::VIM::VirtualMachine]
+  def vcenter_get_vm force = false
+    return @vim_vm if @vim_vm && !force
+
+    info!
+    h = Host.new_with_id(host.first, @client)
+
+    @vim_vm = RbVmomi::VIM::VirtualMachine.new(h.vim, deploy_id)
+  end
+
+  # Returns host id and name, where VM has been deployed
+  # @return [Array<String> | nil]
+  # @example
+  #   => ['0', 'example-node-vcenter'] => Host was found
+  #   => nil => Host wasn't found
+  def host
+    history = to_hash!['VM']["HISTORY_RECORDS"]['HISTORY'] # Searching hostname at VM allocation history
+    history = history.last if history.class == Array # If history consists of 2 or more lines - returns last
+    return history['HID'], history['HOSTNAME']
+  rescue
+    return nil
   end
 
   # Gets the datastore, where VM allocated is
   # @return [String] DS name
-  def get_vms_vcenter_ds
-    host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-    datastores = get_vcenter_dc(host).datastoreFolder.children
+  def vcenter_get_vm_ds
+    return vcenter_get_vm.datastore.first
+  end
 
-    self.info!
-    search_template = "VirtualMachine(\"#{self.deploy_id}\")"
-    datastores.each do | ds |
-      ds.vm.each do | vm |
-        return ds.name if vm.to_s == search_template
-      end
-    end
+  # Checks if vm is on given vCenter Datastore
+  def at_vcenter_ds? ds_name
+    vcenter_datastore_name == ds_name
+  end
+
+  # Gets the datastore, where VM allocated is
+  # @return [String] DS name
+  def vcenter_datastore_name
+    vcenter_get_vm.datastore.first.name
   end
 
   # Resizes VM without powering off the VM
   # @param [Hash] spec
   # @option spec [Integer] :cpu CPU amount to set
   # @option spec [Integer] :ram RAM amount in MB to set
-  # @option spec [String] :name VM name on vCenter node
   # @return [Boolean | String]
   # @note Method returns true if resize action ended correct, false if VM not support hot reconfiguring
-  def hot_resize spec = { :name => nil }
+  def hot_resize spec = {}
     return false if !self.hotAddEnabled?
 
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, spec[:name].nil? ? "one-#{self.info! || self.id}-#{self.name}" : spec[:name]).first
+      vm = vcenter_get_vm
       query = {
         :numCPUs => spec[:cpu],
         :memoryMB => spec[:ram]
@@ -229,16 +237,12 @@ class OpenNebula::VirtualMachine
   end
 
   # Checks if resources hot add enabled
-  # @param [String] name VM name on vCenter node
   # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
-  def hotAddEnabled? name = nil
+  def hotAddEnabled?
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm
       return {
         :cpu => vm.config.cpuHotAddEnabled, :ram => vm.config.memoryHotAddEnabled
       }
@@ -251,14 +255,10 @@ class OpenNebula::VirtualMachine
   # @param [Hash] spec
   # @option spec [Boolean] :cpu
   # @option spec [Boolean] :ram
-  # @option spec [String]  :name VM name on vCenter node
   # @return [true | String]
-  def hotResourcesControlConf spec = { :cpu => true, :ram => true, :name => nil }
+  def hotResourcesControlConf spec = { :cpu => true, :ram => true }
     begin
-      host, name = onblock(:h, IONe.new($client, $db).get_vm_host(self.id)), spec[:name]
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm
       query = {
         :cpuHotAddEnabled => spec[:cpu],
         :memoryHotAddEnabled => spec[:ram]
@@ -286,18 +286,14 @@ class OpenNebula::VirtualMachine
   end
 
   # Gets resources allocation limits from vCenter node
-  # @param [String] name VM name on vCenter node
   # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
-  def getResourcesAllocationLimits name = nil
+  def getResourcesAllocationLimits
     begin
-      host = onblock(:h, IONe.new($client, $db).get_vm_host(self.id))
-      datacenter = get_vcenter_dc(host)
-
-      vm = recursive_find_vm(datacenter.vmFolder, name.nil? ? "one-#{self.info! || self.id}-#{self.name}" : name).first
+      vm = vcenter_get_vm true
       vm_disk = vm.disks.first
-      { cpu: vm.config.cpuAllocation.limit, ram: vm.config.cpuAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
+      { cpu: vm.config.cpuAllocation.limit, ram: vm.config.memoryAllocation.limit, iops: vm_disk.storageIOAllocation.limit }
     rescue => e
       "Unexpected error, cannot handle it: #{e.message}"
     end
@@ -336,6 +332,18 @@ class OpenNebula::VirtualMachine
   def list_snapshots
     out = self.to_hash!['VM']['TEMPLATE']['SNAPSHOT']
     out.class == Array ? out : [out]
+  end
+
+  # Returns all available snapshots in Hash form(DISK_ID => Array<Hash<Snapshot>>)
+  # @return [Hash]
+  def list_disk_snapshots
+    snaps = to_hash!['VM']['SNAPSHOTS']
+    return {} if snaps.nil?
+
+    (snaps.class == Array ? snaps : [snaps]).inject({}) do | r, snap |
+      r[snap['DISK_ID']] = snap['SNAPSHOT'].class == Array ? snap['SNAPSHOT'] : [snap['SNAPSHOT']]
+      r
+    end
   end
 
   # Returns actual state without calling info! method
@@ -389,7 +397,8 @@ class OpenNebula::VirtualMachine
       }
     elsif bp.include? 'PRE' then
       curr = self['/VM/STIME'].to_i
-      delta = bp.split('_')[1].to_i * 86400
+      period = bp.split('_')[1].to_i
+      delta = period * 86400
 
       total = 0
 
@@ -404,10 +413,25 @@ class OpenNebula::VirtualMachine
         curr += delta
       end
 
+      reduce_factor = 1
+      reduce_factors = IONe::Settings['PRE_PAID_REDUCE_FACTOR'].keys_to_i!.sort.to_h
+
+      reduce_factors.each do | period_key, factor |
+        if period >= period_key then
+          reduce_factor = factor
+        else
+          break
+        end
+      end
+      reduce_factor = reduce_factor.to_f
+
       return {
         id: id, name: name,
-        TOTAL: total
+        total_billed: total, reduce_factor: reduce_factor,
+        TOTAL: total * reduce_factor
       }
+    else
+      raise ShowbackError, ["Unknown BILLING_PERIOD!", bp]
     end
   end
 
@@ -469,7 +493,7 @@ class OpenNebula::VirtualMachine
     # Proxy data
     host     = self['/VM/HISTORY_RECORDS/HISTORY[last()]/HOSTNAME']
     vnc_port = self['TEMPLATE/GRAPHICS/PORT']
-    vnc_pw   = self['TEMPLATE/GRAPHICS/PASSWD']
+    # vnc_pw   = self['TEMPLATE/GRAPHICS/PASSWD']
 
     # If it is a vCenter VM
     if self['USER_TEMPLATE/HYPERVISOR'] == "vcenter"

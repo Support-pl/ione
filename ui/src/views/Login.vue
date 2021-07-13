@@ -20,6 +20,16 @@
           ></a-input-password>
         </a-col>
       </a-row>
+      <a-row
+        type="flex"
+        justify="space-around"
+        class="login-grid-item"
+        v-if="fails > 0"
+      >
+        <span class="endpoint-message"
+          >Endpoint used for login: <b>{{ endpoint }}</b></span
+        >
+      </a-row>
       <a-row type="flex" justify="space-around" class="login-grid-item">
         <a-button type="primary" @click="performLogin">Log in</a-button>
       </a-row>
@@ -35,6 +45,8 @@ export default {
         username: "oneadmin",
         password: "",
       },
+      fails: 0,
+      endpoint: process.env.VUE_APP_IONE_API_BASE_URL,
     };
   },
   methods: {
@@ -68,6 +80,7 @@ export default {
           }
         })
         .catch(() => {
+          this.fails++;
           this.$notification.error({
             message: "Login Failed",
             description: "Check your credentials and endpoint",
@@ -81,5 +94,12 @@ export default {
 <style scoped>
 .login-grid-item + .login-grid-item {
   margin-top: 15px;
+}
+
+.endpoint-message {
+  background: rgb(225, 133, 133);
+  border: 1px solid red;
+  border-radius: 10px;
+  padding: 2px 5px;
 }
 </style>

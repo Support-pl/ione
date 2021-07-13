@@ -1,5 +1,7 @@
 <template>
-  <span style="color: #008021">{{ value.body }}</span>
+  <div>
+    <a-switch :checked="value.body === 'TRUE'" :disabled="true"></a-switch>
+  </div>
 </template>
 
 <script>
@@ -8,6 +10,3 @@ export default {
   props: ["value"],
 };
 </script>
-
-<style>
-</style>

@@ -2,7 +2,7 @@ require 'file-tail'
 require 'sinatra-websocket'
 
 get '/wss/ione/log/:logfile' do | logfile |
-  raise StandardError.new("NoAccess") unless @one_user.is_admin?
+  raise StandardError.new("NoAccess") unless @one_user.admin?
 
   backward = params[:backward] || 50
 

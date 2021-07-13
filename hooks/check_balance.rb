@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # -------------------------------------------------------------------------- #
-# Copyright 2021, IONe Cloud Project, Support.by                             #
+# Copyright 2017-2021, IONe Cloud Project, Support.by                        #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -34,10 +34,11 @@ else
   exit 0
 end
 
-RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
-ETC_LOCATION      = "/etc/one/"
+ETC_LOCATION = "/etc/one/"
+ONED_CONF    = ETC_LOCATION + '/oned.conf'
 
-$: << RUBY_LIB_LOCATION
+$: << '/usr/lib/one/ruby'
+$: << '/usr/lib/one/ione'
 
 require 'opennebula'
 include OpenNebula
@@ -54,50 +55,15 @@ balance = u['TEMPLATE/BALANCE'].to_f
 
 require 'yaml'
 require 'json'
-require 'sequel'
-require 'augeas'
 
-work_file_dir  = File.dirname(ONED_CONF)
-work_file_name = File.basename(ONED_CONF)
+require 'core/*'
 
-aug = Augeas.create(:no_modl_autoload => true,
-                    :no_load          => true,
-                    :root             => work_file_dir,
-                    :loadpath         => ONED_CONF)
+vm.recover 3 if balance == 0 && u.groups.include?(IONe::Settings['IAAS_GROUP_ID'])
 
-aug.clear_transforms
-aug.transform(:lens => 'Oned.lns', :incl => work_file_name)
-aug.context = "/files/#{work_file_name}"
-aug.load
-
-if aug.get('DB/BACKEND') != "\"mysql\"" then
-  STDERR.puts "OneDB backend is not MySQL, exiting..."
-  exit 1
-end
-
-ops = {}
-ops[:host]     = aug.get('DB/SERVER')
-ops[:user]     = aug.get('DB/USER')
-ops[:password] = aug.get('DB/PASSWD')
-ops[:database] = aug.get('DB/DB_NAME')
-
-ops.each do |k, v|
-  next if !v || !(v.is_a? String)
-
-  ops[k] = v.chomp('"').reverse.chomp('"').reverse
-end
-
-ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
-
-$db = Sequel.connect(**ops)
-conf = $db[:settings].as_hash(:name, :body)
-
-vm.recover 3 if balance == 0 && u.groups.include?(conf['IAAS_GROUP_ID'].to_i)
-
-capacity = JSON.parse(conf['CAPACITY_COST'])
+capacity = IONe::Settings['CAPACITY_COST']
 vm_price = capacity['CPU_COST'].to_f * vm['//TEMPLATE/VCPU'].to_i + capacity['MEMORY_COST'].to_f * vm['//TEMPLATE/MEMORY'].to_i / 1000
 
-if balance < vm_price * 86400 then
+if balance < vm_price * 86400 && u.groups.include?(IONe::Settings['IAAS_GROUP_ID']) then
   puts "User balance isn't enough to deploy this VM, deleting..."
   vm.recover 3
 else

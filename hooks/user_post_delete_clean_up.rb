@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # -------------------------------------------------------------------------- #
-# Copyright 2020, IONe Cloud Project, Support.by                             #
+# Copyright 2017-2021, IONe Cloud Project, Support.by                        #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -28,29 +28,21 @@ RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
 ETC_LOCATION      = "/etc/one/"
 ONED_CONF         = ETC_LOCATION + "oned.conf"
 
+$: << '/usr/lib/one/ione'
 $: << RUBY_LIB_LOCATION
 
 require 'opennebula'
 include OpenNebula
-user = User.new xml.xpath('//EXTRA/USER'), Client.new
-user.info!
+
+$client = Client.new
+user = User.new xml.xpath('//EXTRA/USER'), $client
 
 require 'yaml'
-require 'json'
-require 'sequel'
-
-$ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
-require $ione_conf['DB']['adapter']
-$db = Sequel.connect({
-                       adapter: $ione_conf['DB']['adapter'].to_sym,
-        user: $ione_conf['DB']['user'], password: $ione_conf['DB']['pass'],
-        database: $ione_conf['DB']['database'], host: $ione_conf['DB']['host']
-                     })
-conf = $db[:settings].as_hash(:name, :body)
+require 'core/*'
 
 id = user.id
 
-unless user.groups.include? conf['IAAS_GROUP_ID'].to_i then
+unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
   exit 0
 end
@@ -65,25 +57,13 @@ end
 
 until pool(id) == []
   pool(id).each do | vm |
-    VirtualMachine.new_with_id(vm[:oid], Client.new).terminate(true)
+    VirtualMachine.new_with_id(vm[:oid], $client).terminate(true)
   end
 end
 
 vn_pool(id).each do | vnet |
-  vnet = VirtualNetwork.new_with_id(vnet[:oid], Client.new)
-  vnet.info!
-
-  if vnet['/VNET/TEMPLATE/TYPE'] == 'PRIVATE' then
-    VirtualNetwork.new_with_id(JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'], Client.new).add_ar(
-      "AR = [\n" \
-        "IP = \"#{vnet['/VNET/AR_POOL/AR/IP']}\",\n" \
-        "SIZE = \"#{vnet['/VNET/AR_POOL/AR/SIZE']}\",\n" \
-        "TYPE = \"#{vnet['/VNET/AR_POOL/AR/TYPE']}\",\n" \
-        "VLAN_ID = \"#{vnet['/VNET/VLAN_ID']}\" ]"
-    ) if vnet['VN_MAD'] == 'vcenter'
-  end
-
-  vnet.delete unless vnet.id == JSON.parse(conf['PRIVATE_NETWORK_DEFAULTS'])['NETWORK_ID'].to_i
+  vnet = VirtualNetwork.new_with_id(vnet[:oid], $client)
+  vnet.delete
 end
 
-puts "User##{id} Virtual Networks successfully cleaned up"
+puts "User##{id} Resources are successfully cleaned up"
