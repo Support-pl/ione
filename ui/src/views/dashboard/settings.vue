@@ -108,7 +108,16 @@
 							@keyup.enter="save(record.name)"
 							@keyup.escape="cancel(record.name)"
 						/>
-						<component :is="types[['float', 'int', 'num'].includes(record.type) ? 'num' : record.type ]" v-else :value="record" />
+						<component
+							v-else-if="Object.keys(types).includes(record.type)"
+							:is="types[record.type]"
+							:value="record"
+						/>
+						<component
+							v-else
+							:is="types.raw"
+							:value="record"
+						/>
 					</span>
 					<span slot="actions" slot-scope="text, record">
 						<a-space class="editable-row-operations">
@@ -136,6 +145,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import raw from "@/components/types/raw.vue";
 import num from "@/components/types/num.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
@@ -180,10 +190,13 @@ export default {
       editingKey: "",
       cacheData: [],
       types: {
+				float: num,
+				int: num,
         num,
         list,
         str,
         object,
+				raw
       },
       selfEdit: ["object"],
 			
