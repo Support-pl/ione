@@ -150,6 +150,7 @@ import num from "@/components/types/num.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
 import object from "@/components/types/object.vue";
+import bool from "@/components/types/bool.vue";
 
 const columns = [
   {
@@ -196,7 +197,8 @@ export default {
         list,
         str,
         object,
-				raw
+				bool,
+				raw,
       },
       selfEdit: ["object"],
 			
