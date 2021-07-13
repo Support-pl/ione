@@ -2,9 +2,83 @@
 	<div class="view__container view__container--settings">
 		<a-row class="view__buttons" type="flex" justify="start">
 			<a-col :span="2">
-				<a-button icon="plus" type="primary">
+				<a-button
+					icon="plus"
+					type="primary"
+					@click="() => addSetting.visible = true"	
+				>
 					Add setting
 				</a-button>
+				<a-modal
+					title="Add setting"
+					:visible="addSetting.visible"
+					:confirm-loading="addSetting.loading"
+					@ok="sendNewSetting"
+					@cancel="() => addSetting.visible = false"
+				>
+					<a-row class="add-setting__info-row">
+						<a-col>Name:</a-col>
+						<a-col>
+							<a-input
+								v-model="addSetting.data.name"
+								placeholder="Enter new setting name"
+							/>
+						</a-col>
+					</a-row>
+
+					<a-row class="add-setting__info-row">
+						<a-col>Description:</a-col>
+						<a-col>
+							<a-textarea
+								v-model="addSetting.data.description"
+								placeholder="Enter new setting description"
+								:auto-size="{ minRows: 3, maxRows: 5 }"
+							/>
+						</a-col>
+					</a-row>
+
+					<a-row class="add-setting__info-row">
+						<a-col>Body (value):</a-col>
+						<a-col>
+							<a-input
+								v-model="addSetting.data.body"
+								placeholder="Enter new setting body"
+							/>
+						</a-col>
+					</a-row>
+					
+					<a-row class="add-setting__info-row" :gutter='[20, 0]'>
+						<a-col :span="12">
+							<a-row>
+								<a-col>Type:</a-col>
+								<a-col>
+									<a-select v-model="addSetting.data.type" style="width: 100%">
+										<a-select-option v-for="(fieldType, index) in possibleFieldTypes" :value="fieldType" :key="'fieldType' + index">
+											{{fieldType}}
+										</a-select-option>
+									</a-select>
+								</a-col>
+							</a-row>
+						</a-col>
+						<a-col :span="12">
+							<a-row>
+								<a-col>Access level:</a-col>
+								<a-col>
+									<a-select v-model="addSetting.data.access_level" style="width: 100%">
+										<a-select-option v-for="(level, index) in possibleAccesslevels" :value="index" :key="'level' + index">
+											{{level}}
+										</a-select-option>
+									</a-select>
+								</a-col>
+							</a-row>
+						</a-col>
+					</a-row>
+					<a-row>
+						<a-col>
+							<span>All fields are required.</span>
+						</a-col>
+					</a-row>
+				</a-modal>
 			</a-col>
 		</a-row>
 		<a-row type="flex" justify="space-around">
@@ -94,6 +168,9 @@ const columns = [
   },
 ];
 
+const possibleFieldTypes = ['int', 'float', 'str', 'object', 'list'];
+const possibleAccesslevels = ['User', 'Admin'];
+
 export default {
   name: "Settings",
   data() {
@@ -109,15 +186,42 @@ export default {
         object,
       },
       selfEdit: ["object"],
+			
+			addSetting: {
+				visible: false,
+				loading: false,
+				data: {
+					access_level: 1,
+					body: "",
+					description: "",
+					name: "",
+					type: "",
+				}
+			},
+
+			possibleFieldTypes,
+			possibleAccesslevels
     };
   },
   async mounted() {
     this.sync();
+    this.addSettingInit();
   },
   computed: {
     ...mapGetters(["credentials"]),
   },
   methods: {
+		addSettingInit(){
+			this.addSetting.visible = false;
+			this.addSetting.loading = false;
+			this.addSetting.data = {
+				access_level: 1,
+				body: "",
+				description: "",
+				name: "",
+				type: this.possibleFieldTypes[0],
+			}
+		},
     async sync() {
       this.settings = (
         await this.$axios({
@@ -152,30 +256,16 @@ export default {
       const targetCache = newCacheData.filter((item) => key === item.name)[0];
       if (target && targetCache) {
         delete target.editable;
-        this.$axios({
-          method: "post",
-          url: `/settings/${key}`,
-          auth: this.credentials,
-          data: target,
-        })
-          .then((res) => {
-            if (res.data.response == 1) {
-              this.$message.success("Success");
-            } else {
-              this.$message.error("Fail");
-              this.cancel(key);
-              return;
-            }
-            this.settings = newData;
-            Object.assign(targetCache, target);
-            this.cacheData = newCacheData;
-          })
-          .catch((err) => {
-            console.error(err);
-            this.$message.error("Fail");
-            this.cancel(key);
-          });
-      }
+				this.sendSetting(key, target)
+				.then(() => {
+					this.settings = newData;
+					Object.assign(targetCache, target);
+					this.cacheData = newCacheData;
+				})
+				.catch(() => {
+          this.cancel(key);
+				});
+			}
       this.editingKey = "";
     },
     cancel(key) {
@@ -191,6 +281,49 @@ export default {
         this.settings = newData;
       }
     },
+		sendSetting(key, data){
+			return new Promise((resolve, reject) => {
+				this.$axios({
+          method: "post",
+          url: `/settings/${key}`,
+          auth: this.credentials,
+          data: data,
+        })
+          .then((res) => {
+            if (res.data.response == 1) {
+              this.$message.success("Success");
+							resolve(res);
+            } else {
+              throw res;
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            this.$message.error("Fail");
+						reject(err);
+          });
+			})
+		},
+		sendNewSetting(){
+			for (const field in this.addSetting.data) {
+				if(this.addSetting.data[field].length == 0){
+					console.log(field);
+					console.log(this.addSetting.data[field]);
+					this.$message.error("All fields are required!");
+					return;
+				}
+			}
+
+			this.addSetting.loading = true;
+			this.sendSetting(this.addSetting.data.name, this.addSetting.data)
+			.then(() => {
+				this.addSettingInit();
+			})
+			.catch(()=> {
+				this.addSetting.loading = false;
+
+			})
+		}
   },
 };
 </script>
@@ -203,5 +336,9 @@ export default {
 
 .view__buttons{
 	margin-bottom: 10px;
+}
+
+.add-setting__info-row:not(:last-of-type){
+	margin-bottom: 15px;
 }
 </style>
