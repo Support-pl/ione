@@ -129,6 +129,16 @@
 									<a>Save</a>
 								</a-popconfirm>
 								<a @click="() => cancel(record.name)">Cancel</a>
+								
+								<a-popconfirm
+									@confirm="() => deleteField(record.name)"
+								>
+									<div slot="title" style="max-width: 160px">
+										Type field name:
+										<a-input stle="margin-top: 10px" v-model="deletingFieldNameSecurity"/>
+									</div>
+									<a color="red">DELETE</a>
+								</a-popconfirm>
 							</template>
 							<span v-else>
 								<a :disabled="editingKey !== ''" @click="() => edit(record.name)"
@@ -215,7 +225,9 @@ export default {
 			},
 
 			possibleFieldTypes,
-			possibleAccesslevels
+			possibleAccesslevels,
+
+			deletingFieldNameSecurity: '',
     };
   },
   async mounted() {
@@ -271,14 +283,21 @@ export default {
       const targetCache = newCacheData.filter((item) => key === item.name)[0];
       if (target && targetCache) {
         delete target.editable;
-				this.sendSetting(key, target)
-				.then(() => {
-					this.settings = newData;
-					Object.assign(targetCache, target);
-					this.cacheData = newCacheData;
+				this.sendSetting({key, data: target})
+				.then((res) => {
+					if (res.data.response == 1) {
+						this.$message.success("Success");
+						this.settings = newData;
+						Object.assign(targetCache, target);
+						this.cacheData = newCacheData;
+					} else {
+						throw res;
+					}
 				})
-				.catch(() => {
+				.catch((err) => {
           this.cancel(key);
+					console.error(err);
+					this.$message.error("Fail");
 				});
 			}
       this.editingKey = "";
@@ -296,27 +315,16 @@ export default {
         this.settings = newData;
       }
     },
-		sendSetting(key, data){
+		sendSetting({key, data}){
 			return new Promise((resolve, reject) => {
 				this.$axios({
           method: "post",
-          url: `/settings/${key}`,
+          url: `/settings${key ? "/" + key : ''}`,
           auth: this.credentials,
           data: data,
         })
-          .then((res) => {
-            if (res.data.response == 1) {
-              this.$message.success("Success");
-							resolve(res);
-            } else {
-              throw res;
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            this.$message.error("Fail");
-						reject(err);
-          });
+          .then(resolve)
+          .catch(reject);
 			})
 		},
 		sendNewSetting(){
@@ -330,14 +338,41 @@ export default {
 			}
 
 			this.addSetting.loading = true;
-			this.sendSetting(this.addSetting.data.name, this.addSetting.data)
+			this.sendSetting({data: this.addSetting.data})
 			.then(() => {
 				this.addSettingInit();
+				this.sync();
+				this.$message.success("Success");
 			})
 			.catch(()=> {
 				this.addSetting.loading = false;
-
+				this.$message.error("Fail");
 			})
+		},
+		deleteField(recordName){
+			if(recordName !== this.deletingFieldNameSecurity || this.deletingFieldNameSecurity == 'removethefkngfield'){
+				this.$message.error('wrong field name');
+				return;
+			}
+
+			console.log(object);
+			this.$axios({
+				method: "delete",
+				url: `/settings/${recordName}`,
+				auth: this.credentials,
+			})
+				.then((res) => {
+					if(res.data.response > 0){
+						this.sync();
+						this.$message.success("Success");
+					} else {
+						throw res
+					}
+				})
+				.catch((err) => {
+					console.error(err);
+					this.$message.success("Failed");
+				});
 		}
   },
 };
