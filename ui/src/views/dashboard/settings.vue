@@ -108,7 +108,7 @@
 							@keyup.enter="save(record.name)"
 							@keyup.escape="cancel(record.name)"
 						/>
-						<component :is="types[record.type]" v-else :value="record" />
+						<component :is="types[['float', 'int', 'num'].includes(record.type) ? 'num' : record.type ]" v-else :value="record" />
 					</span>
 					<span slot="actions" slot-scope="text, record">
 						<a-space class="editable-row-operations">
