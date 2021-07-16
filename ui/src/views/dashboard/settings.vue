@@ -161,7 +161,6 @@ import bool from "@/components/types/bool.vue";
 import list from "@/components/types/list.vue";
 import str from "@/components/types/raw.vue";
 import object from "@/components/types/object.vue";
-import bool from "@/components/types/bool.vue";
 
 const columns = [
   {
