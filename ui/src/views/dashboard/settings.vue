@@ -208,7 +208,6 @@ export default {
         str,
         bool,
         object,
-				bool,
 				raw,
       },
       selfEdit: ["object"],
