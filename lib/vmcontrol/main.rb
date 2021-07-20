@@ -224,6 +224,7 @@ class IONe
   def Delete(userid)
     if userid == 0 then
       LOG "Delete query rejected! Tryed to delete root-user(oneadmin)", "Delete"
+      return
     end
     LOG "Deleting User ##{userid}", "Delete"
     onblock(:u, userid).delete
