@@ -164,6 +164,7 @@ class IONe
       return 1
     elsif userid == 0 then
       LOG "Terminate query rejected! Tryed to delete root-user(oneadmin)", "Terminate"
+      return 1
     end
     Delete(userid)
     LOG "Terminating VM#{vmid}", "Terminate"
