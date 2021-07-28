@@ -1,7 +1,7 @@
 require 'pathname'
 
 @ione = %w(
-  models modules lib scripts service ione_server.rb meta
+  models modules lib scripts service routes ione_server.rb meta
 )
 @ione_logs = %w(
   ione debug rpc suspend
