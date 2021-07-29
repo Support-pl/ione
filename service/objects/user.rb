@@ -145,4 +145,14 @@ class OpenNebula::User
       super
     end
   end
+
+  # Error while processing(calculating) showback Exception
+  class ShowbackError < StandardError
+    attr_reader :params
+
+    def initialize params = []
+      @params = params[1...params.length]
+      super "#{params[0]}\nParams:#{@params.inspect}"
+    end
+  end
 end
