@@ -7,7 +7,7 @@ end
 desc "Configure Nginx"
 task :configure_nginx => [:before, :useful_questions] do
   cd @src_dir
-  if @@nginx == 'n' then
+  if @nginx == 'n' then
     puts "Skipping nginx configuration..."
     return
   end
