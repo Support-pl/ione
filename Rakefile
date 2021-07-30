@@ -16,19 +16,17 @@ task :before, [:silent, :domain] do | _task, args |
   end
 
   @src_dir = pwd
+  @version = File.read("#{@src_dir}/meta/version.txt")
+  puts "Installing IONe #{@version}"
 end
 
 task :useful_questions do
   puts
-  puts "IONe installer is going to overwrite your nginx configuration."
-  nginx = @silent
+  puts "IONe installer is would like to overwrite your nginx configuration."
+  @nginx = @silent
   until ['y', 'n'].include? nginx do
     print "Do you want to continue? (y/n) "
-    nginx = STDIN.gets.strip.downcase
-  end
-  if nginx == 'n' then
-    puts "Exiting"
-    exit 0
+    @nginx = STDIN.gets.strip.downcase
   end
 
   while @domain.nil?
@@ -36,7 +34,7 @@ task :useful_questions do
     @domain = STDIN.gets.strip.downcase
 
     puts "You've entered '#{@domain}'"
-    puts "Nginx going to be configured with following server names:"
+    puts "Nginx should to be configured with following server names:"
     puts "  cloud.#{@domain}      --> Sunstone"
     puts "  ione-api.#{@domain}   --> IONe API"
     puts "  ione-admin.#{@domain} --> IONe UI"
@@ -66,4 +64,26 @@ task :install, [:silent, :domain] => [:before, :useful_questions, :install_gems,
   for msg in $messages do
     puts msg
   end
+end
+
+desc "IONe check update"
+task :check_update do
+  sh %{git checkout master}
+  sh %{git pull}
+  current = File.read('./meta/version.txt')
+  installed = File.read('/usr/lib/one/ione/meta/version.txt')
+  puts "\n" * 5
+  if current != installed then
+    puts "Update available! \n !!! DANGEROUS!!! Run rake update to install it."
+  else
+    puts "You are up to date."
+  end
+end
+
+desc "IONe update"
+task :update, [:silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione, :hooks, :install_ui, :configure_nginx] do
+  for msg in $messages do
+    puts msg
+  end
+  puts "IONe #{@version} is now installed, you're up to date!"
 end
