@@ -7,7 +7,10 @@ end
 desc "Configure Nginx"
 task :configure_nginx => [:before, :useful_questions] do
   cd @src_dir
-
+  if @@nginx == 'n' then
+    puts "Skipping nginx configuration..."
+    return
+  end
   puts
   print "Do you want installer to generate self-signed cert? (y/n) "
   cert = @silent
