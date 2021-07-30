@@ -24,7 +24,7 @@ task :useful_questions do
   puts
   puts "IONe installer is would like to overwrite your nginx configuration."
   @nginx = @silent
-  until ['y', 'n'].include? nginx do
+  until ['y', 'n'].include? @nginx do
     print "Do you want to continue? (y/n) "
     @nginx = STDIN.gets.strip.downcase
   end
