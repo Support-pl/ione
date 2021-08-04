@@ -171,7 +171,7 @@ class IONe
     return vmid.message if vmid.class != Integer
 
     trace << "Changing VM owner:#{__LINE__ + 1}"
-    onblock(:vm, vmid).chown(params['userid'], IONe::Settings['USERS_GROUP'])
+    onblock(:vm, vmid).chown(params['userid'], params['groupid'] || IONe::Settings['USERS_GROUP'])
 
     #####   PostDeploy Activity define   #####
     Thread.new do
