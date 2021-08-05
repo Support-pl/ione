@@ -306,7 +306,7 @@ class OpenNebula::VirtualMachine
   # @return [Integer]
   def uid info = true
     self.info! if info
-    self['UID']
+    self['UID'].to_i
   end
 
   # Returns owner user name
