@@ -67,9 +67,6 @@ class IONe
     LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
     return nil if params['debug'] == 'turn_method_off'
 
-    return { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0',
-'ip_old' => '0.0.0.0' } if params['debug'] == 'data'
-
     LOG "Reinstalling VM#{params['vmid']}", 'Reinstall'
     trace << "Checking params:#{__LINE__ + 1}"
     if params.get('vmid', 'groupid', 'userid', 'templateid').include?(nil) then
