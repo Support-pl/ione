@@ -50,8 +50,9 @@ class IONe
       end
     end
 
-    vn = onblock(:vn, uvnet, @client)
+    vn = onblock(:vn, uvnet, $client)
     vn.chown(u.id, u.groups.first)
+    vn.chmod(1, 1, 1, 0, 0, 0, 0, 0, 0)
     return vn.id
   end
 
