@@ -209,6 +209,36 @@ class IONe
     return e.message, trace
   end
 
+  # Recreates VM - leaves same ID, same IP addresses, amount of resources, etc, but recreates on host
+  # @param [Hash] params
+  # @option params [Integer] :vm
+  # @return [TrueClass, Integer] - true and host where VM been deployed before recreate
+  def Recreate(params, trace = ["Recreate method called:#{__LINE__}"])
+    params.to_sym!
+    LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
+    LOG "Reinstalling VM#{params[:vm]}", 'Reinstall'
+    
+    trace << "Getting VM:#{__LINE__}"
+    vm = onblock(:vm, params[:vm])
+    vm.info!
+    trace << "Checking access rights:#{__LINE__}"
+    onblock(:u, -1, @client) do | u |
+      u.info!
+      if u.id != vm.uid && !u.groups.include?(0) then
+        raise StandardError.new("Not enough access to perform Recreate") 
+      end
+    end
+    trace << "Getting VM host:#{__LINE__}"
+    host, _ = vm.host
+    trace << "Recovering VM:#{__LINE__}"
+    vm.recover(4)
+
+    return true, host.to_i
+  rescue => e
+    LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
+    raise e
+  end
+
   # Creates new virtual machine from the given OS template and resize it to given specs, and new user account, which becomes owner of this VM
   # @param [Hash] params - all needed data for new User and VM creation
   # @option params [String]  :login Username for new OpenNebula account
