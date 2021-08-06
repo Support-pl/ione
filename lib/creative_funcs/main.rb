@@ -217,7 +217,7 @@ class IONe
     params.to_sym!
     LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
     LOG "Reinstalling VM#{params[:vm]}", 'Reinstall'
-    
+
     trace << "Getting VM:#{__LINE__}"
     vm = onblock(:vm, params[:vm])
     vm.info!
@@ -225,7 +225,7 @@ class IONe
     onblock(:u, -1, @client) do | u |
       u.info!
       if u.id != vm.uid && !u.groups.include?(0) then
-        raise StandardError.new("Not enough access to perform Recreate") 
+        raise StandardError.new("Not enough access to perform Recreate")
       end
     end
     trace << "Getting VM host:#{__LINE__}"
