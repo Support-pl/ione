@@ -1,6 +1,15 @@
 require 'pathname'
 require 'yaml'
 
+class String
+  def color
+    self
+  end
+  alias green :color
+  alias yellow :color
+  alias red :color
+end
+
 task :test_install_gems do
   require 'colorize'
   require 'net/http'
