@@ -48,7 +48,7 @@ task :useful_questions do
   puts "Using '#{@domain}' as base domain."
 end
 
-load "rake/install_gems.rake"
+load "rake/install_deps.rake"
 load "rake/install_ione.rake"
 load "rake/install_ui.rake"
 load "rake/configure_nginx.rake"
@@ -56,7 +56,7 @@ load "rake/set_hooks.rake"
 load "rake/test_install.rake"
 
 desc "Full IONe Installation"
-task :install, [:packm, :silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione, :hooks, :install_ui, :configure_nginx] do
+task :install, [:packm, :silent, :domain] => [:before, :useful_questions, :install_deps, :install_ione, :hooks, :install_ui, :configure_nginx] do
   $messages << <<-EOF
     Thanks, for installation and choosing us!
     Configure ione with ione.conf & IONe UI and test install with: rake test_install
@@ -82,7 +82,7 @@ task :check_update do
 end
 
 desc "IONe update"
-task :update, [:silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione, :hooks, :install_ui, :configure_nginx] do
+task :update, [:silent, :domain] => [:before, :useful_questions, :install_deps, :install_ione, :hooks, :install_ui, :configure_nginx] do
   for msg in $messages do
     puts msg
   end

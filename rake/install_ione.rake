@@ -8,7 +8,7 @@ require 'pathname'
 )
 
 desc "IONe Back-End Installation"
-task :install_ione => [:before, :install_gems] do
+task :install_ione => [:before, :install_deps] do
   puts 'Copying conf'
   cp 'sys/ione.conf', '/etc/one/' unless Pathname.new("/etc/one/ione.conf").exist?
 

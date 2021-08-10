@@ -9,8 +9,8 @@
 }
 
 desc "Install Gems"
-task :install_gems, [:packm, :silent] => :before do | _task, args |
-  puts "Installing Gems:\n"
+task :install_deps, [:packm, :silent] => :before do | _task, args |
+  puts "Installing dependencies:\n"
 
   puts "1. Installing required system libs and tools"
   puts "Following packages are going to be installed:\n\t#{@sys_packages[@packm].join(' ')}"

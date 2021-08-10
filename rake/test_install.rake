@@ -10,7 +10,7 @@ class String
   alias red :color
 end
 
-task :test_install_gems do
+task :test_install_deps do
   require 'colorize'
   require 'net/http'
   require 'sequel'
@@ -208,5 +208,5 @@ task :test_api_root do
 end
 
 desc "Check if IONe is installed and running"
-task :test_install => [:test_install_gems, :load_installed_env, :test_config_exists, :test_configured, :test_api_root] do
+task :test_install => [:test_install_deps, :load_installed_env, :test_config_exists, :test_configured, :test_api_root] do
 end
