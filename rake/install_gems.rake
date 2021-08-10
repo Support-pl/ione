@@ -12,11 +12,7 @@ desc "Install Gems"
 task :install_gems, [:packm, :silent] => :before do | _task, args |
   puts "Installing Gems:\n"
 
-  puts "1. Installing gems..."
-  sh %{bundle install}
-  puts
-
-  puts "2. Installing required system libs and tools"
+  puts "1. Installing required system libs and tools"
   puts "Following packages are going to be installed:\n\t#{@sys_packages[@packm].join(' ')}"
 
   a = nil
@@ -43,6 +39,10 @@ task :install_gems, [:packm, :silent] => :before do | _task, args |
     EOF
     exit 1
   end
+  puts
+
+  puts "2. Installing gems..."
+  sh %{bundle install}
   puts
 
   puts "Done.\n"
