@@ -1,6 +1,7 @@
 $messages = []
 
-task :before, [:silent, :domain] do | _task, args |
+task :before, [:packm, :silent, :domain] do | _task, args |
+  @packm  = args[:packm] || 'yum'
   @silent = args[:silent]
   @domain = args[:domain]
 
@@ -55,7 +56,7 @@ load "rake/set_hooks.rake"
 load "rake/test_install.rake"
 
 desc "Full IONe Installation"
-task :install, [:silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione, :hooks, :install_ui, :configure_nginx] do
+task :install, [:packm, :silent, :domain] => [:before, :useful_questions, :install_gems, :install_ione, :hooks, :install_ui, :configure_nginx] do
   $messages << <<-EOF
     Thanks, for installation and choosing us!
     Configure ione with ione.conf & IONe UI and test install with: rake test_install

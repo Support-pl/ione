@@ -1,7 +1,15 @@
-@sys_packages = %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel)
+@sys_packages = {
+  'yum' => %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel),
+  'apt' => %w(npm make automake gcc ruby-dev libmariadb-dev)
+}
+
+@pack_managers = {
+  `yum` => "yum install -yq",
+  'apt' => "apt update && apt -yqq install"
+}
 
 desc "Install Gems"
-task :install_gems, [:silent] => :before do | _task, args |
+task :install_gems, [:packm, :silent] => :before do | _task, args |
   puts "Installing Gems:\n"
 
   puts "1. Installing gems..."
@@ -9,7 +17,7 @@ task :install_gems, [:silent] => :before do | _task, args |
   puts
 
   puts "2. Installing required system libs and tools"
-  puts "Following packages are going to be installed:\n\t#{@sys_packages.join(' ')}"
+  puts "Following packages are going to be installed:\n\t#{@sys_packages[@packm].join(' ')}"
 
   a = nil
   a = 'y' if @silent == 'y' || args[:silent] == 'y'
@@ -19,14 +27,16 @@ task :install_gems, [:silent] => :before do | _task, args |
     a = STDIN.gets.downcase.strip
   end
   exit 0 if a == 'n'
+
+  @packm = args[:packm] || 'yum'
   puts "Installing..."
   begin
-    sh %{sudo yum install -yq #{@sys_packages.join(' ')}}
+    sh %{sudo #{@pack_managers[@packm]} #{@sys_packages[@packm].join(' ')}}
   rescue
     $messages << <<~EOF
-      It seems to be, that you aren't using CentOS or yum doesn't work properly, follow next steps:
+      It seems to be, that #{@packm} doesn't work properly, follow next steps:
       1. Install this packages manually:
-          #{@sys_packages.join(' ')}
+          #{@sys_packages[@packm].join(' ')}
       2. Install need parts using commands from:
           rake --tasks
       Thanks, for installation and choosing us!
