@@ -1,6 +1,6 @@
 @sys_packages = {
-  'yum' => %w(npm make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel),
-  'apt' => %w(npm make automake gcc ruby-dev libmariadb-dev)
+  'yum' => %w(make automake gcc gcc-c++ kernel-devel ruby-devel mysql-devel),
+  'apt' => %w(make automake gcc ruby-dev libmariadb-dev)
 }
 
 @pack_managers = {
