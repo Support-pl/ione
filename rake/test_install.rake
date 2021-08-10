@@ -2,7 +2,7 @@ require 'pathname'
 require 'yaml'
 
 class String
-  def color
+  def color *_args
     self
   end
   alias green :color
