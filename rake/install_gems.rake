@@ -4,7 +4,7 @@
 }
 
 @pack_managers = {
-  `yum` => "yum install -yq",
+  'yum' => "yum install -yq",
   'apt' => "apt update && apt -yqq install"
 }
 
