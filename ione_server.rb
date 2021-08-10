@@ -95,12 +95,6 @@ CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
 ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
-require "SettingsDriver"
-
-# Settings Table Model
-# @see https://github.com/ione-cloud/ione-sunstone/blob/55a9efd68681829624809b4895a49d750d6e6c34/models/SettingsDriver.rb#L13-L37 Settings Model Definition
-class Settings < Sequel::Model(:settings); end
-
 puts 'Including on_helper funcs'
 require "#{ROOT}/service/on_helper.rb"
 include ONeHelper
