@@ -217,8 +217,7 @@ class IONe
   # @return [TrueClass, Integer] - true and host where VM been deployed before recreate
   def Recreate(params, trace = ["Recreate method called:#{__LINE__}"])
     params.to_sym!
-    LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
-    LOG "Reinstalling VM#{params[:vm]}", 'Reinstall'
+    LOG "Recreating VM#{params[:vm]}", 'Recreate'
 
     trace << "Getting VM:#{__LINE__}"
     vm = onblock(:vm, params[:vm])
