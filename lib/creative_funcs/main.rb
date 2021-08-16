@@ -280,7 +280,6 @@ class IONe
       LOG_DEBUG "No vCenter configuration found"
     end
 
-    params['username'] = params['username'] || 'Administrator'
     params['vm_name']  = params['vm_name']  || "#{params['login']}_vm"
     ###################### Doing some important system stuff ###############################################################
 
@@ -329,6 +328,7 @@ class IONe
     trace << "Creating new VM:#{__LINE__ + 1}"
     onblock(:t, params['templateid']) do | t |
       t.info!
+      params['username'] = params['username'] || (t.win? ? 'Administrator' : 'root')
       specs = ""
       if !t['/VMTEMPLATE/TEMPLATE/CAPACITY'] && t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == "VCENTER" then
         specs = {
