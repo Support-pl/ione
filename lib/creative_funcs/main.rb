@@ -234,12 +234,12 @@ class IONe
     trace << "Recovering VM:#{__LINE__}"
     vm.recover(4)
 
-    if params['passwd'] then
+    if params[:passwd] then
       trace << "Changing VM password#{__LINE__}"
-      vm.passwd params['passwd']
+      vm.passwd params[:passwd]
     end
 
-    if params['deploy'] then
+    if params[:deploy] then
       trace << "Waiting for state PENDING to deploy VM:#{__LINE__}"
       vm.wait_state("PENDING", 120)
       trace << "Deploying VM:#{__LINE__}"
