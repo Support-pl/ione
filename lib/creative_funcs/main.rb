@@ -418,7 +418,7 @@ class IONe
                 NETWORK: "YES",
                 PASSWORD: params['passwd'],
                 SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
-                USERNAME: win ? params['username'] : nil
+                USERNAME: params['username']
               }
             }.to_one_template
           )
