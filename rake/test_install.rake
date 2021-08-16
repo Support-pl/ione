@@ -1,15 +1,6 @@
 require 'pathname'
 require 'yaml'
 
-class String
-  def color *_args
-    self
-  end
-  alias green :color
-  alias yellow :color
-  alias red :color
-end
-
 task :test_install_deps do
   require 'colorize'
   require 'net/http'
