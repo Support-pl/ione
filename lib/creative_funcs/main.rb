@@ -233,6 +233,17 @@ class IONe
     trace << "Recovering VM:#{__LINE__}"
     vm.recover(4)
 
+    vm.updateconf(
+            {
+              CONTEXT: {
+                NETWORK: "YES",
+                PASSWORD: params['passwd'],
+                SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
+                USERNAME: win ? params['username'] : nil
+              }
+            }.to_one_template
+          )
+
     return true, host.to_i
   rescue => e
     LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
@@ -408,7 +419,6 @@ class IONe
       end
 
       if %w(VCENTER KVM).include? params['extra']['type'].upcase then
-        win = onblock(:t, params['templateid']).win?
         LOG_DEBUG "Instantiating VM as#{win ? nil : ' not'} Windows"
         trace << "Setting VM context:#{__LINE__ + 2}"
         begin
