@@ -530,4 +530,12 @@ class OpenNebula::VirtualMachine
   def stop_vnc
     File.delete(File.join('/var/lib/one/sunstone_vnc_tokens/', "one-#{id}"))
   end
+
+  # Changes VM password in Context(must be changing on VM immediately)
+  # @param [String] password - new VM password
+  def passwd password
+    context = vm.to_hash['VM']['TEMPLATE']['CONTEXT']
+    context['PASSWORD'] = password
+    updateconf({ CONTEXT: context }.to_one_template)
+  end
 end

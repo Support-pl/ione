@@ -212,6 +212,7 @@ class IONe
   # Recreates VM - leaves same ID, same IP addresses, amount of resources, etc, but recreates on host
   # @param [Hash] params
   # @option params [Integer] :vm
+  # @option params [String] :passwd (optional)
   # @return [TrueClass, Integer] - true and host where VM been deployed before recreate
   def Recreate(params, trace = ["Recreate method called:#{__LINE__}"])
     params.to_sym!
@@ -233,16 +234,11 @@ class IONe
     trace << "Recovering VM:#{__LINE__}"
     vm.recover(4)
 
-    vm.updateconf(
-            {
-              CONTEXT: {
-                NETWORK: "YES",
-                PASSWORD: params['passwd'],
-                SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
-                USERNAME: win ? params['username'] : nil
-              }
-            }.to_one_template
-          )
+    if params['passwd'] then
+      trace << "Changing VM password#{__LINE__}"
+      vm.passwd params['passwd']
+    end
+
 
     return true, host.to_i
   rescue => e
