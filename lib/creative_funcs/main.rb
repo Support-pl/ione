@@ -280,7 +280,7 @@ class IONe
       LOG_DEBUG "No vCenter configuration found"
     end
 
-    params['vm_name']  = params['vm_name']  || "#{params['login']}_vm"
+    params['vm_name'] = params['vm_name'] || "#{params['login']}_vm"
     ###################### Doing some important system stuff ###############################################################
 
     LOG_AUTO "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
