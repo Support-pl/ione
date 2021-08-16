@@ -534,7 +534,7 @@ class OpenNebula::VirtualMachine
   # Changes VM password in Context(must be changing on VM immediately)
   # @param [String] password - new VM password
   def passwd password
-    context = vm.to_hash['VM']['TEMPLATE']['CONTEXT']
+    context = to_hash['VM']['TEMPLATE']['CONTEXT']
     context['PASSWORD'] = password
     updateconf({ CONTEXT: context }.to_one_template)
   end
