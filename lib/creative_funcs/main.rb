@@ -213,6 +213,7 @@ class IONe
   # @param [Hash] params
   # @option params [Integer] :vm
   # @option params [String] :passwd (optional)
+  # @option deploy [Boolean] :deploy (optional)
   # @return [TrueClass, Integer] - true and host where VM been deployed before recreate
   def Recreate(params, trace = ["Recreate method called:#{__LINE__}"])
     params.to_sym!
@@ -239,6 +240,12 @@ class IONe
       vm.passwd params['passwd']
     end
 
+    if params['deploy'] then
+      trace << "Waiting for state PENDING to deploy VM:#{__LINE__}"
+      vm.wait_state("PENDING", 120)
+      trace << "Deploying VM:#{__LINE__}"
+      vm.deploy(host.to_i)
+    end
 
     return true, host.to_i
   rescue => e
