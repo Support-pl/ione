@@ -23,6 +23,16 @@ class OpenNebula::VirtualMachine
     snapshot-create
   )
 
+  # VM Template keys updatable(and rewritable) by #updateconf
+  CONF_KEYS = Set[
+    "INPUT",
+    "RAW",
+    "OS",
+    "FEATURES",
+    "GRAPHICS",
+    "CONTEXT"
+  ]
+
   def initialize(xml, client)
     @vim_vm = nil
     super(xml, client)
@@ -534,8 +544,12 @@ class OpenNebula::VirtualMachine
   # Changes VM password in Context(must be changing on VM immediately)
   # @param [String] password - new VM password
   def passwd password
-    context = to_hash['VM']['TEMPLATE']['CONTEXT']
-    context['PASSWORD'] = password
-    updateconf({ CONTEXT: context }.to_one_template)
+  # Returns VM conf(template parts rewrittable by #updateconf)
+  def conf
+    info!
+    to_hash['VM']['TEMPLATE'].select do | key |
+      CONF_KEYS === key
+    end
+  end
   end
 end
