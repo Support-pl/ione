@@ -544,6 +544,9 @@ class OpenNebula::VirtualMachine
   # Changes VM password in Context(must be changing on VM immediately)
   # @param [String] password - new VM password
   def passwd password
+    updateconf_safe({ CONTEXT: { PASSWORD: password } })
+  end
+
   # Returns VM conf(template parts rewrittable by #updateconf)
   def conf
     info!
