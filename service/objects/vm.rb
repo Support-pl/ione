@@ -551,5 +551,20 @@ class OpenNebula::VirtualMachine
       CONF_KEYS === key
     end
   end
+
+  #
+  # Safe updateconf method - doesn't delete ANY keys. Merges new conf with actual conf
+  #
+  # @param [Hash] new_conf Config keys to change(must be nested)
+  # @example Updating password only
+  #     ```ruby
+  #     vm.updateconf_safe CONTEXT: PASSWORD: "new_password"
+  #     ```
+  #
+  def updateconf_safe new_conf 
+    curr_conf = conf
+    updateconf(
+      curr_conf.deep_merge(new_conf.to_s!).to_one_template
+    )
   end
 end
