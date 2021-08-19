@@ -189,7 +189,19 @@ task :hooks do
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
   end
 
-  require 'colorize'
+  begin
+    require 'colorize'
+  rescue
+    class String
+      def red
+        self
+      end
+
+      def green
+        self
+      end
+    end
+  end
   require '/usr/lib/one/ione/lib/std++/main.rb'
 
   puts 'Adding hooks to HookPool'

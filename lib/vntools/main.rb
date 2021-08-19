@@ -11,7 +11,7 @@ class IONe
   def reserve_public_ip params
     params.to_sym!
 
-    vnet = onblock(:vn, IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'], @client)
+    vnet = onblock(:vn, IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['IAAS'], @client)
     vnet.info!
 
     u = onblock(:u, params[:u], @client)
@@ -50,8 +50,9 @@ class IONe
       end
     end
 
-    vn = onblock(:vn, uvnet, @client)
+    vn = onblock(:vn, uvnet, $client)
     vn.chown(u.id, u.groups.first)
+    vn.chmod(1, 1, 1, 0, 0, 0, 0, 0, 0)
     return vn.id
   end
 

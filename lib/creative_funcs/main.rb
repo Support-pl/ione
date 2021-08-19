@@ -67,9 +67,6 @@ class IONe
     LOG_DEBUG params.merge!({ :method => 'Reinstall' }).debug_out
     return nil if params['debug'] == 'turn_method_off'
 
-    return { 'vmid' => rand(params['vmid'].to_i + 1000), 'vmid_old' => params['vmid'], 'ip' => '0.0.0.0',
-'ip_old' => '0.0.0.0' } if params['debug'] == 'data'
-
     LOG "Reinstalling VM#{params['vmid']}", 'Reinstall'
     trace << "Checking params:#{__LINE__ + 1}"
     if params.get('vmid', 'groupid', 'userid', 'templateid').include?(nil) then
@@ -171,7 +168,7 @@ class IONe
     return vmid.message if vmid.class != Integer
 
     trace << "Changing VM owner:#{__LINE__ + 1}"
-    onblock(:vm, vmid).chown(params['userid'], IONe::Settings['USERS_GROUP'])
+    onblock(:vm, vmid).chown(params['userid'], params['groupid'] || IONe::Settings['USERS_GROUP'])
 
     #####   PostDeploy Activity define   #####
     Thread.new do
@@ -210,6 +207,49 @@ class IONe
   rescue => e
     LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
     return e.message, trace
+  end
+
+  # Recreates VM - leaves same ID, same IP addresses, amount of resources, etc, but recreates on host
+  # @param [Hash] params
+  # @option params [Integer] :vm
+  # @option params [String] :passwd (optional)
+  # @option deploy [Boolean] :deploy (optional)
+  # @return [TrueClass, Integer] - true and host where VM been deployed before recreate
+  def Recreate(params, trace = ["Recreate method called:#{__LINE__}"])
+    params.to_sym!
+    LOG "Recreating VM#{params[:vm]}", 'Recreate'
+
+    trace << "Getting VM:#{__LINE__}"
+    vm = onblock(:vm, params[:vm])
+    vm.info!
+    trace << "Checking access rights:#{__LINE__}"
+    onblock(:u, -1, @client) do | u |
+      u.info!
+      if u.id != vm.uid && !u.groups.include?(0) then
+        raise StandardError.new("Not enough access to perform Recreate")
+      end
+    end
+    trace << "Getting VM host:#{__LINE__}"
+    host, _ = vm.host
+    trace << "Recovering VM:#{__LINE__}"
+    vm.recover(4)
+
+    if params[:passwd] then
+      trace << "Changing VM password#{__LINE__}"
+      vm.passwd params[:passwd]
+    end
+
+    if params[:deploy] then
+      trace << "Waiting for state PENDING to deploy VM:#{__LINE__}"
+      vm.wait_state("PENDING", 120)
+      trace << "Deploying VM:#{__LINE__}"
+      vm.deploy(host.to_i)
+    end
+
+    return true, host.to_i
+  rescue => e
+    LOG_ERROR "Error ocurred while Reinstall: #{e.message}"
+    raise e
   end
 
   # Creates new virtual machine from the given OS template and resize it to given specs, and new user account, which becomes owner of this VM
@@ -253,8 +293,7 @@ class IONe
       LOG_DEBUG "No vCenter configuration found"
     end
 
-    params['username'] = params['username'] || 'Administrator'
-    params['vm_name']  = params['vm_name']  || "#{params['login']}_vm"
+    params['vm_name'] = params['vm_name'] || "#{params['login']}_vm"
     ###################### Doing some important system stuff ###############################################################
 
     LOG_AUTO "CreateVMwithSpecs for #{params['login']} Order Accepted! #{params['trial'] == true ? "VM is Trial" : nil}"
@@ -302,6 +341,7 @@ class IONe
     trace << "Creating new VM:#{__LINE__ + 1}"
     onblock(:t, params['templateid']) do | t |
       t.info!
+      params['username'] = params['username'] || (t.win? ? 'Administrator' : 'root')
       specs = ""
       if !t['/VMTEMPLATE/TEMPLATE/CAPACITY'] && t['/VMTEMPLATE/TEMPLATE/HYPERVISOR'].upcase == "VCENTER" then
         specs = {
@@ -353,7 +393,7 @@ class IONe
       trace << "Setting up NICs:#{__LINE__ + 1}"
       specs['NIC'] = []
       params['ips'].times do
-        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['NETWORK_ID'] }
+        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['PAAS'] }
       end
 
       LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
@@ -381,7 +421,6 @@ class IONe
       end
 
       if %w(VCENTER KVM).include? params['extra']['type'].upcase then
-        win = onblock(:t, params['templateid']).win?
         LOG_DEBUG "Instantiating VM as#{win ? nil : ' not'} Windows"
         trace << "Setting VM context:#{__LINE__ + 2}"
         begin
@@ -391,7 +430,7 @@ class IONe
                 NETWORK: "YES",
                 PASSWORD: params['passwd'],
                 SSH_PUBLIC_KEY: "$USER[SSH_PUBLIC_KEY]",
-                USERNAME: win ? params['username'] : nil
+                USERNAME: params['username']
               }
             }.to_one_template
           )

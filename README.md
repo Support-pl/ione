@@ -12,7 +12,7 @@
     <a href="https://github.com/ione" title="github" rel="nofollow">
         <img src="https://img.shields.io/static/v1?label=github&message=repo&color=green&style=flat" alt="github"/>
     </a>
-    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.1&color=success&style=flat" alt="version"/>
+    <img src="https://img.shields.io/static/v1?label=version&message=v1.0.3&color=success&style=flat" alt="version"/>
     <img src="https://github.com/ione-cloud/ione-sunstone/workflows/Generate%20and%20Deploy%20Docs/badge.svg" alt="Generate and Deploy Docs"/>
 </p>
 
@@ -161,8 +161,13 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
       </tr>
       <tr>
          <td align="left"><strong>PUBLIC_NETWORK_DEFAULTS</strong></td>
-         <td align="left">NETWORK_ID</td>
-         <td align="right"><code>Public IPs pool network ID</code></td>
+         <td align="left">PAAS</td>
+         <td align="right"><code>Public IPs pool network ID for PaaS</code></td>
+      </tr>
+      <tr>
+         <td align="left"><strong></strong></td>
+         <td align="left">IAAS</td>
+         <td align="right"><code>Public IPs pool network ID for IaaS</code></td>
       </tr>
       <tr>
          <td align="left"><strong>VNETS_TEMPLATES</strong></td>
