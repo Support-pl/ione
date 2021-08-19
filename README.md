@@ -45,7 +45,13 @@ Creators:
          <td align="left">OpenNebula</td><td align="center">5.10+(see <a href="https://github.com/ione-cloud/ione/releases">Releases</a> for <br/>older ONe versions)</td><td align="center"></td>
       </tr>
       <tr>
-         <td align="left">MySQL MariaDB Server</td><td align="center">~8.0</td><td align="center"></td>
+         <td align="left">DataBase</td><td align="center"></td><td align="center"></td>
+      </tr>
+      <tr>
+         <td align="right">MySQL MariaDB Server</td><td align="center">~8.0</td><td></td>
+      </tr>
+      <tr>
+         <td align="right">PostgreSQL</td><td align="center">^13.3</td><td></td>
       </tr>
       <tr>
          <td align="left">Ruby</td><td align="center">2.5.5</td><td align="center"></td>

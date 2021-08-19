@@ -8,8 +8,13 @@ task install_ui: [:useful_questions] do
   cd '/usr/lib/one/ione/ui/'
   sh %(sudo npm install --quiet --no-progress)
 
+  puts "Generating env"
+  File.open('.env', 'w') do | file |
+    file.puts "VUE_APP_IONE_API_BASE_URL=https://ione-api.#{@domain}"
+  end
+
   puts 'Building static UI'
-  sh %(VUE_APP_IONE_API_BASE_URL=https://ione-api.#{@domain} sudo npm run build)
+  sh %(sudo npm run build)
 
   puts 'Changing owner'
   chown_R 'oneadmin', 'oneadmin', '/usr/lib/one/ione/ui/dist'

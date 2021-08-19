@@ -23,6 +23,16 @@ class OpenNebula::VirtualMachine
     snapshot-create
   )
 
+  # VM Template keys updatable(and rewritable) by #updateconf
+  CONF_KEYS = Set[
+    "INPUT",
+    "RAW",
+    "OS",
+    "FEATURES",
+    "GRAPHICS",
+    "CONTEXT"
+  ]
+
   def initialize(xml, client)
     @vim_vm = nil
     super(xml, client)
@@ -306,7 +316,7 @@ class OpenNebula::VirtualMachine
   # @return [Integer]
   def uid info = true
     self.info! if info
-    self['UID']
+    self['UID'].to_i
   end
 
   # Returns owner user name
@@ -529,5 +539,35 @@ class OpenNebula::VirtualMachine
   # Deletes VNC proxy token file
   def stop_vnc
     File.delete(File.join('/var/lib/one/sunstone_vnc_tokens/', "one-#{id}"))
+  end
+
+  # Changes VM password in Context(must be changing on VM immediately)
+  # @param [String] password - new VM password
+  def passwd password
+    updateconf_safe({ CONTEXT: { PASSWORD: password } })
+  end
+
+  # Returns VM conf(template parts rewrittable by #updateconf)
+  def conf
+    info!
+    to_hash['VM']['TEMPLATE'].select do | key |
+      CONF_KEYS === key
+    end
+  end
+
+  #
+  # Safe updateconf method - doesn't delete ANY keys. Merges new conf with actual conf
+  #
+  # @param [Hash] new_conf Config keys to change(must be nested)
+  # @example Updating password only
+  #     ```ruby
+  #     vm.updateconf_safe CONTEXT: PASSWORD: "new_password"
+  #     ```
+  #
+  def updateconf_safe new_conf 
+    curr_conf = conf
+    updateconf(
+      curr_conf.deep_merge(new_conf.to_s!).to_one_template
+    )
   end
 end

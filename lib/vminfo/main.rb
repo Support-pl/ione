@@ -151,6 +151,16 @@ class IONe
     r = VirtualMachinePool.new(@client, -1).get_hash['VM_POOL']
     r.empty? ? [] : r['VM']
   end
+  # Returns all @client User vms with extended info
+  # @return [Array<Hash>]
+  def get_user_vms_ext
+    u = onblock(:u, -1, @client)
+    r = u.info!
+
+    raise r if OpenNebula.is_error? r
+
+    u.vms $db
+  end
 
   # @!endgroup
 end

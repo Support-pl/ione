@@ -6,7 +6,7 @@ def passed
   puts "--- " + "Passed".green
 end
 
-def fail msg
+def failed msg
   puts msg.red
   exit
 end

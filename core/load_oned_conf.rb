@@ -1,5 +1,7 @@
 require 'augeas'
 
+ONED_CONF = '/etc/one/oned.conf' unless defined? ONED_CONF
+
 work_file_dir  = File.dirname(ONED_CONF)
 work_file_name = File.basename(ONED_CONF)
 

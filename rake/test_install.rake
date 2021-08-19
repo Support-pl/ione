@@ -1,7 +1,7 @@
 require 'pathname'
 require 'yaml'
 
-task :test_install_gems do
+task :test_install_deps do
   require 'colorize'
   require 'net/http'
   require 'sequel'
@@ -13,7 +13,7 @@ def passed
   puts "--- " + "Passed".green
 end
 
-def fail msg
+def failed msg
   puts msg.red
   exit
 end
@@ -30,7 +30,7 @@ desc "Check if IONe config exists and correct"
 task :test_config_exists do
   puts "Checking if config exists"
   unless Pathname.new("/etc/one/ione.conf").exist? then
-    fail "ione.conf does not exist on /etc/one/. You can get it from repo."
+    failed "ione.conf does not exist on /etc/one/. You can get it from repo."
   end
 
   passed
@@ -39,7 +39,7 @@ task :test_config_exists do
   begin
     YAML.load_file("/etc/one/ione.conf")
   rescue => e
-    fail "Failed to parse ione.conf, got: #{e.message}"
+    failed "Failed to parse ione.conf, got: #{e.message}"
   end
   passed
 end
@@ -83,13 +83,13 @@ task :test_configured do
 
     db = Sequel.connect(**ops)
   rescue => e
-    fail "Can't connect to database, got: #{e.message}"
+    failed "Can't connect to database, got: #{e.message}"
   end
   passed
 
   puts "Checking if settings table exists"
   unless db.table_exists? :settings then
-    fail "Table :settings doesn't exist"
+    failed "Table :settings doesn't exist"
   end
 
   passed
@@ -120,10 +120,6 @@ task :test_api_root do
 
   puts
 
-  def fail msg
-    puts msg.red
-  end
-
   for uri in @uris do
     begin
       puts "Testing #{uri}"
@@ -137,14 +133,14 @@ task :test_api_root do
           http.request(req)
         end
       rescue => e
-        fail "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401
+        failed "Unable to get response from '/', got: #{r.code} #{e.message}" unless r.code == 401
       end
       if uri.scheme == 'http' && r.code == "301" then
         passed
         next
       end
       unless r.code == "404" then
-        fail "Unable to get 404 from '/', got: #{r.code} #{r.body}"
+        failed "Unable to get 404 from '/', got: #{r.code} #{r.body}"
       end
 
       passed
@@ -158,10 +154,10 @@ task :test_api_root do
           http.request(req)
         end
       rescue => e
-        fail "Unable to get response from '/ione/Test', got: #{e.message}"
+        failed "Unable to get response from '/ione/Test', got: #{e.message}"
       end
       if r.code != "200" then
-        fail "Got #{r.code} response from Test, should be 200."
+        failed "Got #{r.code} response from Test, should be 200."
       end
 
       passed
@@ -176,19 +172,19 @@ task :test_api_root do
           http.request(req)
         end
       rescue => e
-        fail "Unable to get response from '/ione/Test', got: #{e.message}"
+        failed "Unable to get response from '/ione/Test', got: #{e.message}"
       end
       if r.code != "200" then
-        fail "Got #{r.code} response from Test, should be 200."
+        failed "Got #{r.code} response from Test, should be 200."
       end
 
       begin
         res = JSON.parse r.body
         r = res['response']
-        fail "Wrong response schema: #{res}" if r.nil?
-        fail "Expected PONG, got: #{r}" unless r == 'PONG'
+        failed "Wrong response schema: #{res}" if r.nil?
+        failed "Expected PONG, got: #{r}" unless r == 'PONG'
       rescue JSON::ParserError
-        fail "Got un-parseable string: #{r.body}"
+        failed "Got un-parseable string: #{r.body}"
       end
       passed
     rescue => e
@@ -199,5 +195,5 @@ task :test_api_root do
 end
 
 desc "Check if IONe is installed and running"
-task :test_install => [:test_install_gems, :load_installed_env, :test_config_exists, :test_configured, :test_api_root] do
+task :test_install => [:test_install_deps, :load_installed_env, :test_config_exists, :test_configured, :test_api_root] do
 end

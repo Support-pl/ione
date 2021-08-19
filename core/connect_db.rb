@@ -1,21 +1,26 @@
-if $oned_conf.get('DB/BACKEND') != "\"mysql\"" then
-  STDERR.puts "OneDB backend is not MySQL, exiting..."
+db_backend = ($oned_conf.get('DB/BACKEND') || $oned_conf.get('DB/backend')).delete("\"")
+case db_backend
+when "mysql"
+  adapter = :mysql2
+when "postgresql"
+  adapter = :postgres
+else
+  STDERR.puts "OneDB backend(#{db_backend}) is not supported, exiting..."
   exit 1
 end
 
 ops = {}
-ops[:host]     = $oned_conf.get('DB/SERVER')
-ops[:user]     = $oned_conf.get('DB/USER')
-ops[:password] = $oned_conf.get('DB/PASSWD')
-ops[:database] = $oned_conf.get('DB/DB_NAME')
+ops[:host]     = ($oned_conf.get('DB/SERVER') || $oned_conf.get('DB/server'))
+ops[:user]     = ($oned_conf.get('DB/USER') || $oned_conf.get('DB/user'))
+ops[:password] = ($oned_conf.get('DB/PASSWD') || $oned_conf.get('DB/passwd'))
+ops[:database] = ($oned_conf.get('DB/DB_NAME') || $oned_conf.get('DB/db_name'))
 
 ops.each do |k, v|
   next if !v || !(v.is_a? String)
-
-  ops[k] = v.chomp('"').reverse.chomp('"').reverse
+  ops[k] = v.delete("\"")
 end
 
-ops.merge! adapter: :mysql2, encoding: 'utf8mb4'
+ops.merge! adapter: adapter
 
 require 'sequel'
 $db = Sequel.connect(**ops)

@@ -164,6 +164,7 @@ class IONe
       return 1
     elsif userid == 0 then
       LOG "Terminate query rejected! Tryed to delete root-user(oneadmin)", "Terminate"
+      return 1
     end
     Delete(userid)
     LOG "Terminating VM#{vmid}", "Terminate"
@@ -223,6 +224,7 @@ class IONe
   def Delete(userid)
     if userid == 0 then
       LOG "Delete query rejected! Tryed to delete root-user(oneadmin)", "Delete"
+      return
     end
     LOG "Deleting User ##{userid}", "Delete"
     onblock(:u, userid).delete

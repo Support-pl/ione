@@ -4,6 +4,7 @@ import store from "@/store";
 import router from "@/router";
 import axios from "axios";
 
+console.log(`Using '${process.env.VUE_APP_IONE_API_BASE_URL}' as base URL`);
 Vue.prototype.$axios = axios.create({
   baseURL: `${process.env.VUE_APP_IONE_API_BASE_URL}`,
 });

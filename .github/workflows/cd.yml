@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-node@v2.1.5
+      - uses: actions/setup-node@v2.3.0
       
       - name: Dependencies
         run: npm install
@@ -71,7 +71,7 @@ jobs:
             chmod +x ione_server.rb
             chmod +x -R hooks/*
             rake hooks
-            rake install_gems[y]
+            rake install_deps[yum, y]
             \cp -f sys/ione.service /usr/lib/systemd/system/ione.service
             systemctl daemon-reload
             systemctl restart ione

@@ -33,6 +33,9 @@ class Hash
   def to_s!
     self.keys.each do |key|
       self[key.to_s] = self.delete key if key.class != String
+      if self[key.to_s].class == Hash then
+        self[key.to_s].to_s!
+      end
     end
     self
   end
@@ -122,6 +125,13 @@ class Hash
     end
     res
   end
+
+  # Generic #merge method better version
+  def deep_merge(second)
+    merger = proc { | _, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+    self.merge(second, &merger)
+  end
+
   # @!endgroup
 end
 

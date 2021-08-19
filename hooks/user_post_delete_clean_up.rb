@@ -42,6 +42,11 @@ require 'core/*'
 
 id = user.id
 
+if id == 0 then
+  puts "oneadmin user, skipping..."
+  exit 0
+end
+
 unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
   exit 0
