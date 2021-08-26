@@ -34,8 +34,10 @@ else
   exit 0
 end
 
-ETC_LOCATION = "/etc/one/"
-ONED_CONF    = ETC_LOCATION + '/oned.conf'
+if ENV["ALPINE"] != "true" then
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+end
 
 $: << '/usr/lib/one/ruby'
 $: << '/usr/lib/one/ione'

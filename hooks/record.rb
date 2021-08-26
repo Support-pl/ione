@@ -15,8 +15,10 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ETC_LOCATION = "/etc/one/"
-ONED_CONF    = ETC_LOCATION + '/oned.conf'
+if ENV["ALPINE"] != "true" then
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+end
 
 require 'yaml'
 require 'base64'

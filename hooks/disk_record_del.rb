@@ -24,8 +24,10 @@ unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
   exit 0
 end
 
-RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
-ETC_LOCATION      = "/etc/one/"
+if ENV["ALPINE"] != "true" then
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+end
 
 $: << RUBY_LIB_LOCATION
 $: << '/usr/lib/one/ione'
