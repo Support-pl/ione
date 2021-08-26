@@ -99,7 +99,7 @@ include OpenNebula
 # OpenNebula credentials
 CREDENTIALS = ALPINE ? ENV["ONE_CREDENTIALS"] : File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
+ENDPOINT = ALPINE ? ENV["ONE_ENDPOINT"] : "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
 puts 'Including on_helper funcs'
