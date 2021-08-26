@@ -3,9 +3,6 @@ module IONeLoggerKit
   require "#{ROOT}/service/time.rb"
   require "colorize"
 
-  `echo > #{LOG_ROOT}/errors.txt && chown oneadmin:oneadmin #{LOG_ROOT}/errors.txt`
-  `echo > #{LOG_ROOT}/sys.log && chown oneadmin:oneadmin #{LOG_ROOT}/sys.log`
-
   $log = []
 
   at_exit do
