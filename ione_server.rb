@@ -16,14 +16,20 @@ if !ONE_LOCATION
   # OpenNebula configs location
   ETC_LOCATION = "/etc/one"
 end
+if ALPINE
+  LOG_LOCATION ||= ENV["LOG_LOCATION"]
+end
 
 # IONe source location
 ROOT_DIR = File.dirname(__FILE__)
 
-$: << '/usr/lib/one/ruby'
-$: << '/usr/lib/one/ruby/cloud'
-$: << '/usr/lib/one/ione'
-$: << '/usr/lib/one/ione/models'
+if ALPINE then
+  $: << ROOT_DIR
+  $: << ROOT_DIR + '/models'
+else
+  $: << '/usr/lib/one/ione'
+  $: << '/usr/lib/one/ione/models'
+end
 
 ######################
 # Required libraries #
@@ -76,7 +82,7 @@ puts 'Setting up Environment(OpenNebula API)'
 
 # Loading DB Credentials and connecting DB
 
-ONED_CONF = ETC_LOCATION + '/oned.conf'
+ONED_CONF = ETC_LOCATION + '/oned.conf' unless ALPINE
 
 require 'core/*'
 
@@ -91,7 +97,7 @@ require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
+CREDENTIALS = ALPINE ? ENV["ONE_CREDENTIALS"] : File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
