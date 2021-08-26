@@ -34,12 +34,14 @@ else
   exit 0
 end
 
-if ENV["ALPINE"] != "true" then
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
   ETC_LOCATION = "/etc/one/"
   ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
 end
-
-$: << '/usr/lib/one/ione'
 
 require 'opennebula'
 include OpenNebula

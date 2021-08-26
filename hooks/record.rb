@@ -15,16 +15,18 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-if ENV["ALPINE"] != "true" then
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
   ETC_LOCATION = "/etc/one/"
   ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
 end
 
 require 'yaml'
 require 'base64'
 require 'nokogiri'
-
-$: << '/usr/lib/one/ione'
 require 'core/*'
 
 vm_template = Nokogiri::XML(Base64::decode64(ARGV.first))
