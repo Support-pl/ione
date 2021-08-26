@@ -1,4 +1,3 @@
-$: << '/usr/lib/one/ruby'
 require 'opennebula'
 
 @hooks = [

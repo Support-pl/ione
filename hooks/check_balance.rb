@@ -39,7 +39,6 @@ if ENV["ALPINE"] != "true" then
   ONED_CONF    = ETC_LOCATION + '/oned.conf'
 end
 
-$: << '/usr/lib/one/ruby'
 $: << '/usr/lib/one/ione'
 
 require 'opennebula'
