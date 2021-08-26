@@ -3,6 +3,7 @@
 # Server start-up time
 STARTUP_TIME = Time.now().to_i # IONe server start time
 INIT_IONE = true
+ALPINE = ENV["ALPINE"] == 'true'
 
 # OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
@@ -45,7 +46,7 @@ require 'open3'
 #################
 
 begin
-  $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+  $ione_conf = YAML.load_file(ALPINE ? "/ione/sys/ione.conf" : "#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 rescue => e
   STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
   exit 1
