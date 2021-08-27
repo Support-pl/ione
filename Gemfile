@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'augeas'
 gem 'colorize'
 gem 'file-tail'
 gem 'mysql2'
