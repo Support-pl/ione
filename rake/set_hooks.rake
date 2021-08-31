@@ -213,3 +213,48 @@ task :hooks do
     end
   end
 end
+
+desc "Setting needed hooks in Container environment"
+task :hooks_tp do
+
+  client = OpenNebula::Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"])
+
+  user = OpenNebula::User.new_with_id(-1, client)
+  begin
+    print "Connecting to OpenNebula XML-RPC API... "
+    rc = user.info!
+    raise if OpenNebula.is_error? rc
+  rescue
+    puts "Error!"
+    puts rc.message
+    print "Retrying in 30sec... "
+    sleep 30
+    retry
+  end
+
+  $: << ENV["IONE_LOCATION"]
+  require 'lib/std++/main.rb'
+
+  @hooks << {
+    "NAME" => 'test-tp-hook',
+    "TYPE" => 'api',
+    "CALL" => 'one.user.allocate',
+    "COMMAND" => '/usr/lib/one/ione/hooks/test_tp.rb',
+    "ARGUMENTS" => '$API'
+  }
+
+  for hook in @hooks do
+    print "Allocating hook #{hook['NAME']}... "
+    hook["ARGUMENTS"] = hook["COMMAND"] + ' ' + hook["ARGUMENTS"]
+    hook["COMMAND"] = '/usr/lib/one/ione/hooks/web_hook.rb'
+
+    rc = OpenNebula::Hook.new_with_id(0, client).allocate(hook.to_one_template)
+    if OpenNebula.is_error? rc then
+      puts "Error: " + rc.message
+    else
+      puts "Success: #{rc}"
+    end
+  end
+
+  chmod_R "+x", "#{ENV["IONE_LOCATION"]}/hooks/"
+end
