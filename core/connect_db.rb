@@ -24,7 +24,7 @@ ops.merge! adapter: adapter
 
 require 'sequel'
 begin
-  puts "Connecting to DB"
+  print "Connecting to DB... "
   $db = Sequel.connect(**ops)
 rescue => e
   puts "Error connecting to DB: #{e.message}"
@@ -33,3 +33,4 @@ rescue => e
   puts "Retrying..."
   retry
 end
+puts "Connected"
