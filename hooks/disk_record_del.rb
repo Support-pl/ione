@@ -38,7 +38,9 @@ vm = xml.xpath("//PARAMETER[TYPE='IN' and POSITION=2]/VALUE").text
 require 'opennebula'
 include OpenNebula
 
-vm = VirtualMachine.new_with_id vm, Client.new
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+vm = VirtualMachine.new_with_id vm, client
 vm.info!
 
 require 'core/*'

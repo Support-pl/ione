@@ -36,8 +36,9 @@ end
 require 'opennebula'
 include OpenNebula
 
-$client = Client.new
-user = User.new xml.xpath('//EXTRA/USER'), $client
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+user = User.new xml.xpath('//EXTRA/USER'), client
 
 require 'yaml'
 require 'core/*'
@@ -64,12 +65,12 @@ end
 
 until pool(id) == []
   pool(id).each do | vm |
-    VirtualMachine.new_with_id(vm[:oid], $client).terminate(true)
+    VirtualMachine.new_with_id(vm[:oid], client).terminate(true)
   end
 end
 
 vn_pool(id).each do | vnet |
-  vnet = VirtualNetwork.new_with_id(vnet[:oid], $client)
+  vnet = VirtualNetwork.new_with_id(vnet[:oid], client)
   vnet.delete
 end
 

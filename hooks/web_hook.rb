@@ -30,3 +30,17 @@ req.body = JSON.generate params: args
 r = Net::HTTP.start(api.hostname, api.port) do | http |
   http.request(req)
 end
+res = JSON.parse r.body
+
+case r.code.to_i
+when 400
+  STDERR.puts res['error']
+  exit 1
+when 403
+  STDERR.puts "Forbidden"
+  exit 1
+else
+  STDOUT.puts res['stdout']
+  STDERR.puts res['stderr']
+  exit res['status']
+end

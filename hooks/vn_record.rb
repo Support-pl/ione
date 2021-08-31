@@ -36,7 +36,9 @@ end
 require 'opennebula'
 include OpenNebula
 
-vnet = VirtualNetwork.new xml.xpath('//EXTRA/VNET'), Client.new
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+vnet = VirtualNetwork.new xml.xpath('//EXTRA/VNET'), client
 vnet.info!
 
 require 'yaml'

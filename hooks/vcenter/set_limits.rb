@@ -39,7 +39,7 @@ require 'service/objects/xml_element'
 require 'service/objects/host'
 require 'service/objects/vm'
 
-client = Client.new
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
 
 xml = Nokogiri::XML(Base64::decode64(ARGV.first))
 id = xml.xpath('//ID').text.to_i

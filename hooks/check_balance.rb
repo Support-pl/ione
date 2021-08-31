@@ -46,10 +46,12 @@ end
 require 'opennebula'
 include OpenNebula
 
-vm = VirtualMachine.new_with_id(vmid, Client.new)
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+vm = VirtualMachine.new_with_id(vmid, client)
 vm.info!
 
-u = User.new_with_id vm['UID'].to_i, Client.new
+u = User.new_with_id vm['UID'].to_i, client
 u.info!
 
 exit 0 if u.groups.include? 0
