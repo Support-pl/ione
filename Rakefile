@@ -16,6 +16,11 @@ task :before, [:packm, :silent, :domain] do | _task, args |
     exit(-1)
   end
 
+  unless system('which node') then
+    puts "Node.js(>=12) must be installed before proceeding with IONe"
+    exit(-1)
+  end
+
   @src_dir = pwd
   @version = File.read("#{@src_dir}/meta/version.txt")
   puts "Installing IONe #{@version}"
