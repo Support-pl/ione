@@ -421,7 +421,6 @@ class IONe
       end
 
       if %w(VCENTER KVM).include? params['extra']['type'].upcase then
-        LOG_DEBUG "Instantiating VM as#{win ? nil : ' not'} Windows"
         trace << "Setting VM context:#{__LINE__ + 2}"
         begin
           vm.updateconf(
