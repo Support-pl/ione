@@ -147,7 +147,7 @@ class IONe
   end
 end
 
-ione_drivers = %w(AnsibleDriver AzureDriver ShowbackDriver IONeKernel VLANManager)
+ione_drivers = %w(AnsibleDriver AzureDriver IONeKernel VLANManager)
 ione_drivers.each do | driver |
   begin
     require driver
