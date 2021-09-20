@@ -1,3 +1,4 @@
+require 'opennebula/lockable_ext'
 require 'date'
 require 'time'
 
@@ -33,8 +34,11 @@ class OpenNebula::VirtualMachine
     "CONTEXT"
   ]
 
+  # initialize method, watchout updates in main code branch
   def initialize(xml, client)
     @vim_vm = nil
+    LockableExt.make_lockable(self, VM_METHODS)
+
     super(xml, client)
   end
 
