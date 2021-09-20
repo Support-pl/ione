@@ -284,6 +284,15 @@ after do
 end
 
 puts "Registering IONe methods"
+
+# Inspect object, but shorten the string if len > 64
+def inspct obj
+  r = obj.inspect
+  return r[0, 64] if r.length > 64
+
+  r
+end
+
 # Endpoint to invoke IONe methods
 # @example Request:
 #    POST /ione/Test
@@ -306,8 +315,9 @@ post '/ione/:method' do | method |
   ensure
     r = { error: r.message } if OpenNebula.is_error? r
   end
-  RPC_LOGGER.debug "IONeAPI sends response #{r.inspect}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  err = defined?(backtrace) && !backtrace.nil?
+  RPC_LOGGER.debug "IONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
@@ -335,8 +345,9 @@ post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
   ensure
     r = { error: r.message } if OpenNebula.is_error? r
   end
-  RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  err = defined?(backtrace) && !backtrace.nil?
+  RPC_LOGGER.debug "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
@@ -369,8 +380,9 @@ post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
   ensure
     r = { error: r.message } if OpenNebula.is_error? r
   end
-  RPC_LOGGER.debug "ONeAPI sends response #{r.inspect}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if defined? backtrace and !backtrace.nil?
+  err = defined?(backtrace) && !backtrace.nil?
+  RPC_LOGGER.debug "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
