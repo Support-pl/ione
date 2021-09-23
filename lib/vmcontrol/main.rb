@@ -172,6 +172,8 @@ class IONe
     r = vm.info!
     raise r if OpenNebula.is_error? r
 
+    vm.unlock # Ensure VM is unlocked
+
     Thread.new do
       begin
         rc = vm.resume
