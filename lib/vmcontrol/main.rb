@@ -181,6 +181,7 @@ class IONe
 
         vm.wait_for_state
       rescue
+        # pass
       ensure
         vm.recover(4)
         vm.wait_for_state 1, 0
