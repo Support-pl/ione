@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  ione:
+    image: ghcr.io/support-pl/ione:latest
+    network_mode: host
+    environment:
+      ALPINE: "true"
+      IONE_LOCATION: /ione
+      ONE_LOCATION: /ione/sys
+      LOG_LOCATION: /log
+      ONE_CREDENTIALS: "oneadmin:password"
+      DB_BACKEND: mysql
+      DB_HOST: localhost
+      DB_USER: oneadmin
+      DB_PASSWORD: DBpassword
+      DB_DATABASE: opennebula
+      ONE_ENDPOINT: "http://localhost:2633/RPC2"
+    ports: 
+      - 8009:8009
+    volumes:
+      - ./sys:/ione/sys
+      - /var/log/one:/log
+  ione-admin:
+    image: ghcr.io/support-pl/ione-admin:latest
+    network_mode: host
+    environment: 
+      VUE_APP_IONE_API_BASE_URL: http://localhost:8009
+    ports:
+      - 5000:5000
