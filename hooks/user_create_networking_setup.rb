@@ -24,18 +24,21 @@ unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
   exit 0
 end
 
-RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
-ETC_LOCATION      = "/etc/one/"
-ONED_CONF         = ETC_LOCATION + "oned.conf"
-
-$: << '/usr/lib/one/ione'
-$: << RUBY_LIB_LOCATION
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
+end
 
 require 'opennebula'
 include OpenNebula
 
-$client = Client.new
-user = User.new xml.xpath('//EXTRA/USER'), $client
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+user = User.new xml.xpath('//EXTRA/USER'), client
 user.info!
 
 require 'yaml'

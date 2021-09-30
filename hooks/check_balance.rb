@@ -34,19 +34,24 @@ else
   exit 0
 end
 
-ETC_LOCATION = "/etc/one/"
-ONED_CONF    = ETC_LOCATION + '/oned.conf'
-
-$: << '/usr/lib/one/ruby'
-$: << '/usr/lib/one/ione'
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
+end
 
 require 'opennebula'
 include OpenNebula
 
-vm = VirtualMachine.new_with_id(vmid, Client.new)
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+vm = VirtualMachine.new_with_id(vmid, client)
 vm.info!
 
-u = User.new_with_id vm['UID'].to_i, Client.new
+u = User.new_with_id vm['UID'].to_i, client
 u.info!
 
 exit 0 if u.groups.include? 0

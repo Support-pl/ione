@@ -24,18 +24,21 @@ unless xml.xpath("/CALL_INFO/RESULT").text.to_i == 1 then
   exit 0
 end
 
-RUBY_LIB_LOCATION = "/usr/lib/one/ruby"
-ETC_LOCATION      = "/etc/one/"
-ONED_CONF         = ETC_LOCATION + "oned.conf"
-
-$: << '/usr/lib/one/ione'
-$: << RUBY_LIB_LOCATION
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
+end
 
 require 'opennebula'
 include OpenNebula
 
-$client = Client.new
-user = User.new xml.xpath('//EXTRA/USER'), $client
+client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+
+user = User.new xml.xpath('//EXTRA/USER'), client
 
 require 'yaml'
 require 'core/*'
@@ -62,12 +65,12 @@ end
 
 until pool(id) == []
   pool(id).each do | vm |
-    VirtualMachine.new_with_id(vm[:oid], $client).terminate(true)
+    VirtualMachine.new_with_id(vm[:oid], client).terminate(true)
   end
 end
 
 vn_pool(id).each do | vnet |
-  vnet = VirtualNetwork.new_with_id(vnet[:oid], $client)
+  vnet = VirtualNetwork.new_with_id(vnet[:oid], client)
   vnet.delete
 end
 
