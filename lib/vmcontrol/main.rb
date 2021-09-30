@@ -173,21 +173,8 @@ class IONe
     raise r if OpenNebula.is_error? r
 
     vm.unlock # Ensure VM is unlocked
+    vm.terminate true
 
-    Thread.new do
-      begin
-        rc = vm.resume
-        raise rc if OpenNebula.is_error? rc
-
-        vm.wait_for_state
-      rescue
-        # pass
-      ensure
-        vm.recover(4)
-        vm.wait_for_state 1, 0
-        vm.terminate(true)
-      end
-    end
     true
   rescue => e
     return e.messages
