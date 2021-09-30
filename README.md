@@ -212,6 +212,9 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
 
 2. Pre-configure IONe in `ione.conf` if needed
 3. Configure credentials and endpoints in `docker-compose.yml`
+
+   3.1 You may need to change tags to anything else from `latest` sometimes. Check [Github packages](https://github.com/orgs/Support-pl/packages?repo_name=ione) to see latest published versions
+
 4. Start IONe using `docker-compose up -d`
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the beginning of this `README`
