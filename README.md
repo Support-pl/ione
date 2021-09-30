@@ -25,6 +25,7 @@ Creators:
 
 - [System requirements](#system-requirements)
 - [Installation classic](#install)
+- [Running in Docker](#running-in-docker)
 - [Notes](#important-notes)
 
 ## Main features
@@ -198,6 +199,20 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
    </tbody>
 </table>
 ---------------------------------------------------------------------------------------------------------
+
+## Running in Docker
+
+1. Download needed files using:
+
+   ```shell
+   mkdir ione && cd ione && \
+   wget https://raw.githubusercontent.com/Support-pl/ione/master/sys/ione.conf && \
+   wget https://raw.githubusercontent.com/Support-pl/ione/ione-tp/docker-compose.yml
+   ```
+
+2. Pre-configure IONe in `ione.conf` if needed
+3. Configure credentials and endpoints in `docker-compose.yml`
+4. Start IONe using `docker-compose up -d`
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the beginning of this `README`
 
