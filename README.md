@@ -21,7 +21,13 @@ Creators:
 [Support.pl](https://support.pl)
 [slnt_opp](https://slnt-opp.xyz)
 
-## Main additional features
+## Table of Contents
+
+- [System requirements](#system-requirements)
+- [Installation classic](#install)
+- [Notes](#important-notes)
+
+## Main features
 
 - Transparent showback
 - Balance
