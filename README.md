@@ -21,7 +21,14 @@ Creators:
 [Support.pl](https://support.pl)
 [slnt_opp](https://slnt-opp.xyz)
 
-## Main additional features
+## Table of Contents
+
+- [System requirements](#system-requirements)
+- [Installation classic](#install)
+- [Running in Docker](#running-in-docker)
+- [Notes](#important-notes)
+
+## Main features
 
 - Transparent showback
 - Balance
@@ -192,6 +199,41 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
    </tbody>
 </table>
 ---------------------------------------------------------------------------------------------------------
+
+## Running in Docker
+
+1. Download needed files using:
+
+   ```shell
+   mkdir ione && cd ione && \
+   wget https://raw.githubusercontent.com/Support-pl/ione/master/sys/ione.conf && \
+   wget https://raw.githubusercontent.com/Support-pl/ione/ione-tp/docker-compose.yml
+   ```
+
+2. Pre-configure IONe in `ione.conf` if needed
+3. Configure credentials and endpoints in `docker-compose.yml` ([reference below](#docker-environment-variables-reference))
+
+   3.1 You may need to change tags to anything else from `latest` sometimes. Check [Github packages](https://github.com/orgs/Support-pl/packages?repo_name=ione) to see latest published versions
+
+4. Start IONe using `docker-compose up -d`
+
+### Docker environment variables reference
+
+```shell
+ALPINE=true # just required to make IONe reading data from env instead of default ONe files
+IONE_LOCATION=/ione # IONe root dir in container
+ONE_LOCATION=/ione/sys # IONe configs dir path
+LOG_LOCATION=/log # Path to dir to write IONe logs in
+ONE_CREDENTIALS="oneadmin:passwd" # oneadmin or other ONe admin(!) user credentials
+ONE_ENDPOINT="http://localhost:2633/RPC2" # ONe XML-RPC API endpoint
+
+# Database connection(must be same DB with ONe and have at least READ access to ONe tables)
+DB_BACKEND=mysql
+DB_HOST=10.6.6.6
+DB_USER=oneadmin
+DB_PASSWORD:passwd
+DB_DATABASE=opennebula
+```
 
 Thanks for choosing us, contacts for support are in "Contacts" section at the beginning of this `README`
 

@@ -35,9 +35,15 @@ else
 end
 
 require 'yaml'
-$: << '/usr/lib/one/ione'
+ALPINE = ENV["ALPINE"] == "true"
+if ALPINE then
+  $: << ENV["IONE_LOCATION"]
+else
+  ETC_LOCATION = "/etc/one/"
+  ONED_CONF    = ETC_LOCATION + '/oned.conf'
+  $: << '/usr/lib/one/ione'
+end
 
-ONED_CONF = "/etc/one/oned.conf"
 require 'core/*'
 
 $db[:traffic_records].insert(

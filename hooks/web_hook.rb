@@ -15,27 +15,32 @@
 # limitations under the License.                                             #
 # -------------------------------------------------------------------------- #
 
-ALPINE = ENV["ALPINE"] == "true"
-if ALPINE then
-  $: << ENV["IONE_LOCATION"]
-else
-  ETC_LOCATION = "/etc/one/"
-  ONED_CONF    = ETC_LOCATION + '/oned.conf'
-  $: << '/usr/lib/one/ione'
+require 'net/http'
+require 'json'
+
+hook, *args = ARGV
+hook = hook.split('/').last
+
+api = URI("http://ione:8009/")
+req = Net::HTTP::Post.new(api + '/hooks/' + hook)
+# Reading credentials from file and using as #basic_auth(uname, passwd)
+req.basic_auth(*File.read('/var/lib/one/.one/one_auth').chomp.split(':'))
+req.body = JSON.generate params: args
+
+r = Net::HTTP.start(api.hostname, api.port) do | http |
+  http.request(req)
 end
+res = JSON.parse r.body
 
-require 'yaml'
-require 'base64'
-require 'nokogiri'
-require 'core/*'
-
-vm_template = Nokogiri::XML(Base64::decode64(ARGV.first))
-id = vm_template.xpath("//ID").text.to_i
-
-puts "Writing new record for VM##{id}"
-
-state = ARGV[1]
-
-$db[:records].insert(id: id, state: state, time: Time.now.to_i)
-
-puts "Success. State: #{state}"
+case r.code.to_i
+when 400
+  STDERR.puts res['error']
+  exit 1
+when 403
+  STDERR.puts "Forbidden"
+  exit 1
+else
+  STDOUT.puts res['stdout']
+  STDERR.puts res['stderr']
+  exit res['status']
+end

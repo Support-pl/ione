@@ -3,6 +3,7 @@
 # Server start-up time
 STARTUP_TIME = Time.now().to_i # IONe server start time
 INIT_IONE = true
+ALPINE = ENV["ALPINE"] == 'true'
 
 # OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
@@ -15,14 +16,20 @@ if !ONE_LOCATION
   # OpenNebula configs location
   ETC_LOCATION = "/etc/one"
 end
+if ALPINE
+  LOG_LOCATION ||= ENV["LOG_LOCATION"]
+end
 
 # IONe source location
 ROOT_DIR = File.dirname(__FILE__)
 
-$: << '/usr/lib/one/ruby'
-$: << '/usr/lib/one/ruby/cloud'
-$: << '/usr/lib/one/ione'
-$: << '/usr/lib/one/ione/models'
+if ALPINE then
+  $: << ROOT_DIR
+  $: << ROOT_DIR + '/models'
+else
+  $: << '/usr/lib/one/ione'
+  $: << '/usr/lib/one/ione/models'
+end
 
 ######################
 # Required libraries #
@@ -45,7 +52,7 @@ require 'open3'
 #################
 
 begin
-  $ione_conf = YAML.load_file("#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+  $ione_conf = YAML.load_file(ALPINE ? "/ione/sys/ione.conf" : "#{ETC_LOCATION}/ione.conf") # IONe configuration constants
 rescue => e
   STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
   exit 1
@@ -75,7 +82,7 @@ puts 'Setting up Environment(OpenNebula API)'
 
 # Loading DB Credentials and connecting DB
 
-ONED_CONF = ETC_LOCATION + '/oned.conf'
+ONED_CONF = ETC_LOCATION + '/oned.conf' unless ALPINE
 
 require 'core/*'
 
@@ -90,9 +97,9 @@ require "opennebula"
 include OpenNebula
 ###########################################
 # OpenNebula credentials
-CREDENTIALS = File.read(VAR_LOCATION + "/.one/one_auth").chomp
+CREDENTIALS = ALPINE ? ENV["ONE_CREDENTIALS"] : File.read(VAR_LOCATION + "/.one/one_auth").chomp
 # XML_RPC endpoint where OpenNebula is listening
-ENDPOINT = "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
+ENDPOINT = ALPINE ? ENV["ONE_ENDPOINT"] : "http://localhost:#{$oned_conf.get('PORT')}/RPC2"
 $client = Client.new(CREDENTIALS, ENDPOINT) # oneadmin auth-client
 
 puts 'Including on_helper funcs'
@@ -233,7 +240,7 @@ RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && 
 # IONe API based on http
 #
 puts "Binding on localhost:8009"
-set :bind, 'localhost'
+set :bind, ALPINE ? '0.0.0.0' : 'localhost'
 set :port, 8009
 
 before do
@@ -260,7 +267,7 @@ before do
       @auth = Base64.decode64 request.env['HTTP_AUTHORIZATION'].split(' ').last
     end
 
-    env[:one_client] = @client   = Client.new(@auth)
+    env[:one_client] = @client   = Client.new(@auth, ENDPOINT)
     env[:one_user]   = @one_user = User.new_with_id(-1, @client)
     rc = @one_user.info!
     if OpenNebula.is_error?(rc)
