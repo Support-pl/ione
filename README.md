@@ -207,7 +207,7 @@ Environment=GEM_PATH=/usr/local/rvm/gems/ruby-2.5.8:/usr/local/rvm/gems/ruby-2.5
    ```shell
    mkdir ione && cd ione && \
    wget https://raw.githubusercontent.com/Support-pl/ione/master/sys/ione.conf && \
-   wget https://raw.githubusercontent.com/Support-pl/ione/ione-tp/docker-compose.yml
+   wget https://raw.githubusercontent.com/Support-pl/ione/master/docker-compose.yml
    ```
 
 2. Pre-configure IONe in `ione.conf` if needed
