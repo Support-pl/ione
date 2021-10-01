@@ -5,6 +5,12 @@ STARTUP_TIME = Time.now().to_i # IONe server start time
 INIT_IONE = true
 ALPINE = ENV["ALPINE"] == 'true'
 
+if ALPINE then
+  require 'rake'
+  Rake.load_rakefile('Rakefile')
+  Rake::Task['hooks_tp'].invoke
+end
+
 # OpenNebula Ruby files location
 ONE_LOCATION = ENV["ONE_LOCATION"]
 
