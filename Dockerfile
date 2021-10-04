@@ -7,4 +7,6 @@ RUN apk update && apk add --virtual build-dependencies build-base
 RUN apk add augeas-dev mariadb-dev postgresql-dev
 RUN bundle install
 
-ENTRYPOINT ["bundle", "exec", "rackup"]
+EXPOSE 8009
+
+ENTRYPOINT ["bundle", "exec", "rackup", "-o", "0.0.0.0", "-p", "8009"]
