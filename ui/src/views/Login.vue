@@ -46,7 +46,7 @@ export default {
         password: "",
       },
       fails: 0,
-      endpoint: process.env.VUE_APP_IONE_API_BASE_URL,
+      endpoint: VUE_APP_IONE_API_BASE_URL,
     };
   },
   methods: {
