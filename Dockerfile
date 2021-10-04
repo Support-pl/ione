@@ -7,4 +7,4 @@ RUN apk update && apk add --virtual build-dependencies build-base
 RUN apk add augeas-dev mariadb-dev postgresql-dev
 RUN bundle install
 
-ENTRYPOINT ["ruby", "/ione/ione_server.rb"]
+ENTRYPOINT ["bundle", "exec", "rackup"]
