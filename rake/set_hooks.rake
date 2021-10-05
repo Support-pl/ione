@@ -235,14 +235,6 @@ task :hooks_tp do
   $: << ENV["IONE_LOCATION"]
   require 'lib/std++/main.rb'
 
-  @hooks << {
-    "NAME" => 'test-tp-hook',
-    "TYPE" => 'api',
-    "CALL" => 'one.user.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/test_tp.rb',
-    "ARGUMENTS" => '$API'
-  }
-
   for hook in @hooks do
     print "Allocating hook #{hook['NAME']}... "
     hook["ARGUMENTS"] = hook["COMMAND"] + ' ' + hook["ARGUMENTS"]
