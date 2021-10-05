@@ -4,7 +4,9 @@ ADD . /ione
 WORKDIR /ione
 
 RUN apk update && apk add --virtual build-dependencies build-base
-RUN apk add augeas-dev mariadb-dev
+RUN apk add augeas-dev mariadb-dev postgresql-dev
 RUN bundle install
 
-ENTRYPOINT ["sh", "command.sh"]
+EXPOSE 8009
+
+ENTRYPOINT ["bundle", "exec", "rackup", "-o", "0.0.0.0", "-p", "8009"]

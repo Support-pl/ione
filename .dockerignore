@@ -2,6 +2,5 @@
 LICENSE
 *.yml
 ui
-modules
 *.service
 nginx.*
