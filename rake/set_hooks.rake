@@ -238,7 +238,7 @@ task :hooks_tp do
   for hook in @hooks do
     print "Allocating hook #{hook['NAME']}... "
     hook["ARGUMENTS"] = hook["COMMAND"] + ' ' + hook["ARGUMENTS"]
-    hook["COMMAND"] = '/usr/lib/one/ione/hooks/web_hook.rb'
+    hook["COMMAND"] = '/var/lib/one/remotes/hooks/web_hook.rb'
 
     rc = OpenNebula::Hook.new_with_id(0, client).allocate(hook.to_one_template)
     if OpenNebula.is_error? rc then
