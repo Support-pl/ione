@@ -59,7 +59,10 @@
           "jest": true
         }
       }
-    ]
+    ],
+    "globals": {
+      "VUE_APP_IONE_API_BASE_URL": true
+    }
   },
   "browserslist": [
     "> 1%",

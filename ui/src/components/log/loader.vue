@@ -37,7 +37,7 @@ export default {
     load() {
       let vm = this;
       let ws = new WebSocket(
-        `${process.env.VUE_APP_IONE_API_BASE_URL.replace(
+        `${VUE_APP_IONE_API_BASE_URL.replace(
           "https",
           "wss"
         )}/wss/ione/log/${this.log.key}?ws=true&auth=${btoa(
