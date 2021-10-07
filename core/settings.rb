@@ -20,6 +20,7 @@ if defined?(INIT_IONE) && INIT_IONE then
     ['DISK_COSTS', "{\"HDD\":0.0,\"SSD\":0.0}", "Costs of different disk types GB/sec", 1, "object"],
     ['IAAS_GROUP_ID', 100, "IaaS(VDC) Users group ID", 1, "int"],
     ['NODES_DEFAULT', "{\"VCENTER\":\"host_id\"}", "Default nodes for different hypervisors", 1, "object"],
+    ['VDC_NODES_DEFAULT', "{\"VCENTER\":\"host_id\"}", "Default nodes for different hypervisors for VDC", 1, "object"],
     ['PUBLIC_IP_COST', 0.0, "Public IP Address cost per sec", 0, "float"],
     ['PUBLIC_NETWORK_DEFAULTS', "{\"IAAS\":\"0\", \"PAAS\": \"0\"}", "Default Public Network Pool IDs for IaaS and PaaS", 1, "object"],
     ['CURRENCY_MAIN', "€", "Currency", 0, "str"],
