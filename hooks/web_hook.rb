@@ -23,8 +23,8 @@ hook = hook.split('/').last
 
 api = URI("http://ione:8009/")
 req = Net::HTTP::Post.new(api + '/hooks/' + hook)
-# Reading credentials from file and using as #basic_auth(uname, passwd)
-req.basic_auth(*File.read('/var/lib/one/.one/one_auth').chomp.split(':'))
+# Reading credentials from ENV and using as #basic_auth(uname, passwd)
+req.basic_auth(*ENV['IONE_AUTH'].split(':'))
 req.body = JSON.generate params: args
 
 r = Net::HTTP.start(api.hostname, api.port) do | http |
