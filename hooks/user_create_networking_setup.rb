@@ -36,9 +36,9 @@ end
 require 'opennebula'
 include OpenNebula
 
-client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
+$client = ALPINE ? Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"]) : Client.new
 
-user = User.new xml.xpath('//EXTRA/USER'), client
+user = User.new xml.xpath('//EXTRA/USER'), $client
 user.info!
 
 require 'yaml'
