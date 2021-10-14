@@ -131,6 +131,8 @@ class VLAN < Sequel::Model(:vlans)
   end
 
   # Create new VNet and lease record with VLAN ID from this Pool
+  # @note Must be exported and accessible $client object with OpenNebula::Client in order to make method working
+  #       Otherwise will raise `info': undefined method `call' for nil:NilClass (NoMethodError) on template
   # @param [String] name - New VNet Name
   # @param [Integer] owner - OpenNebula::User ID. New VNet would be bind to that user
   # @param [Integer] group - OpenNebula::Group ID. New VNet would be bind to that group
