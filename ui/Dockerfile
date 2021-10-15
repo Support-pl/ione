@@ -17,7 +17,5 @@ COPY --from=builder /app/command.sh .
 RUN chmod +x command.sh
 RUN chmod ugo+w config.js
 
-EXPOSE 5000
-
 USER static
 ENTRYPOINT ["sh", "command.sh" ]
