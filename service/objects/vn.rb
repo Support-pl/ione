@@ -46,6 +46,8 @@ class OpenNebula::VirtualNetwork
     else
       return pool
     end
+  rescue
+    return []
   end
 
   # Calculate amount of Public Addresses and bill them with `PUBLIC_IP_COST`
