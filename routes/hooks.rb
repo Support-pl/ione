@@ -9,7 +9,7 @@ if ALPINE then
     end
     hook = "#{ROOT_DIR}/hooks/#{hook}"
     unless File.exist? hook then
-      halt 400, { 'Content-Type': 'application/json' }, { error: "Script doesn't exist" }.to_json
+      halt 400, { 'Content-Type' => 'application/json' }, { error: "Script doesn't exist" }.to_json
     end
 
     stdout, stderr, status = Open3.capture3(hook + " " + @request_hash['params'].join(' '))
