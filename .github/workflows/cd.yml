@@ -18,7 +18,7 @@ jobs:
         working-directory: ./ui
 
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-node@v2.4.1
       
       - name: Dependencies
@@ -44,7 +44,7 @@ jobs:
       name: ${{ github.event.inputs.deployEnvironment }}
     
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
 
       - name: Remove unwanted dirs and files
         run: rm -rf docs modules ui
