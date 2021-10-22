@@ -138,6 +138,21 @@ class IONe
     })
     context['TEMPLATE_ID'] = params['templateid']
 
+    host = params['host']
+    if host.nil? then
+      host = IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
+    end
+    if host.class == Array then
+      host = host.map { | h | "ID=\"#{h}\"" }.join(" | ")
+    else
+      host = "ID=\"#{host}\""
+    end
+
+    context['SCHED_REQUIREMENTS'] = host
+
+    ds = ChooseDS(params['ds_type'], params['extra']['type'])
+    context['SCHED_DS_REQUIREMENTS'] = "ID=\"#{ds}\""
+
     context = context.without('GRAPHICS').to_one_template
     LOG_DEBUG "Resulting capacity template:\n#{context}"
 
@@ -151,13 +166,13 @@ class IONe
     LOG_COLOR "Terminate process is over, new VM is deploying now", 'Reinstall', 'green'
     LOG_DEBUG 'Creating new VM'
     trace << "Instantiating template:#{__LINE__ + 1}"
-    vmid = template.instantiate(params['vm_name'], false, context)
+    vmid = template.instantiate(params['vm_name'], !params['release'], context)
     LOG_DEBUG "New VM ID or an OpenNebula::Error: #{begin vmid.to_str rescue vmid.to_s end}"
     begin
       if vmid.class != Integer && vmid.include?('IP/MAC') then
         trace << "Retrying template instantiation:#{__LINE__ + 1}"
         sleep(3)
-        vmid = template.instantiate(params['login'] + '_vm', false, context)
+        vmid = template.instantiate(params['login'] + '_vm', !params['release'], context)
       end
     rescue
       return vmid.class, vmid.message if vmid.class != Integer
@@ -172,15 +187,7 @@ class IONe
 
     #####   PostDeploy Activity define   #####
     Thread.new do
-      host = if params['host'].nil? then
-               IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
-             else
-               params['host']
-             end
-
       vm = onblock(:vm, vmid)
-      LOG_DEBUG "Deploying VM to the host ##{host}"
-      vm.deploy(host, false, ChooseDS(params['ds_type']))
       LOG_DEBUG 'Waiting until VM will be deployed'
       vm.wait_for_state
 
@@ -396,18 +403,27 @@ class IONe
         specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['PAAS'] }
       end
 
+      host = params['host']
+      if host.nil? then
+        host = IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
+      end
+      if host.class == Array then
+        host = host.map { | h | "ID=\"#{h}\"" }.join(" | ")
+      else
+        host = "ID=\"#{host}\""
+      end
+
+      specs['SCHED_REQUIREMENTS'] = host
+
+      ds = ChooseDS(params['ds_type'], params['extra']['type'])
+      specs['SCHED_DS_REQUIREMENTS'] = "ID=\"#{ds}\""
+
       LOG_DEBUG "Resulting capacity template:\n" + specs.debug_out
       specs = specs.to_one_template
-      vmid = t.instantiate(params['vm_name'], true, specs + "\n" + params['user-template'].to_one_template)
+      vmid = t.instantiate(params['vm_name'], !params['release'], specs + "\n" + params['user-template'].to_one_template)
     end
 
     raise "Template instantiate Error: #{vmid.message}" if OpenNebula.is_error? vmid
-
-    host = if params['host'].nil? then
-             IONe::Settings['NODES_DEFAULT'][params['extra']['type'].upcase]
-           else
-             params['host']
-           end
 
     LOG_AUTO 'Configuring VM Template'
     trace << "Configuring VM Template:#{__LINE__ + 1}"
@@ -452,14 +468,6 @@ class IONe
           LOG_DEBUG "VNC configuring error: #{e.message}"
         end
       end
-
-      if %w(VCENTER KVM).include? params['extra']['type'].upcase then
-        trace << "Deploying VM:#{__LINE__ + 1}"
-        vm.deploy(host, false, ChooseDS(params['ds_type'], params['extra']['type']))
-      else
-        trace << "Deploying VM:#{__LINE__ + 1}"
-        vm.deploy(host, false)
-      end if params['release']
     end
     ##### Creating and Configuring VM END #####
 
