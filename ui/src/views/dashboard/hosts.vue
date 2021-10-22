@@ -132,9 +132,10 @@ export default {
       let requestBody = copyObject(this.nodesDefaultSetting);
       let settingBody = JSON.parse(requestBody.body);
       if (checked) {
-        settingBody[record.VM_MAD] = record.ID;
+        settingBody[record.VM_MAD.toUpperCase()] = record.ID;
       } else {
         delete settingBody[record.VM_MAD];
+        delete settingBody[record.VM_MAD.toUpperCase()];
       }
       requestBody.body = JSON.stringify(settingBody);
       this.$axios({
