@@ -233,16 +233,18 @@ class IONe
       end
     end
 
-    img_pool, mon = DatastorePool.new(@client), []
-    img_pool.info_all!
-    img_pool.each do | img |
+    ds_pool, mon = DatastorePool.new(@client), []
+    ds_pool.info_all!
+
+    allow_system_ds = IONe::Settings['ALLOW_USING_SYSTEM_DATASTORES']
+    ds_pool.each do | ds |
       mon << {
-        'id' => img.id, 'name' => img.name.split('(').first, :full_size => size_convert[img.to_hash['DATASTORE']['TOTAL_MB']],
-          'used' => size_convert[img.to_hash['DATASTORE']['USED_MB']],
-          'type' => img.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
-          'deploy' => img.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
-          'hypervisor' => img.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
-      } if img.short_type_str == type && img.id > 2
+        'id' => ds.id, 'name' => ds.name.split('(').first, :full_size => size_convert[ds.to_hash['DATASTORE']['TOTAL_MB']],
+          'used' => size_convert[ds.to_hash['DATASTORE']['USED_MB']],
+          'type' => ds.to_hash['DATASTORE']['TEMPLATE']['DRIVE_TYPE'],
+          'deploy' => ds.to_hash['DATASTORE']['TEMPLATE']['DEPLOY'],
+          'hypervisor' => ds.to_hash['DATASTORE']['TEMPLATE']['HYPERVISOR']
+      } if ds.short_type_str == type && (allow_system_ds || ds.id > 2)
     end
     mon
   end
