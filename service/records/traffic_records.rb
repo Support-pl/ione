@@ -57,7 +57,7 @@ class OpenNebula::TrafficRecords < RecordsSource
     :vm
   end
 
-  # inits RecordsSource class with SnapshotRecord class as base and syncronysing frequency and records(unless no nosync given)
+  # inits RecordsSource class with TrafficRecord class as base and syncronysing frequency and records(unless no nosync given)
   def initialize id, nosync = false
     super(TrafficRecord, id)
     @bill_freq = IONe::Settings['TRAFFIC_BILL_FREQ']
