@@ -130,9 +130,9 @@ class OpenNebula::SnapshotRecords < RecordsSource
 
   # Gets All of the SnapshotRecords before stime and with deletion time greater than stime or nil and counts(which is initial quantity of snaps)
   def init_state stime
-    # SELECT * FROM `snapshot_records` WHERE ((`crt` < 0) AND ((`del` >= 0) OR NOT `del`))
+    # SELECT * FROM "snapshot_records" WHERE (("del" >= 15) OR ("del" IS NULL))
     {
-      snaps: @records.where { crt < stime }.where { (del >= stime) | ~del }.count
+      snaps: @records.where { crt < stime }.where { (del >= stime) | Sequel[del: nil] }.count
     }
   end
 end
