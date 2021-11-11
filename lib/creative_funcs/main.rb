@@ -3,6 +3,7 @@ class IONe
   # @param [String]   login       - login for new OpenNebula User
   # @param [String]   pass        - password for new OpenNebula User
   # @param [Integer]  groupid     - Secondary group for new user
+  # @param [Integer]  balance     - Balance to be set by default
   # @param [OpenNebula::Client] client
   # @param [Boolean]  object      - Returns userid of the new User and object of new User
   # @param [String]   locale      - Sets given locale for Sunstone
@@ -12,7 +13,7 @@ class IONe
   #       Object set to true:     777, OpenNebula::User(777)
   #   Error:                      "[one.user.allocation] Error ...", maybe caused if user with given name already exists
   #   Error:                      0
-  def UserCreate(login, pass, groupid = nil, locale = nil, client: @client, object: false, type: 'vcenter')
+  def UserCreate(login, pass, groupid = nil, locale = nil, balace = 0, client: @client, object: false, type: 'vcenter')
     user = User.new(User.build_xml(0), client) # Generates user template using oneadmin user object
     allocation_result =
       begin
@@ -31,7 +32,7 @@ class IONe
       }
     }
     attrs['AZURE_TOKEN'] = login if type == 'azure'
-    attrs.merge! BALANCE: 0, LABELS: "IaaS" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
+    attrs.merge! BALANCE: balace, LABELS: "IaaS" if groupid.to_i == IONe::Settings['IAAS_GROUP_ID']
 
     user.update(attrs.to_one_template, true)
     return user.id, user if object
