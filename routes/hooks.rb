@@ -1,4 +1,4 @@
-# !@group Ansible Playbook Endpoints
+# !@group OpenNebula Hooks Endpoints
 if ALPINE then
 
   require 'open3'
