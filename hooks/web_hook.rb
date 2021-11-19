@@ -21,7 +21,6 @@ require 'json'
 ALPINE = ENV["ALPINE"] == "true"
 
 hook, *args = ARGV
-hook = hook.split('/').last
 
 api = URI("http://ione:8009/")
 unless ALPINE then
