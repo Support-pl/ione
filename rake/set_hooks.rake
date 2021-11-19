@@ -204,8 +204,8 @@ task :hooks do
     end
   end
 
-  ENV["ONE_CREDENTIALS"] = Client.new.one_auth
-  ENV["ONE_ENDPOINT"] = Client.new.one_endpoint
+  ENV["ONE_CREDENTIALS"] = OpenNebula::Client.new.one_auth
+  ENV["ONE_ENDPOINT"] = OpenNebula::Client.new.one_endpoint
   Rake::Task["hooks_tp"].invoke
 end
 
