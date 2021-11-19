@@ -186,6 +186,8 @@ task :hooks do
     puts 'Copying hooks scripts'
     cp_r "hooks", "/usr/lib/one/ione/"
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
+
+    cp "hooks/web_hook.rb", "/var/lib/one/remotes/hooks/web_hook.rb"
   end
 
   begin
@@ -201,22 +203,14 @@ task :hooks do
       end
     end
   end
-  require '/usr/lib/one/ione/lib/std++/main.rb'
 
-  puts 'Adding hooks to HookPool'
-  for hook in @hooks do
-    rc = OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
-    if OpenNebula.is_error? rc then
-      puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- X".red
-    else
-      puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- V".green
-    end
-  end
+  ENV["ONE_CREDENTIALS"] = Client.new.one_auth
+  ENV["ONE_ENDPOINT"] = Client.new.one_endpoint
+  Rake::Task["hooks_tp"].invoke
 end
 
 desc "Setting needed hooks in Container environment"
 task :hooks_tp do
-
   client = OpenNebula::Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"])
 
   user = OpenNebula::User.new_with_id(-1, client)
