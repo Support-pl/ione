@@ -207,6 +207,7 @@ task :hooks do
 
   ENV["ONE_CREDENTIALS"] = OpenNebula::Client.new.one_auth
   ENV["ONE_ENDPOINT"] = OpenNebula::Client.new.one_endpoint
+  ENV["IONE_LOCATION"] = "/usr/lib/one/ione"
   Rake::Task["hooks_tp"].invoke
 end
 
