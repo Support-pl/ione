@@ -2,7 +2,8 @@
 require 'open3'
 
 post '/hooks/:hook' do | hook |
-  unless IPAddr.new(request.env['REMOTE_ADDR']).private? then
+  addr = IPAddr.new(request.env['REMOTE_ADDR'])
+  unless addr.private? || addr.loopback? then
     halt 403
   end
   hook = "#{ROOT_DIR}/hooks/#{hook}"
