@@ -32,7 +32,7 @@ if ALPINE then
   # Reading credentials from ENV and using as #basic_auth(uname, passwd)
   req.basic_auth(*ENV['IONE_AUTH'].split(':'))
 else
-  req.basic_auth(File.read(File.expand_path("~oneadmin/.one/one_auth")))
+  req.basic_auth(*File.read(File.expand_path("~oneadmin/.one/one_auth")).split(':'))
 end
 req.body = JSON.generate params: args
 
