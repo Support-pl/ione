@@ -188,6 +188,7 @@ task :hooks do
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
 
     cp "hooks/web_hook.rb", "/var/lib/one/remotes/hooks/web_hook.rb"
+    chmod "+x", "/var/lib/one/remotes/hooks/web_hook.rb"
   end
 
   begin
