@@ -5,6 +5,11 @@ class OpenNebula::XMLElement
     self.info! || self.to_hash
   end
 
+  # Calls info! method and returns a xml representing the object
+  def to_xml!
+    self.info! || self.to_xml
+  end
+
   # Performs info and returns name
   def name!
     info!
