@@ -44,6 +44,9 @@ when 400
   res = JSON.parse r.body
   STDERR.puts res['error']
   exit 1
+when 404
+  STDERR.puts "Hook not Found"
+  exit 1
 when 403
   STDERR.puts "Forbidden"
   exit 1
