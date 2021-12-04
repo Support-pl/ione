@@ -301,6 +301,9 @@ class IONe
       LOG_DEBUG "No vCenter configuration found"
     end
 
+    paas_vnet = IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['PAAS']
+    return { error: "VNetNotConfigured" } if paas_vnet.nil? || paas_vnet == ""
+
     params['vm_name'] = params['vm_name'] || "#{params['login']}_vm"
     ###################### Doing some important system stuff ###############################################################
 
@@ -400,8 +403,9 @@ class IONe
 
       trace << "Setting up NICs:#{__LINE__ + 1}"
       specs['NIC'] = []
+
       params['ips'].times do
-        specs['NIC'] << { NETWORK_ID: IONe::Settings['PUBLIC_NETWORK_DEFAULTS']['PAAS'] }
+        specs['NIC'] << { NETWORK_ID: paas_vnet }
       end
 
       host = params['host']
