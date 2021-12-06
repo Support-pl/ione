@@ -65,6 +65,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3.6.1
         with:
+          tags: type=raw,value=latest
           images: ${{ env.REGISTRY }}/support-pl/ione-admin
 
       - name: Build and push Docker image
