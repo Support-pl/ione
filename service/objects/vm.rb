@@ -340,7 +340,7 @@ class OpenNebula::VirtualMachine
     self.info!
     !self.to_hash['VM']['TEMPLATE']['SNAPSHOT'].nil?
   end
-  alias :got_snapshot? :got_snapshot?
+  alias :got_snapshot? :got_snapshots?
 
   def got_disk_snapshots?
     self.info!
