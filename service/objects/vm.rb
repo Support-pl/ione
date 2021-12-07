@@ -336,7 +336,7 @@ class OpenNebula::VirtualMachine
 
   # Gives info about snapshots availability
   # @return [Boolean]
-  def got_snapshot?
+  def got_snapshots?
     self.info!
     !self.to_hash['VM']['TEMPLATE']['SNAPSHOT'].nil?
   end
