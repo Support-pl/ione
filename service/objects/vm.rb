@@ -340,6 +340,7 @@ class OpenNebula::VirtualMachine
     self.info!
     !self.to_hash['VM']['TEMPLATE']['SNAPSHOT'].nil?
   end
+  alias :got_snapshot? :got_snapshot?
 
   # Returns all available snapshots
   # @return [Array<Hash>, Hash, nil]
