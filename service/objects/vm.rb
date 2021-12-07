@@ -342,6 +342,11 @@ class OpenNebula::VirtualMachine
   end
   alias :got_snapshot? :got_snapshot?
 
+  def got_disk_snapshots?
+    self.info!
+    !self.to_hash['VM']['SNAPSHOTS'].nil?
+  end
+
   # Returns all available snapshots
   # @return [Array<Hash>, Hash, nil]
   def list_snapshots
