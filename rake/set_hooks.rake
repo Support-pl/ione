@@ -119,7 +119,7 @@ require 'opennebula'
   {
     "NAME" => 'set-limits',
     "ON" => "RUNNING",
-    "COMMAND" => "vcenter/set_limits.rb",
+    "COMMAND" => "vcenter_set_limits.rb",
     "ARGUMENTS" => "$TEMPLATE",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -130,7 +130,7 @@ require 'opennebula'
     "STATE" => "ACTIVE",
     "LCM_STATE" => "RUNNING",
     "ARGUMENTS" => "$TEMPLATE",
-    "COMMAND" => "vcenter/check_running_state.rb",
+    "COMMAND" => "vcenter_check_running_state.rb",
     "TYPE" => "state",
     "RESOURCE" => "VM"
   },
