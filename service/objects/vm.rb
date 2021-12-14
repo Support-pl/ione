@@ -500,6 +500,37 @@ class OpenNebula::VirtualMachine
     }
   end
 
+  def start_vmrc
+    r = info!
+    return { error: "No access to VM" } if OpenNebula.is_error? r
+
+    unless [state, lcm_state] == [3, 3] then
+      return { error: "VM isn't running" }
+    end
+
+    unless self['USER_TEMPLATE/HYPERVISOR'] == 'vcenter' then
+      return { error: "VM isn't vCenter VM" }
+    end
+
+    unless self['MONITORING/VCENTER_ESX_HOST'] then
+      return { error: "Can't determine ESX host from monitoring, try again later"}
+    end
+
+    vcenter_get_vm
+
+    ticket = @vim_vm.AcquireTicket(:ticketType => 'webmks')
+
+    begin
+      f = File.open(File.join('/var/lib/one/sunstone_vmrc_tokens/', ticket.ticket.sanitize), 'w')
+      f.write("https://#{ticket.host}:#{ticket.port}")
+      f.close
+    rescue
+      return { error: "Cannot create VNC proxy token" }
+    end
+
+    return { ticket: ticket.ticket }
+  end
+
   # Generates VNC proxy token file
   def start_vnc
     r = info!
