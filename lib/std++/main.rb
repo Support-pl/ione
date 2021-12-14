@@ -193,3 +193,20 @@ class IPAddr
   end
   alias private? :local?
 end
+
+class String
+  # Copy of OpenNebula VCenterDriver::FileHelper
+  def sanitize
+    text = self.clone
+    # Bad as defined by wikipedia:
+    # https://en.wikipedia.org/wiki/Filename in
+    # Reserved_characters_and_words
+    # Also have to escape the backslash
+    bad_chars = ['/', '\\', '?', '%', '*', ':',
+                 '|', '"', '<', '>', '.', ' ']
+    bad_chars.each do |bad_char|
+      text.gsub!(bad_char, '_')
+    end
+    text
+  end
+end
