@@ -248,7 +248,7 @@ Most probably `gem install mysql2` will fail on building native extentions. The 
 
 ## Useful Doc-Pages
 
-- [WHMCS Module Overview and Installation guides](/file.WHMCS.html)
-- [Showback Configuration Reference](/file.Showback.html)
-- [Snapshots management features and billing reference](/file.VMSnapshots.html)
-- [VLAN Manager reference](/file.VLANManager.html)
+- [WHMCS Module Overview and Installation guides](https://docs.ione-cloud.net/file.WHMCS.html)
+- [Showback Configuration Reference](https://docs.ione-cloud.net/file.Showback.html)
+- [Snapshots management features and billing reference](https://docs.ione-cloud.net/file.VMSnapshots.html)
+- [VLAN Manager reference](https://docs.ione-cloud.net/file.VLANManager.html)
