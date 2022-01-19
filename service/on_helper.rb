@@ -62,10 +62,10 @@ module ONeHelper
   # @param [OpenNebula::Host] host
   # @return [Datacenter]
   def get_vcenter_dc(host)
-    host = host.to_hash!['HOST']['TEMPLATE']
+    host.info! true
     VIM.connect(
-      :host => host['VCENTER_HOST'], :insecure => true,
-      :user => host['VCENTER_USER'], :password => host['VCENTER_PASSWORD_ACTUAL']
+      :host => host['//VCENTER_HOST'], :insecure => true,
+      :user => host['//VCENTER_USER'], :password => host['//VCENTER_PASSWORD']
     ).serviceInstance.find_datacenter
   end
 

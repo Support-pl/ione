@@ -134,7 +134,6 @@ class OpenNebula::VirtualMachine
   # !@group vCenterHelper
 
   # Sets resources allocation limits at vCenter node
-  # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Attention!!! VM will be rebooted at the process
   # @note Valid units are: CPU - MHz, RAM - MB
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
@@ -251,7 +250,6 @@ class OpenNebula::VirtualMachine
   end
 
   # Checks if resources hot add enabled
-  # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def hotAddEnabled?
@@ -300,7 +298,6 @@ class OpenNebula::VirtualMachine
   end
 
   # Gets resources allocation limits from vCenter node
-  # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def getResourcesAllocationLimits
@@ -336,9 +333,15 @@ class OpenNebula::VirtualMachine
 
   # Gives info about snapshots availability
   # @return [Boolean]
-  def got_snapshot?
+  def got_snapshots?
     self.info!
     !self.to_hash['VM']['TEMPLATE']['SNAPSHOT'].nil?
+  end
+  alias :got_snapshot? :got_snapshots?
+
+  def got_disk_snapshots?
+    self.info!
+    !self.to_hash['VM']['SNAPSHOTS'].nil?
   end
 
   # Returns all available snapshots
@@ -492,6 +495,37 @@ class OpenNebula::VirtualMachine
       records: TrafficRecords.new(id).records,
       monitoring: monitoring(['NETTX', 'NETRX'])
     }
+  end
+
+  def start_vmrc
+    r = info!
+    return { error: "No access to VM" } if OpenNebula.is_error? r
+
+    unless [state, lcm_state] == [3, 3] then
+      return { error: "VM isn't running" }
+    end
+
+    unless self['USER_TEMPLATE/HYPERVISOR'] == 'vcenter' then
+      return { error: "VM isn't vCenter VM" }
+    end
+
+    unless self['MONITORING/VCENTER_ESX_HOST'] then
+      return { error: "Can't determine ESX host from monitoring, try again later"}
+    end
+
+    vcenter_get_vm
+
+    ticket = @vim_vm.AcquireTicket(:ticketType => 'webmks')
+
+    begin
+      f = File.open(File.join('/var/lib/one/sunstone_vmrc_tokens/', ticket.ticket.sanitize), 'w')
+      f.write("https://#{ticket.host}:#{ticket.port}")
+      f.close
+    rescue
+      return { error: "Cannot create VNC proxy token" }
+    end
+
+    return { ticket: ticket.ticket }
   end
 
   # Generates VNC proxy token file

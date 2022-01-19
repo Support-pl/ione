@@ -285,4 +285,12 @@ class IONe
   def SetVMResourcesLimits vmid, host, params
     PostDeployActivities.new(@client).LimitsController(params, vmid, onblock(:h, host))
   end
+
+  # Generates VMRC ticket for given VM
+  def StartVMRC vmid
+    r = onblock(:vm, vmid, @client).info!
+    raise "" if OpenNebula.is_error? r
+
+    onblock(:vm, vmid).start_vmrc
+  end
 end

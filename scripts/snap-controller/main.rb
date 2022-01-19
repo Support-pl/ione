@@ -10,7 +10,7 @@ begin
       while found do
         found = false
         vm_pool.each do | vm |
-          target_vms << vm if vm.got_snapshot?
+          target_vms << vm if vm.got_snapshots?
         end
         target_vms.each do | vm |
           active_state = IONe.new($client, $db).LCM_STATE(vm.id) == 3

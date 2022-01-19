@@ -58,9 +58,10 @@ require 'open3'
 #################
 
 begin
-  $ione_conf = YAML.load_file(ALPINE ? "/ione/sys/ione.conf" : "#{ETC_LOCATION}/ione.conf") # IONe configuration constants
+  conf_path = ALPINE ? "/ione/sys/ione.conf" : "#{ETC_LOCATION}/ione.conf"
+  $ione_conf = YAML.load_file(conf_path) # IONe configuration constants
 rescue => e
-  STDERR.puts "Error parsing config file #{ETC_LOCATION}/ione.conf: #{e.message}"
+  STDERR.puts "Error parsing config file #{conf_path}: #{e.message}"
   exit 1
 end
 

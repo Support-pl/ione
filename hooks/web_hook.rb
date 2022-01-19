@@ -18,28 +18,40 @@
 require 'net/http'
 require 'json'
 
+ALPINE = ENV["ALPINE"] == "true"
+
 hook, *args = ARGV
-hook = hook.split('/').last
 
 api = URI("http://ione:8009/")
+unless ALPINE then
+  api = URI("http://localhost:8009/")
+end
 req = Net::HTTP::Post.new(api + '/hooks/' + hook)
-# Reading credentials from ENV and using as #basic_auth(uname, passwd)
-req.basic_auth(*ENV['IONE_AUTH'].split(':'))
+if ALPINE then
+  # Reading credentials from ENV and using as #basic_auth(uname, passwd)
+  req.basic_auth(*ENV['IONE_AUTH'].split(':'))
+else
+  req.basic_auth(*File.read(File.expand_path("~oneadmin/.one/one_auth")).split(':'))
+end
 req.body = JSON.generate params: args
 
 r = Net::HTTP.start(api.hostname, api.port) do | http |
   http.request(req)
 end
-res = JSON.parse r.body
 
 case r.code.to_i
 when 400
+  res = JSON.parse r.body
   STDERR.puts res['error']
+  exit 1
+when 404
+  STDERR.puts "Hook not Found"
   exit 1
 when 403
   STDERR.puts "Forbidden"
   exit 1
 else
+  res = JSON.parse r.body
   STDOUT.puts res['stdout']
   STDERR.puts res['stderr']
   exit res['status']

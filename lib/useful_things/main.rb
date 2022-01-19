@@ -281,7 +281,6 @@ class IONe
   # Checks if resources hot add enabled
   # @param [Integer] vmid VM ID
   # @param [String] name VM name on vCenter node
-  # @note For correct work of this method, you must keep actual vCenter Password at VCENTER_PASSWORD_ACTUAL attribute in OpenNebula
   # @note Method searches VM by it's default name: one-(id)-(name), if target vm got another name, you should provide it
   # @return [Hash | String] Returns limits Hash if success or exception message if fails
   def get_vm_hotadd_conf(vmid, name = nil)

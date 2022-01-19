@@ -5,35 +5,35 @@ require 'opennebula'
     "NAME" => 'set-price',
     "TYPE" => 'api',
     "CALL" => 'one.vm.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/set_price.rb',
+    "COMMAND" => 'set_price.rb',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'check-balance-vm-allocate',
     "TYPE" => 'api',
     "CALL" => 'one.vm.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb vm',
+    "COMMAND" => 'check_balance.rb vm',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'check-balance-tmpl-instantiate',
     "TYPE" => 'api',
     "CALL" => 'one.template.instantiate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/check_balance.rb tmpl',
+    "COMMAND" => 'check_balance.rb tmpl',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'insert-zero-traffic-record-vm-allocate',
     "TYPE" => 'api',
     "CALL" => 'one.vm.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb vm',
+    "COMMAND" => 'insert_zero_traffic_record.rb vm',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'insert-zero-traffic-record-tmpl-instantiate',
     "TYPE" => 'api',
     "CALL" => 'one.template.instantiate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/insert_zero_traffic_record.rb tmpl',
+    "COMMAND" => 'insert_zero_traffic_record.rb tmpl',
     "ARGUMENTS" => '$API'
   },
   {
@@ -41,7 +41,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "PENDING",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE pnd",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -51,7 +51,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "HOLD",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE pnd",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -61,7 +61,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "ACTIVE",
     "LCM_STATE" => "BOOT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE on",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -71,7 +71,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "ACTIVE",
     "LCM_STATE" => "RUNNING",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE on",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -81,7 +81,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "STOPPED",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE off",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -91,7 +91,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "SUSPENDED",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE off",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -101,7 +101,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "DONE",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE off",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -111,7 +111,7 @@ require 'opennebula'
     "ON" => "CUSTOM",
     "STATE" => "POWEROFF",
     "LCM_STATE" => "LCM_INIT",
-    "COMMAND" => "/usr/lib/one/ione/hooks/record.rb",
+    "COMMAND" => "record.rb",
     "ARGUMENTS" => "\$TEMPLATE off",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -119,7 +119,7 @@ require 'opennebula'
   {
     "NAME" => 'set-limits',
     "ON" => "RUNNING",
-    "COMMAND" => "/usr/lib/one/ione/hooks/vcenter/set_limits.rb",
+    "COMMAND" => "vcenter_set_limits.rb",
     "ARGUMENTS" => "$TEMPLATE",
     "TYPE" => "state",
     "RESOURCE" => "VM"
@@ -130,7 +130,7 @@ require 'opennebula'
     "STATE" => "ACTIVE",
     "LCM_STATE" => "RUNNING",
     "ARGUMENTS" => "$TEMPLATE",
-    "COMMAND" => "/usr/lib/one/ione/hooks/vcenter/check_running_state.rb",
+    "COMMAND" => "vcenter_check_running_state.rb",
     "TYPE" => "state",
     "RESOURCE" => "VM"
   },
@@ -138,42 +138,42 @@ require 'opennebula'
     "NAME" => 'user-create-networking-setup',
     "TYPE" => 'api',
     "CALL" => 'one.user.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/user_create_networking_setup.rb',
+    "COMMAND" => 'user_create_networking_setup.rb',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'user-post-delete-clean-up',
     "TYPE" => 'api',
     "CALL" => 'one.user.delete',
-    "COMMAND" => '/usr/lib/one/ione/hooks/user_post_delete_clean_up.rb',
+    "COMMAND" => 'user_post_delete_clean_up.rb',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'vn-record-crt',
     "TYPE" => 'api',
     "CALL" => 'one.vn.allocate',
-    "COMMAND" => '/usr/lib/one/ione/hooks/vn_record.rb',
+    "COMMAND" => 'vn_record.rb',
     "ARGUMENTS" => '$API crt'
   },
   {
     "NAME" => 'vn-record-del',
     "TYPE" => 'api',
     "CALL" => 'one.vn.delete',
-    "COMMAND" => '/usr/lib/one/ione/hooks/vn_record.rb',
+    "COMMAND" => 'vn_record.rb',
     "ARGUMENTS" => '$API del'
   },
   {
     "NAME" => 'disk-attach-record',
     "TYPE" => 'api',
     "CALL" => 'one.vm.attach',
-    "COMMAND" => '/usr/lib/one/ione/hooks/disk_record_crt.rb',
+    "COMMAND" => 'disk_record_crt.rb',
     "ARGUMENTS" => '$API'
   },
   {
     "NAME" => 'disk-detach-record',
     "TYPE" => 'api',
     "CALL" => 'one.vm.detach',
-    "COMMAND" => '/usr/lib/one/ione/hooks/disk_record_del.rb',
+    "COMMAND" => 'disk_record_del.rb',
     "ARGUMENTS" => '$API'
   }
 ]
@@ -186,6 +186,9 @@ task :hooks do
     puts 'Copying hooks scripts'
     cp_r "hooks", "/usr/lib/one/ione/"
     chmod_R "+x", "/usr/lib/one/ione/hooks/"
+
+    cp "hooks/web_hook.rb", "/var/lib/one/remotes/hooks/web_hook.rb"
+    chmod "+x", "/var/lib/one/remotes/hooks/web_hook.rb"
   end
 
   begin
@@ -201,22 +204,15 @@ task :hooks do
       end
     end
   end
-  require '/usr/lib/one/ione/lib/std++/main.rb'
 
-  puts 'Adding hooks to HookPool'
-  for hook in @hooks do
-    rc = OpenNebula::Hook.new_with_id(0, OpenNebula::Client.new).allocate(hook.to_one_template)
-    if OpenNebula.is_error? rc then
-      puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- X".red
-    else
-      puts "#{hook['NAME']}#{' ' * (48 - hook['NAME'].size)}--- V".green
-    end
-  end
+  ENV["ONE_CREDENTIALS"] = OpenNebula::Client.new.one_auth
+  ENV["ONE_ENDPOINT"] = OpenNebula::Client.new.one_endpoint
+  ENV["IONE_LOCATION"] = "/usr/lib/one/ione"
+  Rake::Task["hooks_tp"].invoke
 end
 
 desc "Setting needed hooks in Container environment"
 task :hooks_tp do
-
   client = OpenNebula::Client.new(ENV["ONE_CREDENTIALS"], ENV["ONE_ENDPOINT"])
 
   user = OpenNebula::User.new_with_id(-1, client)
