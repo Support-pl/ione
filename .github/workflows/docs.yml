@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.96.0
+        uses: ruby/setup-ruby@v1.97.0
         with:
           ruby-version: 2.5
 
