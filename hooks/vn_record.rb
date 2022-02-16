@@ -51,6 +51,6 @@ class AR < Sequel::Model(:ars); end
 AR.create do | r |
   r.vnid  = vnet.id
   r.arid  = ARGV.last == 'crt' ? 0 : -1
-  r.stime  = Time.now.to_i
-  r.state = ARGV.last
+  r.stime = Time.now.to_i
+  r.owner = vnet['//UID'].to_i
 end
