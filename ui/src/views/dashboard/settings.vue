@@ -88,7 +88,19 @@
 					:data-source="settings"
 					rowKey="name"
 					:scroll="{ x: true }"
+					:pagination="{pageSize: itemsPerPage}"
 				>
+					<span slot="footer">
+						<a-row type="flex" justify="end">
+							<a-col>
+								per page: <a-select v-model="itemsPerPage">
+									<a-select-option v-for="step in itemsPerPageSteps" :key="step" :value="step">
+										{{step}}
+									</a-select-option>
+								</a-select>
+							</a-col>
+						</a-row>
+					</span>
 					<span slot="access_level" slot-scope="access_level">
 						<a-tag :color="access_level == 0 ? 'red' : 'blue'">{{
 							access_level == 0 ? "User" : "Admin"
@@ -228,6 +240,8 @@ export default {
 			possibleAccesslevels,
 
 			deletingFieldNameSecurity: '',
+			itemsPerPage: 25,
+			itemsPerPageSteps: [10, 25, 50, 100]
     };
   },
   async mounted() {
