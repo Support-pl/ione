@@ -240,8 +240,8 @@ rpc_log_file = "#{LOG_ROOT}/rpc.log"
 RPC_LOGGER = Logger.new(rpc_log_file)
 
 puts 'Pre-init job ended, starting up server'
-RPC_LOGGER.debug "Preparing to start up server"
-RPC_LOGGER.debug "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && MAIN_IONE(#{MAIN_IONE}) => #{!defined?(DEBUG_LIB) && MAIN_IONE}"
+RPC_LOGGER.info "Preparing to start up server"
+RPC_LOGGER.info "Condition is !defined?(DEBUG_LIB)(#{!defined?(DEBUG_LIB)}) && MAIN_IONE(#{MAIN_IONE}) => #{!defined?(DEBUG_LIB) && MAIN_IONE}"
 
 #
 # IONe API based on http
@@ -280,10 +280,10 @@ before do
     if OpenNebula.is_error?(rc)
       halt 401, { 'Allow' => "*" }, "False Credentials given"
     end
-    RPC_LOGGER.debug "Authorized #{@one_user.name} as #{@one_user.admin? ? "" : "NOT "}Admin"
+    RPC_LOGGER.info "Authorized #{@one_user.name} as #{@one_user.admin? ? "" : "NOT "}Admin"
   rescue => e
-    RPC_LOGGER.debug "Exception #{e.message}"
-    RPC_LOGGER.debug "Backtrace #{e.backtrace.inspect}"
+    RPC_LOGGER.info "Exception #{e.message}"
+    RPC_LOGGER.info "Backtrace #{e.backtrace.inspect}"
     halt 200, { 'Content-Type' => 'application/json', 'Allow' => "*" }, { response: e.message }.to_json
   end
 end
@@ -321,7 +321,7 @@ end
 # @see IONe#Test
 post '/ione/:method' do | method |
   begin
-    RPC_LOGGER.debug "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    RPC_LOGGER.info "IONeAPI calls proxy method #{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
     r = IONe.new(@client, $db).send(method, *@request_hash['params'])
   rescue => e
     r = e.message
@@ -330,8 +330,8 @@ post '/ione/:method' do | method |
     r = { error: r.message } if OpenNebula.is_error? r
   end
   err = defined?(backtrace) && !backtrace.nil?
-  RPC_LOGGER.debug "IONeAPI sends response #{err ? r.inspect : inspct(r)}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
+  RPC_LOGGER.info "IONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.info "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
@@ -351,7 +351,7 @@ puts "Registering ONe methods"
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
   begin
-    RPC_LOGGER.debug "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    RPC_LOGGER.info "ONeAPI calls proxy object method one.#{object}.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
     r = onblock(object.to_sym, @request_hash['oid'], @client).send(method.to_s << excl.to_s, *@request_hash['params'])
   rescue => e
     r = e.message
@@ -360,8 +360,8 @@ post %r{/one\.(\w+)\.(\w+)(\!|\=)?} do | object, method, excl |
     r = { error: r.message } if OpenNebula.is_error? r
   end
   err = defined?(backtrace) && !backtrace.nil?
-  RPC_LOGGER.debug "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
+  RPC_LOGGER.info "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.info "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
@@ -381,7 +381,7 @@ puts "Registering ONe Pool methods"
 # @see ONeHelper#onblock-instance_method
 post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
   begin
-    RPC_LOGGER.debug "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
+    RPC_LOGGER.info "ONeAPI calls proxy pool method one.#{object}.pool.#{method}(#{@request_hash['params'].collect { |p| p.inspect }.join(", ")})"
     r =
       (
         @request_hash['uid'].nil? ?
@@ -395,8 +395,8 @@ post %r{/one\.(\w+)\.pool\.(\w+)(\!|\=)?} do | object, method, excl |
     r = { error: r.message } if OpenNebula.is_error? r
   end
   err = defined?(backtrace) && !backtrace.nil?
-  RPC_LOGGER.debug "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
-  RPC_LOGGER.debug "Backtrace #{backtrace.inspect}" if err
+  RPC_LOGGER.info "ONeAPI sends response #{err ? r.inspect : inspct(r)}"
+  RPC_LOGGER.info "Backtrace #{backtrace.inspect}" if err
   json response: r
 end
 
@@ -410,4 +410,4 @@ Dir["#{ROOT}/routes/*.rb"].each do |file|
 end
 
 puts 'Enpoints are registered, starting up done'
-RPC_LOGGER.debug "Endpoints are registered, starting up done"
+RPC_LOGGER.info "Endpoints are registered, starting up done"
