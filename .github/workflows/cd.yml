@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.4.0
-      - uses: actions/setup-node@v2.5.1
+      - uses: actions/setup-node@v3.0.0
       
       - name: Dependencies
         run: npm install
@@ -30,7 +30,7 @@ jobs:
         run: npm run build
 
       - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.1
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.2
         with:
           username: ${{ secrets.SFTP_USER }}
           server: ${{ secrets.SFTP_HOST }}
