@@ -9,4 +9,4 @@ RUN bundle install
 
 EXPOSE 8009
 
-ENTRYPOINT ["bundle", "exec", "rackup", "-o", "0.0.0.0", "-p", "8009"]
+ENTRYPOINT ["bundle", "exec", "rackup", "-o", "127.0.0.1", "-p", "8009"]
