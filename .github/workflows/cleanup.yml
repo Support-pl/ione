@@ -8,7 +8,7 @@ on:
       images:
         description: 'comma-separated Images Names list'
         required: true
-        default: support-pl/ione, support-pl/ione-admin
+        default: ione, ione-admin
 
 jobs:
   clean-ghcr:
