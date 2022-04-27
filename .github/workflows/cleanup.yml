@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
   workflow_dispatch:
-    inputs:
-      images:
-        description: 'comma-separated Images Names list'
-        required: true
-        default: ione, ione-admin
 
 jobs:
   clean-ghcr:
@@ -18,7 +13,7 @@ jobs:
       - name: Untagged Images (> 1 day)
         uses: snok/container-retention-policy@v1
         with:
-          image-names: ${{ github.event.inputs.images }}
+          image-names: ione, ione-admin
           cut-off: A day ago UTC
           account-type: org
           org-name: support-pl
@@ -28,7 +23,7 @@ jobs:
       - name: Dev Images (> 2 weeks)
         uses: snok/container-retention-policy@v1
         with:
-          image-names: ${{ github.event.inputs.images }}
+          image-names: ione, ione-admin
           cut-off: 2 weeks ago UTC
           account-type: org
           org-name: support-pl
