@@ -2,8 +2,8 @@ FROM node:16 AS builder
 ADD . /app
 WORKDIR /app
 
-RUN npm install
-RUN npm run build
+RUN yarn
+RUN yarn build
 
 # final
 FROM alpine:3.13.2
