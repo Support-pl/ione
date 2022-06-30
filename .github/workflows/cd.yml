@@ -30,7 +30,7 @@ jobs:
         run: npm run build
 
       - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.2
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.3
         with:
           username: ${{ secrets.SFTP_USER }}
           server: ${{ secrets.SFTP_HOST }}
