@@ -63,10 +63,8 @@ def vn_pool id
   $db[:network_pool].select(:oid).where(uid: id).to_a
 end
 
-until pool(id) == []
-  pool(id).each do | vm |
+pool(id).each do | vm |
     VirtualMachine.new_with_id(vm[:oid], client).terminate(true)
-  end
 end
 
 vn_pool(id).each do | vnet |
