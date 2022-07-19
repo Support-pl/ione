@@ -54,6 +54,8 @@ unless user.groups.include? IONe::Settings['IAAS_GROUP_ID'] then
   puts "Not IaaS User, skipping..."
   exit 0
 end
+  
+sleep 30
 
 def pool id
   $db[:vm_pool].select(:oid).where(uid: id).exclude(state: 6).to_a
