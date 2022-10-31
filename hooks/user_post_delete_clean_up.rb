@@ -64,7 +64,8 @@ def vn_pool id
 end
 
 pool(id).each do | vm |
-    VirtualMachine.new_with_id(vm[:oid], client).terminate(true)
+  sleep 15
+  VirtualMachine.new_with_id(vm[:oid], client).terminate(true)
 end
 
 vn_pool(id).each do | vnet |
