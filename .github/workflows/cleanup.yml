@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Untagged Images (> 1 day)
-        uses: snok/container-retention-policy@v1
+        uses: snok/container-retention-policy@v2
         with:
           image-names: ione, ione-admin
           cut-off: A day ago UTC
@@ -21,7 +21,7 @@ jobs:
           token: ${{ secrets.PACKAGES_PAT }}
 
       - name: Dev Images (> 2 weeks)
-        uses: snok/container-retention-policy@v1
+        uses: snok/container-retention-policy@v2
         with:
           image-names: ione, ione-admin
           cut-off: 2 weeks ago UTC
