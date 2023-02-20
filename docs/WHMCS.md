@@ -22,4 +22,4 @@ For more information check our [Virtual Datacenter Module for OpenNebula](https:
 
 ## Installation
 
-Installation guide [here](https://docs.ione-cloud.net/file.WHMCS_module_installation.html).
+Installation guide [here](https://support-pl.github.io/ione/file.WHMCS_module_installation.html).
