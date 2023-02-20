@@ -9,6 +9,16 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -31,12 +41,14 @@ jobs:
 
       - name: Generating Docs
         run: yard --yardopts docs/.yardopts --plugin yard-sinatra 
-
-      - name: Deploy docs via FTP
-        uses: sebastianpopp/ftp-action@releases/v2
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          host: ${{ secrets.DOCS_FTP_DESTINATION }}
-          user: ${{ secrets.DOCS_FTP_USER }}
-          password: ${{ secrets.DOCS_FTP_PASSWORD }}
-          localDir: "doc"
-          remoteDir: "/"
+          # Upload entire repository
+          path: 'doc'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
