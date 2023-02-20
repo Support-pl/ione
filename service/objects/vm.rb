@@ -194,7 +194,7 @@ class OpenNebula::VirtualMachine
     info!
     h = Host.new_with_id(host.first, @client)
 
-    @vim_vm = RbVmomi::VIM::VirtualMachine.new(h.vim, deploy_id)
+    @vim_vm = RbVmomi::VIM::VirtualMachine.new(h.vim, deploy_id.split('_').first)
   end
 
   # Returns host id and name, where VM has been deployed
