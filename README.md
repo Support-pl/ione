@@ -21,6 +21,11 @@ Creators:
 [Support.pl](https://support.pl)
 [slnt_opp](https://slnt-opp.xyz)
 
+### Migration to NoCloud / Deprecation Notice
+> IONe wasn't getting many updates recently, this is due to our work on [NoCloud](https://github.com/slntopp/nocloud), which does everything IONe does and much more.  
+And ofcourse, [NoCloud](https://github.com/slntopp/nocloud) is easy to migrate to from IONe.  
+[Check it out!](https://github.com/slntopp/nocloud)
+
 ## Table of Contents
 
 - [System requirements](#system-requirements)
